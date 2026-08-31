@@ -1,6 +1,6 @@
 import { computed, reactive, ref } from 'vue';
-import { useRoute } from 'vue-router';
 import { defineStore } from 'pinia';
+import { router } from '@/router';
 import { useLoading } from '@sa/hooks';
 import { fetchGetUserInfo, fetchLogin } from '@/service/api';
 import { useRouterPush } from '@/hooks/common/router';
@@ -12,7 +12,6 @@ import { useTabStore } from '../tab';
 import { clearAuthStorage, getToken } from './shared';
 
 export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
-  const route = useRoute();
   const authStore = useAuthStore();
   const routeStore = useRouteStore();
   const tabStore = useTabStore();
@@ -46,12 +45,15 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
     authStore.$reset();
 
-    if (!route.meta.constant) {
+    tabStore.cacheTabs();
+
+    // reset route store (remove auth routes) before navigating to login,
+    // so the route re-registration won't interfere with the navigation
+    await routeStore.resetStore();
+
+    if (!router.currentRoute.value.meta.constant) {
       await toLogin();
     }
-
-    tabStore.cacheTabs();
-    routeStore.resetStore();
   }
 
   /** Record the user ID of the previous login session Used to compare with the current user ID on next login */

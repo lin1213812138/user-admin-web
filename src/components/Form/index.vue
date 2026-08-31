@@ -43,7 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
 const formRef = ref<FormInst | null>(null);
 
 const mergedRules = computed<FormRules>(() => {
-  const base: FormRules = { ...(props.rules || {}) };
+  const base: FormRules = { ...props.rules };
   if (props.items) {
     for (const item of props.items) {
       if (item.required && !base[item.key]) {
