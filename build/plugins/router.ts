@@ -26,6 +26,19 @@ export function setupElegantRouter() {
 
       const constantRoutes: RouteKey[] = ['login', '403', '404', '500'];
 
+      /** menu icon of the route */
+      const routeIcons: Partial<Record<RouteKey, string>> = {
+        'system-manage': 'ic:baseline-settings',
+        'system-manage_role': 'ic:round-supervisor-account',
+        'system-manage_user': 'ic:round-person'
+      };
+
+      /** menu order of the route, the smaller the value, the higher the order */
+      const routeOrders: Partial<Record<RouteKey, number>> = {
+        'system-manage_role': 1,
+        'system-manage_user': 2
+      };
+
       const meta: Partial<RouteMeta> = {
         title: key,
         i18nKey: `route.${key}` as App.I18n.I18nKey
@@ -33,6 +46,14 @@ export function setupElegantRouter() {
 
       if (constantRoutes.includes(key)) {
         meta.constant = true;
+      }
+
+      if (routeIcons[key]) {
+        meta.icon = routeIcons[key];
+      }
+
+      if (routeOrders[key] !== undefined) {
+        meta.order = routeOrders[key];
       }
 
       return meta;

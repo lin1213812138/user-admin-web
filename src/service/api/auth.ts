@@ -1,40 +1,34 @@
 import { request } from '../request';
+import { md5 } from '@/utils/crypto';
 
 /**
- * Login
+ * Login (wms-user backend)
  *
- * @param userName User name
- * @param password Password
+ * Request body: `{ account, password }`, where `password = MD5(MD5(plain) + plain)`.
+ * Response: `{ user }` (no token; the session is kept via an httpOnly cookie, so the
+ * request instance must be created with `withCredentials: true`).
+ *
+ * @param userName User account
+ * @param password Plain text password
  */
 export function fetchLogin(userName: string, password: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/auth/login',
+  return request<Api.Auth.LoginResult>({
+    url: '/api/v1/user/login',
     method: 'post',
     data: {
-      userName,
-      password
+      account: userName,
+      password: md5(md5(password) + password)
     }
   });
-}
-
-/** Get user info */
-export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({ url: '/auth/getUserInfo' });
 }
 
 /**
- * Refresh token
+ * Get current user info from the session (wms-user: `/user/session/get`)
  *
- * @param refreshToken Refresh token
+ * The backend registers this route as POST only; a GET is answered with 404.
  */
-export function fetchRefreshToken(refreshToken: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/auth/refreshToken',
-    method: 'post',
-    data: {
-      refreshToken
-    }
-  });
+export function fetchGetUserInfo() {
+  return request<Api.Auth.SessionUser>({ url: '/api/v1/user/session/get', method: 'post' });
 }
 
 /**

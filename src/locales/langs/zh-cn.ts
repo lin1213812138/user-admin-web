@@ -16,6 +16,7 @@ const local: App.I18n.Schema = {
     close: '关闭',
     check: '勾选',
     selectAll: '全选',
+    unselectAll: '取消全选',
     expandColumn: '展开列',
     columnSetting: '列设置',
     config: '配置',
@@ -243,7 +244,8 @@ const local: App.I18n.Schema = {
     'iframe-page': '外链页面',
     home: '首页',
     'system-manage': '系统管理',
-    'system-manage_user': '用户管理'
+    'system-manage_user': '用户管理',
+    'system-manage_role': '角色管理'
   },
   page: {
     login: {
@@ -306,6 +308,23 @@ const local: App.I18n.Schema = {
           userPhonePlaceholder: '请输入手机号',
           userEmailPlaceholder: '请输入邮箱'
         }
+      },
+      role: {
+        roleName: '角色名称',
+        roleCode: '角色标识',
+        remark: '角色描述',
+        sort: '排序',
+        status: '状态',
+        createTime: '创建时间',
+        permission: '分配权限',
+        permissionTip: '勾选该角色可访问的菜单',
+        form: {
+          roleNamePlaceholder: '请输入角色名称',
+          roleCodePlaceholder: '请输入角色标识',
+          sortPlaceholder: '请输入排序值',
+          statusPlaceholder: '请选择状态',
+          remarkPlaceholder: '请输入角色描述'
+        }
       }
     },
     home: {
@@ -350,7 +369,7 @@ const local: App.I18n.Schema = {
     },
     pwd: {
       required: '请输入密码',
-      invalid: '密码格式不正确，6-18位字符，包含字母、数字、下划线'
+      invalid: '密码格式不正确，3-18位字符，包含字母、数字、下划线'
     },
     confirmPwd: {
       required: '请输入确认密码',

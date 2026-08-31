@@ -328,6 +328,7 @@ declare namespace App {
         close: string;
         check: string;
         selectAll: string;
+        unselectAll: string;
         expandColumn: string;
         columnSetting: string;
         config: string;
@@ -584,6 +585,23 @@ declare namespace App {
               nickNamePlaceholder: string;
               userPhonePlaceholder: string;
               userEmailPlaceholder: string;
+            };
+          };
+          role: {
+            roleName: string;
+            roleCode: string;
+            remark: string;
+            sort: string;
+            status: string;
+            createTime: string;
+            permission: string;
+            permissionTip: string;
+            form: {
+              roleNamePlaceholder: string;
+              roleCodePlaceholder: string;
+              sortPlaceholder: string;
+              statusPlaceholder: string;
+              remarkPlaceholder: string;
             };
           };
         };

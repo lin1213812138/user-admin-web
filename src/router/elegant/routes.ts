@@ -85,12 +85,25 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'system-manage_role',
+        path: '/system-manage/role',
+        component: 'view.system-manage_role',
+        meta: {
+          title: 'system-manage_role',
+          i18nKey: 'route.system-manage_role',
+          icon: 'ic:round-supervisor-account',
+          order: 1
+        }
+      },
+      {
         name: 'system-manage_user',
         path: '/system-manage/user',
         component: 'view.system-manage_user',
         meta: {
           title: 'system-manage_user',
-          i18nKey: 'route.system-manage_user'
+          i18nKey: 'route.system-manage_user',
+          icon: 'ic:round-person',
+          order: 2
         }
       }
     ]

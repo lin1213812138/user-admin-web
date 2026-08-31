@@ -21,6 +21,8 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   const token = ref('');
 
   const userInfo: Api.Auth.UserInfo = reactive({
+    _id: '',
+    account: '',
     userId: '',
     userName: '',
     roles: [],
@@ -91,6 +93,25 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     return false;
   }
 
+  /** Map a wms-user detail object into the normalized userInfo and persist the session */
+  function applyUser(user: Api.Auth.UserDetail) {
+    // preserve every field returned by the backend (status / warehouse / role ids / dates ...)
+    Object.assign(userInfo, user);
+
+    const authKeys = Object.keys(user.authMap || {});
+
+    userInfo.userId = String(user['_id'] ?? '');
+    userInfo.userName = user.name || user.account || user.originAccount || '';
+    userInfo.roles = authKeys;
+    userInfo.buttons = authKeys.concat((user.showOps || []).filter(item => typeof item === 'string') as string[]);
+
+    // wms-user keeps the real session in an httpOnly cookie; we only persist a local
+    // marker (the user id) so the route guard / `isLogin` keep working across reloads.
+    token.value = userInfo.userId;
+    localStg.set('token', token.value);
+    localStg.set('userInfo', userInfo);
+  }
+
   /**
    * Login
    *
@@ -101,28 +122,26 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   async function login(userName: string, password: string, redirect = true) {
     startLoading();
 
-    const { data: loginToken, error } = await fetchLogin(userName, password);
+    const { data, error } = await fetchLogin(userName, password);
 
-    if (!error) {
-      const pass = await loginByToken(loginToken);
+    if (!error && data?.user) {
+      applyUser(data.user);
 
-      if (pass) {
-        // Check if the tab needs to be cleared
-        const isClear = checkTabClear();
-        let needRedirect = redirect;
+      // Check if the tab needs to be cleared
+      const isClear = checkTabClear();
+      let needRedirect = redirect;
 
-        if (isClear) {
-          // If the tab needs to be cleared,it means we don't need to redirect.
-          needRedirect = false;
-        }
-        await redirectFromLogin(needRedirect);
-
-        window.$notification?.success({
-          title: $t('page.login.common.loginSuccess'),
-          content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
-          duration: 4500
-        });
+      if (isClear) {
+        // If the tab needs to be cleared,it means we don't need to redirect.
+        needRedirect = false;
       }
+      await redirectFromLogin(needRedirect);
+
+      window.$notification?.success({
+        title: $t('page.login.common.loginSuccess'),
+        content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
+        duration: 4500
+      });
     } else {
       resetStore();
     }
@@ -130,29 +149,13 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     endLoading();
   }
 
-  async function loginByToken(loginToken: Api.Auth.LoginToken) {
-    // 1. stored in the localStorage, the later requests need it in headers
-    localStg.set('token', loginToken.token);
-    localStg.set('refreshToken', loginToken.refreshToken);
-
-    // 2. get user info
-    const pass = await getUserInfo();
-
-    if (pass) {
-      token.value = loginToken.token;
-
-      return true;
-    }
-
-    return false;
-  }
-
+  /** Fetch current user info from the session and apply it */
   async function getUserInfo() {
-    const { data: info, error } = await fetchGetUserInfo();
+    const { data, error } = await fetchGetUserInfo();
 
-    if (!error) {
+    if (!error && data) {
       // update store
-      Object.assign(userInfo, info);
+      applyUser(data);
 
       return true;
     }
@@ -160,16 +163,26 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     return false;
   }
 
+  /** Init user info after page reload (validates the cookie session) */
   async function initUserInfo() {
     const maybeToken = getToken();
 
-    if (maybeToken) {
-      token.value = maybeToken;
-      const pass = await getUserInfo();
+    if (!maybeToken) {
+      return;
+    }
 
-      if (!pass) {
-        resetStore();
-      }
+    token.value = maybeToken;
+
+    // restore cached userInfo for an instant UI, then refresh it from the session
+    const cached = localStg.get('userInfo') as Api.Auth.UserInfo | null;
+    if (cached) {
+      Object.assign(userInfo, cached);
+    }
+
+    const pass = await getUserInfo();
+
+    if (!pass) {
+      resetStore();
     }
   }
 

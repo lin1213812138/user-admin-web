@@ -41,5 +41,65 @@ declare namespace Api {
     type UserUpdateParams = UserCreateParams & {
       id: number;
     };
+
+    /** role */
+    interface Role {
+      id: number;
+      /** role name */
+      roleName: string;
+      /** role code */
+      roleCode: string;
+      /** role remark */
+      remark: string;
+      /** role sort */
+      sort: number;
+      /** role status */
+      status: Api.Common.EnableStatus;
+      createTime: string;
+    }
+
+    /** role list */
+    type RoleList = Api.Common.PaginatingQueryRecord<Role>;
+
+    /** role search params */
+    type RoleSearchParams = Api.Common.CommonSearchParams & {
+      roleName?: string;
+      roleCode?: string;
+      status?: Api.Common.EnableStatus | null;
+    };
+
+    /** role create params */
+    type RoleCreateParams = {
+      roleName: string;
+      roleCode: string;
+      remark: string;
+      sort: number;
+      status: Api.Common.EnableStatus;
+    };
+
+    /** role update params */
+    type RoleUpdateParams = RoleCreateParams & {
+      id: number;
+    };
+
+    /** menu node of role permission tree */
+    interface RoleMenuNode {
+      id: number;
+      /** menu title */
+      title: string;
+      children?: RoleMenuNode[];
+    }
+
+    /** role permission tree, contains all menus and the checked menus of the role */
+    type RoleMenuTree = {
+      menus: RoleMenuNode[];
+      checkedMenuIds: number[];
+    };
+
+    /** role assign menu params */
+    type RoleAssignMenuParams = {
+      roleId: number;
+      menuIds: number[];
+    };
   }
 }

@@ -16,6 +16,7 @@ const local: App.I18n.Schema = {
     close: 'Close',
     check: 'Check',
     selectAll: 'Select All',
+    unselectAll: 'Unselect All',
     expandColumn: 'Expand Column',
     columnSetting: 'Column Setting',
     config: 'Config',
@@ -247,7 +248,8 @@ const local: App.I18n.Schema = {
     'iframe-page': 'Iframe',
     home: 'Home',
     'system-manage': 'System Management',
-    'system-manage_user': 'User Management'
+    'system-manage_user': 'User Management',
+    'system-manage_role': 'Role Management'
   },
   page: {
     login: {
@@ -310,6 +312,23 @@ const local: App.I18n.Schema = {
           userPhonePlaceholder: 'Please enter phone',
           userEmailPlaceholder: 'Please enter email'
         }
+      },
+      role: {
+        roleName: 'Role Name',
+        roleCode: 'Role Code',
+        remark: 'Description',
+        sort: 'Sort',
+        status: 'Status',
+        createTime: 'Create Time',
+        permission: 'Assign Permission',
+        permissionTip: 'Check the menus that the role can access',
+        form: {
+          roleNamePlaceholder: 'Please enter role name',
+          roleCodePlaceholder: 'Please enter role code',
+          sortPlaceholder: 'Please enter sort value',
+          statusPlaceholder: 'Please select status',
+          remarkPlaceholder: 'Please enter role description'
+        }
       }
     },
     home: {
@@ -354,7 +373,7 @@ const local: App.I18n.Schema = {
     },
     pwd: {
       required: 'Please enter password',
-      invalid: '6-18 characters, including letters, numbers, and underscores'
+      invalid: '3-18 characters, including letters, numbers, and underscores'
     },
     confirmPwd: {
       required: 'Please enter password again',

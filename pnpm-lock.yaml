@@ -41,6 +41,9 @@ importers:
       clipboard:
         specifier: 2.0.11
         version: 2.0.11
+      crypto-js:
+        specifier: 4.2.0
+        version: 4.2.0
       dayjs:
         specifier: 1.11.20
         version: 1.11.20
@@ -108,6 +111,9 @@ importers:
       '@tauri-apps/cli':
         specifier: '2'
         version: 2.11.1
+      '@types/crypto-js':
+        specifier: 4.2.2
+        version: 4.2.2
       '@types/node':
         specifier: 25.7.0
         version: 25.7.0
