@@ -54,11 +54,43 @@ const model = reactive<Api.SystemManage.UserCreateParams>({
 });
 
 const formItems = computed<FormItemConfig[]>(() => [
-  { key: 'userName', label: $t('page.manage.user.userName'), type: 'input', required: true, span: 24, placeholder: $t('page.manage.user.form.userNamePlaceholder') },
-  { key: 'nickName', label: $t('page.manage.user.nickName'), type: 'input', span: 24, placeholder: $t('page.manage.user.form.nickNamePlaceholder') },
-  { key: 'userPhone', label: $t('page.manage.user.userPhone'), type: 'input', span: 24, placeholder: $t('page.manage.user.form.userPhonePlaceholder') },
-  { key: 'userEmail', label: $t('page.manage.user.userEmail'), type: 'input', span: 24, placeholder: $t('page.manage.user.form.userEmailPlaceholder') },
-  { key: 'status', label: $t('page.manage.user.status'), type: 'switch', span: 24, checkedText: $t('common.enable'), uncheckedText: $t('common.disable') }
+  {
+    key: 'userName',
+    label: $t('page.manage.user.userName'),
+    type: 'input',
+    required: true,
+    span: 24,
+    placeholder: $t('page.manage.user.form.userNamePlaceholder')
+  },
+  {
+    key: 'nickName',
+    label: $t('page.manage.user.nickName'),
+    type: 'input',
+    span: 24,
+    placeholder: $t('page.manage.user.form.nickNamePlaceholder')
+  },
+  {
+    key: 'userPhone',
+    label: $t('page.manage.user.userPhone'),
+    type: 'input',
+    span: 24,
+    placeholder: $t('page.manage.user.form.userPhonePlaceholder')
+  },
+  {
+    key: 'userEmail',
+    label: $t('page.manage.user.userEmail'),
+    type: 'input',
+    span: 24,
+    placeholder: $t('page.manage.user.form.userEmailPlaceholder')
+  },
+  {
+    key: 'status',
+    label: $t('page.manage.user.status'),
+    type: 'switch',
+    span: 24,
+    checkedText: $t('common.enable'),
+    uncheckedText: $t('common.disable')
+  }
 ]);
 
 function fillFormByRow() {

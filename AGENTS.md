@@ -15,20 +15,20 @@
 
 ### 技术栈
 
-| 领域 | 选型 | 版本 |
-| --- | --- | --- |
-| 框架 | Vue 3（`<script setup>` + TS） | 3.5 |
-| 构建 | Vite | 8 |
-| 语言 | TypeScript（严格模式） | 6 |
-| 状态管理 | Pinia（**Setup Store 写法**） | 3 |
-| 路由 | vue-router + **elegant-router（自动生成）** | 5 / 0.3.8 |
-| UI 组件 | Naive UI | 2.44 |
-| 表格 | vxe-table + vxe-pc-ui | 4.5 |
-| 样式 | UnoCSS（presetWind3 + presetSoybeanAdmin）+ SCSS | 66 |
-| 请求 | Axios（封装在 `@sa/axios`） | - |
-| 国际化 | vue-i18n | 11 |
-| 包管理 | **pnpm workspace monorepo** | ≥10.5 |
-| 桌面端 | Tauri（`src-tauri/`，Rust） | 2 |
+| 领域     | 选型                                             | 版本      |
+| -------- | ------------------------------------------------ | --------- |
+| 框架     | Vue 3（`<script setup>` + TS）                   | 3.5       |
+| 构建     | Vite                                             | 8         |
+| 语言     | TypeScript（严格模式）                           | 6         |
+| 状态管理 | Pinia（**Setup Store 写法**）                    | 3         |
+| 路由     | vue-router + **elegant-router（自动生成）**      | 5 / 0.3.8 |
+| UI 组件  | Naive UI                                         | 2.44      |
+| 表格     | vxe-table + vxe-pc-ui                            | 4.5       |
+| 样式     | UnoCSS（presetWind3 + presetSoybeanAdmin）+ SCSS | 66        |
+| 请求     | Axios（封装在 `@sa/axios`）                      | -         |
+| 国际化   | vue-i18n                                         | 11        |
+| 包管理   | **pnpm workspace monorepo**                      | ≥10.5     |
+| 桌面端   | Tauri（`src-tauri/`，Rust）                      | 2         |
 
 ### 环境要求
 
@@ -153,9 +153,9 @@ user-admin-web/
 
 ### 路径别名
 
-| 别名 | 指向 |
-| --- | --- |
-| `@/*` | `./src/*` |
+| 别名  | 指向       |
+| ----- | ---------- |
+| `@/*` | `./src/*`  |
 | `~/*` | 项目根目录 |
 
 ---
@@ -178,12 +178,12 @@ user-admin-web/
 
 #### 文件 → 路由映射
 
-| views 中的文件 | 生成的 name / path |
-| --- | --- |
-| `views/home/index.vue` | `home` / `/home`（单层路由，component 为 `layout.base$view.home`） |
-| `views/system-manage/user/index.vue` | `system-manage_user` / `/system-manage/user` |
-| `views/_builtin/403/index.vue` | `403` / `/403`（`_builtin` 前缀被剥离） |
-| `views/_builtin/iframe-page/[url].vue` | `iframe-page` / `/iframe-page/:url`（`[param]` 为动态段） |
+| views 中的文件                         | 生成的 name / path                                                 |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| `views/home/index.vue`                 | `home` / `/home`（单层路由，component 为 `layout.base$view.home`） |
+| `views/system-manage/user/index.vue`   | `system-manage_user` / `/system-manage/user`                       |
+| `views/_builtin/403/index.vue`         | `403` / `/403`（`_builtin` 前缀被剥离）                            |
+| `views/_builtin/iframe-page/[url].vue` | `iframe-page` / `/iframe-page/:url`（`[param]` 为动态段）          |
 
 - 层级分隔符为**下划线 `_`**：`a/b/c` → `a_b_c`
 - 单层路由 name 不含 `_`，component 写成 `layout.xxx$view.yyy`
@@ -200,9 +200,13 @@ ElegantVueRouter({
     base: 'src/layouts/base-layout/index.vue',
     blank: 'src/layouts/blank-layout/index.vue'
   },
-  routePathTransformer(routeName, routePath) { /* login 等特殊路径改写 */ },
-  onRouteMetaGen(routeName) { /* 生成默认 meta：title + i18nKey；login/403/404/500 自动 constant: true */ }
-})
+  routePathTransformer(routeName, routePath) {
+    /* login 等特殊路径改写 */
+  },
+  onRouteMetaGen(routeName) {
+    /* 生成默认 meta：title + i18nKey；login/403/404/500 自动 constant: true */
+  }
+});
 ```
 
 2. **自定义路由 meta**（icon / order / roles / hideInMenu / keepAlive 等）→ 写到
@@ -212,7 +216,7 @@ ElegantVueRouter({
 
 3. **meta 字段的完整定义** 在 `src/typings/router.d.ts` 的 `RouteMeta` 接口：
    `title / i18nKey / roles / keepAlive / constant / icon / localIcon / iconFontSize / order /
-   href / hideInMenu / activeMenu / multiTab / fixedIndexInTab / query`
+href / hideInMenu / activeMenu / multiTab / fixedIndexInTab / query`
 
 #### 路由模式
 
@@ -297,11 +301,11 @@ export function fetchGetUserList(params: Api.SystemManage.UserSearchParams) {
 
 #### 后端约定码（见 `.env`）
 
-| 变量 | 含义 |
-| --- | --- |
-| `VITE_SERVICE_SUCCESS_CODE=0000` | 业务成功码 |
-| `VITE_SERVICE_LOGOUT_CODES` | 直接登出 |
-| `VITE_SERVICE_MODAL_LOGOUT_CODES` | 弹窗提示后登出 |
+| 变量                               | 含义                       |
+| ---------------------------------- | -------------------------- |
+| `VITE_SERVICE_SUCCESS_CODE=0000`   | 业务成功码                 |
+| `VITE_SERVICE_LOGOUT_CODES`        | 直接登出                   |
+| `VITE_SERVICE_MODAL_LOGOUT_CODES`  | 弹窗提示后登出             |
 | `VITE_SERVICE_EXPIRED_TOKEN_CODES` | token 过期，触发刷新并重试 |
 
 ---
@@ -310,13 +314,13 @@ export function fetchGetUserList(params: Api.SystemManage.UserSearchParams) {
 
 全局类型通过**命名空间**声明，无需 import 即可使用：
 
-| 命名空间 | 位置 | 用途 |
-| --- | --- | --- |
-| `App.*` | `src/typings/app.d.ts` | 应用级类型（含 `App.Theme.*`、`App.I18n.*`、`App.Service.*`） |
-| `Api.*` | `src/typings/api/*.d.ts` | 接口请求/响应类型 |
-| `Common.*` | `src/typings/common.d.ts` | 通用类型（如 `Common.EnableStatus`） |
-| `UnionKey.*` | `src/typings/union-key.d.ts` | 联合 key（如 `UnionKey.LoginModule`） |
-| `RouteKey` | `src/typings/elegant-router.d.ts`（自动生成） | 路由名联合类型 |
+| 命名空间     | 位置                                          | 用途                                                          |
+| ------------ | --------------------------------------------- | ------------------------------------------------------------- |
+| `App.*`      | `src/typings/app.d.ts`                        | 应用级类型（含 `App.Theme.*`、`App.I18n.*`、`App.Service.*`） |
+| `Api.*`      | `src/typings/api/*.d.ts`                      | 接口请求/响应类型                                             |
+| `Common.*`   | `src/typings/common.d.ts`                     | 通用类型（如 `Common.EnableStatus`）                          |
+| `UnionKey.*` | `src/typings/union-key.d.ts`                  | 联合 key（如 `UnionKey.LoginModule`）                         |
+| `RouteKey`   | `src/typings/elegant-router.d.ts`（自动生成） | 路由名联合类型                                                |
 
 新增共享类型时**优先扩展示有命名空间**，不要新建散落的 `.d.ts`。
 
@@ -352,10 +356,14 @@ export function fetchGetUserList(params: Api.SystemManage.UserSearchParams) {
 已内置分页、loading、列显隐配置、列持久化（`cacheKey`）。典型用法：
 
 ```ts
-const { data, loading, columns, pagination, getData, persistColumns } = useVxeTable<Api.SystemManage.UserList, UserItem>({
+const { data, loading, columns, pagination, getData, persistColumns } = useVxeTable<
+  Api.SystemManage.UserList,
+  UserItem
+>({
   api: ({ current, size }) => fetchGetUserList({ current, size }) as Promise<Api.SystemManage.UserList>,
   transform: r => ({ records: r.records, total: r.total }),
-  columns: () => [{ key: 'userName', title: $t('page.manage.user.userName'), visible: true, sortable: false }] as VxeColumnConfig[],
+  columns: () =>
+    [{ key: 'userName', title: $t('page.manage.user.userName'), visible: true, sortable: false }] as VxeColumnConfig[],
   defaultPageSize: 20,
   cacheKey: 'system-manage-user'
 });
@@ -374,29 +382,29 @@ const { data, loading, columns, pagination, getData, persistColumns } = useVxeTa
 
 配置见 `.oxfmtrc.json`，**执行 `pnpm fmt` 即可，不要手动调整格式**：
 
-| 项 | 值 |
-| --- | --- |
-| 缩进 | 2 空格 |
-| 换行 | LF（见 `.editorconfig`） |
-| 单引号 | 是（`singleQuote: true`） |
-| 打印宽度 | 120 |
-| 尾随逗号 | 无（`trailingComma: "none"`） |
+| 项               | 值                                               |
+| ---------------- | ------------------------------------------------ |
+| 缩进             | 2 空格                                           |
+| 换行             | LF（见 `.editorconfig`）                         |
+| 单引号           | 是（`singleQuote: true`）                        |
+| 打印宽度         | 120                                              |
+| 尾随逗号         | 无（`trailingComma: "none"`）                    |
 | 箭头函数单参括号 | 省略（`arrowParens: "avoid"`，即 `item => ...`） |
 
 ### 命名
 
-| 对象 | 规则 | 示例 |
-| --- | --- | --- |
-| 组件文件 | kebab-case | `table-column-setting.vue` |
-| 组件使用 | PascalCase（ESLint 规则，忽略 `icon-*` / `vxe-*`） | `<TableColumnSetting />` |
-| 目录 | kebab-case | `system-manage/`、`global-header/` |
-| 页面目录 | kebab-case + `index.vue` | `views/system-manage/user/index.vue` |
-| 页面私有子组件 | 同级 `modules/` 目录 | `views/system-manage/user/modules/user-operate-drawer.vue` |
-| 组合式函数 | `useXxx` | `useVxeTable`、`useRouterPush` |
-| 接口函数 | `fetchXxx` | `fetchGetUserList`、`fetchCreateUser` |
-| store | `useXxxStore`，id 取 `SetupStoreId` | `useAuthStore` |
-| 类型命名空间 | 已有命名空间内扩展 | `Api.SystemManage.UserList` |
-| 路由目录 | 下划线 `_` 为层级分隔符，勿在业务目录名中使用 | - |
+| 对象           | 规则                                               | 示例                                                       |
+| -------------- | -------------------------------------------------- | ---------------------------------------------------------- |
+| 组件文件       | kebab-case                                         | `table-column-setting.vue`                                 |
+| 组件使用       | PascalCase（ESLint 规则，忽略 `icon-*` / `vxe-*`） | `<TableColumnSetting />`                                   |
+| 目录           | kebab-case                                         | `system-manage/`、`global-header/`                         |
+| 页面目录       | kebab-case + `index.vue`                           | `views/system-manage/user/index.vue`                       |
+| 页面私有子组件 | 同级 `modules/` 目录                               | `views/system-manage/user/modules/user-operate-drawer.vue` |
+| 组合式函数     | `useXxx`                                           | `useVxeTable`、`useRouterPush`                             |
+| 接口函数       | `fetchXxx`                                         | `fetchGetUserList`、`fetchCreateUser`                      |
+| store          | `useXxxStore`，id 取 `SetupStoreId`                | `useAuthStore`                                             |
+| 类型命名空间   | 已有命名空间内扩展                                 | `Api.SystemManage.UserList`                                |
+| 路由目录       | 下划线 `_` 为层级分隔符，勿在业务目录名中使用      | -                                                          |
 
 ### 注释
 
@@ -421,11 +429,11 @@ const { data, loading, columns, pagination, getData, persistColumns } = useVxeTa
 
 ## 6. 环境变量
 
-| 文件 | 用途 |
-| --- | --- |
-| `.env` | 公共配置（base url、应用名、图标前缀、路由模式、服务码、存储前缀等） |
-| `.env.test` | 测试环境后端地址（`pnpm dev` 默认使用） |
-| `.env.prod` | 生产环境后端地址（`pnpm build` 使用） |
+| 文件        | 用途                                                                 |
+| ----------- | -------------------------------------------------------------------- |
+| `.env`      | 公共配置（base url、应用名、图标前缀、路由模式、服务码、存储前缀等） |
+| `.env.test` | 测试环境后端地址（`pnpm dev` 默认使用）                              |
+| `.env.prod` | 生产环境后端地址（`pnpm build` 使用）                                |
 
 关键变量（改前请确认影响面）：
 
@@ -454,23 +462,23 @@ const { data, loading, columns, pagination, getData, persistColumns } = useVxeTa
 7. **禁止硬编码文案**，一律走 i18n（且 zh-cn / en-us 同步新增）
 8. **禁止硬编码 Pinia store id**，统一用 `SetupStoreId` 枚举
 9. **禁止在业务代码中写死后端地址**，走环境变量 + `src/utils/service.ts` 的 `getServiceBaseURL`
-10. **不要把 `src-tauri/**` 的构建产物纳入关注范围**；Vite dev server 已配置忽略监听该目录
+10. **不要把 `src-tauri/**` 的构建产物纳入关注范围\*\*；Vite dev server 已配置忽略监听该目录
 11. **不要动 `packages/` 下 `@sa/*` 内部包**，除非任务明确要求；业务改动应落在 `src/`
 
 ---
 
 ## 8. 常见任务速查
 
-| 任务 | 入口 |
-| --- | --- |
-| 新增页面 | `src/views/<模块>/<页面>/index.vue` → `pnpm gen-route` → 补 `customRoutes` 与 i18n |
-| 新增接口 | `src/typings/api/*.d.ts` → `src/service/api/*.ts` → `src/service/api/index.ts` |
-| 新增 store | `src/store/modules/<模块>/index.ts`（Setup Store）+ `SetupStoreId` 枚举 |
-| 新增全局组件 | `src/components/{common,custom,advanced}/`（自动按需引入，无需注册） |
-| 新增布局模块 | `src/layouts/modules/`，并在对应布局中引入 |
-| 修改主题默认值 | `src/theme/settings.ts` |
-| 修改 UnoCSS 配置 | `uno.config.ts` / `packages/uno-preset` |
-| 修改 Vite 配置/插件 | `vite.config.ts` → `build/plugins/*` → `build/config/*` |
-| 新增环境变量 | `.env` / `.env.test` / `.env.prod` + `src/typings/vite-env.d.ts` |
-| 新增路由守卫 | `src/router/guard/*.ts` 并在 `guard/index.ts` 注册 |
-| 修改代理 | `build/config/proxy.ts` |
+| 任务                | 入口                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------- |
+| 新增页面            | `src/views/<模块>/<页面>/index.vue` → `pnpm gen-route` → 补 `customRoutes` 与 i18n |
+| 新增接口            | `src/typings/api/*.d.ts` → `src/service/api/*.ts` → `src/service/api/index.ts`     |
+| 新增 store          | `src/store/modules/<模块>/index.ts`（Setup Store）+ `SetupStoreId` 枚举            |
+| 新增全局组件        | `src/components/{common,custom,advanced}/`（自动按需引入，无需注册）               |
+| 新增布局模块        | `src/layouts/modules/`，并在对应布局中引入                                         |
+| 修改主题默认值      | `src/theme/settings.ts`                                                            |
+| 修改 UnoCSS 配置    | `uno.config.ts` / `packages/uno-preset`                                            |
+| 修改 Vite 配置/插件 | `vite.config.ts` → `build/plugins/*` → `build/config/*`                            |
+| 新增环境变量        | `.env` / `.env.test` / `.env.prod` + `src/typings/vite-env.d.ts`                   |
+| 新增路由守卫        | `src/router/guard/*.ts` 并在 `guard/index.ts` 注册                                 |
+| 修改代理            | `build/config/proxy.ts`                                                            |

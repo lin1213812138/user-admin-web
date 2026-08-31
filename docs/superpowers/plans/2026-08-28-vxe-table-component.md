@@ -22,17 +22,20 @@
 ### Task 1: 安装并注册 vxe-table v4
 
 **Files:**
+
 - Modify: `package.json`（dependencies 区块，约 49-73 行）
 - Create: `src/plugins/vxe-table.ts`
 - Modify: `src/main.ts:4`（引入 setup 函数）
 - Modify: `src/main.ts:11-33`（在 `setupApp` 内调用）
 
 **Interfaces:**
+
 - Produces: `setupVxeTable(app)` —— 注册 `VxePcUi` 与 `VxeTable` 插件及样式。
 
 - [ ] **Step 1: 添加依赖到 package.json**
 
 在 `dependencies` 中 `naive-ui` 之后新增：
+
 ```json
     "naive-ui": "2.44.1",
     "vxe-pc-ui": "^4.5.9",
@@ -58,19 +61,31 @@ export function setupVxeTable(app: App) {
 - [ ] **Step 3: 在 `src/main.ts` 注册**
 
 第 4 行 import 增加 `setupVxeTable`：
+
 ```ts
 import { setupVueRootValidator } from 'vite-plugin-vue-transition-root-validator/client';
-import { setupAppVersionNotification, setupDayjs, setupIconifyOffline, setupLoading, setupNProgress, setupVxeTable } from './plugins';
+import {
+  setupAppVersionNotification,
+  setupDayjs,
+  setupIconifyOffline,
+  setupLoading,
+  setupNProgress,
+  setupVxeTable
+} from './plugins';
 ```
+
 在 `src/plugins/index.ts` 导出：
+
 ```ts
 export * from './vxe-table';
 ```
-在 `setupApp` 中 `setupStore(app)` 之后调用：
-```ts
-  setupStore(app);
 
-  setupVxeTable(app);
+在 `setupApp` 中 `setupStore(app)` 之后调用：
+
+```ts
+setupStore(app);
+
+setupVxeTable(app);
 ```
 
 - [ ] **Step 4: 安装依赖**
@@ -88,9 +103,11 @@ Expected: 通过（vxe-table 类型可被识别；若有样式类型报错，确
 ### Task 2: 列配置类型与配套 hook `use-vxe-table.ts`
 
 **Files:**
+
 - Create: `src/components/Table/use-vxe-table.ts`
 
 **Interfaces:**
+
 - Produces:
   - `interface VxeColumnConfig { key: string; title: string; visible: boolean; width?: number | null; minWidth?: number | null; fixed?: '' | 'left' | 'right'; sortable: boolean; }`
   - `function useVxeTable<ApiData>(options: { api: () => Promise<ResponseData>; transform: (r: ResponseData) => ApiData[]; columns: () => VxeColumnConfig[]; immediate?: boolean; }): { data: Ref<ApiData[]>; loading: Ref<boolean>; columnConfigs: Ref<VxeColumnConfig[]>; columns: ComputedRef<VxeColumnRenderColumn[]>; getData: () => Promise<void>; resetColumns: () => void; }`
@@ -192,9 +209,11 @@ Expected: 通过，无类型错误。
 ### Task 3: 通用表格组件 `table.vue`
 
 **Files:**
+
 - Create: `src/components/Table/table.vue`
 
 **Interfaces:**
+
 - Consumes: `useVxeTable` 返回的 `columns`（`VxeColumnRenderColumn[]`）、`data`、`loading`；通过 props 接收。
 - Produces: 组件 `Table`，props：`columns: VxeColumnRenderColumn[]`、`data: any[]`、`loading: boolean`、`height?: number | string`、`maxHeight?: number | string`、`rowConfig?: object`、`border?: boolean`、`stripe?: boolean`；`v-model:columns` 可选；默认 slot `operation` 用于表头操作区。
 
@@ -267,9 +286,11 @@ Expected: 通过；`<vxe-table>` 已被 Task 1 的 `app.use(VxeTable)` 注册为
 ### Task 4: 列配置弹窗 `table-column-config.vue`
 
 **Files:**
+
 - Create: `src/components/Table/table-column-config.vue`
 
 **Interfaces:**
+
 - Consumes: `VxeColumnConfig` 类型（来自 `./use-vxe-table`）。
 - Produces: 组件 `TableColumnConfig`，props：`visible: boolean`、`columns: VxeColumnConfig[]`；emits：`update:visible`、`update:columns`、`confirm`、`reset`。交互：拖拽排序（vue-draggable-plus）、显隐 Switch、宽度/最小宽度数字输入（`NInputNumber`）、固定下拉（`NSelect`）、排序 Switch；底部「重置」「确认」。
 
@@ -339,8 +360,20 @@ function handleReset() {
         <icon-mdi-drag class="cursor-move text-icon" />
         <NSwitch v-model:value="col.visible" />
         <span class="w-120px truncate">{{ col.title }}</span>
-        <NInputNumber v-model:value="col.width" :placeholder="$t('common.width')" size="small" class="w-110px" :min="0" />
-        <NInputNumber v-model:value="col.minWidth" :placeholder="$t('common.minWidth')" size="small" class="w-110px" :min="0" />
+        <NInputNumber
+          v-model:value="col.width"
+          :placeholder="$t('common.width')"
+          size="small"
+          class="w-110px"
+          :min="0"
+        />
+        <NInputNumber
+          v-model:value="col.minWidth"
+          :placeholder="$t('common.minWidth')"
+          size="small"
+          class="w-110px"
+          :min="0"
+        />
         <NSelect v-model:value="col.fixed" :options="fixedOptions" size="small" class="w-110px" />
         <NSwitch v-model:value="col.sortable" />
         <span class="text-12px text-#999">{{ $t('common.sortable') }}</span>
@@ -361,6 +394,7 @@ function handleReset() {
 - [ ] **Step 2: 补全缺失的 i18n key**
 
 在 `src/locales/langs/zh-cn.ts` 与 `src/locales/langs/en-us.ts` 的 `common` 命名空间补充（如已有则跳过）：`unFixed`、`fixedLeft`、`fixedRight`、`width`、`minWidth`、`sortable`、`reset`、`confirm`。参照现有 `common` 结构：
+
 ```ts
 // zh-cn
 unFixed: '不固定',
@@ -392,11 +426,13 @@ Expected: 通过，新增 i18n key 在 `App.I18n.I18nKey` 类型内（若项目�
 ### Task 5: 导出与临时 demo 验证
 
 **Files:**
+
 - Create: `src/components/Table/index.ts`
 - Create: 临时 demo 页面 `src/views/_demo-vxe-table/index.vue`（验证后删除）
 - Modify: 临时路由（验证后删除）
 
 **Interfaces:**
+
 - Produces: `src/components/Table/index.ts` 导出 `Table`、`TableColumnConfig`、`useVxeTable`、`VxeColumnConfig`。
 
 - [ ] **Step 1: 编写 `index.ts`**
@@ -415,14 +451,23 @@ export type { VxeColumnConfig, VxeColumnRenderColumn } from './use-vxe-table';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 
-const { data, loading, columnConfigs, columns, getData, resetColumns } = useVxeTable<{ list: { id: number; name: string; age: number }[] }, { id: number; name: string; age: number }>({
-  api: async () => ({ list: [{ id: 1, name: 'A', age: 18 }, { id: 2, name: 'B', age: 20 }] }),
+const { data, loading, columnConfigs, columns, getData, resetColumns } = useVxeTable<
+  { list: { id: number; name: string; age: number }[] },
+  { id: number; name: string; age: number }
+>({
+  api: async () => ({
+    list: [
+      { id: 1, name: 'A', age: 18 },
+      { id: 2, name: 'B', age: 20 }
+    ]
+  }),
   transform: r => r.list,
-  columns: () => [
-    { key: 'id', title: 'ID', visible: true, sortable: false },
-    { key: 'name', title: 'Name', visible: true, sortable: true },
-    { key: 'age', title: 'Age', visible: true, width: 100, fixed: 'right', sortable: false }
-  ] as VxeColumnConfig[]
+  columns: () =>
+    [
+      { key: 'id', title: 'ID', visible: true, sortable: false },
+      { key: 'name', title: 'Name', visible: true, sortable: true },
+      { key: 'age', title: 'Age', visible: true, width: 100, fixed: 'right', sortable: false }
+    ] as VxeColumnConfig[]
 });
 
 const configVisible = ref(false);

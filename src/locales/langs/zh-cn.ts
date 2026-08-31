@@ -289,8 +289,8 @@ const local: App.I18n.Schema = {
         title: '重置密码'
       },
       bindWeChat: {
-          title: '绑定微信'
-        }
+        title: '绑定微信'
+      }
     },
     manage: {
       user: {

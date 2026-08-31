@@ -143,7 +143,7 @@ watch(innerVisible, val => {
     :title="$t('common.columnSetting')"
     preset="card"
     :bordered="false"
-    style="width: 50%; height: 600px;"
+    style="width: 50%; height: 600px"
     content-style="display:flex;flex-direction:column;min-height:0;"
   >
     <div ref="tableRef" class="w-full flex-1 min-h-0 table-config-dialog">

@@ -102,27 +102,27 @@ defineExpose({
             <slot v-if="item.slot" :name="item.slot" :model="model" :item="item" />
             <NInput
               v-else-if="item.type === 'input' || !item.type"
-              v-model:value="(model[item.key] as string)"
+              v-model:value="model[item.key] as string"
               :placeholder="item.placeholder"
               :disabled="item.disabled"
             />
             <NInput
               v-else-if="item.type === 'textarea'"
-              v-model:value="(model[item.key] as string)"
+              v-model:value="model[item.key] as string"
               type="textarea"
               :placeholder="item.placeholder"
               :disabled="item.disabled"
             />
             <NInputNumber
               v-else-if="item.type === 'number'"
-              v-model:value="(model[item.key] as number)"
+              v-model:value="model[item.key] as number"
               :placeholder="item.placeholder"
               :disabled="item.disabled"
               class="w-full"
             />
             <NSwitch
               v-else-if="item.type === 'switch'"
-              v-model:value="(model[item.key] as string | number | boolean)"
+              v-model:value="model[item.key] as string | number | boolean"
               :disabled="item.disabled"
             >
               <template v-if="item.checkedText" #checked>{{ item.checkedText }}</template>
@@ -130,7 +130,7 @@ defineExpose({
             </NSwitch>
             <NSelect
               v-else-if="item.type === 'select'"
-              v-model:value="(model[item.key] as string | number)"
+              v-model:value="model[item.key] as string | number"
               :options="item.options"
               :placeholder="item.placeholder"
               :disabled="item.disabled"

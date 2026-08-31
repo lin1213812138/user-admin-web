@@ -1,7 +1,14 @@
 import { createApp } from 'vue';
 import './plugins/assets';
 import { setupVueRootValidator } from 'vite-plugin-vue-transition-root-validator/client';
-import { setupAppVersionNotification, setupDayjs, setupIconifyOffline, setupLoading, setupNProgress, setupVxeTable } from './plugins';
+import {
+  setupAppVersionNotification,
+  setupDayjs,
+  setupIconifyOffline,
+  setupLoading,
+  setupNProgress,
+  setupVxeTable
+} from './plugins';
 import { setupStore } from './store';
 import { setupRouter } from './router';
 import { getLocale, setupI18n } from './locales';

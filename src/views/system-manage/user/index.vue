@@ -28,7 +28,16 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       { key: 'nickName', title: $t('page.manage.user.nickName'), visible: true, sortable: false },
       { key: 'userPhone', title: $t('page.manage.user.userPhone'), visible: true, sortable: false },
       { key: 'userEmail', title: $t('page.manage.user.userEmail'), visible: true, sortable: false },
-      { key: 'status', title: $t('page.manage.user.status'), type: 'status', visible: true, width: 100, fixed: 'right', sortable: false, align: 'center'},
+      {
+        key: 'status',
+        title: $t('page.manage.user.status'),
+        type: 'status',
+        visible: true,
+        width: 100,
+        fixed: 'right',
+        sortable: false,
+        align: 'center'
+      },
       { key: 'createTime', title: $t('page.manage.user.createTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
   defaultPageSize: 20,

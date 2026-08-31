@@ -79,7 +79,12 @@ function handleClick(evt: MouseEvent) {
     v-bind="
       isAnchor
         ? { href, target, onClick: handleClick }
-        : { role: 'link', tabindex: disabled ? -1 : 0, onClick: handleClick, onKeydown: (e: KeyboardEvent) => e.key === 'Enter' && handleClick(e as unknown as MouseEvent) }
+        : {
+            role: 'link',
+            tabindex: disabled ? -1 : 0,
+            onClick: handleClick,
+            onKeydown: (e: KeyboardEvent) => e.key === 'Enter' && handleClick(e as unknown as MouseEvent)
+          }
     "
     class="link"
     :class="[typeClass, underlineClass, { 'link--disabled': disabled }]"
@@ -114,7 +119,9 @@ function handleClick(evt: MouseEvent) {
   cursor: pointer;
   text-decoration: none;
   outline: none;
-  transition: color 0.2s, opacity 0.2s;
+  transition:
+    color 0.2s,
+    opacity 0.2s;
   color: var(--link-color, #409eff);
 }
 
