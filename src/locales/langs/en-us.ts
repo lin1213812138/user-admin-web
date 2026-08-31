@@ -37,6 +37,7 @@ const local: App.I18n.Schema = {
     copy: 'Copy',
     copySuccess: 'Copied successfully',
     copyFailed: 'Copy failed',
+    createSuccess: 'Created successfully',
     detail: 'Detail',
     edit: 'Edit',
     enable: 'Enable',
@@ -249,7 +250,8 @@ const local: App.I18n.Schema = {
     home: 'Home',
     'system-manage': 'System Management',
     'system-manage_user': 'User Management',
-    'system-manage_role': 'Role Management'
+    'system-manage_role': 'Role Management',
+    'system-manage_menu': 'Menu Management'
   },
   page: {
     login: {
@@ -328,6 +330,35 @@ const local: App.I18n.Schema = {
           sortPlaceholder: 'Please enter sort value',
           statusPlaceholder: 'Please select status',
           remarkPlaceholder: 'Please enter role description'
+        }
+      },
+      menu: {
+        parentMenu: 'Parent Menu',
+        topMenu: 'Top Menu',
+        type: 'Menu Type',
+        catalog: 'Catalog',
+        menu: 'Menu',
+        menuName: 'Menu Name',
+        icon: 'Menu Icon',
+        routePath: 'Route Path',
+        componentPath: 'Component Path',
+        permission: 'Permission Code',
+        sort: 'Sort',
+        status: 'Status',
+        visible: 'Visible',
+        keepAlive: 'Keep Alive',
+        isExternal: 'External Link',
+        redirect: 'Redirect',
+        createTime: 'Create Time',
+        addMenu: 'Add Menu',
+        editMenu: 'Edit Menu',
+        form: {
+          menuNamePlaceholder: 'Please enter menu name',
+          iconPlaceholder: 'Please enter icon name, e.g. mdi:home',
+          routePlaceholder: 'Please enter route path, e.g. /system/menu',
+          componentPlaceholder: 'Please enter component path, e.g. views/system-manage/menu/index.vue',
+          permissionPlaceholder: 'Please enter permission code, e.g. system:menu:list',
+          redirectPlaceholder: 'Please enter redirect path'
         }
       }
     },

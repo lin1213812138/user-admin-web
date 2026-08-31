@@ -4,6 +4,7 @@ import { $t } from '@/locales';
 import { fetchDeleteRole, fetchGetRoleList } from '@/service/api/system-manage';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
+import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 import RoleOperateDrawer from './modules/role-operate-drawer.vue';
 import RolePermissionDrawer from './modules/role-permission-drawer.vue';
 
@@ -16,6 +17,32 @@ const searchParams = reactive<Omit<Api.SystemManage.RoleSearchParams, 'current' 
 const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() => [
   { label: $t('common.enable'), value: '1' },
   { label: $t('common.disable'), value: '2' }
+]);
+
+const searchItems = computed<FormItemConfig[]>(() => [
+  {
+    key: 'roleName',
+    label: $t('page.manage.role.roleName'),
+    type: 'input',
+    span: 6,
+    placeholder: $t('page.manage.role.form.roleNamePlaceholder')
+  },
+  {
+    key: 'roleCode',
+    label: $t('page.manage.role.roleCode'),
+    type: 'input',
+    span: 6,
+    placeholder: $t('page.manage.role.form.roleCodePlaceholder')
+  },
+  {
+    key: 'status',
+    label: $t('page.manage.role.status'),
+    type: 'select',
+    span: 6,
+    options: statusOptions.value,
+    placeholder: $t('page.manage.role.form.statusPlaceholder')
+  },
+  { key: 'actions', label: ' ', slot: 'actions', span: 6 }
 ]);
 
 const { data, loading, columnConfigs, columns, pagination, getData, persistColumns } = useVxeTable<
@@ -119,36 +146,16 @@ function handleSubmitted() {
 <template>
   <div class="h-full w-full flex flex-col gap-12px p-16px">
     <NCard :bordered="false" class="card-wrapper shrink-0">
-      <NForm :model="searchParams" label-placement="left" :label-width="70" inline>
-        <NFormItem :label="$t('page.manage.role.roleName')" path="roleName">
-          <NInput
-            v-model:value="searchParams.roleName"
-            :placeholder="$t('page.manage.role.form.roleNamePlaceholder')"
-            clearable
-            class="w-200px"
-            @keyup.enter="handleSearch"
-          />
-        </NFormItem>
-        <NFormItem :label="$t('page.manage.role.roleCode')" path="roleCode">
-          <NInput
-            v-model:value="searchParams.roleCode"
-            :placeholder="$t('page.manage.role.form.roleCodePlaceholder')"
-            clearable
-            class="w-200px"
-            @keyup.enter="handleSearch"
-          />
-        </NFormItem>
-        <NFormItem :label="$t('page.manage.role.status')" path="status">
-          <NSelect
-            v-model:value="searchParams.status"
-            :options="statusOptions"
-            :placeholder="$t('page.manage.role.form.statusPlaceholder')"
-            clearable
-            class="w-160px"
-          />
-        </NFormItem>
-        <NFormItem>
-          <NSpace>
+      <NFormWrap
+        :model="searchParams"
+        :items="searchItems"
+        :grid-x-gap="16"
+        label-placement="left"
+        :label-width="70"
+        grid-responsive="self"
+      >
+        <template #actions>
+          <div class="flex items-center gap-8px">
             <NButton type="primary" ghost @click="handleSearch">
               <template #icon>
                 <icon-ic-round-search class="text-icon" />
@@ -161,9 +168,9 @@ function handleSubmitted() {
               </template>
               {{ $t('common.reset') }}
             </NButton>
-          </NSpace>
-        </NFormItem>
-      </NForm>
+          </div>
+        </template>
+      </NFormWrap>
     </NCard>
 
     <div class="flex-1 min-h-0">

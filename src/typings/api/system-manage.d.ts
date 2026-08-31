@@ -82,6 +82,75 @@ declare namespace Api {
       id: number;
     };
 
+    /** menu type */
+    type MenuType = 'catalog' | 'menu';
+
+    /** menu record */
+    interface Menu {
+      id: number;
+      /** parent menu id, 0 means top level */
+      parentId: number;
+      /** menu name */
+      menuName: string;
+      /** menu type: catalog or menu */
+      menuType: MenuType;
+      /** menu icon */
+      icon: string;
+      /** route path */
+      routePath: string;
+      /** component path */
+      componentPath: string;
+      /** permission code */
+      permission: string;
+      /** sort order */
+      sort: number;
+      /** menu status */
+      status: Api.Common.EnableStatus;
+      /** whether visible */
+      visible: 1 | 2;
+      /** whether keep alive */
+      keepAlive: 1 | 2;
+      /** whether external link */
+      isExternal: 1 | 2;
+      /** redirect path */
+      redirect: string;
+      createTime: string;
+      /** children menus (built at frontend) */
+      children?: Menu[];
+    }
+
+    /** menu list (flat array, built to tree at frontend) */
+    type MenuList = Menu[];
+
+    /** menu search params */
+    type MenuSearchParams = {
+      menuName?: string;
+      status?: Api.Common.EnableStatus | null;
+    };
+
+    /** menu create params */
+    type MenuCreateParams = Pick<
+      Menu,
+      | 'parentId'
+      | 'menuName'
+      | 'menuType'
+      | 'icon'
+      | 'routePath'
+      | 'componentPath'
+      | 'permission'
+      | 'sort'
+      | 'status'
+      | 'visible'
+      | 'keepAlive'
+      | 'isExternal'
+      | 'redirect'
+    >;
+
+    /** menu update params */
+    type MenuUpdateParams = MenuCreateParams & {
+      id: number;
+    };
+
     /** menu node of role permission tree */
     interface RoleMenuNode {
       id: number;

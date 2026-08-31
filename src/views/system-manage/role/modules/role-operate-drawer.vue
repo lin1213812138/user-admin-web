@@ -3,7 +3,7 @@ import { computed, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
 import { fetchCreateRole, fetchUpdateRole } from '@/service/api/system-manage';
 import CommonDrawer from '@/components/common/drawer.vue';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
+import NForm, { type FormItemConfig } from '@/components/Form/index.vue';
 
 type DrawerMode = 'create' | 'edit' | 'detail';
 
@@ -43,7 +43,7 @@ const title = computed(() => {
 
 const submitting = ref(false);
 
-const formRef = ref<InstanceType<typeof NFormWrap>>();
+const formRef = ref<InstanceType<typeof NForm>>();
 
 const model = reactive<Api.SystemManage.RoleCreateParams>({
   roleName: '',
@@ -153,6 +153,6 @@ watch(
     :footer="!isDetail"
     @submit="handleSubmit"
   >
-    <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :disabled="isDetail" />
+    <NForm ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :disabled="isDetail" />
   </CommonDrawer>
 </template>

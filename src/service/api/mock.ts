@@ -197,3 +197,137 @@ export function mockCreateUser(params: Api.SystemManage.UserCreateParams): Api.S
 
   return newUser;
 }
+
+/** create menu mock record */
+function createMenu(
+  id: number,
+  parentId: number,
+  menuName: string,
+  menuType: Api.SystemManage.MenuType,
+  extra: Partial<Api.SystemManage.Menu> = {}
+): Api.SystemManage.Menu {
+  return {
+    id,
+    parentId,
+    menuName,
+    menuType,
+    icon: menuType === 'catalog' ? 'mdi:menu' : 'mdi:file-document',
+    routePath: menuType === 'catalog' ? `/${menuName}` : `/${menuName}/index`,
+    componentPath: menuType === 'catalog' ? '' : 'layouts/base-layout/index.vue',
+    permission: '',
+    sort: id,
+    status: '1',
+    visible: 1,
+    keepAlive: 1,
+    isExternal: 2,
+    redirect: '',
+    createTime: '2026-08-28 10:00:00',
+    ...extra
+  };
+}
+
+/** mock menu data (flat, built to tree at frontend) */
+const menus: Api.SystemManage.Menu[] = [
+  createMenu(1, 0, 'home', 'menu', { menuName: '首页', routePath: '/home', icon: 'mdi:home' }),
+  createMenu(2, 0, 'system-manage', 'catalog', { menuName: '系统管理', routePath: '/system-manage', icon: 'mdi:cog' }),
+  createMenu(21, 2, 'user', 'menu', {
+    menuName: '用户管理',
+    routePath: '/system-manage/user',
+    componentPath: 'views/system-manage/user/index.vue',
+    permission: 'system:user:list'
+  }),
+  createMenu(22, 2, 'role', 'menu', {
+    menuName: '角色管理',
+    routePath: '/system-manage/role',
+    componentPath: 'views/system-manage/role/index.vue',
+    permission: 'system:role:list'
+  }),
+  createMenu(23, 2, 'menu', 'menu', {
+    menuName: '菜单管理',
+    routePath: '/system-manage/menu',
+    componentPath: 'views/system-manage/menu/index.vue',
+    permission: 'system:menu:list'
+  }),
+  createMenu(24, 2, 'dept', 'menu', {
+    menuName: '部门管理',
+    routePath: '/system-manage/dept',
+    componentPath: 'views/system-manage/dept/index.vue',
+    permission: 'system:dept:list'
+  })
+];
+
+/** mock menu list (flat array) */
+export function mockMenuList(_params: Api.SystemManage.MenuSearchParams): Api.SystemManage.MenuList {
+  return [...menus];
+}
+
+/** mock create menu */
+export function mockCreateMenu(params: Api.SystemManage.MenuCreateParams): Api.SystemManage.Menu {
+  const id = menus.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+  const newMenu: Api.SystemManage.Menu = {
+    id,
+    parentId: params.parentId,
+    menuName: params.menuName,
+    menuType: params.menuType,
+    icon: params.icon,
+    routePath: params.routePath,
+    componentPath: params.componentPath,
+    permission: params.permission,
+    sort: params.sort,
+    status: params.status,
+    visible: params.visible,
+    keepAlive: params.keepAlive,
+    isExternal: params.isExternal,
+    redirect: params.redirect,
+    createTime: '2026-08-28 10:00:00'
+  };
+  menus.push(newMenu);
+
+  return newMenu;
+}
+
+/** mock update menu */
+export function mockUpdateMenu(params: Api.SystemManage.MenuUpdateParams): Api.SystemManage.Menu {
+  const index = menus.findIndex(item => item.id === params.id);
+  const updated: Api.SystemManage.Menu = {
+    ...menus[index],
+    parentId: params.parentId,
+    menuName: params.menuName,
+    menuType: params.menuType,
+    icon: params.icon,
+    routePath: params.routePath,
+    componentPath: params.componentPath,
+    permission: params.permission,
+    sort: params.sort,
+    status: params.status,
+    visible: params.visible,
+    keepAlive: params.keepAlive,
+    isExternal: params.isExternal,
+    redirect: params.redirect
+  };
+  menus.splice(index, 1, updated);
+
+  return updated;
+}
+
+/** mock delete menu by ids (also remove descendants) */
+export function mockDeleteMenu(ids: number[]): boolean {
+  const toRemove = new Set<number>(ids);
+  let expanded = true;
+  while (expanded) {
+    expanded = false;
+    for (const item of menus) {
+      if (!toRemove.has(item.id) && item.parentId !== 0 && toRemove.has(item.parentId)) {
+        toRemove.add(item.id);
+        expanded = true;
+      }
+    }
+  }
+  for (let i = menus.length - 1; i >= 0; i -= 1) {
+    if (toRemove.has(menus[i].id)) {
+      menus.splice(i, 1);
+    }
+  }
+
+  return true;
+}

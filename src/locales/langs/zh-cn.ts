@@ -37,6 +37,7 @@ const local: App.I18n.Schema = {
     copy: '复制',
     copySuccess: '复制成功',
     copyFailed: '复制失败',
+    createSuccess: '新增成功',
     detail: '详情',
     edit: '编辑',
     enable: '启用',
@@ -245,7 +246,8 @@ const local: App.I18n.Schema = {
     home: '首页',
     'system-manage': '系统管理',
     'system-manage_user': '用户管理',
-    'system-manage_role': '角色管理'
+    'system-manage_role': '角色管理',
+    'system-manage_menu': '菜单管理'
   },
   page: {
     login: {
@@ -324,6 +326,35 @@ const local: App.I18n.Schema = {
           sortPlaceholder: '请输入排序值',
           statusPlaceholder: '请选择状态',
           remarkPlaceholder: '请输入角色描述'
+        }
+      },
+      menu: {
+        parentMenu: '上级菜单',
+        topMenu: '顶级菜单',
+        type: '菜单类型',
+        catalog: '目录',
+        menu: '菜单',
+        menuName: '菜单名称',
+        icon: '菜单图标',
+        routePath: '路由地址',
+        componentPath: '组件路径',
+        permission: '权限标识',
+        sort: '排序',
+        status: '状态',
+        visible: '是否可见',
+        keepAlive: '是否缓存',
+        isExternal: '是否外链',
+        redirect: '重定向',
+        createTime: '创建时间',
+        addMenu: '新增菜单',
+        editMenu: '编辑菜单',
+        form: {
+          menuNamePlaceholder: '请输入菜单名称',
+          iconPlaceholder: '请输入图标名称，如 mdi:home',
+          routePlaceholder: '请输入路由地址，如 /system/menu',
+          componentPlaceholder: '请输入组件路径，如 views/system-manage/menu/index.vue',
+          permissionPlaceholder: '请输入权限标识，如 system:menu:list',
+          redirectPlaceholder: '请输入重定向地址'
         }
       }
     },

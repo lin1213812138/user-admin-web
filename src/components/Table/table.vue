@@ -5,6 +5,7 @@ import Link from '@/components/common/link.vue';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import { copyText } from '@/utils/common';
 import type { VxeColumnRenderColumn, VxePagination } from './use-vxe-table';
+import type { VxeTablePropTypes } from 'vxe-table';
 
 defineOptions({
   name: 'Table'
@@ -24,6 +25,8 @@ interface Props {
   actionWidth?: number;
   actionAlign?: 'left' | 'center' | 'right';
   height?: string;
+  /** vxe-table tree-config, enable tree mode when provided */
+  treeConfig?: VxeTablePropTypes.TreeConfig;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -37,7 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
   actionTitle: '操作',
   actionWidth: 140,
   actionAlign: 'left',
-  height: '100%'
+  height: '100%',
+  treeConfig: undefined
 });
 
 const actionJustify = computed(() => {
@@ -105,6 +109,7 @@ function handleSelectionChange({ records }: { records: any[] }) {
         :row-config="{ isHover: true, height: 40 }"
         :seq-config="{ startIndex: seqStartIndex }"
         :height="height"
+        :tree-config="treeConfig"
         class="w-full table-draggable"
         @checkbox-change="handleSelectionChange"
         @checkbox-all="handleSelectionChange"

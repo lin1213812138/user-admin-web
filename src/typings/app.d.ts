@@ -349,6 +349,7 @@ declare namespace App {
         copy: string;
         copySuccess: string;
         copyFailed: string;
+        createSuccess: string;
         detail: string;
         edit: string;
         enable: string;
@@ -602,6 +603,35 @@ declare namespace App {
               sortPlaceholder: string;
               statusPlaceholder: string;
               remarkPlaceholder: string;
+            };
+          };
+          menu: {
+            parentMenu: string;
+            topMenu: string;
+            type: string;
+            catalog: string;
+            menu: string;
+            menuName: string;
+            icon: string;
+            routePath: string;
+            componentPath: string;
+            permission: string;
+            sort: string;
+            status: string;
+            visible: string;
+            keepAlive: string;
+            isExternal: string;
+            redirect: string;
+            createTime: string;
+            addMenu: string;
+            editMenu: string;
+            form: {
+              menuNamePlaceholder: string;
+              iconPlaceholder: string;
+              routePlaceholder: string;
+              componentPlaceholder: string;
+              permissionPlaceholder: string;
+              redirectPlaceholder: string;
             };
           };
         };
