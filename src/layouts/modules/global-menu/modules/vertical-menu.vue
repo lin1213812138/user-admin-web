@@ -54,6 +54,7 @@ watch(
         :options="routeStore.menus"
         :inverted="inverted"
         :indent="18"
+        :accordion="themeStore.sider.accordion"
         @update:value="routerPushByKeyWithMetaQuery"
       />
     </SimpleScrollbar>

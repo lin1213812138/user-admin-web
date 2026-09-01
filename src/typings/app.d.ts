@@ -98,6 +98,8 @@ declare namespace App {
         mixChildMenuWidth: number;
         /** Whether to auto select the first submenu */
         autoSelectFirstMenu: boolean;
+        /** Whether the sidebar menu is accordion (only one submenu expanded at a time) */
+        accordion: boolean;
       };
       /** Footer */
       footer: {
@@ -369,6 +371,9 @@ declare namespace App {
         error: string;
         index: string;
         keywordSearch: string;
+        keyword: string;
+        status: string;
+        remark: string;
         logout: string;
         logoutConfirm: string;
         lookForward: string;
@@ -464,6 +469,7 @@ declare namespace App {
             mixChildMenuWidth: string;
             autoSelectFirstMenu: string;
             autoSelectFirstMenuTip: string;
+            accordion: string;
           };
           footer: {
             title: string;
@@ -644,6 +650,117 @@ declare namespace App {
               componentPlaceholder: string;
               permissionPlaceholder: string;
               redirectPlaceholder: string;
+            };
+          };
+        };
+        dataManage: {
+          common: {
+            createTime: string;
+            keywordPlaceholder: string;
+          };
+          basic: {
+            title: string;
+            customer: {
+              title: string;
+              code: string;
+              name: string;
+              contact: string;
+              phone: string;
+              address: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            supplier: {
+              title: string;
+              code: string;
+              name: string;
+              contact: string;
+              phone: string;
+              level: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            goods: {
+              title: string;
+              code: string;
+              name: string;
+              spec: string;
+              unit: string;
+              categoryName: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            category: {
+              title: string;
+              code: string;
+              name: string;
+              sort: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+          };
+          finance: {
+            title: string;
+            account: {
+              title: string;
+              code: string;
+              name: string;
+              accountType: string;
+              bank: string;
+              balance: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            currency: {
+              title: string;
+              code: string;
+              name: string;
+              rate: string;
+              symbol: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            tax: {
+              title: string;
+              name: string;
+              rate: string;
+              taxType: string;
+              form: { namePlaceholder: string };
+            };
+            settlement: {
+              title: string;
+              name: string;
+              period: string;
+              form: { namePlaceholder: string };
+            };
+          };
+          business: {
+            title: string;
+            warehouse: {
+              title: string;
+              code: string;
+              name: string;
+              address: string;
+              manager: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            location: {
+              title: string;
+              code: string;
+              name: string;
+              warehouseName: string;
+              capacity: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            carrier: {
+              title: string;
+              code: string;
+              name: string;
+              contact: string;
+              phone: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            store: {
+              title: string;
+              code: string;
+              name: string;
+              address: string;
+              owner: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
             };
           };
         };

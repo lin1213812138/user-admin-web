@@ -5,6 +5,15 @@
 
 import type { GeneratedRoute } from '@elegant-router/types';
 
+/**
+ * All generated routes (literal, kept for the elegant-router vite plugin).
+ *
+ * NOTE: the plugin parses this export on startup
+ * (`JSON.parse(JSON.stringify(n.exports.generatedRoutes))`) to merge newly
+ * scanned routes and preserve hand-added meta (icon/order). It MUST stay a
+ * literal array — composing it from other arrays (spread / concat) breaks the
+ * plugin. It is auto-updated on regeneration.
+ */
 export const generatedRoutes: GeneratedRoute[] = [
   {
     name: '403',
@@ -38,6 +47,48 @@ export const generatedRoutes: GeneratedRoute[] = [
       constant: true,
       hideInMenu: true
     }
+  },
+  {
+    name: 'data-manage',
+    path: '/data-manage',
+    component: 'layout.base',
+    meta: {
+      title: 'data-manage',
+      i18nKey: 'route.data-manage',
+      icon: 'ic:baseline-folder'
+    },
+    children: [
+      {
+        name: 'data-manage_basic',
+        path: '/data-manage/basic',
+        component: 'view.data-manage_basic',
+        meta: {
+          title: 'data-manage_basic',
+          i18nKey: 'route.data-manage_basic',
+          icon: 'ic:baseline-inventory'
+        }
+      },
+      {
+        name: 'data-manage_business',
+        path: '/data-manage/business',
+        component: 'view.data-manage_business',
+        meta: {
+          title: 'data-manage_business',
+          i18nKey: 'route.data-manage_business',
+          icon: 'ic:baseline-warehouse'
+        }
+      },
+      {
+        name: 'data-manage_finance',
+        path: '/data-manage/finance',
+        component: 'view.data-manage_finance',
+        meta: {
+          title: 'data-manage_finance',
+          i18nKey: 'route.data-manage_finance',
+          icon: 'ic:baseline-account-balance-wallet'
+        }
+      }
+    ]
   },
   {
     name: 'home',
@@ -118,3 +169,13 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   }
 ];
+
+/** A route is non-menu when it is constant or explicitly hidden from the menu. */
+const isNonMenuRoute = (route: GeneratedRoute): boolean =>
+  Boolean(route.meta?.constant) || Boolean(route.meta?.hideInMenu);
+
+/** Non-menu routes (constant / hideInMenu) — derived from `generatedRoutes`. */
+export const nonMenuRoutes = generatedRoutes.filter(isNonMenuRoute);
+
+/** Menu routes (shown in the sidebar) — derived from `generatedRoutes`. */
+export const menuRoutes = generatedRoutes.filter(route => !isNonMenuRoute(route));

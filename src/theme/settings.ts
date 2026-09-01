@@ -4,7 +4,7 @@ export const themeSettings: App.Theme.ThemeSetting = {
   grayscale: false,
   colourWeakness: false,
   recommendColor: false,
-  themeColor: '#646cff',
+  themeColor: '#3b82f6',
   themeRadius: 6,
   otherColor: {
     info: '#2080f0',
@@ -49,7 +49,8 @@ export const themeSettings: App.Theme.ThemeSetting = {
     mixWidth: 90,
     mixCollapsedWidth: 64,
     mixChildMenuWidth: 200,
-    autoSelectFirstMenu: false
+    autoSelectFirstMenu: false,
+    accordion: true
   },
   footer: {
     visible: false,

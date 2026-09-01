@@ -57,6 +57,9 @@ const local: App.I18n.Schema = {
     error: 'Error',
     index: 'Index',
     keywordSearch: 'Please enter keyword',
+    keyword: 'Keyword',
+    status: 'Status',
+    remark: 'Remark',
     logout: 'Logout',
     logoutConfirm: 'Are you sure you want to log out?',
     lookForward: 'Coming soon',
@@ -193,7 +196,8 @@ const local: App.I18n.Schema = {
         mixChildMenuWidth: 'Mix Child Menu Width',
         autoSelectFirstMenu: 'Auto Select First Submenu',
         autoSelectFirstMenuTip:
-          'When a first-level menu is clicked, the first submenu is automatically selected and navigated to the deepest level'
+          'When a first-level menu is clicked, the first submenu is automatically selected and navigated to the deepest level',
+        accordion: 'Sidebar Accordion'
       },
       footer: {
         title: 'Footer Settings',
@@ -262,7 +266,11 @@ const local: App.I18n.Schema = {
     'system-manage': 'System Management',
     'system-manage_user': 'User Management',
     'system-manage_role': 'Role Management',
-    'system-manage_menu': 'Menu Management'
+    'system-manage_menu': 'Menu Management',
+    'data-manage': 'Data Manage',
+    'data-manage_basic': 'Basic',
+    'data-manage_finance': 'Finance',
+    'data-manage_business': 'Business'
   },
   page: {
     login: {
@@ -371,6 +379,117 @@ const local: App.I18n.Schema = {
           componentPlaceholder: 'Please enter component path, e.g. views/system-manage/menu/index.vue',
           permissionPlaceholder: 'Please enter permission code, e.g. system:menu:list',
           redirectPlaceholder: 'Please enter redirect path'
+        }
+      }
+    },
+    dataManage: {
+      common: {
+        createTime: 'Created Time',
+        keywordPlaceholder: 'Please enter name or code'
+      },
+      basic: {
+        title: 'Basic',
+        customer: {
+          title: 'Customer',
+          code: 'Customer Code',
+          name: 'Customer Name',
+          contact: 'Contact',
+          phone: 'Phone',
+          address: 'Address',
+          form: { codePlaceholder: 'Enter customer code', namePlaceholder: 'Enter customer name' }
+        },
+        supplier: {
+          title: 'Supplier',
+          code: 'Supplier Code',
+          name: 'Supplier Name',
+          contact: 'Contact Person',
+          phone: 'Phone',
+          level: 'Level',
+          form: { codePlaceholder: 'Enter supplier code', namePlaceholder: 'Enter supplier name' }
+        },
+        goods: {
+          title: 'Goods',
+          code: 'Goods Code',
+          name: 'Goods Name',
+          spec: 'Spec',
+          unit: 'Unit',
+          categoryName: 'Category',
+          form: { codePlaceholder: 'Enter goods code', namePlaceholder: 'Enter goods name' }
+        },
+        category: {
+          title: 'Category',
+          code: 'Category Code',
+          name: 'Category Name',
+          sort: 'Sort',
+          form: { codePlaceholder: 'Enter category code', namePlaceholder: 'Enter category name' }
+        }
+      },
+      finance: {
+        title: 'Finance',
+        account: {
+          title: 'Account',
+          code: 'Account Code',
+          name: 'Account Name',
+          accountType: 'Account Type',
+          bank: 'Bank',
+          balance: 'Balance',
+          form: { codePlaceholder: 'Enter account code', namePlaceholder: 'Enter account name' }
+        },
+        currency: {
+          title: 'Currency',
+          code: 'Currency Code',
+          name: 'Currency Name',
+          rate: 'Rate',
+          symbol: 'Symbol',
+          form: { codePlaceholder: 'Enter currency code', namePlaceholder: 'Enter currency name' }
+        },
+        tax: {
+          title: 'Tax',
+          name: 'Plan Name',
+          rate: 'Rate',
+          taxType: 'Tax Type',
+          form: { namePlaceholder: 'Enter plan name' }
+        },
+        settlement: {
+          title: 'Settlement',
+          name: 'Method Name',
+          period: 'Period',
+          form: { namePlaceholder: 'Enter method name' }
+        }
+      },
+      business: {
+        title: 'Business',
+        warehouse: {
+          title: 'Warehouse',
+          code: 'Warehouse Code',
+          name: 'Warehouse Name',
+          address: 'Address',
+          manager: 'Manager',
+          form: { codePlaceholder: 'Enter warehouse code', namePlaceholder: 'Enter warehouse name' }
+        },
+        location: {
+          title: 'Location',
+          code: 'Location Code',
+          name: 'Location Name',
+          warehouseName: 'Warehouse',
+          capacity: 'Capacity',
+          form: { codePlaceholder: 'Enter location code', namePlaceholder: 'Enter location name' }
+        },
+        carrier: {
+          title: 'Carrier',
+          code: 'Carrier Code',
+          name: 'Carrier Name',
+          contact: 'Contact',
+          phone: 'Phone',
+          form: { codePlaceholder: 'Enter carrier code', namePlaceholder: 'Enter carrier name' }
+        },
+        store: {
+          title: 'Store',
+          code: 'Store Code',
+          name: 'Store Name',
+          address: 'Address',
+          owner: 'Owner',
+          form: { codePlaceholder: 'Enter store code', namePlaceholder: 'Enter store name' }
         }
       }
     },

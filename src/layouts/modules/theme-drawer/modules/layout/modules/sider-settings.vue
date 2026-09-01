@@ -39,6 +39,13 @@ const isHybridLayoutMode = computed(() => layoutMode.value.includes('hybrid'));
       </template>
       <NSwitch v-model:value="themeStore.sider.autoSelectFirstMenu" />
     </SettingItem>
+    <SettingItem
+      v-if="layoutMode === 'vertical' || isMixLayoutMode"
+      key="7"
+      :label="$t('theme.layout.sider.accordion')"
+    >
+      <NSwitch v-model:value="themeStore.sider.accordion" />
+    </SettingItem>
   </TransitionGroup>
 </template>
 

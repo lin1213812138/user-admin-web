@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { $t } from '@/locales';
 import Link from '@/components/common/link.vue';
-import SvgIcon from '@/components/custom/svg-icon.vue';
+import IconRenderer from '@/components/custom/icon-renderer.vue';
 import { copyText } from '@/utils/common';
 import type { VxeColumnRenderColumn, VxePagination } from './use-vxe-table';
 import type { VxeTablePropTypes } from 'vxe-table';
@@ -145,7 +145,7 @@ function handleSelectionChange({ records }: { records: any[] }) {
                 <NTooltip trigger="hover">
                   <template #trigger>
                     <span class="vxe-link-icon" @click.stop="handleCopy(row[col.key])">
-                      <SvgIcon icon="mdi:content-copy" />
+                      <IconRenderer icon="vicons:ionicons5:Copy" :size="14" />
                     </span>
                   </template>
                   <span>{{ $t('common.copy') }}</span>

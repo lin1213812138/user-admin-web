@@ -115,6 +115,7 @@ watch(
               :options="secondLevelMenus"
               :inverted="inverted"
               :indent="18"
+              :accordion="themeStore.sider.accordion"
               @update:value="routerPushByKeyWithMetaQuery"
             />
           </SimpleScrollbar>

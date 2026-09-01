@@ -8,14 +8,16 @@ defineOptions({ name: 'IconRenderer' });
 interface Props {
   /** iconify name (e.g. "mdi:home") or vicons key (e.g. "vicons:ionicons5:Home") */
   icon?: string;
+  /** box size in px, default 18 */
+  size?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), { icon: '' });
+const props = withDefaults(defineProps<Props>(), { icon: '', size: 18 });
 
 /** Box size (px). All SVGs render into this box, then per-icon optical
  *  scaling normalizes the *drawn* content to `TARGET_DRAWN` so the picker
  *  grid looks uniform regardless of viewBox padding. */
-const ICON_SIZE = 18;
+const ICON_SIZE = computed(() => props.size);
 /** Target drawn-content size (px) after scaling. Picked 14 so that even
  *  mdi:plus-style glyphs (drawn ≈ 9px) reach the target at scale ≈ 1.56
  *  (visual 28px) — well inside the 32px cell. Smaller than 14 would make
@@ -53,8 +55,9 @@ const rootRef = ref<HTMLElement | null>(null);
 const scale = ref(1);
 
 const wrapperStyle = computed<CSSProperties>(() => ({
-  width: `${ICON_SIZE}px`,
-  height: `${ICON_SIZE}px`,
+  width: `${ICON_SIZE.value}px`,
+  height: `${ICON_SIZE.value}px`,
+  '--icon-size': `${ICON_SIZE.value}px`,
   // expose scale to ::deep(svg) via CSS variable
   '--icon-scale': String(scale.value)
 }));
@@ -79,14 +82,14 @@ async function normalize(): Promise<void> {
   }
   // getBBox returns user units. Convert to rendered px using the viewBox.
   const viewBoxAttr = svg.getAttribute('viewBox');
-  let viewBoxSize = ICON_SIZE;
+  let viewBoxSize = ICON_SIZE.value;
   if (viewBoxAttr) {
     const parts = viewBoxAttr.split(/[\s,]+/).map(Number);
     if (parts.length === 4 && parts[2] > 0) {
       viewBoxSize = parts[2];
     }
   }
-  const pxPerUnit = ICON_SIZE / viewBoxSize;
+  const pxPerUnit = ICON_SIZE.value / viewBoxSize;
   const drawnW = bbox.width * pxPerUnit;
   const drawnH = bbox.height * pxPerUnit;
   if (drawnW <= 0 || drawnH <= 0) {
@@ -134,8 +137,8 @@ watch(
 .icon-renderer ::deep(svg) {
   display: block;
   flex-shrink: 0;
-  width: 18px !important;
-  height: 18px !important;
+  width: var(--icon-size, 18px) !important;
+  height: var(--icon-size, 18px) !important;
   transform: scale(var(--icon-scale, 1));
   transform-origin: center;
 }

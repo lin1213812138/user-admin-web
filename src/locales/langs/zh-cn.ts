@@ -57,6 +57,9 @@ const local: App.I18n.Schema = {
     error: '错误',
     index: '序号',
     keywordSearch: '请输入关键词搜索',
+    keyword: '关键词',
+    status: '状态',
+    remark: '备注',
     logout: '退出登录',
     logoutConfirm: '确认退出登录吗？',
     lookForward: '敬请期待',
@@ -189,7 +192,8 @@ const local: App.I18n.Schema = {
         mixCollapsedWidth: '混合布局侧边栏折叠宽度',
         mixChildMenuWidth: '混合布局子菜单宽度',
         autoSelectFirstMenu: '自动选择第一个子菜单',
-        autoSelectFirstMenuTip: '点击一级菜单时，自动选择并导航到第一个子菜单的最深层级'
+        autoSelectFirstMenuTip: '点击一级菜单时，自动选择并导航到第一个子菜单的最深层级',
+        accordion: '侧边栏手风琴'
       },
       footer: {
         title: '底部设置',
@@ -258,7 +262,11 @@ const local: App.I18n.Schema = {
     'system-manage': '系统管理',
     'system-manage_user': '用户管理',
     'system-manage_role': '角色管理',
-    'system-manage_menu': '菜单管理'
+    'system-manage_menu': '菜单管理',
+    'data-manage': '资料管理',
+    'data-manage_basic': '基础资料',
+    'data-manage_finance': '财务资料',
+    'data-manage_business': '业务资料'
   },
   page: {
     login: {
@@ -367,6 +375,117 @@ const local: App.I18n.Schema = {
           componentPlaceholder: '请输入组件路径，如 views/system-manage/menu/index.vue',
           permissionPlaceholder: '请输入权限标识，如 system:menu:list',
           redirectPlaceholder: '请输入重定向地址'
+        }
+      }
+    },
+    dataManage: {
+      common: {
+        createTime: '创建时间',
+        keywordPlaceholder: '请输入名称或编码'
+      },
+      basic: {
+        title: '基础资料',
+        customer: {
+          title: '客户',
+          code: '客户编码',
+          name: '客户名称',
+          contact: '联系人',
+          phone: '联系电话',
+          address: '地址',
+          form: { codePlaceholder: '请输入客户编码', namePlaceholder: '请输入客户名称' }
+        },
+        supplier: {
+          title: '供应商',
+          code: '供应商编码',
+          name: '供应商名称',
+          contact: '对接人',
+          phone: '联系电话',
+          level: '等级',
+          form: { codePlaceholder: '请输入供应商编码', namePlaceholder: '请输入供应商名称' }
+        },
+        goods: {
+          title: '商品',
+          code: '商品编码',
+          name: '商品名称',
+          spec: '规格',
+          unit: '单位',
+          categoryName: '分类',
+          form: { codePlaceholder: '请输入商品编码', namePlaceholder: '请输入商品名称' }
+        },
+        category: {
+          title: '商品分类',
+          code: '分类编码',
+          name: '分类名称',
+          sort: '排序',
+          form: { codePlaceholder: '请输入分类编码', namePlaceholder: '请输入分类名称' }
+        }
+      },
+      finance: {
+        title: '财务资料',
+        account: {
+          title: '结算账户',
+          code: '账户编码',
+          name: '账户名称',
+          accountType: '账户类型',
+          bank: '开户行',
+          balance: '余额',
+          form: { codePlaceholder: '请输入账户编码', namePlaceholder: '请输入账户名称' }
+        },
+        currency: {
+          title: '币种',
+          code: '币种代码',
+          name: '币种名称',
+          rate: '汇率',
+          symbol: '符号',
+          form: { codePlaceholder: '请输入币种代码', namePlaceholder: '请输入币种名称' }
+        },
+        tax: {
+          title: '税率',
+          name: '方案名称',
+          rate: '税率',
+          taxType: '税种',
+          form: { namePlaceholder: '请输入方案名称' }
+        },
+        settlement: {
+          title: '结算方式',
+          name: '方式名称',
+          period: '结算周期',
+          form: { namePlaceholder: '请输入方式名称' }
+        }
+      },
+      business: {
+        title: '业务资料',
+        warehouse: {
+          title: '仓库',
+          code: '仓库编码',
+          name: '仓库名称',
+          address: '地址',
+          manager: '管理员',
+          form: { codePlaceholder: '请输入仓库编码', namePlaceholder: '请输入仓库名称' }
+        },
+        location: {
+          title: '库位',
+          code: '库位编码',
+          name: '库位名称',
+          warehouseName: '所属仓库',
+          capacity: '容量',
+          form: { codePlaceholder: '请输入库位编码', namePlaceholder: '请输入库位名称' }
+        },
+        carrier: {
+          title: '承运商',
+          code: '承运商编码',
+          name: '承运商名称',
+          contact: '联系人',
+          phone: '联系电话',
+          form: { codePlaceholder: '请输入承运商编码', namePlaceholder: '请输入承运商名称' }
+        },
+        store: {
+          title: '门店',
+          code: '门店编码',
+          name: '门店名称',
+          address: '地址',
+          owner: '负责人',
+          form: { codePlaceholder: '请输入门店编码', namePlaceholder: '请输入门店名称' }
         }
       }
     },

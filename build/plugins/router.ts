@@ -30,7 +30,11 @@ export function setupElegantRouter() {
       const routeIcons: Partial<Record<RouteKey, string>> = {
         'system-manage': 'ic:baseline-settings',
         'system-manage_role': 'ic:round-supervisor-account',
-        'system-manage_user': 'ic:round-person'
+        'system-manage_user': 'ic:round-person',
+        'data-manage': 'ic:baseline-folder',
+        'data-manage_basic': 'ic:baseline-inventory',
+        'data-manage_finance': 'ic:baseline-account-balance-wallet',
+        'data-manage_business': 'ic:baseline-warehouse'
       };
 
       /** menu order of the route, the smaller the value, the higher the order */
