@@ -320,6 +320,8 @@ declare namespace App {
       };
       common: {
         action: string;
+        expandFilter: string;
+        collapseFilter: string;
         add: string;
         addSuccess: string;
         backToHome: string;
@@ -334,7 +336,16 @@ declare namespace App {
         config: string;
         confirm: string;
         drag: string;
+        iconPicker: {
+          placeholder: string;
+          clear: string;
+          search: string;
+          empty: string;
+          all: string;
+          iconify: string;
+        };
         show: string;
+        treeNodeColumnLocked: string;
         name: string;
         fixed: string;
         width: string;
@@ -625,6 +636,7 @@ declare namespace App {
             createTime: string;
             addMenu: string;
             editMenu: string;
+            addSubMenu: string;
             form: {
               menuNamePlaceholder: string;
               iconPlaceholder: string;

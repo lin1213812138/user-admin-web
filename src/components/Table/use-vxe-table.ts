@@ -14,6 +14,8 @@ export interface VxeColumnConfig {
   fixed?: '' | 'left' | 'right';
   align?: 'left' | 'center' | 'right';
   sortable: boolean;
+  /** mark as vxe-table tree-node column (renders indent + ▷ arrow) */
+  treeNode?: boolean;
 }
 
 export type VxeColumnRenderColumn = {
@@ -29,6 +31,8 @@ export type VxeColumnRenderColumn = {
   fixed?: '' | 'left' | 'right';
   align?: 'left' | 'center' | 'right';
   sortable?: boolean;
+  /** mark as vxe-table tree-node column (renders indent + ▷ arrow) */
+  treeNode?: boolean;
 };
 
 export interface VxePagination {
@@ -94,7 +98,9 @@ export function useVxeTable<ResponseData, ApiData>(options: UseVxeTableOptions<R
 
   const columns = computed<VxeColumnRenderColumn[]>(() =>
     columnConfigs.value
-      .filter(col => col.visible)
+      // a tree-node column must always render; otherwise the table loses its
+      // indent + ▷ arrow and the tree collapses to a flat list.
+      .filter(col => col.visible || col.treeNode)
       .map(col => ({
         key: col.key,
         title: col.title,
@@ -105,7 +111,8 @@ export function useVxeTable<ResponseData, ApiData>(options: UseVxeTableOptions<R
         minWidth: col.minWidth ?? undefined,
         fixed: col.fixed || undefined,
         align: col.align,
-        sortable: col.sortable
+        sortable: col.sortable,
+        treeNode: col.treeNode
       }))
   );
 

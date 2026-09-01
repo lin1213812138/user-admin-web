@@ -8,6 +8,8 @@ const local: App.I18n.Schema = {
   },
   common: {
     action: '操作',
+    expandFilter: '展开',
+    collapseFilter: '收起',
     add: '新增',
     addSuccess: '添加成功',
     backToHome: '返回首页',
@@ -22,7 +24,16 @@ const local: App.I18n.Schema = {
     config: '配置',
     confirm: '确认',
     drag: '拖拽',
+    iconPicker: {
+      placeholder: '请选择图标',
+      clear: '清空',
+      search: '搜索图标',
+      empty: '无匹配图标',
+      all: '全部',
+      iconify: 'Iconify'
+    },
     show: '显示',
+    treeNodeColumnLocked: '树节点列不可隐藏',
     name: '名称',
     fixed: '固定',
     width: '宽度',
@@ -348,6 +359,7 @@ const local: App.I18n.Schema = {
         createTime: '创建时间',
         addMenu: '新增菜单',
         editMenu: '编辑菜单',
+        addSubMenu: '增加子菜单',
         form: {
           menuNamePlaceholder: '请输入菜单名称',
           iconPlaceholder: '请输入图标名称，如 mdi:home',

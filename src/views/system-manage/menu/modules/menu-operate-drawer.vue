@@ -18,6 +18,8 @@ interface Props {
   rowData: number | null;
   /** full menu tree data, used to build parent options */
   treeData: MenuItem[];
+  /** preselected parent id when adding a sub menu (null = top level) */
+  parentId?: number | null;
 }
 
 const props = defineProps<Props>();
@@ -133,9 +135,9 @@ const formItems = computed<FormItemConfig[]>(() => {
     {
       key: 'icon',
       label: $t('page.manage.menu.icon'),
-      type: 'input',
+      type: 'icon-picker',
       span: 24,
-      placeholder: $t('page.manage.menu.form.iconPlaceholder')
+      placeholder: $t('common.iconPicker.placeholder')
     }
   ];
 
@@ -239,6 +241,8 @@ watch(
       model.value = createDefaultModel();
       if (props.operateType === 'edit' && props.rowData != null) {
         await loadDetail(props.rowData);
+      } else if (props.operateType === 'add' && props.parentId != null) {
+        model.value.parentId = props.parentId;
       }
     }
   }
@@ -257,7 +261,7 @@ async function loadDetail(id: number) {
       routePath: row.routePath,
       componentPath: row.componentPath,
       permission: row.permission,
-      sort: row.sort,
+      sort: row.sort ?? 1,
       status: row.status,
       visible: row.visible,
       keepAlive: row.keepAlive,
@@ -280,6 +284,7 @@ function flatten(list: MenuItem[]): MenuItem[] {
 }
 
 async function handleSubmit() {
+  console.log(model.value, 'model.value');
   if (!(await formRef.value?.validate())) return;
 
   loading.value = true;

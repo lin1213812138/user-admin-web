@@ -1,7 +1,7 @@
 import type { SelectOption } from 'naive-ui';
 
 /** 表单支持的控件类型 */
-export type FormItemType = 'input' | 'textarea' | 'number' | 'switch' | 'select';
+export type FormItemType = 'input' | 'textarea' | 'number' | 'switch' | 'select' | 'icon-picker';
 
 /** 单个表单项配置，驱动 FormWrap 自动渲染 */
 export interface FormItemConfig {

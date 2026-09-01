@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { FormInst, FormItemRule, FormRules } from 'naive-ui';
+import { $t } from '@/locales';
 import { type FormItemConfig } from './form-config';
+import IconPicker from '@/components/custom/icon-picker.vue';
 
 export type { FormItemConfig } from './form-config';
 
@@ -42,19 +44,68 @@ const props = withDefaults(defineProps<Props>(), {
 
 const formRef = ref<FormInst | null>(null);
 
+/** field items (exclude slot-only action items) */
+const fieldItems = computed<FormItemConfig[]>(() => (props.items ?? []).filter(i => !i.slot));
+/** slot-only action items, rendered in the right action area */
+const actionItems = computed<FormItemConfig[]>(() => (props.items ?? []).filter(i => i.slot));
+
+/** total rows by span accumulation (24 per row) */
+const totalRows = computed<number>(() => {
+  let used = 0;
+  let rows = 0;
+  for (const item of fieldItems.value) {
+    const span = Number(item.span ?? 24);
+    if (used + span > 24) {
+      rows += 1;
+      used = span;
+    } else {
+      used += span;
+    }
+  }
+  if (used > 0) rows += 1;
+  return rows;
+});
+
+/** whether to show expand/collapse toggle: only when action items exist and rows exceed 1 */
+const showToggle = computed<boolean>(() => actionItems.value.length > 0 && totalRows.value > 1);
+
+const expanded = ref(true);
+
+/** visible field items: when collapsed, only the first row */
+const visibleFieldItems = computed<FormItemConfig[]>(() => {
+  if (expanded.value || !showToggle.value) return fieldItems.value;
+  let used = 0;
+  let rows = 0;
+  const result: FormItemConfig[] = [];
+  for (const item of fieldItems.value) {
+    const span = Number(item.span ?? 24);
+    if (used + span > 24) {
+      rows += 1;
+      used = span;
+    } else {
+      used += span;
+    }
+    if (rows >= 1) break;
+    result.push(item);
+  }
+  return result;
+});
+
 const mergedRules = computed<FormRules>(() => {
   const base: FormRules = { ...props.rules };
-  if (props.items) {
-    for (const item of props.items) {
-      if (item.required && !base[item.key]) {
-        base[item.key] = [
-          {
-            required: true,
-            message: item.requiredMsg || `${item.label}必填`,
-            trigger: ['input', 'change', 'blur']
-          }
-        ] as FormItemRule[];
+  for (const item of fieldItems.value) {
+    if (item.required && !base[item.key]) {
+      const rule: FormItemRule = {
+        required: true,
+        message: item.requiredMsg || `${item.label}必填`,
+        trigger: ['change', 'blur']
+      };
+      // Numeric field: declare `type: 'number'` so async-validator does not treat a
+      // number value (incl. valid `0`) as empty and wrongly fail the required check.
+      if (item.type === 'number') {
+        rule.type = 'number';
       }
+      base[item.key] = [rule];
     }
   }
   return base;
@@ -62,6 +113,10 @@ const mergedRules = computed<FormRules>(() => {
 
 function getSpan(item: FormItemConfig): number | string {
   return item.span ?? 24;
+}
+
+function toggleExpand() {
+  expanded.value = !expanded.value;
 }
 
 /** 校验表单，通过后返回 true */
@@ -95,13 +150,12 @@ defineExpose({
     :label-width="labelWidth"
     :disabled="disabled"
   >
-    <template v-if="items?.length">
+    <template v-if="fieldItems.length">
       <NGrid :cols="24" :x-gap="gridXGap" item-responsive :responsive="gridResponsive">
-        <NGi v-for="item in items" :key="item.key" :span="getSpan(item)">
+        <NGi v-for="item in visibleFieldItems" :key="item.key" :span="getSpan(item)">
           <NFormItem :label="item.label" :path="item.key">
-            <slot v-if="item.slot" :name="item.slot" :model="model" :item="item" />
             <NInput
-              v-else-if="item.type === 'input' || !item.type"
+              v-if="item.type === 'input' || !item.type"
               v-model:value="model[item.key] as string"
               :placeholder="item.placeholder"
               :disabled="item.disabled"
@@ -135,9 +189,25 @@ defineExpose({
               :placeholder="item.placeholder"
               :disabled="item.disabled"
             />
+            <IconPicker
+              v-else-if="item.type === 'icon-picker'"
+              v-model:value="model[item.key] as string"
+              :placeholder="item.placeholder"
+              :disabled="item.disabled"
+            />
           </NFormItem>
         </NGi>
       </NGrid>
+      <div v-if="actionItems.length || showToggle" class="flex-y-center justify-end gap-8px">
+        <template v-for="it in actionItems" :key="it.key">
+          <slot :name="it.slot" :model="model" :item="it" />
+        </template>
+        <NButton v-if="showToggle" text type="primary" @click="toggleExpand">
+          {{ expanded ? $t('common.collapseFilter') : $t('common.expandFilter') }}
+          <icon-ic-baseline-keyboard-arrow-up v-if="expanded" class="text-icon" />
+          <icon-ic-baseline-keyboard-arrow-down v-else class="text-icon" />
+        </NButton>
+      </div>
     </template>
     <slot v-else />
   </NForm>

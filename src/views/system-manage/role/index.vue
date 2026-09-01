@@ -183,7 +183,6 @@ function handleSubmitted() {
         :show-checkbox="true"
         :show-action="true"
         :action-width="180"
-        action-align="center"
         @refresh="getData"
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"

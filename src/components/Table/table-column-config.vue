@@ -159,7 +159,11 @@ watch(innerVisible, val => {
           <icon-mdi-drag class="rank-icon cursor-move text-icon" @mousedown.stop />
         </template>
         <template #visible="{ row }">
-          <NSwitch v-model:value="row.visible" />
+          <NSwitch
+            v-model:value="row.visible"
+            :disabled="row.treeNode"
+            :title="row.treeNode ? $t('common.treeNodeColumnLocked') : ''"
+          />
         </template>
         <template #title="{ row }">
           <span class="truncate">{{ row.title }}</span>

@@ -128,6 +128,7 @@ function handleSelectionChange({ records }: { records: any[] }) {
           :align="col.align"
           :header-align="col.align"
           :sortable="col.sortable"
+          :tree-node="col.treeNode"
         >
           <template v-if="$slots[col.key]" #default="scope">
             <slot :name="col.key" v-bind="scope" />

@@ -8,6 +8,8 @@ const local: App.I18n.Schema = {
   },
   common: {
     action: 'Action',
+    expandFilter: 'Expand',
+    collapseFilter: 'Collapse',
     add: 'Add',
     addSuccess: 'Add Success',
     backToHome: 'Back to home',
@@ -22,7 +24,16 @@ const local: App.I18n.Schema = {
     config: 'Config',
     confirm: 'Confirm',
     drag: 'Drag',
+    iconPicker: {
+      placeholder: 'Select an icon',
+      clear: 'Clear',
+      search: 'Search icons',
+      empty: 'No matching icons',
+      all: 'All',
+      iconify: 'Iconify'
+    },
     show: 'Show',
+    treeNodeColumnLocked: 'Tree-node column cannot be hidden',
     name: 'Name',
     fixed: 'Fixed',
     width: 'Width',
@@ -352,6 +363,7 @@ const local: App.I18n.Schema = {
         createTime: 'Create Time',
         addMenu: 'Add Menu',
         editMenu: 'Edit Menu',
+        addSubMenu: 'Add Submenu',
         form: {
           menuNamePlaceholder: 'Please enter menu name',
           iconPlaceholder: 'Please enter icon name, e.g. mdi:home',
