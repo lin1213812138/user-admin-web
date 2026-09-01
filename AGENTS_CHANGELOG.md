@@ -13,3 +13,5 @@
 - [图标选择器接入 xicons（@vicons）](./changelog/图标选择器接入xicons.md) — 2026-09-01
 - [菜单排序必填校验不通过（number 字段缺 type）](./changelog/菜单排序必填校验不通过.md) — 2026-09-01
 - [菜单管理操作列「增加子菜单」](./changelog/增加子菜单.md) — 2026-09-01
+- [资料管理模块设计](./changelog/资料管理模块设计.md) — 2026-09-01（基础/财务/业务资料，方案 A 通用配置驱动组件）
+- [pnpm release 命令报错诊断](./changelog/pnpm-release命令报错诊断.md) — 2026-09-01
