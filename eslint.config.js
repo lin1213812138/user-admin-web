@@ -11,5 +11,4 @@ const baseConfig = defineConfig({
   ]
 });
 
-// prepend a global ignore for Tauri build artifacts (not covered by .gitignore in flat config)
-export default baseConfig.then(config => [{ ignores: ['src-tauri/target/**'] }, ...config]);
+export default baseConfig;

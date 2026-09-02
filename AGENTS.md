@@ -26,7 +26,7 @@ Vue 3 + TypeScript 前端项目，WMS 出库管理的**管理端**界面（应�
 - **路由**: Vue Router 5 + **elegant-router 0.3.8（按目录自动生成）**，history 模式
 - **HTTP**: Axios，封装在内部包 `@sa/axios`（`createFlatRequest`）
 - **国际化**: vue-i18n 11（zh-cn / en-us）
-- **桌面端**: Tauri 2（`src-tauri/`）
+
 - **图表**: ECharts 6
 - **样式**: UnoCSS 66（presetWind3 + presetSoybeanAdmin）+ SCSS
 - **包管理**: pnpm workspace monorepo（**禁止 npm / yarn**）
@@ -37,22 +37,21 @@ Vue 3 + TypeScript 前端项目，WMS 出库管理的**管理端**界面（应�
 
 ## 常用命令
 
-| 命令                                                | 说明                                                                                                                   |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `pnpm i`                                            | 首次安装依赖。monorepo 架构，只能用 pnpm。                                                                             |
-| `pnpm dev`                                          | 启动开发服务器（`--mode test`，端口 9527）。会触发 elegant-router 重新生成路由文件。                                   |
-| `pnpm dev:prod`                                     | 以 prod 环境配置启动开发服务器。                                                                                       |
-| `pnpm build`                                        | 生产构建（`--mode prod`）。                                                                                            |
-| `pnpm build:test`                                   | 测试环境构建（`--mode test`）。                                                                                        |
-| `pnpm preview`                                      | 预览构建产物（端口 9725）。                                                                                            |
-| `pnpm typecheck`                                    | `vue-tsc --noEmit --skipLibCheck` 类型检查。改完代码必跑。                                                             |
-| `pnpm lint`                                         | `oxlint --fix && eslint --fix .`。                                                                                     |
-| `pnpm fmt`                                          | oxfmt 格式化。提交前必须真正执行过，否则 pre-commit 的 `git diff --exit-code` 会拒绝提交。                             |
-| `pnpm gen-route`                                    | 手动重新生成路由文件（等价于 `pnpm dev` 触发的那一次生成）。                                                           |
-| `pnpm commit` / `pnpm commit:zh`                    | 交互式生成 Conventional Commits 提交信息。**不要直接 `git commit`**，`commit-msg` 钩子由 `sa git-commit-verify` 校验。 |
-| `pnpm dev:tauri` / `pnpm build:tauri`               | Tauri 桌面端开发 / 打包。                                                                                              |
-| `pnpm tauri-icon`                                   | 从 `public/logo.png` 重新生成 Tauri 图标。                                                                             |
-| `pnpm cleanup` / `pnpm release` / `pnpm update-pkg` | 清理依赖与产物 / 发版 / 批量更新依赖。                                                                                 |
+| 命令                             | 说明                                                                                                                   |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `pnpm i`                         | 首次安装依赖。monorepo 架构，只能用 pnpm。                                                                             |
+| `pnpm dev`                       | 启动开发服务器（`--mode test`，端口 9527）。会触发 elegant-router 重新生成路由文件。                                   |
+| `pnpm dev:prod`                  | 以 prod 环境配置启动开发服务器。                                                                                       |
+| `pnpm build`                     | 生产构建（`--mode prod`）。                                                                                            |
+| `pnpm build:test`                | 测试环境构建（`--mode test`）。                                                                                        |
+| `pnpm preview`                   | 预览构建产物（端口 9725）。                                                                                            |
+| `pnpm typecheck`                 | `vue-tsc --noEmit --skipLibCheck` 类型检查。改完代码必跑。                                                             |
+| `pnpm lint`                      | `oxlint --fix && eslint --fix .`。                                                                                     |
+| `pnpm fmt`                       | oxfmt 格式化。提交前必须真正执行过，否则 pre-commit 的 `git diff --exit-code` 会拒绝提交。                             |
+| `pnpm gen-route`                 | 手动重新生成路由文件（等价于 `pnpm dev` 触发的那一次生成）。                                                           |
+| `pnpm commit` / `pnpm commit:zh` | 交互式生成 Conventional Commits 提交信息。**不要直接 `git commit`**，`commit-msg` 钩子由 `sa git-commit-verify` 校验。 |
+
+| `pnpm cleanup` / `pnpm release` / `pnpm update-pkg` | 清理依赖与产物 / 发版 / 批量更新依赖。 |
 
 **本仓库没有测试框架，也没有 test 脚本。** 验证手段是 `pnpm typecheck` + `pnpm lint` + `pnpm build`，不要去找单测命令或臆造测试入口。
 
@@ -98,7 +97,7 @@ user-admin-web/
 │       ├── _builtin/           #   login / 403 / 404 / 500 / iframe-page
 │       ├── home/               #   首页（modules/ 为演示子组件）
 │       └── system-manage/      #   user / role / menu / dept
-├── src-tauri/                  # Tauri Rust 工程（构建产物无需关注）
+
 ├── changelog/                  # Agent 讨论记录（见顶部规则 1）
 ├── .env / .env.test / .env.prod
 ├── uno.config.ts / vite.config.ts / tsconfig.json / eslint.config.js / .oxfmtrc.json
