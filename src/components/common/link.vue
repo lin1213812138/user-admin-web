@@ -24,6 +24,8 @@ interface Props {
   target?: string;
   /** 图标位置 */
   iconPosition?: LinkIconPosition;
+  /** 图标是否在 hover 时才显示（默认常显） */
+  iconHover?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +34,8 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   href: '',
   target: '_self',
-  iconPosition: 'left'
+  iconPosition: 'left',
+  iconHover: false
 });
 
 const emit = defineEmits<{
@@ -87,7 +90,7 @@ function handleClick(evt: MouseEvent) {
           }
     "
     class="link"
-    :class="[typeClass, underlineClass, { 'link--disabled': disabled }]"
+    :class="[typeClass, underlineClass, { 'link--disabled': disabled, 'link--icon-hover': iconHover }]"
     :style="{ '--link-color': linkColor, '--link-color-hover': linkColorHover }"
   >
     <template v-if="props.iconPosition === 'left'">
@@ -148,5 +151,13 @@ function handleClick(evt: MouseEvent) {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+/* 图标仅 hover 时显示：默认不占位，hover 时出现 */
+.link--icon-hover .link__icon {
+  display: none;
+}
+.link--icon-hover:hover .link__icon {
+  display: inline-flex;
 }
 </style>

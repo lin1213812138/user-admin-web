@@ -139,7 +139,7 @@ function handleSelectionChange({ records }: { records: any[] }) {
             </NTag>
           </template>
           <template v-else-if="col.type === 'detail'" #default="{ row }">
-            <Link type="primary" icon-position="right" @click="emit('detail', row)">
+            <Link type="primary" icon-position="right" icon-hover @click="emit('detail', row)">
               {{ row[col.key] }}
               <template #icon>
                 <NTooltip trigger="hover">

@@ -49,6 +49,41 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'home',
+    path: '/home',
+    component: 'layout.base$view.home',
+    meta: {
+      title: 'home',
+      i18nKey: 'route.home',
+      icon: 'mdi:monitor-dashboard'
+    }
+  },
+  {
+    name: 'iframe-page',
+    path: '/iframe-page/:url',
+    component: 'layout.base$view.iframe-page',
+    props: true,
+    meta: {
+      title: 'iframe-page',
+      i18nKey: 'route.iframe-page',
+      constant: true,
+      hideInMenu: true,
+      keepAlive: true
+    }
+  },
+  {
+    name: 'login',
+    path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?',
+    component: 'layout.blank$view.login',
+    props: true,
+    meta: {
+      title: 'login',
+      i18nKey: 'route.login',
+      constant: true,
+      hideInMenu: true
+    }
+  },
+  {
     name: 'data-manage',
     path: '/data-manage',
     component: 'layout.base',
@@ -89,41 +124,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       }
     ]
-  },
-  {
-    name: 'home',
-    path: '/home',
-    component: 'layout.base$view.home',
-    meta: {
-      title: 'home',
-      i18nKey: 'route.home',
-      icon: 'mdi:monitor-dashboard'
-    }
-  },
-  {
-    name: 'iframe-page',
-    path: '/iframe-page/:url',
-    component: 'layout.base$view.iframe-page',
-    props: true,
-    meta: {
-      title: 'iframe-page',
-      i18nKey: 'route.iframe-page',
-      constant: true,
-      hideInMenu: true,
-      keepAlive: true
-    }
-  },
-  {
-    name: 'login',
-    path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?',
-    component: 'layout.blank$view.login',
-    props: true,
-    meta: {
-      title: 'login',
-      i18nKey: 'route.login',
-      constant: true,
-      hideInMenu: true
-    }
   },
   {
     name: 'system-manage',
