@@ -4,6 +4,7 @@
 
 ## 2026-09-03
 
+- [pnpm release 提交被 pre-commit 钩子拦截（git diff --exit-code 失败）](./changelog/pnpm-release 提交被 pre-commit 拦截.md)
 - [侧边栏菜单顺序 vs elegant-router 自动重排路由文件](./changelog/路由菜单顺序与elegant路由生成.md)
 - [资料管理子档案按需懒加载（KeepAlive 缓存）](./changelog/资料管理子档案按需懒加载.md)
 

@@ -46,3 +46,13 @@
 - 不要用 `<NSpin :show>` 直接包裹 `vxe-table`（naive-ui NSpin 的 show 是硬显隐，spinner 出现/消失无平滑过渡，且 loading 时表格高度易跳动）。
 - 正确：让 `vxe-table` 始终渲染（height='100%' 占满），外层加 `relative`，用独立遮罩层 `<Transition name="fade"><div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/60"><NSpin size="large" /></div></Transition>` 控制 loading 显隐，复用全局 `.fade-*`（opacity 0.3s）。spinner 淡入淡出平滑、表格高度稳定。
 - 当前菜单页采用 children 模式：扁平数据 → `buildMenuTree(data.value)` 组树 → 表格和抽屉共用 `menuTree`。`buildMenuTree` 是从 `parentId` 推导的，符合"用 parentId 渲染"。
+
+## pnpm release 流程踩坑（已修复）
+
+- `pnpm release` = `sa release` → `packages/scripts/src/commands/release.ts`（bumpp）。**交互式**：真实终端跑，会弹版本选择菜单（选 `next`/`patch` 回车）；非交互 shell 会卡住。
+- 链路：bumpp 改版本 → 跑 `execute`（`pnpm sa changelog` 重生成 `CHANGELOG.md`）→ `git commit -A` 触发 `pre-commit` 钩子（`pnpm typecheck && pnpm lint && pnpm fmt && git diff --exit-code`）。
+- **历史坑 1（2026-09-01）**：空仓库无 tag 时 `git describe` 报 `No names found`，changelog 卡死。已建本地基准 tag `v0.0.0` 解决。
+- **历史坑 2（2026-09-03，已修复）**：`@soybeanjs/changelog` 生成的 `CHANGELOG.md` 贡献者段有空行，`oxfmt` 会删它；`pre-commit` 的 `git diff --exit-code` 因此检测到未暂存改动 → `git commit` 退出 1。修复：把 bumpp 的 `execute` 改为函数，先跑 `pnpm sa changelog` 再补一句 `pnpm fmt`，让 changelog 在 bumpp 暂存前就 fmt 干净，钩子里的 fmt 变空操作。
+- bumpp `execute` 字符串若含 `&&` 会被 `tokenizeArgs` 误拆，必须用函数式 `execute` 分两次 `execCommand`。
+- `sa` 由 `tsx` 直跑 `packages/scripts/src`（bin.ts `#!/usr/bin/env tsx`），改 scripts 即时生效，无需构建。
+- 该命令最后会 push 到远程（含 tag），运行前确保 `git status` 干净且确实要推送。
