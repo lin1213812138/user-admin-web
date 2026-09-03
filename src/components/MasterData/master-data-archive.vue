@@ -139,31 +139,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col gap-12px py-8px px-16px">
-    <NCard :bordered="false" class="card-wrapper shrink-0">
-      <NFormWrap
-        :model="searchParams"
-        :items="config.searchItems"
-        :grid-x-gap="16"
-        label-placement="left"
-        :label-width="80"
-        grid-responsive="self"
-      >
-        <template #actions>
-          <div class="flex items-center gap-8px">
-            <NButton type="primary" ghost @click="handleSearch">
-              <template #icon><icon-ic-round-search class="text-icon" /></template>
-              {{ $t('common.search') }}
-            </NButton>
-            <NButton @click="handleReset">
-              <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-              {{ $t('common.reset') }}
-            </NButton>
-          </div>
-        </template>
-      </NFormWrap>
-    </NCard>
-
+  <div class="h-full w-full flex flex-col gap-12px py-8px pl-16px">
     <div class="flex-1 min-h-0">
       <Table
         :columns="columns"
@@ -174,6 +150,10 @@ async function handleSubmit() {
         :show-checkbox="true"
         :show-action="true"
         :action-width="180"
+        :search-items="config.searchItems"
+        :search-model="searchParams"
+        @search="handleSearch"
+        @reset="handleReset"
         @refresh="getData"
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"

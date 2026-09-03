@@ -7,6 +7,7 @@
 - [pnpm release 提交被 pre-commit 钩子拦截（git diff --exit-code 失败）](./changelog/pnpm-release 提交被 pre-commit 拦截.md)
 - [侧边栏菜单顺序 vs elegant-router 自动重排路由文件](./changelog/路由菜单顺序与elegant路由生成.md)
 - [资料管理子档案按需懒加载（KeepAlive 缓存）](./changelog/资料管理子档案按需懒加载.md)
+- [搜索栏独立封装为 SearchBar 组件（通用 Table 配置委托、各界面独立配置）](./changelog/搜索栏内置通用Table组件.md)
 
 ## 2026-09-01
 

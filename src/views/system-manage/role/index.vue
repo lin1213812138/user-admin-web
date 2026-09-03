@@ -4,7 +4,7 @@ import { $t } from '@/locales';
 import { fetchDeleteRole, fetchGetRoleList } from '@/service/api/system-manage';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
+import type { FormItemConfig } from '@/components/Form/index.vue';
 import RoleOperateDrawer from './modules/role-operate-drawer.vue';
 import RolePermissionDrawer from './modules/role-permission-drawer.vue';
 
@@ -145,36 +145,10 @@ function handleSubmitted() {
 
 <template>
   <div class="h-full w-full flex flex-col gap-12px p-16px">
-    <NCard :bordered="false" class="card-wrapper shrink-0">
-      <NFormWrap
-        :model="searchParams"
-        :items="searchItems"
-        :grid-x-gap="16"
-        label-placement="left"
-        :label-width="70"
-        grid-responsive="self"
-      >
-        <template #actions>
-          <div class="flex items-center gap-8px">
-            <NButton type="primary" ghost @click="handleSearch">
-              <template #icon>
-                <icon-ic-round-search class="text-icon" />
-              </template>
-              {{ $t('common.search') }}
-            </NButton>
-            <NButton @click="handleReset">
-              <template #icon>
-                <icon-ic-round-refresh class="text-icon" />
-              </template>
-              {{ $t('common.reset') }}
-            </NButton>
-          </div>
-        </template>
-      </NFormWrap>
-    </NCard>
-
     <div class="flex-1 min-h-0">
       <Table
+        :search-items="searchItems"
+        :search-model="searchParams"
         :columns="columns"
         :data="data"
         :loading="loading"
@@ -183,6 +157,8 @@ function handleSubmitted() {
         :show-checkbox="true"
         :show-action="true"
         :action-width="180"
+        @search="handleSearch"
+        @reset="handleReset"
         @refresh="getData"
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"

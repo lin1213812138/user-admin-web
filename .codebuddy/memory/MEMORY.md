@@ -1,5 +1,11 @@
 # MEMORY
 
+## 语言偏好（最高优先级）
+
+- 用户明确要求：**所有内容一律中文**，包括设计文档、讨论记录、代码注释。
+- 这**覆盖** AGENTS.md 里「代码注释用英文 JSDoc」的约定。本项目实际以中文为准，不要写英文注释 / 英文文档。
+- 例外：第三方库 API、变量名、技术专有名词可保留英文；但解释性注释、commit 说明、文档正文都用中文。
+
 ## vxe-table v4 tree 模式（项目踩坑）
 
 `tree-config` 必须显式带 **`rowField`**，否则 vxe-table 不进入 tree 模式，只渲染顶层数组、忽略 `children` 嵌套（菜单管理页曾因此树形子级不显示）。
@@ -43,8 +49,14 @@
 
 ## 表格 loading 显示约定（全项目通用 Table）
 
-- 不要用 `<NSpin :show>` 直接包裹 `vxe-table`（naive-ui NSpin 的 show 是硬显隐，spinner 出现/消失无平滑过渡，且 loading 时表格高度易跳动）。
-- 正确：让 `vxe-table` 始终渲染（height='100%' 占满），外层加 `relative`，用独立遮罩层 `<Transition name="fade"><div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/60"><NSpin size="large" /></div></Transition>` 控制 loading 显隐，复用全局 `.fade-*`（opacity 0.3s）。spinner 淡入淡出平滑、表格高度稳定。
+- **统一用 vxe-table 自带的 `:loading`**（原生遮罩自带平滑淡入淡出、与表格高度/滚动条协同更好）。不要另包 `<NSpin :show>` 或自定义 fade 遮罩层（naive-ui NSpin 的 show 是硬显隐、无平滑过渡，且 loading 时表格高度易跳动）。
+- 落地（src/components/Table/table.vue）：`vxe-table` 加 `:loading="loading"` 即可；`loading` 由 `useVxeTable` 的 `startLoading/endLoading` 控制（mock 异步化让 loading 真实可见）。`NSpin` 在 Table 内不使用（全局注册，删 usage 即可）。
+
+## 表格列宽/行为约定（全项目通用 Table）
+
+- 默认开启**列宽拖拽**：`vxe-table` 上加 `:column-config="{ resizable: true }"`（vxe-table 默认 `resizable:false`，需显式开启）。所有档案页表格均可拖拽列右边界调整列宽。
+- 个别列不想可拖：在该 `vxe-column` 上单独设 `:resizable="false"` 覆盖。
+- 列内容溢出统一**单行省略+tooltip**：`vxe-table` 上加 `:show-overflow="'tooltip'"`（vxe-table 等价于 show-over-tooltip，鼠标悬停显示完整内容）。个别列需换行展示：在该 `vxe-column` 上单独设 `:show-overflow="false"` 覆盖。
 - 当前菜单页采用 children 模式：扁平数据 → `buildMenuTree(data.value)` 组树 → 表格和抽屉共用 `menuTree`。`buildMenuTree` 是从 `parentId` 推导的，符合"用 parentId 渲染"。
 
 ## pnpm release 流程踩坑（已修复）
@@ -56,3 +68,12 @@
 - bumpp `execute` 字符串若含 `&&` 会被 `tokenizeArgs` 误拆，必须用函数式 `execute` 分两次 `execCommand`。
 - `sa` 由 `tsx` 直跑 `packages/scripts/src`（bin.ts `#!/usr/bin/env tsx`），改 scripts 即时生效，无需构建。
 - 该命令最后会 push 到远程（含 tag），运行前确保 `git status` 干净且确实要推送。
+
+## 通用表格搜索栏（独立 SearchBar 组件 + Table 配置委托）
+
+- 搜索栏是**独立、可复用**的组件 `src/components/SearchBar/search-bar.vue`（2026-09-03 落地；spec: `docs/superpowers/specs/2026-09-03-search-bar-table-design.md`），**不依赖 MasterData、任何表格/页面都能直接用**。
+- `SearchBar` props：`items: FormItemConfig[]`、`model: Record<string,unknown>`、`collapsed?: boolean`（默认 `true` 收起）、`gridXGap`/`gridResponsive`/`labelPlacement`/`labelWidth`；emits：`search` / `reset`。内部 `NCard + NFormWrap`（`#actions` 槽位内置「搜索/重置」按钮）；折叠用 **`opacity` + `transform: translateY(-8px)`**（`Transition` + `v-show` 切 `display`，0.2s）。**关键：绝不动画布局属性**——`height` 与 `grid-template-rows: 0fr↔1fr` 都逐帧触发整张 `NFormWrap` 重排、字段多必卡；只有 `opacity`/`transform` 走 GPU。收起 `display:none`（空间回收；状态保留因为 model 在父页面）。复用 `common.search`/`common.reset`，不新增 i18n。
+- 通用 `Table`（`src/components/Table/table.vue`）把搜索栏做成**可选「表格配置」**：新增 props `searchItems` / `searchModel` / `searchDefaultCollapsed`（默认 `true` 收起）+ emits `search`/`reset`；操作栏最右渲染搜索图标按钮（`icon-ic-round-search`，展开态高亮 `primary`），**内部委托渲染独立 `<SearchBar>`**，不再内联 NFormWrap。即：所有用通用 Table 的页面，只要在 `<Table>` 上配 `:search-items`/`:search-model` 并监听 `@search`/`@reset` 即可获得搜索栏；同时 `SearchBar` 也能被不基于通用 Table 的页面直接复用。
+- 用法（master-data-archive / role）：`<Table ... :search-items="..." :search-model="searchParams" @search="handleSearch" @reset="handleReset" />`；搜索栏显隐由 Table 内置的图标按钮控制。
+- 折叠状态不持久化（默认收起）。
+- 每个界面的搜索项必须各自配置：12 个档案页各自声明独立的 `searchItems`（基线 keyword + status + actions），`shared.ts` 仅保留真正共用的 `useArchiveStatusOptions()`；`searchItems` 末项保留 `{ key:'actions', slot:'actions' }` 以驱动 NFormWrap 的按钮区。禁止把搜索项抽成跨界面共享函数。

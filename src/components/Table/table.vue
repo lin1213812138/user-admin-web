@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { $t } from '@/locales';
 import Link from '@/components/common/link.vue';
 import IconRenderer from '@/components/custom/icon-renderer.vue';
+import type { FormItemConfig } from '@/components/Form/index.vue';
+import SearchBar from '@/components/SearchBar/search-bar.vue';
 import { copyText } from '@/utils/common';
 import type { VxeColumnRenderColumn, VxePagination } from './use-vxe-table';
 import type { VxeTablePropTypes } from 'vxe-table';
@@ -27,6 +29,12 @@ interface Props {
   height?: string;
   /** vxe-table tree-config, enable tree mode when provided */
   treeConfig?: VxeTablePropTypes.TreeConfig;
+  /** 搜索栏配置项，传入即启用内嵌可折叠搜索栏（由所有使用本表格的页面各自配置） */
+  searchItems?: FormItemConfig[];
+  /** 搜索表单数据对象（按引用传递，由父页面持有并在取数时读取） */
+  searchModel?: Record<string, unknown>;
+  /** 搜索栏是否默认收起 */
+  searchDefaultCollapsed?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -41,8 +49,14 @@ const props = withDefaults(defineProps<Props>(), {
   actionWidth: 140,
   actionAlign: 'left',
   height: '100%',
-  treeConfig: undefined
+  treeConfig: undefined,
+  searchItems: undefined,
+  searchModel: undefined,
+  searchDefaultCollapsed: true
 });
+
+/** 搜索栏是否收起（默认收起，让表格更清爽） */
+const searchCollapsed = ref(props.searchDefaultCollapsed);
 
 const actionJustify = computed(() => {
   if (props.actionAlign === 'center') return 'justify-center';
@@ -56,6 +70,8 @@ const emit = defineEmits<{
   (e: 'selectionChange', records: any[]): void;
   (e: 'afterRender'): void;
   (e: 'detail', row: any): void;
+  (e: 'search'): void;
+  (e: 'reset'): void;
 }>();
 
 function refresh() {
@@ -91,22 +107,45 @@ function handleSelectionChange({ records }: { records: any[] }) {
 
 <template>
   <div class="h-full w-full flex flex-col min-h-0">
+    <div v-if="searchItems?.length" :class="{ 'mb-12px': !searchCollapsed }">
+      <SearchBar
+        :items="searchItems"
+        :model="searchModel ?? {}"
+        :collapsed="searchCollapsed"
+        @search="emit('search')"
+        @reset="emit('reset')"
+      />
+    </div>
+
     <div class="mb-12px flex-y-center justify-between gap-12px">
       <div class="flex-y-center gap-8px flex-wrap">
         <slot name="operation-left" :refresh="refresh" />
       </div>
       <div class="flex-y-center gap-8px flex-wrap justify-end">
         <slot name="operation-right" :refresh="refresh" />
+        <NButton
+          v-if="searchItems?.length"
+          size="small"
+          :type="searchCollapsed ? 'default' : 'primary'"
+          :title="$t('common.search')"
+          @click="searchCollapsed = !searchCollapsed"
+        >
+          <template #icon><icon-ic-round-search class="text-icon" /></template>
+        </NButton>
       </div>
     </div>
-    <div class="relative w-full min-h-0 bg-white" :class="height === '100%' ? 'flex-1' : ''">
+
+    <div class="w-full min-h-0 bg-white" :class="height === '100%' ? 'flex-1' : ''">
       <vxe-table
         :data="data"
         :border="border"
         :stripe="stripe"
         :row-config="{ isHover: true, height: 40 }"
+        :column-config="{ resizable: true }"
         :seq-config="{ startIndex: seqStartIndex }"
         :height="height"
+        :loading="loading"
+        show-overflow="tooltip"
         :tree-config="treeConfig"
         class="w-full table-draggable"
         @checkbox-change="handleSelectionChange"
@@ -170,11 +209,6 @@ function handleSelectionChange({ records }: { records: any[] }) {
           <span class="text-14px text-#909399">{{ $t('common.noData') }}</span>
         </template>
       </vxe-table>
-      <Transition name="fade">
-        <div v-if="loading" class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-          <NSpin size="large" />
-        </div>
-      </Transition>
     </div>
 
     <div v-if="pagination" class="mt-12px flex justify-end">
@@ -187,7 +221,11 @@ function handleSelectionChange({ records }: { records: any[] }) {
         show-quick-jumper
         @update:page="handlePageChange"
         @update:page-size="handlePageSizeChange"
-      />
+      >
+        <template #prefix>
+          <span class="mr-8px">{{ $t('datatable.itemCount', { total: pagination.total }) }}</span>
+        </template>
+      </NPagination>
     </div>
   </div>
 </template>

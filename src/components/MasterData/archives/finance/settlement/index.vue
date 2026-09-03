@@ -3,15 +3,28 @@ import { $t } from '@/locales';
 import MasterDataArchive from '@/components/MasterData/master-data-archive.vue';
 import type { ArchiveConfig } from '@/components/MasterData/types';
 import type { VxeColumnConfig } from '@/components/Table';
-import { useArchiveBase } from '@/components/MasterData/shared';
+import type { FormItemConfig } from '@/components/Form/index.vue';
+import { useArchiveStatusOptions } from '@/components/MasterData/shared';
 
-const { baseSearch } = useArchiveBase();
+const statusOptions = useArchiveStatusOptions();
+
+const searchItems: FormItemConfig[] = [
+  {
+    key: 'keyword',
+    label: $t('common.keyword'),
+    type: 'input',
+    span: 8,
+    placeholder: $t('page.dataManage.common.keywordPlaceholder')
+  },
+  { key: 'status', label: $t('common.status'), type: 'select', span: 8, options: statusOptions.value },
+  { key: 'actions', label: ' ', slot: 'actions', span: 8 }
+];
 
 const config: ArchiveConfig<Api.DataManage.FinanceSettlement> = {
   archive: 'settlement',
   cacheKey: 'data-manage-finance-settlement',
   titleI18nKey: 'page.dataManage.finance.settlement.title',
-  searchItems: baseSearch(),
+  searchItems,
   columns: () =>
     [
       {
