@@ -59,7 +59,7 @@ const config: ArchiveConfig<Api.DataManage.BusinessWarehouse> = {
     { key: 'manager', label: $t('page.dataManage.business.warehouse.manager'), type: 'input', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', address: '', manager: '', status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', address: '', manager: '', status: 1, remark: '' })
 };
 </script>
 

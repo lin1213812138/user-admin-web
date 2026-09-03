@@ -62,7 +62,7 @@ const config: ArchiveConfig<Api.DataManage.BasicGoods> = {
     { key: 'categoryName', label: $t('page.dataManage.basic.goods.categoryName'), type: 'input', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', spec: '', unit: '', categoryName: '', status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', spec: '', unit: '', categoryName: '', status: 1, remark: '' })
 };
 </script>
 

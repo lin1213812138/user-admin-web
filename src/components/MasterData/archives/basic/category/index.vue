@@ -58,7 +58,7 @@ const config: ArchiveConfig<Api.DataManage.BasicCategory> = {
     { key: 'sort', label: $t('page.dataManage.basic.category.sort'), type: 'number', required: true, span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', sort: 0, status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', sort: 0, status: 1, remark: '' })
 };
 </script>
 

@@ -15,8 +15,8 @@ const searchParams = reactive<Omit<Api.SystemManage.RoleSearchParams, 'current' 
 });
 
 const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() => [
-  { label: $t('common.enable'), value: '1' },
-  { label: $t('common.disable'), value: '2' }
+  { label: $t('common.enable'), value: 1 },
+  { label: $t('common.disable'), value: 0 }
 ]);
 
 const searchItems = computed<FormItemConfig[]>(() => [

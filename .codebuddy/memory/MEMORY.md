@@ -6,6 +6,13 @@
 - 这**覆盖** AGENTS.md 里「代码注释用英文 JSDoc」的约定。本项目实际以中文为准，不要写英文注释 / 英文文档。
 - 例外：第三方库 API、变量名、技术专有名词可保留英文；但解释性注释、commit 说明、文档正文都用中文。
 
+## 状态字段 EnableStatus 约定（number 0/1）
+
+- **`Api.Common.EnableStatus = 0 | 1`**（number 类型，不是字符串）：`1` = 启用，`0` = 禁用。原 `'1'`/`'2'` 字符串惯例已于 2026-09-03 全局改为 `0/1`（用户明确要求"禁用为0启用为1"且是 number 类型）。
+- 涉及：类型定义 `src/typings/api/common.d.ts`、所有 mock（`mock.ts`/`mock-data-manage.ts` 及 12 个 MasterData 档案页 `createDefault`）、状态下拉选项（role/index、menu-operate-drawer、`MasterData/shared.ts` 的 `useArchiveStatusOptions`：enable=`1`、disable=`0`）、状态列渲染 `Table/table.vue` 的 `type:'status'` 默认 `activeValue ?? 1`、以及各状态开关（NSwitch）都需配 `checkedValue:1`/`uncheckedValue:0`（通过 `FormItemConfig.checkedValue/uncheckedValue` 透传）。
+- **坑**：NSwitch 默认 `checked-value=true`，若绑数字 `1` 不配 `checkedValue` 会显示成"禁用"；`type:'status'` 列默认 `activeValue ?? '1'`（字符串）也会因 `1 === '1'` 为 false 全部显示禁用——两处都已改成默认 `1`。
+- 表单开关映射字段：`src/components/Form/form-config.ts` 的 `FormItemConfig` 已加 `checkedValue?: string|number|boolean` / `uncheckedValue?: ...`，`Form/index.vue` 的 NSwitch 绑定二者。
+
 ## vxe-table v4 tree 模式（项目踩坑）
 
 `tree-config` 必须显式带 **`rowField`**，否则 vxe-table 不进入 tree 模式，只渲染顶层数组、忽略 `children` 嵌套（菜单管理页曾因此树形子级不显示）。
@@ -77,3 +84,11 @@
 - 用法（master-data-archive / role）：`<Table ... :search-items="..." :search-model="searchParams" @search="handleSearch" @reset="handleReset" />`；搜索栏显隐由 Table 内置的图标按钮控制。
 - 折叠状态不持久化（默认收起）。
 - 每个界面的搜索项必须各自配置：12 个档案页各自声明独立的 `searchItems`（基线 keyword + status + actions），`shared.ts` 仅保留真正共用的 `useArchiveStatusOptions()`；`searchItems` 末项保留 `{ key:'actions', slot:'actions' }` 以驱动 NFormWrap 的按钮区。禁止把搜索项抽成跨界面共享函数。
+
+## 系统设置页内 Tab 切换（无独立子路由 URL）
+
+- 「系统设置」(`system-manage_setting`) 是单一菜单项，点进去**顶部全局 tab 显示「系统设置」**，页面内 `NTabs` 再用本地 `activeKey` 切换 7 个子模块（录单格式/打印格式/导出格式/运单规则/通知配置/初始化数据/站点扫描）。
+- 实现：`setting/index.vue` 用 `import` 直接加载 7 个子组件，经 `componentMap` 由 `<keep-alive><component :is="componentMap[activeKey]"></keep-alive>` 渲染；切换只改 `activeKey`，**不 `router.push` 子路由**。
+- **7 个子模块是纯组件，放在 `setting/modules/`**（如 `InputFormat.vue`），**不是路由**：elegant-router 默认忽略 `views/**/modules/` 与 `components/` 目录，因此不会生成 `system-manage_setting_*` 子路由，也不会给父路由加自动 `redirect`。子模块**无独立 URL**，刷新回到默认 `input-format`。
+- ⚠️ **历史坑（2026-09-03，已修复）**：最初子页放在 `setting/<name>/index.vue`，被 elegant-router 自动生成为 `system-manage_setting` 的子路由，父路由因此被自动加 `redirect` 到第一个子路由；当时 `guard/route.ts` 又有「`system-manage_setting_*` 一律 replace 回父路由」规则 → 父子互指**重定向死循环、页面卡死**。修复 = 把子页移出自动路由目录到 `modules/`，并删除守卫那条已失效规则。
+- 衍生经验：① elegant-router 的 `transform.ts` 会给任何有 `children` 的路由自动加 `redirect` 指向首子路由——设计"父页面 + 子组件"结构时务必别让子组件落在自动路由目录；② `sa gen-route` 是**交互式新建路由脚手架，不是全量重生成**；全量重生成靠 `pnpm dev`/`build` 的 vite 插件（本机 WebStorm `coding-copilot` 的 `node-safe-delete-shim` 会拦截 vite 的 `rm` 导致 dev 启动失败，但配置阶段已写好生成的路由文件）。

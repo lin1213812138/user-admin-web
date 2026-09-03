@@ -62,7 +62,7 @@ const config: ArchiveConfig<Api.DataManage.BasicSupplier> = {
     { key: 'level', label: $t('page.dataManage.basic.supplier.level'), type: 'input', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', contact: '', phone: '', level: '', status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', contact: '', phone: '', level: '', status: 1, remark: '' })
 };
 </script>
 

@@ -171,8 +171,8 @@ function handleSelectionChange({ records }: { records: any[] }) {
             <slot :name="col.key" v-bind="scope" />
           </template>
           <template v-else-if="col.type === 'status'" #default="{ row }">
-            <NTag size="small" :type="row[col.key] === (col.activeValue ?? '1') ? 'success' : 'error'">
-              {{ row[col.key] === (col.activeValue ?? '1') ? $t('common.enable') : $t('common.disable') }}
+            <NTag size="small" :type="row[col.key] === (col.activeValue ?? 1) ? 'success' : 'error'">
+              {{ row[col.key] === (col.activeValue ?? 1) ? $t('common.enable') : $t('common.disable') }}
             </NTag>
           </template>
           <template v-else-if="col.type === 'detail'" #default="{ row }">

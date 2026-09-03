@@ -71,7 +71,7 @@ const config: ArchiveConfig<Api.DataManage.BusinessLocation> = {
     { key: 'capacity', label: $t('page.dataManage.business.location.capacity'), type: 'number', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', warehouseName: '', capacity: 0, status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', warehouseName: '', capacity: 0, status: 1, remark: '' })
 };
 </script>
 

@@ -61,7 +61,7 @@ const config: ArchiveConfig<Api.DataManage.BasicCustomer> = {
     { key: 'address', label: $t('page.dataManage.basic.customer.address'), type: 'input', span: 24 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', contact: '', phone: '', address: '', status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', contact: '', phone: '', address: '', status: 1, remark: '' })
 };
 </script>
 

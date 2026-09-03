@@ -31,6 +31,7 @@ export function setupElegantRouter() {
         'system-manage': 'ic:baseline-settings',
         'system-manage_role': 'ic:round-supervisor-account',
         'system-manage_user': 'ic:round-person',
+        'system-manage_setting': 'ic:baseline-settings-applications',
         'data-manage': 'ic:baseline-folder',
         'data-manage_basic': 'ic:baseline-inventory',
         'data-manage_finance': 'ic:baseline-account-balance-wallet',
@@ -43,7 +44,9 @@ export function setupElegantRouter() {
         'data-manage': 1,
         'system-manage': 2,
         'system-manage_role': 1,
-        'system-manage_user': 2
+        'system-manage_user': 2,
+        'system-manage_menu': 3,
+        'system-manage_setting': 4
       };
 
       const meta: Partial<RouteMeta> = {

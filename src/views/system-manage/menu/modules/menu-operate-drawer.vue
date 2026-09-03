@@ -45,7 +45,7 @@ function createDefaultModel(): Api.SystemManage.MenuCreateParams {
     componentPath: '',
     permission: '',
     sort: 1,
-    status: '1',
+    status: 1,
     visible: 1,
     keepAlive: 1,
     isExternal: 2,
@@ -103,8 +103,8 @@ const typeOptions = computed(() => [
 ]);
 
 const statusOptions = computed(() => [
-  { label: $t('common.enable'), value: '1' },
-  { label: $t('common.disable'), value: '2' }
+  { label: $t('common.enable'), value: 1 },
+  { label: $t('common.disable'), value: 0 }
 ]);
 
 const formItems = computed<FormItemConfig[]>(() => {

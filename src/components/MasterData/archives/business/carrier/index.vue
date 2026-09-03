@@ -59,7 +59,7 @@ const config: ArchiveConfig<Api.DataManage.BusinessCarrier> = {
     { key: 'phone', label: $t('page.dataManage.business.carrier.phone'), type: 'input', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', contact: '', phone: '', status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', contact: '', phone: '', status: 1, remark: '' })
 };
 </script>
 

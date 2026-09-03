@@ -1,7 +1,7 @@
 import type { SelectOption } from 'naive-ui';
 
 /** 表单支持的控件类型 */
-export type FormItemType = 'input' | 'textarea' | 'number' | 'switch' | 'select' | 'icon-picker';
+export type FormItemType = 'input' | 'textarea' | 'number' | 'switch' | 'select' | 'icon-picker' | 'checkbox';
 
 /** 单个表单项配置，驱动 FormWrap 自动渲染 */
 export interface FormItemConfig {
@@ -25,6 +25,10 @@ export interface FormItemConfig {
   checkedText?: string;
   /** 开关未选中时文案 */
   uncheckedText?: string;
+  /** 开关选中时的值 */
+  checkedValue?: string | number | boolean;
+  /** 开关未选中时的值 */
+  uncheckedValue?: string | number | boolean;
   /** 使用具名插槽自定义渲染内容，插槽名为 key */
   slot?: string;
   /** 禁用该项 */

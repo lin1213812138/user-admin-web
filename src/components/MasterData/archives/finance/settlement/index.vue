@@ -48,7 +48,7 @@ const config: ArchiveConfig<Api.DataManage.FinanceSettlement> = {
     { key: 'period', label: $t('page.dataManage.finance.settlement.period'), type: 'input', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ name: '', period: '', status: '1', remark: '' })
+  createDefault: () => ({ name: '', period: '', status: 1, remark: '' })
 };
 </script>
 

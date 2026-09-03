@@ -51,7 +51,7 @@ const config: ArchiveConfig<Api.DataManage.FinanceTax> = {
     { key: 'taxType', label: $t('page.dataManage.finance.tax.taxType'), type: 'input', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ name: '', rate: 0.13, taxType: '', status: '1', remark: '' })
+  createDefault: () => ({ name: '', rate: 0.13, taxType: '', status: 1, remark: '' })
 };
 </script>
 

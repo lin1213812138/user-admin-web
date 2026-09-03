@@ -50,7 +50,7 @@ const model = reactive<Api.SystemManage.UserCreateParams>({
   nickName: '',
   userPhone: '',
   userEmail: '',
-  status: '1'
+  status: 1
 });
 
 const formItems = computed<FormItemConfig[]>(() => [
@@ -89,7 +89,9 @@ const formItems = computed<FormItemConfig[]>(() => [
     type: 'switch',
     span: 24,
     checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
+    uncheckedText: $t('common.disable'),
+    checkedValue: 1,
+    uncheckedValue: 0
   }
 ]);
 
@@ -107,7 +109,7 @@ function resetForm() {
   model.nickName = '';
   model.userPhone = '';
   model.userEmail = '';
-  model.status = '1';
+  model.status = 1;
 }
 
 async function handleSubmit() {

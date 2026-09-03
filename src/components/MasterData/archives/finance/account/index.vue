@@ -68,7 +68,7 @@ const config: ArchiveConfig<Api.DataManage.FinanceAccount> = {
     { key: 'balance', label: $t('page.dataManage.finance.account.balance'), type: 'number', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', accountType: '', bank: '', balance: 0, status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', accountType: '', bank: '', balance: 0, status: 1, remark: '' })
 };
 </script>
 

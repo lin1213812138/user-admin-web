@@ -80,7 +80,8 @@ const local: App.I18n.Schema = {
     yesOrNo: {
       yes: '是',
       no: '否'
-    }
+    },
+    devInProgress: '待开发'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -266,7 +267,8 @@ const local: App.I18n.Schema = {
     'data-manage': '资料管理',
     'data-manage_basic': '基础资料',
     'data-manage_finance': '财务资料',
-    'data-manage_business': '业务资料'
+    'data-manage_business': '业务资料',
+    'system-manage_setting': '系统设置'
   },
   page: {
     login: {
@@ -376,6 +378,16 @@ const local: App.I18n.Schema = {
           permissionPlaceholder: '请输入权限标识，如 system:menu:list',
           redirectPlaceholder: '请输入重定向地址'
         }
+      },
+      setting: {
+        inputFormat: '录单格式',
+        printFormat: '打印格式',
+        exportFormat: '导出格式',
+        waybillRule: '运单号规则',
+        notificationConfig: '通知配置',
+        initData: '初始化数据',
+        stationScan: '站点扫描配置',
+        fieldMapping: '字段映射'
       }
     },
     dataManage: {

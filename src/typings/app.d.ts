@@ -395,6 +395,7 @@ declare namespace App {
           yes: string;
           no: string;
         };
+        devInProgress: string;
       };
       request: {
         logout: string;
@@ -651,6 +652,16 @@ declare namespace App {
               permissionPlaceholder: string;
               redirectPlaceholder: string;
             };
+          };
+          setting: {
+            inputFormat: string;
+            printFormat: string;
+            exportFormat: string;
+            waybillRule: string;
+            notificationConfig: string;
+            initData: string;
+            stationScan: string;
+            fieldMapping: string;
           };
         };
         dataManage: {

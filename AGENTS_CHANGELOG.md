@@ -4,6 +4,15 @@
 
 ## 2026-09-03
 
+- [设置页 MasterDetail：启用/禁用与操作栏改为可选（showStatus/showActions）](./changelog/设置页MasterDetail状态与操作栏改为可选.md)
+- [设置页操作按钮样式统一（工具栏 ghost 一致）](./changelog/设置页操作按钮样式统一.md)
+- [系统设置点开卡死：路由重定向死循环修复（子页移出自动路由目录）](./changelog/系统设置点开卡死-路由重定向死循环修复.md)
+- [录单格式列表 hover 样式修正（hover 与选中态区分）](./changelog/录单格式列表hover样式修正.md)
+- [系统设置 tab 栏不够突出：NCard 包裹增强视觉层次](./changelog/系统设置tab栏不够突出.md)
+- [系统设置右侧内容区补充背景卡片（MasterDetail 右侧 NCard 包裹）](./changelog/系统设置右侧内容区补充背景卡片.md)
+- [系统设置：顶层 tab 固定显示「系统设置」+ 页内 tab 切子模块](./changelog/系统设置顶层tab显示系统设置.md)
+- [系统设置：单一菜单项 + tab 切换（hiddenRoutes 配置 + 默认进入录单格式）](./changelog/系统设置单一菜单项与tab切换.md)
+- [录单格式列表 hover 与选中高亮失效修复（改用 useThemeVars）](./changelog/录单格式列表hover与选中高亮修复.md)
 - [pnpm release 提交被 pre-commit 钩子拦截（git diff --exit-code 失败）](./changelog/pnpm-release 提交被 pre-commit 拦截.md)
 - [侧边栏菜单顺序 vs elegant-router 自动重排路由文件](./changelog/路由菜单顺序与elegant路由生成.md)
 - [资料管理子档案按需懒加载（KeepAlive 缓存）](./changelog/资料管理子档案按需懒加载.md)

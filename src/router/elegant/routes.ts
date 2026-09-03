@@ -144,7 +144,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.system-manage_menu',
         meta: {
           title: 'system-manage_menu',
-          i18nKey: 'route.system-manage_menu'
+          i18nKey: 'route.system-manage_menu',
+          order: 3
         }
       },
       {
@@ -156,6 +157,17 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.system-manage_role',
           icon: 'ic:round-supervisor-account',
           order: 1
+        }
+      },
+      {
+        name: 'system-manage_setting',
+        path: '/system-manage/setting',
+        component: 'view.system-manage_setting',
+        meta: {
+          title: 'system-manage_setting',
+          i18nKey: 'route.system-manage_setting',
+          order: 4,
+          icon: 'ic:baseline-settings-applications'
         }
       },
       {

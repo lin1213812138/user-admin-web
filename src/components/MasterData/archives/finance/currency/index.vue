@@ -73,7 +73,7 @@ const config: ArchiveConfig<Api.DataManage.FinanceCurrency> = {
     { key: 'symbol', label: $t('page.dataManage.finance.currency.symbol'), type: 'input', span: 12 },
     { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
   ],
-  createDefault: () => ({ code: '', name: '', rate: 1, symbol: '', status: '1', remark: '' })
+  createDefault: () => ({ code: '', name: '', rate: 1, symbol: '', status: 1, remark: '' })
 };
 </script>
 

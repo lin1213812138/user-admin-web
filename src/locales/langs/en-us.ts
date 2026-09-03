@@ -80,7 +80,8 @@ const local: App.I18n.Schema = {
     yesOrNo: {
       yes: 'Yes',
       no: 'No'
-    }
+    },
+    devInProgress: 'In Progress'
   },
   request: {
     logout: 'Logout user after request failed',
@@ -270,7 +271,8 @@ const local: App.I18n.Schema = {
     'data-manage': 'Data Manage',
     'data-manage_basic': 'Basic',
     'data-manage_finance': 'Finance',
-    'data-manage_business': 'Business'
+    'data-manage_business': 'Business',
+    'system-manage_setting': 'System Settings'
   },
   page: {
     login: {
@@ -380,6 +382,16 @@ const local: App.I18n.Schema = {
           permissionPlaceholder: 'Please enter permission code, e.g. system:menu:list',
           redirectPlaceholder: 'Please enter redirect path'
         }
+      },
+      setting: {
+        inputFormat: 'Input Format',
+        printFormat: 'Print Format',
+        exportFormat: 'Export Format',
+        waybillRule: 'Waybill Rule',
+        notificationConfig: 'Notification Config',
+        initData: 'Init Data',
+        stationScan: 'Station Scan Config',
+        fieldMapping: 'Field Mapping'
       }
     },
     dataManage: {

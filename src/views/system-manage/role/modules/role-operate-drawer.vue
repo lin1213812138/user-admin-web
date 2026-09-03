@@ -50,7 +50,7 @@ const model = reactive<Api.SystemManage.RoleCreateParams>({
   roleCode: '',
   remark: '',
   sort: 1,
-  status: '1'
+  status: 1
 });
 
 const formItems = computed<FormItemConfig[]>(() => [
@@ -84,7 +84,9 @@ const formItems = computed<FormItemConfig[]>(() => [
     type: 'switch',
     span: 24,
     checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
+    uncheckedText: $t('common.disable'),
+    checkedValue: 1,
+    uncheckedValue: 0
   },
   {
     key: 'remark',
@@ -109,7 +111,7 @@ function resetForm() {
   model.roleCode = '';
   model.remark = '';
   model.sort = 1;
-  model.status = '1';
+  model.status = 1;
 }
 
 async function handleSubmit() {

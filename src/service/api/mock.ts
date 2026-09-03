@@ -1,6 +1,6 @@
 /** local mock data for system manage module (used in dev when backend api is absent) */
 
-const STATUS: Api.Common.EnableStatus[] = ['1', '2'];
+const STATUS: Api.Common.EnableStatus[] = [1, 0];
 
 function createUser(i: number): Api.SystemManage.User {
   return {
@@ -50,7 +50,7 @@ function createRole(id: number, roleName: string, roleCode: string, sort: number
     roleCode,
     remark: `${roleName}的默认权限集合`,
     sort,
-    status: id === 4 ? '2' : '1',
+    status: id === 4 ? 0 : 1,
     createTime: '2026-08-28 10:00:00'
   };
 }
@@ -216,7 +216,7 @@ function createMenu(
     componentPath: menuType === 'catalog' ? '' : 'layouts/base-layout/index.vue',
     permission: '',
     sort: id,
-    status: '1',
+    status: 1,
     visible: 1,
     keepAlive: 1,
     isExternal: 2,

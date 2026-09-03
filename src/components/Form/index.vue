@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { FormInst, FormItemRule, FormRules } from 'naive-ui';
+import type { FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui';
 import { $t } from '@/locales';
 import { type FormItemConfig } from './form-config';
 import IconPicker from '@/components/custom/icon-picker.vue';
@@ -35,7 +35,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   rules: undefined,
   items: undefined,
-  gridXGap: 0,
+  gridXGap: 16,
   gridResponsive: 'screen',
   labelPlacement: 'top',
   labelWidth: 'auto',
@@ -48,6 +48,11 @@ const formRef = ref<FormInst | null>(null);
 const fieldItems = computed<FormItemConfig[]>(() => (props.items ?? []).filter(i => !i.slot));
 /** slot-only action items, rendered in the right action area */
 const actionItems = computed<FormItemConfig[]>(() => (props.items ?? []).filter(i => i.slot));
+
+/** checkbox 选项值（SelectOption.value 可能为数组/null，这里收敛为 string | number） */
+function cbValue(opt: SelectOption): string | number {
+  return opt.value as string | number;
+}
 
 /** total rows by span accumulation (24 per row) */
 const totalRows = computed<number>(() => {
@@ -178,6 +183,8 @@ defineExpose({
               v-else-if="item.type === 'switch'"
               v-model:value="model[item.key] as string | number | boolean"
               :disabled="item.disabled"
+              :checked-value="item.checkedValue"
+              :unchecked-value="item.uncheckedValue"
             >
               <template v-if="item.checkedText" #checked>{{ item.checkedText }}</template>
               <template v-if="item.uncheckedText" #unchecked>{{ item.uncheckedText }}</template>
@@ -189,6 +196,17 @@ defineExpose({
               :placeholder="item.placeholder"
               :disabled="item.disabled"
             />
+            <NCheckboxGroup
+              v-else-if="item.type === 'checkbox'"
+              v-model:value="model[item.key] as (string | number)[]"
+              :disabled="item.disabled"
+            >
+              <NSpace>
+                <NCheckbox v-for="opt in item.options ?? []" :key="String(opt.value)" :value="cbValue(opt)">
+                  {{ opt.label }}
+                </NCheckbox>
+              </NSpace>
+            </NCheckboxGroup>
             <IconPicker
               v-else-if="item.type === 'icon-picker'"
               v-model:value="model[item.key] as string"

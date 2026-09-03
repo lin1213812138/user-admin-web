@@ -10,7 +10,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     contact: `联系人${i}`,
     phone: `138${String(10000000 + i).padStart(8, '0')}`,
     address: `上海市浦东新区世纪大道 ${i} 号`,
-    status: i % 5 === 0 ? '2' : '1',
+    status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-01 09:00:00`
   }),
@@ -21,7 +21,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     contact: `对接人${i}`,
     phone: `139${String(10000000 + i).padStart(8, '0')}`,
     level: i % 3 === 0 ? 'A' : 'B',
-    status: i % 4 === 0 ? '2' : '1',
+    status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-02 10:00:00`
   }),
@@ -32,7 +32,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     spec: `规格${i}`,
     unit: i % 2 === 0 ? '件' : '箱',
     categoryName: `分类${i % 5}`,
-    status: i % 6 === 0 ? '2' : '1',
+    status: i % 6 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-03 11:00:00`
   }),
@@ -41,7 +41,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     code: `CAT${String(i).padStart(3, '0')}`,
     name: `商品分类${i}`,
     sort: i,
-    status: '1',
+    status: 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-04 12:00:00`
   }),
@@ -52,7 +52,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     accountType: i % 2 === 0 ? '银行' : '现金',
     bank: i % 2 === 0 ? `招商银行 ${i}` : '',
     balance: i * 1000,
-    status: i % 4 === 0 ? '2' : '1',
+    status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-05 13:00:00`
   }),
@@ -62,7 +62,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     name: `币种${i}`,
     rate: 1 + i * 0.1,
     symbol: i % 2 === 0 ? '¥' : '$',
-    status: '1',
+    status: 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-06 14:00:00`
   }),
@@ -71,7 +71,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     name: `税率方案${i}`,
     rate: 0.13,
     taxType: i % 2 === 0 ? '增值税' : '附加税',
-    status: '1',
+    status: 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-07 15:00:00`
   }),
@@ -79,7 +79,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     id: i,
     name: `结算方式${i}`,
     period: i % 2 === 0 ? '月结' : '现结',
-    status: '1',
+    status: 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-08 16:00:00`
   }),
@@ -89,7 +89,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     name: `仓库${i}`,
     address: `仓储区 ${i} 栋`,
     manager: `仓管${i}`,
-    status: i % 5 === 0 ? '2' : '1',
+    status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-09 17:00:00`
   }),
@@ -99,7 +99,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     name: `库位${i}`,
     warehouseName: `仓库${i % 3}`,
     capacity: i * 100,
-    status: i % 4 === 0 ? '2' : '1',
+    status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-10 18:00:00`
   }),
@@ -109,7 +109,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     name: `承运商${i}`,
     contact: `调度${i}`,
     phone: `137${String(10000000 + i).padStart(8, '0')}`,
-    status: i % 5 === 0 ? '2' : '1',
+    status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-11 19:00:00`
   }),
@@ -119,7 +119,7 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     name: `门店${i}`,
     address: `商圈 ${i} 号`,
     owner: `店长${i}`,
-    status: i % 4 === 0 ? '2' : '1',
+    status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-12 20:00:00`
   })
