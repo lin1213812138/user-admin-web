@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.0.3](https://github.com/lin1213812138/user-admin-web/compare/v0.0.2...v0.0.3) (2026-09-03)
+
+### &nbsp;&nbsp;&nbsp;📖 Documentation
+
+- 更新记忆与变更日志 &nbsp;-&nbsp; by **LINFLY** [<samp>(acb7e)</samp>](https://github.com/lin1213812138/user-admin-web/commit/acb7efc)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[LINFLY](mailto:2276928094@qq.com)
+
 ## [v0.0.2](https://github.com/lin1213812138/user-admin-web/compare/v0.0.1...v0.0.2) (2026-09-03)
 
 ### &nbsp;&nbsp;&nbsp;🚀 Features
