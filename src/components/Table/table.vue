@@ -99,11 +99,9 @@ function handleSelectionChange({ records }: { records: any[] }) {
         <slot name="operation-right" :refresh="refresh" />
       </div>
     </div>
-    <div class="w-full min-h-0 bg-white" :class="height === '100%' ? 'flex-1' : ''">
-      <!-- :checkbox-config="{ trigger: 'checkbox' }" -->
+    <div class="relative w-full min-h-0 bg-white" :class="height === '100%' ? 'flex-1' : ''">
       <vxe-table
         :data="data"
-        :loading="loading"
         :border="border"
         :stripe="stripe"
         :row-config="{ isHover: true, height: 40 }"
@@ -172,6 +170,11 @@ function handleSelectionChange({ records }: { records: any[] }) {
           <span class="text-14px text-#909399">{{ $t('common.noData') }}</span>
         </template>
       </vxe-table>
+      <Transition name="fade">
+        <div v-if="loading" class="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+          <NSpin size="large" />
+        </div>
+      </Transition>
     </div>
 
     <div v-if="pagination" class="mt-12px flex justify-end">

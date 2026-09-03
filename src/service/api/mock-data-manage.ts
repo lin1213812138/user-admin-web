@@ -135,10 +135,19 @@ const idSeq: Record<Api.DataManage.DataManageArchiveKey, number> = Object.fromEn
   keys.map(key => [key, 19])
 ) as Record<Api.DataManage.DataManageArchiveKey, number>;
 
-export function mockArchiveList<T extends MasterDataRow>(
+/** Simulated network latency so table loading / button loading states stay visible in DEV */
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const LIST_DELAY_MS = 400;
+const MUTATE_DELAY_MS = 200;
+
+export async function mockArchiveList<T extends MasterDataRow>(
   archive: Api.DataManage.DataManageArchiveKey,
   params: Api.DataManage.ArchiveSearchParams
 ): Promise<Api.DataManage.ArchiveList<T>> {
+  await delay(LIST_DELAY_MS);
   let rows = datasets[archive] as T[];
   const { keyword, status, current, size } = params;
   if (keyword && keyword.trim()) {
@@ -153,33 +162,36 @@ export function mockArchiveList<T extends MasterDataRow>(
   }
   const total = rows.length;
   const start = (current - 1) * size;
-  return Promise.resolve({ records: rows.slice(start, start + size), total });
+  return { records: rows.slice(start, start + size), total };
 }
 
-export function mockArchiveCreate<T extends MasterDataRow>(
+export async function mockArchiveCreate<T extends MasterDataRow>(
   archive: Api.DataManage.DataManageArchiveKey,
   params: Partial<T>
 ): Promise<T> {
+  await delay(MUTATE_DELAY_MS);
   const id = idSeq[archive]++;
   const row = { ...(params as object), id } as T;
   datasets[archive].push(row as unknown as MasterDataRow);
-  return Promise.resolve(row);
+  return row;
 }
 
-export function mockArchiveUpdate<T extends MasterDataRow>(
+export async function mockArchiveUpdate<T extends MasterDataRow>(
   archive: Api.DataManage.DataManageArchiveKey,
   params: T
 ): Promise<T> {
+  await delay(MUTATE_DELAY_MS);
   const list = datasets[archive];
   const idx = list.findIndex(r => r.id === params.id);
   if (idx >= 0) {
     list[idx] = { ...list[idx], ...(params as object) } as MasterDataRow;
   }
-  return Promise.resolve(list[idx] as unknown as T);
+  return list[idx] as unknown as T;
 }
 
-export function mockArchiveDelete(archive: Api.DataManage.DataManageArchiveKey, ids: number[]): Promise<boolean> {
+export async function mockArchiveDelete(archive: Api.DataManage.DataManageArchiveKey, ids: number[]): Promise<boolean> {
+  await delay(MUTATE_DELAY_MS);
   const set = new Set(ids);
   datasets[archive] = datasets[archive].filter(r => !set.has(r.id));
-  return Promise.resolve(true);
+  return true;
 }

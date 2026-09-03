@@ -14,6 +14,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Account: typeof import('./../components/MasterData/archives/finance/account/index.vue')['default']
     AppProvider: typeof import('./../components/common/app-provider.vue')['default']
+    ArchiveSwitch: typeof import('./../components/MasterData/archive-switch.vue')['default']
     BetterScroll: typeof import('./../components/custom/better-scroll.vue')['default']
     ButtonIcon: typeof import('./../components/custom/button-icon.vue')['default']
     Carrier: typeof import('./../components/MasterData/archives/business/carrier/index.vue')['default']
@@ -124,6 +125,7 @@ declare module 'vue' {
 declare global {
   const Account: typeof import('./../components/MasterData/archives/finance/account/index.vue')['default']
   const AppProvider: typeof import('./../components/common/app-provider.vue')['default']
+  const ArchiveSwitch: typeof import('./../components/MasterData/archive-switch.vue')['default']
   const BetterScroll: typeof import('./../components/custom/better-scroll.vue')['default']
   const ButtonIcon: typeof import('./../components/custom/button-icon.vue')['default']
   const Carrier: typeof import('./../components/MasterData/archives/business/carrier/index.vue')['default']

@@ -39,6 +39,9 @@ export function setupElegantRouter() {
 
       /** menu order of the route, the smaller the value, the higher the order */
       const routeOrders: Partial<Record<RouteKey, number>> = {
+        home: 0,
+        'data-manage': 1,
+        'system-manage': 2,
         'system-manage_role': 1,
         'system-manage_user': 2
       };

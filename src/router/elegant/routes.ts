@@ -49,48 +49,14 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
-    name: 'home',
-    path: '/home',
-    component: 'layout.base$view.home',
-    meta: {
-      title: 'home',
-      i18nKey: 'route.home',
-      icon: 'mdi:monitor-dashboard'
-    }
-  },
-  {
-    name: 'iframe-page',
-    path: '/iframe-page/:url',
-    component: 'layout.base$view.iframe-page',
-    props: true,
-    meta: {
-      title: 'iframe-page',
-      i18nKey: 'route.iframe-page',
-      constant: true,
-      hideInMenu: true,
-      keepAlive: true
-    }
-  },
-  {
-    name: 'login',
-    path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?',
-    component: 'layout.blank$view.login',
-    props: true,
-    meta: {
-      title: 'login',
-      i18nKey: 'route.login',
-      constant: true,
-      hideInMenu: true
-    }
-  },
-  {
     name: 'data-manage',
     path: '/data-manage',
     component: 'layout.base',
     meta: {
       title: 'data-manage',
       i18nKey: 'route.data-manage',
-      icon: 'ic:baseline-folder'
+      icon: 'ic:baseline-folder',
+      order: 1
     },
     children: [
       {
@@ -126,13 +92,50 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'home',
+    path: '/home',
+    component: 'layout.base$view.home',
+    meta: {
+      title: 'home',
+      i18nKey: 'route.home',
+      icon: 'mdi:monitor-dashboard',
+      order: 0
+    }
+  },
+  {
+    name: 'iframe-page',
+    path: '/iframe-page/:url',
+    component: 'layout.base$view.iframe-page',
+    props: true,
+    meta: {
+      title: 'iframe-page',
+      i18nKey: 'route.iframe-page',
+      constant: true,
+      hideInMenu: true,
+      keepAlive: true
+    }
+  },
+  {
+    name: 'login',
+    path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?',
+    component: 'layout.blank$view.login',
+    props: true,
+    meta: {
+      title: 'login',
+      i18nKey: 'route.login',
+      constant: true,
+      hideInMenu: true
+    }
+  },
+  {
     name: 'system-manage',
     path: '/system-manage',
     component: 'layout.base',
     meta: {
       title: 'system-manage',
       i18nKey: 'route.system-manage',
-      icon: 'ic:baseline-settings'
+      icon: 'ic:baseline-settings',
+      order: 2
     },
     children: [
       {

@@ -34,4 +34,15 @@
 
 - DEV mock（`src/service/api/mock.ts` 的 `mockMenuList`）返回**扁平**数组，每行带 `parentId`、无 `children`。
 - 生产 `/system/menu/list` 返回的是带 `children` 的嵌套树、无 `parentId` 字段（按用户实测确认）。
+
+## archive-switch / 动态档案切换的布局陷阱
+
+- 内容区**不要**多套 `<div class='absolute inset-0'>` 包裹 `<Transition>` + `<KeepAlive>` + `defineAsyncComponent`：会让切到非首屏档案（首次加载的 async 组件）时真实组件挂载异常、内容只剩微小 spinner、搜索栏/表格全不可见；仓库（默认首项）能加载，切走再切回也触发同一问题。
+- 正确结构（src/components/MasterData/archive-switch.vue）：外层 `<div class='flex h-full w-full overflow-hidden'>`（根也要 overflow-hidden 配合 fade-slide 动画），右侧 `<div class='relative min-w-0 flex-1 overflow-hidden'>` 直接放 `<Transition :name mode='out-in'><KeepAlive><component :is='asyncComps[activeKey]' :key='activeKey' class='h-full w-full' /></KeepAlive></Transition>`，不要再包 absolute 层。
+- fade-slide / zoom-fade 等带 translate/scale 的页面切换动画会让 component 溢出容器 → **右侧容器与根都必须 `overflow-hidden`**，否则动画期间触发页面级横向/竖向滚动条。
+
+## 表格 loading 显示约定（全项目通用 Table）
+
+- 不要用 `<NSpin :show>` 直接包裹 `vxe-table`（naive-ui NSpin 的 show 是硬显隐，spinner 出现/消失无平滑过渡，且 loading 时表格高度易跳动）。
+- 正确：让 `vxe-table` 始终渲染（height='100%' 占满），外层加 `relative`，用独立遮罩层 `<Transition name="fade"><div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/60"><NSpin size="large" /></div></Transition>` 控制 loading 显隐，复用全局 `.fade-*`（opacity 0.3s）。spinner 淡入淡出平滑、表格高度稳定。
 - 当前菜单页采用 children 模式：扁平数据 → `buildMenuTree(data.value)` 组树 → 表格和抽屉共用 `menuTree`。`buildMenuTree` 是从 `parentId` 推导的，符合"用 parentId 渲染"。

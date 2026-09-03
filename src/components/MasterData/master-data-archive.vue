@@ -139,7 +139,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col gap-12px p-16px">
+  <div class="h-full w-full flex flex-col gap-12px py-8px px-16px">
     <NCard :bordered="false" class="card-wrapper shrink-0">
       <NFormWrap
         :model="searchParams"

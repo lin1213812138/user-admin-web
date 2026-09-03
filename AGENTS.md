@@ -2,7 +2,7 @@
 
 > **重要规则**:
 >
-> 1. 每次与本 Agent 讨论的问题定位、决策、修复，必须在 `changelog/` 目录下生成单独的文档，文件名从用户提示词中提取（如 `changelog/转运项批量搜索.md`），同时将条目链接追加到 [AGENTS_CHANGELOG.md](./AGENTS_CHANGELOG.md) 中。AGENTS.md 只维护项目架构信息，不直接存储讨论记录。
+> 1. 每次与本 Agent 讨论的问题定位、决策、修复，必须在 `changelog/` 目录下生成单独的文档，文件名从用户提示词中提取（如 `changelog/转运项批量搜索.md`），同时将条目链接追加到 [AGENTS_CHANGELOG.md](./AGENTS_CHANGELOG.md) 中（该索引按日期分组，日期最新在上）。AGENTS.md 只维护项目架构信息，不直接存储讨论记录。
 > 2. **开发新功能或修复 Bug 前必须先设计**：在提出任何设计方案之前，不得编写任何代码。设计方案必须使用 `brainstorming` skill 完成，待用户确认设计后才能进入开发阶段。用户确认之前，任何实现动作（代码编写、文件创建等）都是违规操作。
 >
 > 兄弟项目 `user-web`（同后端 `wms-user` 的另一套前端：Element Plus + JavaScript）见 [user-web AGENTS.md](../user-web/AGENTS.md)。本仓库是它的 **Naive UI + TypeScript** 重写版，业务模块正在逐步迁移。
