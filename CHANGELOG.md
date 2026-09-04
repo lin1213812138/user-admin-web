@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.0.4](https://github.com/lin1213812138/user-admin-web/compare/v0.0.3...v0.0.4) (2026-09-04)
+
+### &nbsp;&nbsp;&nbsp;📖 Documentation
+
+- 更新系统设置开发记忆与实现计划 &nbsp;-&nbsp; by **LINFLY** [<samp>(86d94)</samp>](https://github.com/lin1213812138/user-admin-web/commit/86d94f3)
+
+### &nbsp;&nbsp;&nbsp;🏡 Chore
+
+- **docs**: 添加设置页整理设计与实施计划文档 &nbsp;-&nbsp; by **LINFLY** [<samp>(540cf)</samp>](https://github.com/lin1213812138/user-admin-web/commit/540cfca)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[LINFLY](mailto:2276928094@qq.com)
+
 ## [v0.0.3](https://github.com/lin1213812138/user-admin-web/compare/v0.0.2...v0.0.3) (2026-09-03)
 
 ### &nbsp;&nbsp;&nbsp;📖 Documentation
