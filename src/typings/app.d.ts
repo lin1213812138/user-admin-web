@@ -397,6 +397,7 @@ declare namespace App {
           no: string;
         };
         devInProgress: string;
+        excelTemplate: string;
       };
       request: {
         logout: string;
@@ -677,7 +678,30 @@ declare namespace App {
               detailTitle: string;
               copyTitle: string;
             };
-            exportFormat: string;
+            exportFormat: {
+              title: string;
+              listTitle: string;
+              name: string;
+              scope: string;
+              scopeInternal: string;
+              scopeCustomer: string;
+              scopeAll: string;
+              fileName: string;
+              remark: string;
+              lastEditor: string;
+              editTime: string;
+              create: string;
+              delete: string;
+              edit: string;
+              download: string;
+              downloadFields: string;
+              newTitle: string;
+              editTitle: string;
+              detailTitle: string;
+              hint: string;
+              downloadToast: string;
+              downloadFieldsToast: string;
+            };
             waybillRule: string;
             notificationConfig: string;
             initData: string;

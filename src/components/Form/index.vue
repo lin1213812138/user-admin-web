@@ -225,6 +225,7 @@ defineExpose({
               :placeholder="item.placeholder"
               :disabled="item.disabled"
             />
+            <slot v-else-if="item.type === 'custom'" :name="item.key" :model="model" :item="item" />
           </NFormItem>
         </NGi>
       </NGrid>

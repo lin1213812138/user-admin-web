@@ -82,7 +82,8 @@ const local: App.I18n.Schema = {
       yes: '是',
       no: '否'
     },
-    devInProgress: '待开发'
+    devInProgress: '待开发',
+    excelTemplate: '选择模板'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -403,7 +404,30 @@ const local: App.I18n.Schema = {
           detailTitle: '打印模板详情',
           copyTitle: '复制打印模板'
         },
-        exportFormat: '导出格式',
+        exportFormat: {
+          title: '导出格式',
+          listTitle: '导出格式类型',
+          name: '模板名称',
+          scope: '使用范围',
+          scopeInternal: '内部系统',
+          scopeCustomer: '客户',
+          scopeAll: '全部',
+          fileName: '上传模板',
+          remark: '备注',
+          lastEditor: '最后编辑',
+          editTime: '编辑时间',
+          create: '新建',
+          delete: '删除',
+          edit: '编辑',
+          download: '下载模板',
+          downloadFields: '字段模板下载',
+          newTitle: '新建导出模板',
+          editTitle: '编辑导出模板',
+          detailTitle: '导出模板详情',
+          hint: '该模板在 [业务操作-业务管理-导出] 时调用！',
+          downloadToast: '模板下载功能待后端接入',
+          downloadFieldsToast: '字段模板下载功能待后端接入'
+        },
         waybillRule: '运单号规则',
         notificationConfig: '通知配置',
         initData: '初始化数据',

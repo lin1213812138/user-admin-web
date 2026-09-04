@@ -82,7 +82,8 @@ const local: App.I18n.Schema = {
       yes: 'Yes',
       no: 'No'
     },
-    devInProgress: 'In Progress'
+    devInProgress: 'In Progress',
+    excelTemplate: 'Excel Template'
   },
   request: {
     logout: 'Logout user after request failed',
@@ -407,7 +408,30 @@ const local: App.I18n.Schema = {
           detailTitle: 'Print Template Detail',
           copyTitle: 'Copy Print Template'
         },
-        exportFormat: 'Export Format',
+        exportFormat: {
+          title: 'Export Format',
+          listTitle: 'Export Format Type',
+          name: 'Template Name',
+          scope: 'Scope',
+          scopeInternal: 'Internal System',
+          scopeCustomer: 'Customer',
+          scopeAll: 'All',
+          fileName: 'Template File',
+          remark: 'Remark',
+          lastEditor: 'Last Editor',
+          editTime: 'Edit Time',
+          create: 'Create',
+          delete: 'Delete',
+          edit: 'Edit',
+          download: 'Download Template',
+          downloadFields: 'Download Field Template',
+          newTitle: 'New Export Template',
+          editTitle: 'Edit Export Template',
+          detailTitle: 'Export Template Detail',
+          hint: 'This template is called at [Business Operation - Business Management - Export]!',
+          downloadToast: 'Template download pending backend integration',
+          downloadFieldsToast: 'Field template download pending backend integration'
+        },
         waybillRule: 'Waybill Rule',
         notificationConfig: 'Notification Config',
         initData: 'Init Data',
