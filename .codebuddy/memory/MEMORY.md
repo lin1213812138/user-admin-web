@@ -11,6 +11,7 @@
 - 涉及：类型 `src/typings/api/common.d.ts`、所有 mock、状态下拉选项（role / menu-operate-drawer / `MasterData/shared.ts` 的 `useArchiveStatusOptions`）、`Table/table.vue` 的 `type:'status'` 列、各 NSwitch。
 - **坑**：NSwitch 默认 `checked-value=true`，绑数字 `1` 必须配 `checkedValue:1`/`uncheckedValue:0`；`type:'status'` 列的 `activeValue` 默认也要是 number `1`（字符串 `'1'` 会导致 `1==='1'` 为 false，全部显示禁用）。
 - `FormItemConfig` 已支持 `checkedValue` / `uncheckedValue`，`Form/index.vue` 的 NSwitch 绑定二者。
+- `FormWrap` 的 `mergedRules` 自动必填规则已通用改为 `required:true` + 自定义 `validator` 判空（仅 `null/undefined/''` 视为空），数字 `0`/`1` 不再误判。不要再为数字字段补 `type:'number'` 来规避（旧补丁已移除，2026-09-04）。
 
 ## 通用 Table 约定（src/components/Table）
 
@@ -38,8 +39,9 @@
 ## 系统设置页 MasterDetail 右侧「占满剩余高度」机制
 
 - **右侧内容是每个界面独有的，不是共用组件**（用户 2026-09-04 明确）：不要在 `MasterDetail` 里按「统一行为」改，壳体只负责让 slot 有可用高度，「谁占满」由各页面自己的卡片决定。
-- 壳（`components/MasterDetail.vue`）右侧：`NScrollbar content-class="min-h-full flex-col"` + 内部 slot 容器 `flex-1 flex-col`。用 **`min-height:100%` 而不是 `height:100%`**（后者内容超出会截断、外层滚动失效）。无需 prop/分支，没有 `flex-1` 子元素的页面视觉零变化。
-- 卡片侧：`components/FieldMapping.vue` 有可选 `fill` prop → NCard 加 `flex-1 min-h-0 flex-col`，`content-style` 改 `{ display:flex; flex-direction:column; min-height:0; flex:1 }`，内容区包 `NScrollbar` 内部滚动。**只有 `InputFormat.vue`（录单格式）传 `fill`**，其它 5 页保持自然高度。
+- 壳（`components/MasterDetail.vue`）右侧：**2026-09-04 终版已移除外层 `NScrollbar`**（它 `content-class="min-h-full flex-col"` 会让内容包裹层随内容撑高，导致子卡片永远不比内容矮、内部滚动失效、整块溢出）。改为固定高度内容容器 `<div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-16px py-16px">` + 顶部操作栏 `shrink-0`。**整体不滚动**，高度不足时卡片 `flex:1` 吃剩余空间，内容超高由各页内容自己内部滚动。
+- 卡片侧：`components/FieldMapping.vue` 有可选 `fill` prop → NCard 加 `flex flex-1 min-h-0 flex-col`，`content-style` = `{ display:flex; flex-direction:column; min-height:0; flex:1; padding:0 }`（`flex:1`=basis 0 干净占满，勿用 `1 1 auto` 否则被内容撑开溢出），`v-if="fill"` 时内容包 `<NScrollbar class="min-h-0 flex-1" content-class="min-h-full">` **内部滚动**。非 fill 分支保持自然高度 div。
+- **关键坑（2026-09-04 反复踩）**：`MasterDetail` 外层若用 `NScrollbar` + `min-h-full`，其 content wrapper 会随内容长高，子卡片 `flex-1` 跟着长高 → 卡片不比内容矮 → 内部 NScrollbar 永不触发、整页溢出。所以「整体不滚 + 子卡片内滚」必须去掉外层 NScrollbar，用固定高度 `overflow-hidden` 容器。`flex-1` 是 `1 1 0%`（basis 0），`flex-auto` 是 `1 1 auto`（basis 取内容）会撑高，别混用。
 - 业务事实：**字段映射只在录单格式存在**，其它 5 个页面的 FieldMapping 是模板复制的占位数据（本轮未清理）。
 - 既有坑：`modules/PrintFormat.vue` 有 6 个 `@typescript-eslint/no-unused-vars` 误报（变量在模板中确有使用，同结构的 StationScan.vue 不报错）→ 全库 `pnpm lint` / pre-commit 会失败，未处理。
 

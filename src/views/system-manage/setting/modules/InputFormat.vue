@@ -314,8 +314,7 @@ const formItems = computed<FormItemConfig[]>(() => [
     span: 6,
     options: [
       { label: '内部系统', value: 'internal' },
-      { label: '客户下单', value: 'customer' },
-      { label: '微信下单', value: 'wechat' }
+      { label: '客户下单', value: 'customer' }
     ]
   },
   { key: 'remark', label: $t('common.remark'), type: 'input', span: 6, placeholder: '请输入备注' }

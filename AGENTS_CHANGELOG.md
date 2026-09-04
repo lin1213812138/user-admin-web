@@ -4,6 +4,7 @@
 
 ## 2026-09-04
 
+- [菜单「状态」选了仍报必填（FormWrap 必填规则带 trigger 导致数字值被判空）](./changelog/菜单状态必填校验失败.md)
 - [录单格式「字段映射」高度自适应占满（MasterDetail slot 容器撑满 + FieldMapping fill）](./changelog/录单格式字段映射高度自适应占满.md)
 - [录单格式列表启用/禁用不明显（MasterDetail 状态改实心彩色徽标）](./changelog/录单格式列表启用禁用不明显.md)
 - [设置页整理：字段映射项改为 key/label/span 结构 + 清空其余 5 页占位内容（LookForward 空状态）](./changelog/设置页整理字段映射结构与占位清理.md)

@@ -94,7 +94,10 @@ function handleSelect(id: number) {
     </div>
     <div class="min-w-0 flex-1 flex-col">
       <NCard class="h-full" :content-style="{ padding: '0', display: 'flex', flexDirection: 'column', minHeight: '0' }">
-        <div v-if="showActions" class="flex items-center justify-between px-16px py-12px border-b-1 border-[#ebeef5]">
+        <div
+          v-if="showActions"
+          class="flex shrink-0 items-center justify-between px-16px py-12px border-b-1 border-[#ebeef5]"
+        >
           <slot name="header">
             <NSpace>
               <NButton v-if="editable" type="primary" ghost size="small" @click="emit('create')">
@@ -127,12 +130,10 @@ function handleSelect(id: number) {
           </slot>
           <slot name="operation-extra" />
         </div>
-        <!-- content 撑满：高度不足时 slot 容器被拉伸，卡片可 flex:1 吃掉剩余空间；内容超高时仍由本层滚动 -->
-        <NScrollbar class="min-h-0 flex-1" content-class="min-h-full flex-col">
-          <div class="min-w-full flex-1 flex-col px-16px py-16px">
-            <slot />
-          </div>
-        </NScrollbar>
+        <!-- 右侧内容区：固定高度（flex-1 + min-h-0 + overflow-hidden），整体不滚动；高度不足时卡片 flex:1 吃掉剩余空间，内容超高时由各页内容自行内部滚动（如录单格式字段映射卡片） -->
+        <div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-16px py-16px">
+          <slot />
+        </div>
       </NCard>
     </div>
   </div>

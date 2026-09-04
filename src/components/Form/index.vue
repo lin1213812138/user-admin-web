@@ -100,16 +100,25 @@ const mergedRules = computed<FormRules>(() => {
   const base: FormRules = { ...props.rules };
   for (const item of fieldItems.value) {
     if (item.required && !base[item.key]) {
+      const message = item.requiredMsg || `${item.label}必填`;
       const rule: FormItemRule = {
         required: true,
-        message: item.requiredMsg || `${item.label}必填`,
-        trigger: ['change', 'blur']
+        message,
+        trigger: ['change', 'blur'],
+        // Custom empty check instead of async-validator's built-in `required` rule: when
+        // `trigger` is set, the built-in rule falls back to the `string` validator, which
+        // wrongly treats a valid number (e.g. 0) as empty. `required: true` here only drives
+        // naive-ui's required mark (rules.some(r => r.required)), not the empty check.
+        validator: (_rule, value, callback) => {
+          const empty =
+            value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0);
+          if (empty) {
+            callback(new Error(message));
+          } else {
+            callback();
+          }
+        }
       };
-      // Numeric field: declare `type: 'number'` so async-validator does not treat a
-      // number value (incl. valid `0`) as empty and wrongly fail the required check.
-      if (item.type === 'number') {
-        rule.type = 'number';
-      }
       base[item.key] = [rule];
     }
   }
