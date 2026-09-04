@@ -20,13 +20,16 @@ const props = withDefaults(
     /** 是否渲染默认的顶部操作栏（新增/编辑/删除），非所有 tab 通用 */
     showActions?: boolean;
     editable?: boolean;
+    /** 是否显示左侧列表的搜索框（固定分类场景传 false） */
+    showSearch?: boolean;
   }>(),
   {
     listTitle: '',
     searchPlaceholder: '',
     showStatus: false,
     showActions: false,
-    editable: true
+    editable: true,
+    showSearch: true
   }
 );
 
@@ -70,7 +73,7 @@ function handleSelect(id: number) {
         :content-style="{ padding: '8px', display: 'flex', flexDirection: 'column', minHeight: '0' }"
       >
         <template #default>
-          <NInput v-model:value="keyword" :placeholder="searchPlaceholder" clearable class="mb-6px" />
+          <NInput v-if="showSearch" v-model:value="keyword" :placeholder="searchPlaceholder" clearable class="mb-6px" />
           <NScrollbar class="min-h-0 flex-1">
             <div
               v-for="item in filteredItems"
@@ -96,7 +99,7 @@ function handleSelect(id: number) {
       <NCard class="h-full" :content-style="{ padding: '0', display: 'flex', flexDirection: 'column', minHeight: '0' }">
         <div
           v-if="showActions"
-          class="flex shrink-0 items-center justify-between px-16px py-12px border-b-1 border-[#ebeef5]"
+          class="flex shrink-0 items-center justify-between px-16px py-16px border-b-1 border-[#ebeef5]"
         >
           <slot name="header">
             <NSpace>

@@ -4,6 +4,7 @@
 
 ## 2026-09-04
 
+- [打印格式界面实现（左侧固定分类 + 右侧模板表格 + 新建/查看/复制/删除/设为默认）](./changelog/打印格式界面实现.md)
 - [菜单「状态」选了仍报必填（FormWrap 必填规则带 trigger 导致数字值被判空）](./changelog/菜单状态必填校验失败.md)
 - [录单格式「字段映射」高度自适应占满（MasterDetail slot 容器撑满 + FieldMapping fill）](./changelog/录单格式字段映射高度自适应占满.md)
 - [录单格式列表启用/禁用不明显（MasterDetail 状态改实心彩色徽标）](./changelog/录单格式列表启用禁用不明显.md)

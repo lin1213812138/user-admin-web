@@ -12,7 +12,7 @@ import StationScan from './modules/StationScan.vue';
 
 const tabs = [
   { key: 'input-format', label: $t('page.manage.setting.inputFormat') },
-  { key: 'print-format', label: $t('page.manage.setting.printFormat') },
+  { key: 'print-format', label: $t('page.manage.setting.printFormat.title') },
   { key: 'export-format', label: $t('page.manage.setting.exportFormat') },
   { key: 'waybill-rule', label: $t('page.manage.setting.waybillRule') },
   { key: 'notification-config', label: $t('page.manage.setting.notificationConfig') },

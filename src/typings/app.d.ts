@@ -326,6 +326,7 @@ declare namespace App {
         collapseFilter: string;
         add: string;
         addSuccess: string;
+        saveSuccess: string;
         backToHome: string;
         batchDelete: string;
         cancel: string;
@@ -655,7 +656,27 @@ declare namespace App {
           };
           setting: {
             inputFormat: string;
-            printFormat: string;
+            printFormat: {
+              title: string;
+              listTitle: string;
+              name: string;
+              labelSize: string;
+              isDefault: string;
+              yes: string;
+              no: string;
+              generatedCount: string;
+              remark: string;
+              lastEditor: string;
+              editTime: string;
+              create: string;
+              delete: string;
+              view: string;
+              copy: string;
+              setDefault: string;
+              newTitle: string;
+              detailTitle: string;
+              copyTitle: string;
+            };
             exportFormat: string;
             waybillRule: string;
             notificationConfig: string;
