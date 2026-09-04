@@ -33,4 +33,6 @@ export interface FormItemConfig {
   slot?: string;
   /** 禁用该项 */
   disabled?: boolean;
+  /** 表单项是否清空 */
+  clearable?: boolean;
 }

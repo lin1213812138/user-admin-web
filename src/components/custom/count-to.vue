@@ -1,4 +1,22 @@
 <script setup lang="ts">
+/**
+ * 数字滚动动画组件
+ *
+ * 作用：将数字从 startValue 平滑递增/递减到 endValue，常用于大屏数字、统计面板。
+ *
+ * 使用方式：
+ * ```vue
+ * <CountTo :end-value="100" :duration="2000" prefix="$" />
+ * ```
+ *
+ * Props 说明：
+ * - startValue / endValue：起始与结束数值
+ * - duration：动画时长（毫秒）
+ * - autoplay：start 或 end 变化时是否自动播放
+ * - decimals：小数位数；prefix / suffix：前后缀
+ * - separator：千分位分隔符；decimal：小数点符号
+ * - useEasing / transition：是否启用缓动及缓动曲线（TransitionPresets 的键名）
+ */
 import { computed, nextTick, ref, watch } from 'vue';
 import { TransitionPresets, useTransition } from '@vueuse/core';
 
@@ -7,16 +25,27 @@ defineOptions({
 });
 
 interface Props {
+  /** 起始值 */
   startValue?: number;
+  /** 结束值 */
   endValue?: number;
+  /** 动画时长（毫秒） */
   duration?: number;
+  /** 是否自动播放 */
   autoplay?: boolean;
+  /** 小数位数 */
   decimals?: number;
+  /** 前缀 */
   prefix?: string;
+  /** 后缀 */
   suffix?: string;
+  /** 千分位分隔符 */
   separator?: string;
+  /** 小数点符号 */
   decimal?: string;
+  /** 是否启用缓动 */
   useEasing?: boolean;
+  /** 缓动曲线（TransitionPresets 的键名） */
   transition?: keyof typeof TransitionPresets;
 }
 

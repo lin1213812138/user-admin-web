@@ -2,6 +2,12 @@
 
 > 本文件维护所有 Agent 讨论/修复记录的索引，**按日期分组（最新日期在上）**。详细文档见 `changelog/` 目录。
 
+## 2026-09-04
+
+- [录单格式「字段映射」高度自适应占满（MasterDetail slot 容器撑满 + FieldMapping fill）](./changelog/录单格式字段映射高度自适应占满.md)
+- [录单格式列表启用/禁用不明显（MasterDetail 状态改实心彩色徽标）](./changelog/录单格式列表启用禁用不明显.md)
+- [设置页整理：字段映射项改为 key/label/span 结构 + 清空其余 5 页占位内容（LookForward 空状态）](./changelog/设置页整理字段映射结构与占位清理.md)
+
 ## 2026-09-03
 
 - [设置页 MasterDetail：启用/禁用与操作栏改为可选（showStatus/showActions）](./changelog/设置页MasterDetail状态与操作栏改为可选.md)

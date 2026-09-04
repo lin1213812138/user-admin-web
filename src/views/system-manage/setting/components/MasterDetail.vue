@@ -55,7 +55,12 @@ function handleSelect(id: number) {
 <template>
   <div
     class="h-full w-full flex gap-8px overflow-hidden"
-    :style="{ '--menu-primary': themeVars.primaryColor, '--menu-hover-bg': themeVars.hoverColor }"
+    :style="{
+      '--menu-primary': themeVars.primaryColor,
+      '--menu-hover-bg': themeVars.hoverColor,
+      '--status-enable': themeVars.successColor,
+      '--status-disable': themeVars.errorColor
+    }"
   >
     <div class="w-240px h-full flex-col">
       <NCard
@@ -76,6 +81,10 @@ function handleSelect(id: number) {
             >
               <span class="truncate">{{ item.name }}</span>
               <span v-if="showStatus && item.status !== undefined" class="menu-item__status">
+                <i
+                  class="menu-item__dot"
+                  :class="item.status === 1 ? 'menu-item__dot--enable' : 'menu-item__dot--disable'"
+                />
                 {{ item.status === 1 ? $t('common.enable') : $t('common.disable') }}
               </span>
             </div>
@@ -118,8 +127,9 @@ function handleSelect(id: number) {
           </slot>
           <slot name="operation-extra" />
         </div>
-        <NScrollbar class="min-h-0 flex-1">
-          <div class="min-w-full px-16px py-16px">
+        <!-- content 撑满：高度不足时 slot 容器被拉伸，卡片可 flex:1 吃掉剩余空间；内容超高时仍由本层滚动 -->
+        <NScrollbar class="min-h-0 flex-1" content-class="min-h-full flex-col">
+          <div class="min-w-full flex-1 flex-col px-16px py-16px">
             <slot />
           </div>
         </NScrollbar>
@@ -150,7 +160,22 @@ function handleSelect(id: number) {
   background-color: var(--menu-primary);
 }
 .menu-item__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
   font-size: 12px;
-  opacity: 0.85;
+}
+.menu-item__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.menu-item__dot--enable {
+  background-color: var(--status-enable);
+}
+.menu-item__dot--disable {
+  background-color: var(--status-disable);
 }
 </style>

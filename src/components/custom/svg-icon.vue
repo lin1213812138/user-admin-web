@@ -5,10 +5,10 @@ import { Icon } from '@iconify/vue';
 defineOptions({ name: 'SvgIcon', inheritAttrs: false });
 
 /**
- * Props
+ * Props 说明
  *
- * - Support iconify and local svg icon
- * - If icon and localIcon are passed at the same time, localIcon will be rendered first
+ * - 同时支持 iconify 在线图标与本地 svg-sprite 图标
+ * - 若同时传入 icon 与 localIcon，优先渲染 localIcon
  */
 interface Props {
   /** Iconify icon name */
@@ -36,7 +36,7 @@ const symbolId = computed(() => {
   return `#${prefix}-${icon}`;
 });
 
-/** If localIcon is passed, render localIcon first */
+/** 若传入了 localIcon，则优先渲染本地图标 */
 const renderLocalIcon = computed(() => props.localIcon || !props.icon);
 </script>
 

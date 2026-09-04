@@ -91,13 +91,14 @@ function handleDelete(row: WaybillRule) {
 </script>
 
 <template>
-  <div class="h-full w-full p-16px">
+  <div class="h-full w-full">
     <Table
       :columns="columns"
       :data="data"
       :loading="loading"
       :pagination="pagination"
       :show-seq="true"
+      :show-checkbox="true"
       :show-action="true"
       @refresh="getData"
       @page-change="handlePageChange"

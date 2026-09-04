@@ -1,11 +1,25 @@
 <script lang="ts" setup>
+/**
+ * 波浪背景装饰组件
+ *
+ * 作用：基于主题色生成渐变光斑背景，绝对定位铺满父容器，常用于登录页、首页等装饰背景。
+ *
+ * 使用方式（需父容器提供定位上下文，如 class="relative"）：
+ * ```vue
+ * <div class="relative h-full w-full overflow-hidden">
+ *   <WaveBg theme-color="#2080f0" />
+ * </div>
+ * ```
+ *
+ * 说明：组件内部使用 position:absolute 铺满，请确保父级为定位元素且按需设置 overflow。
+ */
 import { computed } from 'vue';
 import { getPaletteColorByNumber } from '@sa/color';
 
 defineOptions({ name: 'WaveBg' });
 
 interface Props {
-  /** Theme color */
+  /** 主题色（十六进制），用作渐变光斑的基准色 */
   themeColor: string;
 }
 

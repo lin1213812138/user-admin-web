@@ -1,4 +1,19 @@
 <script setup lang="ts">
+/**
+ * 图标选择器组件
+ *
+ * 作用：弹窗式图标选择，内置 iconify 在线图标与 vicons 矢量图标两套资源，
+ *       支持按来源切换 Tab、关键词搜索、清空已选图标。
+ *
+ * 使用方式（配合 v-model 绑定选中的图标 key）：
+ * ```vue
+ * <IconPicker v-model:value="form.icon" />
+ * ```
+ *
+ * 说明：
+ * - 选中的 value 为图标 key，形如 "mdi:home"（iconify）或 "vicons:ionicons5:Home"（vicons）
+ * - 通过 `disabled` 禁用、`placeholder` 设置占位文案、`clearable` 控制是否显示清空按钮
+ */
 import { computed, ref } from 'vue';
 import { Icon } from '@iconify/vue';
 import { $t } from '@/locales';

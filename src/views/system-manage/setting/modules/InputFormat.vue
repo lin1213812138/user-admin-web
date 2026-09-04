@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { $t } from '@/locales';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 import MasterDetail from '../components/MasterDetail.vue';
-import FieldMapping from '../components/FieldMapping.vue';
+import FieldMapping, { type FieldMappingGroup } from '../components/FieldMapping.vue';
 
 interface InputFormatItem {
   id: number;
@@ -14,12 +14,58 @@ interface InputFormatItem {
   fields: Record<string, string[]>;
 }
 
-const navGroups = [
-  { key: 'waybill', title: '运单信息', fields: ['业务备注', '内部备注', '小计金额', '净重', '货物件数', '长', '宽'] },
-  { key: 'receiver', title: '收件人信息', fields: ['收件人姓名', '电话', '地址', '公司'] },
-  { key: 'sender', title: '发件人信息', fields: ['发件人姓名', '电话', '地址'] },
-  { key: 'goods', title: '物品信息', fields: ['品名', '数量', '重量', '体积'] },
-  { key: 'subItem', title: '子件信息', fields: ['单件材积', '计费重', '单件重量'] }
+const navGroups: FieldMappingGroup[] = [
+  {
+    key: 'waybill',
+    title: '运单信息',
+    fields: [
+      { key: 'bizRemark', label: '业务备注' },
+      { key: 'innerRemark', label: '内部备注' },
+      { key: 'subtotal', label: '小计金额' },
+      { key: 'netWeight', label: '净重' },
+      { key: 'goodsCount', label: '货物件数' },
+      { key: 'length', label: '长' },
+      { key: 'width', label: '宽' }
+    ]
+  },
+  {
+    key: 'receiver',
+    title: '收件人信息',
+    fields: [
+      { key: 'receiverName', label: '收件人姓名' },
+      { key: 'receiverPhone', label: '电话' },
+      { key: 'receiverAddress', label: '地址', span: 4 },
+      { key: 'receiverCompany', label: '公司', span: 4 }
+    ]
+  },
+  {
+    key: 'sender',
+    title: '发件人信息',
+    fields: [
+      { key: 'senderName', label: '发件人姓名' },
+      { key: 'senderPhone', label: '电话' },
+      { key: 'senderAddress', label: '地址', span: 12 }
+    ]
+  },
+  {
+    key: 'goods',
+    title: '物品信息',
+    fields: [
+      { key: 'goodsName', label: '品名' },
+      { key: 'quantity', label: '数量' },
+      { key: 'weight', label: '重量' },
+      { key: 'volume', label: '体积' }
+    ]
+  },
+  {
+    key: 'subItem',
+    title: '子件信息',
+    fields: [
+      { key: 'singleVolume', label: '单件材积' },
+      { key: 'chargeWeight', label: '计费重' },
+      { key: 'singleWeight', label: '单件重量' }
+    ]
+  }
 ];
 
 const extraFormatNames = [
@@ -70,11 +116,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer', 'wechat'],
     remark: '',
     fields: {
-      waybill: ['业务备注', '内部备注'],
+      waybill: ['bizRemark', 'innerRemark'],
       receiver: [],
       sender: [],
-      goods: ['小计金额', '净重', '货物件数', '长', '宽'],
-      subItem: ['单件材积', '计费重']
+      goods: ['subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
+      subItem: ['singleVolume', 'chargeWeight']
     }
   },
   {
@@ -84,10 +130,10 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer'],
     remark: '',
     fields: {
-      waybill: ['业务备注'],
-      receiver: ['收件人姓名'],
+      waybill: ['bizRemark'],
+      receiver: ['receiverName'],
       sender: [],
-      goods: ['净重', '货物件数'],
+      goods: ['netWeight', 'goodsCount'],
       subItem: []
     }
   },
@@ -98,11 +144,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal'],
     remark: '跨境电商专用，字段最全',
     fields: {
-      waybill: ['业务备注', '内部备注', '小计金额', '净重', '货物件数', '长', '宽'],
-      receiver: ['收件人姓名', '电话', '地址', '公司'],
-      sender: ['发件人姓名', '电话', '地址'],
-      goods: ['品名', '数量', '重量', '体积'],
-      subItem: ['单件材积', '计费重', '单件重量']
+      waybill: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
+      receiver: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
+      sender: ['senderName', 'senderPhone', 'senderAddress'],
+      goods: ['goodsName', 'quantity', 'weight', 'volume'],
+      subItem: ['singleVolume', 'chargeWeight', 'singleWeight']
     }
   },
   {
@@ -112,10 +158,10 @@ const formats = ref<InputFormatItem[]>([
     scope: ['wechat'],
     remark: '微信小程序同城下单',
     fields: {
-      waybill: ['业务备注'],
-      receiver: ['收件人姓名', '电话', '地址'],
-      sender: ['发件人姓名', '电话'],
-      goods: ['品名', '数量'],
+      waybill: ['bizRemark'],
+      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
+      sender: ['senderName', 'senderPhone'],
+      goods: ['goodsName', 'quantity'],
       subItem: []
     }
   },
@@ -126,11 +172,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer'],
     remark: '冷链运输，需记录体积与重量',
     fields: {
-      waybill: ['业务备注', '内部备注', '净重', '货物件数'],
-      receiver: ['收件人姓名', '电话', '地址'],
-      sender: ['发件人姓名', '电话'],
-      goods: ['品名', '数量', '重量', '体积'],
-      subItem: ['单件材积', '单件重量']
+      waybill: ['bizRemark', 'innerRemark', 'netWeight', 'goodsCount'],
+      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
+      sender: ['senderName', 'senderPhone'],
+      goods: ['goodsName', 'quantity', 'weight', 'volume'],
+      subItem: ['singleVolume', 'singleWeight']
     }
   },
   {
@@ -140,10 +186,10 @@ const formats = ref<InputFormatItem[]>([
     scope: ['customer', 'wechat'],
     remark: '收件人付运费（暂时停用）',
     fields: {
-      waybill: ['业务备注', '小计金额'],
-      receiver: ['收件人姓名', '电话', '地址'],
-      sender: ['发件人姓名'],
-      goods: ['品名', '数量', '重量'],
+      waybill: ['bizRemark', 'subtotal'],
+      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
+      sender: ['senderName'],
+      goods: ['goodsName', 'quantity', 'weight'],
       subItem: []
     }
   },
@@ -154,10 +200,10 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal'],
     remark: '内部临时使用，已废弃',
     fields: {
-      waybill: ['业务备注'],
-      receiver: ['收件人姓名'],
+      waybill: ['bizRemark'],
+      receiver: ['receiverName'],
       sender: [],
-      goods: ['品名'],
+      goods: ['goodsName'],
       subItem: []
     }
   },
@@ -168,11 +214,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer', 'wechat'],
     remark: '大件/重货，需长宽与体积',
     fields: {
-      waybill: ['业务备注', '内部备注', '小计金额', '净重', '货物件数', '长', '宽'],
-      receiver: ['收件人姓名', '电话', '地址'],
-      sender: ['发件人姓名', '电话', '地址'],
-      goods: ['品名', '数量', '重量', '体积'],
-      subItem: ['单件材积', '计费重']
+      waybill: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
+      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
+      sender: ['senderName', 'senderPhone', 'senderAddress'],
+      goods: ['goodsName', 'quantity', 'weight', 'volume'],
+      subItem: ['singleVolume', 'chargeWeight']
     }
   },
   {
@@ -182,10 +228,10 @@ const formats = ref<InputFormatItem[]>([
     scope: ['customer', 'wechat'],
     remark: '电商平台客户下单',
     fields: {
-      waybill: ['业务备注'],
-      receiver: ['收件人姓名', '电话', '地址', '公司'],
+      waybill: ['bizRemark'],
+      receiver: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
       sender: [],
-      goods: ['品名', '数量', '重量'],
+      goods: ['goodsName', 'quantity', 'weight'],
       subItem: []
     }
   },
@@ -196,7 +242,7 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal'],
     remark: '字段映射测试用',
     fields: {
-      waybill: ['业务备注', '内部备注', '小计金额'],
+      waybill: ['bizRemark', 'innerRemark', 'subtotal'],
       receiver: [],
       sender: [],
       goods: [],
@@ -210,11 +256,11 @@ const formats = ref<InputFormatItem[]>([
     scope: extraScopes[i % extraScopes.length],
     remark: '',
     fields: {
-      waybill: ['业务备注', '内部备注'],
-      receiver: i % 2 === 0 ? ['收件人姓名', '电话', '地址'] : [],
-      sender: i % 2 === 0 ? ['发件人姓名', '电话', '地址'] : [],
-      goods: ['品名', '数量', '重量', '体积'],
-      subItem: i % 3 === 0 ? ['单件材积', '计费重'] : []
+      waybill: ['bizRemark', 'innerRemark'],
+      receiver: i % 2 === 0 ? ['receiverName', 'receiverPhone', 'receiverAddress'] : [],
+      sender: i % 2 === 0 ? ['senderName', 'senderPhone', 'senderAddress'] : [],
+      goods: ['goodsName', 'quantity', 'weight', 'volume'],
+      subItem: i % 3 === 0 ? ['singleVolume', 'chargeWeight'] : []
     }
   }))
 ]);
@@ -344,9 +390,16 @@ function handleCancel() {
         <NButton size="small" @click="handleCancel">取消</NButton>
       </NSpace>
     </template>
-    <NFormWrap v-if="current || isEditing" :model="formModel" :items="formItems" :disabled="!isEditing" />
+    <NFormWrap
+      v-if="current || isEditing"
+      class="shrink-0"
+      :model="formModel"
+      :items="formItems"
+      :disabled="!isEditing"
+    />
     <FieldMapping
       v-if="current || isEditing"
+      fill
       :nav-groups="navGroups"
       :model-value="fieldModel"
       @update:model-value="fieldModel = $event"
