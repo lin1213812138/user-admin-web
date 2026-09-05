@@ -398,6 +398,27 @@ declare namespace App {
         };
         devInProgress: string;
         excelTemplate: string;
+        export: string;
+        exportFields: string;
+        exportSelectedCount: string;
+        exportSuccess: string;
+        exportFailed: string;
+        exportScope: string;
+        exportScopeAll: string;
+        exportScopePage: string;
+        exportScopeChecked: string;
+        exportScopeCheckedEmpty: string;
+        exportScopeAllUnavailable: string;
+        addField: string;
+        customField: string;
+        fieldName: string;
+        fieldNamePlaceholder: string;
+        dataField: string;
+        dataFieldPlaceholder: string;
+        valueMode: string;
+        valueModeField: string;
+        valueModeFixed: string;
+        fixedValuePlaceholder: string;
       };
       request: {
         logout: string;

@@ -8,10 +8,18 @@ import SearchBar from '@/components/SearchBar/search-bar.vue';
 import { copyText } from '@/utils/common';
 import type { VxeColumnRenderColumn, VxePagination } from './use-vxe-table';
 import type { VxeTablePropTypes } from 'vxe-table';
+import { createDefaultExportName } from '@/components/Export';
 
 defineOptions({
   name: 'Table'
 });
+
+/** 支持原生导出的 vxe-table 实例最小形状（方法由 @vxe-ui/plugin-export-xlsx 运行时挂载） */
+interface VxeExportableTable {
+  /** 打开 vxe-table 高级导出弹窗 */
+  openExport?: (options?: VxeTablePropTypes.ExportConfig) => void;
+  exportData?: (options?: VxeTablePropTypes.ExportConfig) => Promise<unknown>;
+}
 
 interface Props {
   columns: VxeColumnRenderColumn[];
@@ -35,6 +43,10 @@ interface Props {
   searchModel?: Record<string, unknown>;
   /** 搜索栏是否默认收起 */
   searchDefaultCollapsed?: boolean;
+  /** 是否在右侧操作栏内置「导出」按钮：点击打开 vxe-table 原生高级导出弹窗 */
+  actionExport?: boolean;
+  /** actionExport 导出文件名（不含扩展名），缺省「导出_时间戳」 */
+  exportFilename?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -52,8 +64,35 @@ const props = withDefaults(defineProps<Props>(), {
   treeConfig: undefined,
   searchItems: undefined,
   searchModel: undefined,
-  searchDefaultCollapsed: true
+  searchDefaultCollapsed: true,
+  actionExport: false,
+  exportFilename: undefined
 });
+
+/** vxe-table 实例（原生导出按钮要用它的 openExport/exportData） */
+const tableRef = ref<VxeExportableTable | null>(null);
+
+/** 高级导出默认配置 */
+const exportConfig = computed<VxeTablePropTypes.ExportConfig>(() => ({
+  type: 'xlsx',
+  filename: props.exportFilename || createDefaultExportName(),
+  sheetName: 'Sheet1'
+}));
+
+/** action-export：打开 vxe-table 原生高级导出弹窗 */
+function handleNativeExport() {
+  const instance = tableRef.value;
+  if (!instance?.openExport) {
+    window.$message?.error($t('common.exportFailed'));
+    return;
+  }
+  try {
+    instance.openExport(exportConfig.value);
+  } catch (error) {
+    console.error('vxe openExport failed', error);
+    window.$message?.error($t('common.exportFailed'));
+  }
+}
 
 /** 搜索栏是否收起（默认收起，让表格更清爽） */
 const searchCollapsed = ref(props.searchDefaultCollapsed);
@@ -122,6 +161,12 @@ function handleSelectionChange({ records }: { records: any[] }) {
         <slot name="operation-left" :refresh="refresh" />
       </div>
       <div class="flex-y-center gap-8px flex-wrap justify-end">
+        <NButton v-if="actionExport" size="small" @click="handleNativeExport">
+          <!--          {{ $t('common.export') }}-->
+          <template #icon>
+            <icon-mdi-download class="text-icon" />
+          </template>
+        </NButton>
         <slot name="operation-right" :refresh="refresh" />
         <NButton
           v-if="searchItems?.length"
@@ -137,6 +182,7 @@ function handleSelectionChange({ records }: { records: any[] }) {
 
     <div class="w-full min-h-0 bg-white" :class="height === '100%' ? 'flex-1' : ''">
       <vxe-table
+        ref="tableRef"
         :data="data"
         :border="border"
         :stripe="stripe"
@@ -146,6 +192,7 @@ function handleSelectionChange({ records }: { records: any[] }) {
         :height="height"
         :loading="loading"
         show-overflow="tooltip"
+        :export-config="exportConfig"
         :tree-config="treeConfig"
         class="w-full table-draggable"
         @checkbox-change="handleSelectionChange"

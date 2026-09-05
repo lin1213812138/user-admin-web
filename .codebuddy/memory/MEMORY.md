@@ -22,6 +22,27 @@
   - 折叠动画**只动 `opacity` + `translateY`**（0.2s），绝不动画 `height` / `grid-template-rows: 0fr`（逐帧重排整张表单，字段多必卡）。收起用 `display:none`，状态保留在父页面 model。
   - 每个界面各自声明 `searchItems`（末项 `{ key:'actions', slot:'actions' }`），禁止抽成跨界面共享函数。
 
+## 表格导出体系（v3，2026-09-05 定稿）
+
+- 两套并存、按页面需要开：**右上 `Table action-export` = vxe-table 原生高级导出弹窗**（`<vxe-table>` 挂 ref 调 `openExport({ type:'xlsx', filename, sheetName })`，弹出「导出数据」面板，可选择文件名/类型/字段/表头）；**exceljs 字段选择导出 = `TableExportAction`**，由页面自行放进**左侧操作栏**（`operation-left`），字段勾选/含隐藏列/fetchAll 全量/status 文案都由它负责。
+- 引擎：exceljs 动态 import 的 `export-xlsx.ts`（唯一出口）；`@vxe-ui/plugin-export-xlsx` 全局注册于 `src/plugins/vxe-table.ts`，只支撑原生 exportData。`exportRowsToXlsx` 与 `createDefaultExportName` 从 `@/components/Export` 导出。
+- vxe-table 实例的 `exportData` 在核心 d.ts 里**没有**类型声明（方法由插件运行时挂载）→ table.vue 用本地最小接口 `VxeExportableTable` 收敛，勿依赖官方类型。
+- ⚠️ `src/typings/components.d.ts` 由 vite 插件生成（禁手改）；本机因 WebStorm shim 拦 vite 缓存 rm 跑不起 dev 去重生成。**已登记进 components.d.ts 的组件文件不能直接删除**，否则残留引用致 typecheck 失败——保留 alias 文件（非 setup script `export default` 指向主体）即可，待下次 dev/build 正常后再清理。示例：`Export/field-export.vue` 是 `table-export-action.vue` 的 alias，勿删。
+- 用户管理页是两套并存的示例页。
+
+## 导出「数据范围」选项（2026-09-05 加在 exceljs 管线 B 上）
+
+- `TableExportAction`（左操作栏）的字段弹窗**顶部操作行**（与「新增字段」按钮同排，位于其左侧）有「数据范围」单选项：**全部数据 / 当前页（N 条）/ 勾选数据（N 条）**，分别取 `fetchAll()` / `data` / `checkedData`。弹窗高度维持 520px（合并后不额外占行）。
+- 类型在 `Export/type.ts`：`ExportScope = 'all'|'page'|'checked'`、`ExportScopeOption{value,label,disabled,hint}`、`ExportConfirmPayload{scope: ExportScope|null, fields}`。
+- `FieldSelectDialog` 的**范围区是可选能力**：不传 `scopes` 就不渲染（`DataExport` 非表格页因此零变化）。`confirm` 事件签名是 `(payload: ExportConfirmPayload)`，不是裸 `ExportField[]`。
+- 规则：默认 `有 fetchAll → 全部，否则 → 当前页`；**每次打开弹窗重置，不记忆**；不可用项**灰显禁用**（不隐藏），hint 挂 `title`。
+- 页面接入只需多传一个 `:checked-data="checkedRows"`（页面 `@selection-change` 已持有），无需改 `useVxeTable`。
+
+## build 被 WebStorm shim 拦截的确定性解法
+
+- `pnpm build` 报 `plugin vite:prepare-out-dir` / `emptyDir` / `--file parameter is required` 时，**编译其实已成功**（日志会先打印 Build successful），只是清空 dist 被 `node-safe-delete-shim` 拦。
+- 解法：先手动删产物目录再 build —— PowerShell `Remove-Item -Recurse -Force dist`（不受 node 层 shim 影响）。**不要当成代码问题去查**。
+
 ## vxe-table v4 树表（v4.5.9 踩坑）
 
 - `tree-config` 必须显式带 **`rowField`**，否则不进树模式。

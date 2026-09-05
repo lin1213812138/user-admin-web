@@ -4,6 +4,7 @@ import { $t } from '@/locales';
 import { fetchGetUserList } from '@/service/api/system-manage';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
+import { TableExportAction } from '@/components/Export';
 import UserOperateDrawer from './modules/user-operate-drawer.vue';
 
 interface UserItem {
@@ -83,6 +84,12 @@ function handleDetail(row: Api.SystemManage.User) {
 function handleCreated() {
   getData();
 }
+
+/** 导出用：一次拉全量用户（真实后端可走专用导出接口或大 size 查询） */
+async function fetchAllUsers(): Promise<UserItem[]> {
+  const res = (await fetchGetUserList({ current: 1, size: 9999 })) as Api.SystemManage.UserList;
+  return res.records;
+}
 </script>
 
 <template>
@@ -95,6 +102,8 @@ function handleCreated() {
       :show-seq="true"
       :show-checkbox="true"
       :show-action="true"
+      action-export
+      :export-filename="$t('route.system-manage_user')"
       @refresh="getData"
       @page-change="handlePageChange"
       @selection-change="handleSelectionChange"
@@ -114,6 +123,13 @@ function handleCreated() {
             </template>
             {{ $t('common.batchDelete') }}
           </NButton>
+          <TableExportAction
+            :columns="columnConfigs"
+            :data="data"
+            :checked-data="checkedRows"
+            :fetch-all="fetchAllUsers"
+            :filename="$t('route.system-manage_user')"
+          />
         </NSpace>
       </template>
 
