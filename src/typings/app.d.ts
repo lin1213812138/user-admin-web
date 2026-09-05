@@ -638,6 +638,8 @@ declare namespace App {
             createTime: string;
             permission: string;
             permissionTip: string;
+            searchMenuPlaceholder: string;
+            loadMenuFailed: string;
             form: {
               roleNamePlaceholder: string;
               roleCodePlaceholder: string;

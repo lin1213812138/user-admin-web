@@ -4,6 +4,7 @@
 
 ## 2026-09-05
 
+- [分配权限界面改为表格模式（抽屉内 vxe 树形表格 + 双接口拼接列数据，已实现待手测）](./changelog/%E5%88%86%E9%85%8D%E6%9D%83%E9%99%90%E7%95%8C%E9%9D%A2%E6%94%B9%E4%B8%BA%E8%A1%A8%E6%A0%BC%E6%A8%A1%E5%BC%8F.md)
 - [导出组件增加「数据范围」选项（全部 / 当前页 / 勾选数据），仅作用于 exceljs 字段选择弹窗（已实现，待手测）](./changelog/%E5%AF%BC%E5%87%BA%E8%8C%83%E5%9B%B4%E9%80%89%E9%A1%B9%E8%AE%BE%E8%AE%A1.md)
 - [导出字段弹窗升级为「可新增字段」的编辑表格（可编辑列名 + 拖拽排序 + 自定义字段取数据/固定值）](./changelog/%E5%AF%BC%E5%87%BA%E5%AD%97%E6%AE%B5%E5%BC%B9%E7%AA%97%E5%8D%87%E7%BA%A7%E4%B8%BA%E5%8F%AF%E6%96%B0%E5%A2%9E%E5%AD%97%E6%AE%B5%E7%9A%84%E7%BC%96%E8%BE%91%E8%A1%A8%E6%A0%BC.md)
 - [Table action-export 改为打开 vxe-table 原生高级导出弹窗](./changelog/Table%20action-export%20%E6%89%93%E5%BC%80%20vxe%20%E9%AB%98%E7%BA%A7%E5%AF%BC%E5%87%BA%E5%BC%B9%E7%AA%97.md)

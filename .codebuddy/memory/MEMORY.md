@@ -66,6 +66,14 @@
 - 业务事实：**字段映射只在录单格式存在**，其它 5 个页面的 FieldMapping 是模板复制的占位数据（本轮未清理）。
 - 既有坑：`modules/PrintFormat.vue` 有 6 个 `@typescript-eslint/no-unused-vars` 误报（变量在模板中确有使用，同结构的 StationScan.vue 不报错）→ 全库 `pnpm lint` / pre-commit 会失败，未处理。
 
+## 按钮权限（前端静态配置，2026-09-05）
+
+- 角色分配权限抽屉（`role/modules/role-permission-drawer.vue`）每行菜单后渲染「操作权限」列（按钮 `NCheckboxGroup`），让角色勾选到按钮粒度。
+- 按钮清单集中在 `src/constants/button-permissions.ts`：导出 `ButtonPermission{code,label}`、`getMenuButtons({permission, routePath})`。以菜单 **`permission` 或 `routePath`** 为 key 匹配（命中即返回），需与后端 `/system/menu/list` 返回字段一致。
+- 按钮 `code` 约定 `system:{模块}:{操作}`（如 `system:user:add`）；角色专属码（`system:role:assign`/`system:user:resetPwd` 等）在配置里直接写。
+- 勾选状态按菜单 id 存 `rowButtonChecks: Record<number, string[]>`，独立于搜索过滤（防丢）。提交随 `menuIds` 携带 `buttonCodes`（`RoleAssignMenuParams` 已加 `buttonCodes?`）。
+- **后端依赖（尚未实现）**：① `/system/role/assignMenu` 需支持接收并落库 `buttonCodes`；② 角色已分配按钮的**回显**需 `role/menuTree` 返回 `checkedButtonCodes`（目前回显为空，需用户重新勾）。
+
 ## 其它零散约定
 
 - **改通用组件前先确认实际链路**：用户截图 → 页面 → 子组件。设置页左侧列表（录单格式等）是 `setting/components/MasterDetail.vue`，**不是**通用 Table；其状态徽标已改为实心彩色 NTag（暗黑模式文字换 `#1f1f1f`）。

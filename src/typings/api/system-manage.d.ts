@@ -169,6 +169,8 @@ declare namespace Api {
     type RoleAssignMenuParams = {
       roleId: number;
       menuIds: number[];
+      /** 角色分配的按钮权限码（前端按菜单勾选，需后端支持接收） */
+      buttonCodes?: string[];
     };
   }
 }

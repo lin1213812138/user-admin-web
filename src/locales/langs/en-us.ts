@@ -368,6 +368,8 @@ const local: App.I18n.Schema = {
         createTime: 'Create Time',
         permission: 'Assign Permission',
         permissionTip: 'Check the menus that the role can access',
+        searchMenuPlaceholder: 'Search menu name / route / permission',
+        loadMenuFailed: 'Failed to load menu permissions',
         form: {
           roleNamePlaceholder: 'Please enter role name',
           roleCodePlaceholder: 'Please enter role code',

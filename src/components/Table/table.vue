@@ -14,11 +14,17 @@ defineOptions({
   name: 'Table'
 });
 
-/** 支持原生导出的 vxe-table 实例最小形状（方法由 @vxe-ui/plugin-export-xlsx 运行时挂载） */
+/** 支持原生导出与勾选操作的 vxe-table 实例最小形状（方法由 @vxe-ui/plugin-export-xlsx 运行时挂载） */
 interface VxeExportableTable {
   /** 打开 vxe-table 高级导出弹窗 */
   openExport?: (options?: VxeTablePropTypes.ExportConfig) => void;
   exportData?: (options?: VxeTablePropTypes.ExportConfig) => Promise<unknown>;
+  /** 获取已勾选的行（树模式下父子联动后会包含父节点） */
+  getCheckboxRecords?: () => Record<string, unknown>[];
+  /** 获取半选（indeterminate）行，树模式下父节点部分子节点勾选时为半选 */
+  getCheckboxIndeterminateRecords?: () => Record<string, unknown>[];
+  /** 勾选 / 取消勾选全部行 */
+  setAllCheckboxRow?: (checked: boolean) => Promise<unknown>;
 }
 
 interface Props {
@@ -37,6 +43,10 @@ interface Props {
   height?: string;
   /** vxe-table tree-config, enable tree mode when provided */
   treeConfig?: VxeTablePropTypes.TreeConfig;
+  /** vxe-table checkbox-config, e.g. { checkStrictly: false, checkField: 'checked' } for cascaded tree checkbox */
+  checkboxConfig?: VxeTablePropTypes.CheckboxConfig;
+  /** vxe-table row-config, default { isHover: true, height: 40 } */
+  rowConfig?: VxeTablePropTypes.RowConfig;
   /** 搜索栏配置项，传入即启用内嵌可折叠搜索栏（由所有使用本表格的页面各自配置） */
   searchItems?: FormItemConfig[];
   /** 搜索表单数据对象（按引用传递，由父页面持有并在取数时读取） */
@@ -62,6 +72,8 @@ const props = withDefaults(defineProps<Props>(), {
   actionAlign: 'left',
   height: '100%',
   treeConfig: undefined,
+  checkboxConfig: undefined,
+  rowConfig: undefined,
   searchItems: undefined,
   searchModel: undefined,
   searchDefaultCollapsed: true,
@@ -103,14 +115,21 @@ const actionJustify = computed(() => {
   return 'justify-start';
 });
 
+const finalRowConfig = computed<VxeTablePropTypes.RowConfig>(() => ({
+  isHover: true,
+  height: 40,
+  ...props.rowConfig
+}));
+
 const emit = defineEmits<{
   (e: 'refresh'): void;
   (e: 'pageChange', pagination: { current: number; size: number }): void;
-  (e: 'selectionChange', records: any[]): void;
+  (e: 'selectionChange', records: any[], indeterminates: any[]): void;
   (e: 'afterRender'): void;
   (e: 'detail', row: any): void;
   (e: 'search'): void;
   (e: 'reset'): void;
+  (e: 'toggleTreeExpand', payload: { row: any; expanded: boolean }): void;
 }>();
 
 function refresh() {
@@ -139,9 +158,33 @@ const seqStartIndex = computed(() => {
   return (current - 1) * size;
 });
 
-function handleSelectionChange({ records }: { records: any[] }) {
-  emit('selectionChange', records);
+function handleSelectionChange() {
+  const instance = tableRef.value;
+  const records = instance?.getCheckboxRecords?.() ?? [];
+  const indeterminates = instance?.getCheckboxIndeterminateRecords?.() ?? [];
+  // 半选父节点（部分子节点勾选）也要纳入勾选集合，否则提交 menuIds 会丢失父菜单
+  emit('selectionChange', records, indeterminates);
 }
+
+function handleToggleTreeExpand(params: any) {
+  emit('toggleTreeExpand', { row: params.row, expanded: params.treeExpanded ?? params.expanded ?? false });
+}
+
+/** 获取当前勾选行，供调用方（如权限勾选抽屉）读取最终勾选结果 */
+function getCheckboxRecords(): Record<string, unknown>[] {
+  return tableRef.value?.getCheckboxRecords?.() ?? [];
+}
+
+/** 勾选 / 取消勾选全部行 */
+async function setAllCheckboxRow(checked: boolean) {
+  await tableRef.value?.setAllCheckboxRow?.(checked);
+}
+
+function setTreeExpand(rows: any[], expanded: boolean) {
+  (tableRef.value as any)?.setTreeExpand?.(rows, expanded);
+}
+
+defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
 </script>
 
 <template>
@@ -186,7 +229,7 @@ function handleSelectionChange({ records }: { records: any[] }) {
         :data="data"
         :border="border"
         :stripe="stripe"
-        :row-config="{ isHover: true, height: 40 }"
+        :row-config="finalRowConfig"
         :column-config="{ resizable: true }"
         :seq-config="{ startIndex: seqStartIndex }"
         :height="height"
@@ -194,10 +237,12 @@ function handleSelectionChange({ records }: { records: any[] }) {
         show-overflow="tooltip"
         :export-config="exportConfig"
         :tree-config="treeConfig"
+        :checkbox-config="checkboxConfig"
         class="w-full table-draggable"
         @checkbox-change="handleSelectionChange"
         @checkbox-all="handleSelectionChange"
         @after-render="$emit('afterRender')"
+        @toggle-tree-expand="handleToggleTreeExpand"
       >
         <vxe-column v-if="showSeq" type="seq" title="#" :width="50" fixed="left" align="center" />
         <vxe-column v-if="showCheckbox" type="checkbox" :width="50" fixed="left" align="center" />

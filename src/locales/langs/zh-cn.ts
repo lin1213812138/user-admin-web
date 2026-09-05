@@ -364,6 +364,8 @@ const local: App.I18n.Schema = {
         createTime: '创建时间',
         permission: '分配权限',
         permissionTip: '勾选该角色可访问的菜单',
+        searchMenuPlaceholder: '搜索菜单名称 / 路由地址 / 权限标识',
+        loadMenuFailed: '菜单权限加载失败',
         form: {
           roleNamePlaceholder: '请输入角色名称',
           roleCodePlaceholder: '请输入角色标识',
