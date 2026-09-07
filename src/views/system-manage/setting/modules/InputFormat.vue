@@ -401,6 +401,7 @@ function handleCancel() {
       fill
       :nav-groups="navGroups"
       :model-value="fieldModel"
+      :disabled="!isEditing"
       @update:model-value="fieldModel = $event"
     />
   </MasterDetail>

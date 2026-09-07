@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useThemeVars } from 'naive-ui';
 import { $t } from '@/locales';
 import Link from '@/components/common/link.vue';
 import IconRenderer from '@/components/custom/icon-renderer.vue';
@@ -136,6 +137,32 @@ function refresh() {
   emit('refresh');
 }
 
+const themeVars = useThemeVars();
+
+/** 复制图标跟随主题色（含 hover 态），随主题切换自动更新 */
+const copyIconStyle = computed(() => ({
+  '--vxe-copy-color': themeVars.value.primaryColor,
+  '--vxe-copy-hover-color': themeVars.value.primaryColorHover
+}));
+
+/**
+ * 当前鼠标所在行的 rowid。vxe-table 会把固定列拆成独立的 <tr>，纯 CSS :hover 无法跨
+ * 主区/固定列关联同一行，因此用事件委托读 tr[rowid] 自行维护 hover 行。
+ */
+const hoverRowId = ref<string | null>(null);
+
+function handleRowMouseOver(evt: MouseEvent) {
+  const tr = (evt.target as HTMLElement | null)?.closest?.('tr[rowid]');
+  const rowid = tr?.getAttribute('rowid') ?? null;
+  if (rowid !== hoverRowId.value) {
+    hoverRowId.value = rowid;
+  }
+}
+
+function handleTableMouseLeave() {
+  hoverRowId.value = null;
+}
+
 async function handleCopy(text: string) {
   const ok = await copyText(text);
   if (ok) {
@@ -223,7 +250,12 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
       </div>
     </div>
 
-    <div class="w-full min-h-0 bg-white" :class="height === '100%' ? 'flex-1' : ''">
+    <div
+      class="w-full min-h-0 bg-white"
+      :class="height === '100%' ? 'flex-1' : ''"
+      @mouseover="handleRowMouseOver"
+      @mouseleave="handleTableMouseLeave"
+    >
       <vxe-table
         ref="tableRef"
         :data="data"
@@ -267,20 +299,21 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
               {{ row[col.key] === (col.activeValue ?? 1) ? $t('common.enable') : $t('common.disable') }}
             </NTag>
           </template>
-          <template v-else-if="col.type === 'detail'" #default="{ row }">
-            <Link type="primary" icon-position="right" icon-hover @click="emit('detail', row)">
-              {{ row[col.key] }}
-              <template #icon>
-                <NTooltip trigger="hover">
-                  <template #trigger>
-                    <span class="vxe-link-icon" @click.stop="handleCopy(row[col.key])">
-                      <IconRenderer icon="vicons:ionicons5:Copy" :size="14" />
-                    </span>
-                  </template>
-                  <span>{{ $t('common.copy') }}</span>
-                </NTooltip>
+          <template v-else-if="col.type === 'detail'" #default="{ row, rowid }">
+            <Link type="primary" @click="emit('detail', row)">{{ row[col.key] }}</Link>
+            <NTooltip trigger="hover">
+              <template #trigger>
+                <span
+                  class="vxe-cell-copy"
+                  :class="{ 'is-hover': hoverRowId === rowid }"
+                  :style="copyIconStyle"
+                  @click="handleCopy(row[col.key])"
+                >
+                  <IconRenderer icon="vicons:ionicons5:Copy" :size="14" />
+                </span>
               </template>
-            </Link>
+              <span>{{ $t('common.copy') }}</span>
+            </NTooltip>
           </template>
         </vxe-column>
         <vxe-column
@@ -323,10 +356,29 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
 </template>
 
 <style scoped>
-.vxe-link-icon {
+/** copy 图标常占位（避免 hover 时行内元素跳动），仅在鼠标悬停整行时显形 */
+.vxe-cell-copy {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  margin-left: 4px;
+  vertical-align: middle;
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  color: var(--vxe-copy-color, currentColor);
+  transition:
+    opacity 0.2s,
+    color 0.2s;
+}
+
+.vxe-body--row:hover .vxe-cell-copy,
+.vxe-cell-copy.is-hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vxe-cell-copy:hover {
+  color: var(--vxe-copy-hover-color, var(--vxe-copy-color, currentColor));
 }
 </style>
