@@ -20,6 +20,8 @@
     "dev": "vite --mode test",
     "dev:prod": "vite --mode prod",
     "fmt": "oxfmt",
+    "font:build": "node scripts/font/extract-i18n-charset.mjs && node scripts/font/build-subset.mjs",
+    "font:charset": "node scripts/font/extract-i18n-charset.mjs",
     "gen-route": "sa gen-route",
     "lint": "oxlint --fix && eslint --fix .",
     "prepare": "simple-git-hooks",

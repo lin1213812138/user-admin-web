@@ -80,4 +80,27 @@
 - **i18n 新增键三处同步**：`locales/langs/zh-cn.ts`、`en-us.ts`、`typings/app.d.ts` 的 `App.I18n.Schema`，否则 `pnpm typecheck` 报 `I18nKey`。
 - `pnpm release`（bumpp，交互式）：已修复两坑——空仓库 `git describe` 需基准 tag `v0.0.0`；CHANGELOG 空行被 oxfmt 删导致 `git diff --exit-code` 失败，改为 bumpp 的**函数式 execute**（含 `&&` 的字符串会被误拆）里先 `pnpm sa changelog` 再 `pnpm fmt`。最后会 push 远程含 tag。
 - archive-switch 布局：内容区**不要**多套 `<div class='absolute inset-0'>` 包 Transition+KeepAlive+defineAsyncComponent（切档案会只剩微小 spinner）；根与右侧容器都要 `overflow-hidden` 防切换动画溢出滚动条。
-- 本机 WebStorm `coding-copilot` 的 `node-safe-delete-shim` 会拦截 vite 的 `rm` 导致 dev 启动失败。
+- 本机 WebStorm `coding-copilot` 的 `node-safe-delete-shim` 会拦截 vite 的 `rm` 导致 dev 启动失败；**pnpm install/add 同样会被拦**（报 `--file parameter is required`）。
+  - 解法：命令实际由 **PowerShell** 执行，用 `$env:NODE_OPTIONS=""; pnpm add -D xxx`（cmd 的 `set NODE_OPTIONS=` 无效）。同理 dist 清空用 `Remove-Item -Recurse -Force dist`。
+
+## 字体子集化链路（2026-09-07 建立）
+
+- 需求：全站阿里巴巴普惠体，全字库 9~16MB 导致加载慢 → 采用**真子集**（非 unicode-range 全量分包）。
+- 提取脚本 `scripts/font/extract-i18n-charset.mjs`：扫 views/components/layouts/locales-langs/constants/typings/router/store 的 .ts/.vue，**跳过 src/service（DEV mock）**，输出单行字符表。
+  - 仅 i18n：478 汉字 / `zh-i18n-charset.txt`；整站静态：**765 汉字 / 875 字符 → `zh-web-charset.txt`（采用）**。
+- 子集化用 **Python fonttools `pyftsubset --flavor=woff2`**（源 `src/assets/fonts/source/Alibaba-PuHuiTi.otf`，来自兄弟项目 user-web）→ `AlibabaPuHuiTi-subset.woff2` 仅 116KB，family `Alibaba PuHuiTi`。
+- `cn-font-split` 的 `subsets` 是分包范围不是真子集，别用它做"只保留指定字"。
+- 覆盖盲区：naive-ui 内置 zhCN 文案（node_modules）、后端动态业务值（需 3500 常用字或服务端子集兜底）。
+
+## 全局字体接入必须覆盖三处（2026-09-07 坑）
+
+只改 `src/styles/css/reset.css` 的 `html { font-family }` **不够**——两个组件库各自有字体栈，不继承全局：
+
+1. `reset.css` 的 `html`（样式链：`main.ts → plugins/assets.ts → uno.css + styles/css/global.css → reset.css`）。
+2. **Naive UI**：`NConfigProvider` 的 `theme-overrides`（`useThemeStore().naiveTheme`）由 `store/modules/theme/shared.ts` 的 `getNaiveTheme()` 构造 → 在 `common` 里加 `fontFamily`（Naive 用自带默认字体栈，NButton/NInput/弹窗等不继承 html）。
+3. **vxe-table**：vxe 自带 `:root { --vxe-ui-font-family: -apple-system,... }` → 需在 `html:root`（更高特异性）覆盖为自定义变量，否则所有表格不变。
+
+- 建议统一用 CSS 变量 `--app-font-family`（定义在 `styles/css/font.css`），三处引用；但 Naive 的 TS 侧需写完整字符串（cssinjs 不走 CSS 变量），改字体名要同步两处。
+- 配套：`@font-face` 用 `font-display: swap`（不阻塞首屏）；字体放 `src/assets/fonts/` 用相对路径引用（走 Vite hash + base），不要放 public。
+- **改文案不会自动更新字体子集**。维护命令：`pnpm font:charset`（重提取字符表）、`pnpm font:build`（提取+重建 woff2，走 `scripts/font/build-subset.mjs` 调 Python fontTools）。忘跑只是新增字回退系统字体，不报错。
+- 源字体 `src/assets/fonts/source/Alibaba-PuHuiTi.otf`(6.53MB) 已被 `.gitignore` 排除 → 他人 clone 后**无法重建子集**，需自备 otf（或改方案：入库/内网共享）。

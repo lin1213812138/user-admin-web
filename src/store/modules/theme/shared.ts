@@ -234,6 +234,13 @@ function getNaiveThemeColors(colors: App.Theme.ThemeColor, recommended = false) 
 }
 
 /**
+ * Application font family
+ *
+ * It must stay consistent with the CSS variable `--app-font-family` in `src/styles/css/font.css`
+ */
+const APP_FONT_FAMILY = "'Alibaba PuHuiTi', ui-sans-serif, system-ui, -apple-system, 'Microsoft YaHei', sans-serif";
+
+/**
  * Get naive theme
  *
  * @param colors Theme colors
@@ -250,7 +257,8 @@ export function getNaiveTheme(
   const theme: GlobalThemeOverrides = {
     common: {
       ...getNaiveThemeColors(colors, settings.recommendColor),
-      borderRadius: `${settings.themeRadius}px`
+      borderRadius: `${settings.themeRadius}px`,
+      fontFamily: APP_FONT_FAMILY
     },
     LoadingBar: {
       colorLoading

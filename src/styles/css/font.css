@@ -1,0 +1,22 @@
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('../../assets/fonts/AlibabaPuHuiTi-subset.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --app-font-family: 'Alibaba PuHuiTi', ui-sans-serif, system-ui, -apple-system, 'Microsoft YaHei', sans-serif;
+}
+
+/* Override vxe-table built-in font stack; html:root raises specificity so it wins even if vxe styles load later */
+html:root {
+  --vxe-ui-font-family: var(--app-font-family);
+}
+
+/* Naive UI injects its own font stack into `body` via cssinjs; higher specificity keeps the app font in charge */
+html body,
+#app {
+  font-family: var(--app-font-family);
+}
