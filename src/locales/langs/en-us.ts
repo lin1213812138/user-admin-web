@@ -295,7 +295,8 @@ const local: App.I18n.Schema = {
     'data-manage_basic': 'Basic',
     'data-manage_finance': 'Finance',
     'data-manage_business': 'Business',
-    'system-manage_setting': 'System Settings'
+    'system-manage_setting': 'System Settings',
+    'system-manage_print-design': 'Design Label'
   },
   page: {
     login: {
@@ -429,7 +430,8 @@ const local: App.I18n.Schema = {
           setDefault: 'Set Default',
           newTitle: 'New Print Template',
           detailTitle: 'Print Template Detail',
-          copyTitle: 'Copy Print Template'
+          copyTitle: 'Copy Print Template',
+          design: 'Design'
         },
         exportFormat: {
           title: 'Export Format',
@@ -460,6 +462,37 @@ const local: App.I18n.Schema = {
         initData: 'Init Data',
         stationScan: 'Station Scan Config',
         fieldMapping: 'Field Mapping'
+      },
+      printDesign: {
+        title: 'Design Label',
+        back: 'Back',
+        paper: 'Paper Size',
+        zoomOut: 'Zoom Out',
+        zoomIn: 'Zoom In',
+        showGrid: 'Show Grid',
+        hideGrid: 'Hide Grid',
+        clear: 'Clear',
+        clearConfirm: 'Confirm Clear',
+        clearContent: 'All elements on the canvas will be removed. Continue?',
+        save: 'Save',
+        preview: 'Preview',
+        fields: 'Business Fields',
+        basicElements: 'Basic Elements',
+        basicText: 'Text',
+        basicLongText: 'Long Text',
+        basicImage: 'Image',
+        basicBarcode: 'Barcode',
+        basicQrcode: 'QR Code',
+        basicTable: 'Table',
+        basicHline: 'H Line',
+        basicVline: 'V Line',
+        basicRect: 'Rect',
+        canvas: 'Canvas',
+        properties: 'Properties',
+        print: 'Print',
+        loadFailed: 'Failed to load designer',
+        saveSuccess: 'Saved successfully',
+        noTemplate: 'Template not found'
       }
     },
     dataManage: {

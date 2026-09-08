@@ -12,7 +12,9 @@ const mockDb: Api.PrintFormat.Template[] = [
     generatedCount: 1280,
     remark: '默认内单',
     lastEditor: 'admin',
-    editTime: '2026-08-01 10:20'
+    editTime: '2026-08-01 10:20',
+    designJson: '',
+    paperSize: '100×150mm'
   },
   {
     id: 2,
@@ -23,7 +25,9 @@ const mockDb: Api.PrintFormat.Template[] = [
     generatedCount: 320,
     remark: '',
     lastEditor: 'admin',
-    editTime: '2026-08-12 14:05'
+    editTime: '2026-08-12 14:05',
+    designJson: '',
+    paperSize: '80×60mm'
   },
   {
     id: 3,
@@ -34,7 +38,9 @@ const mockDb: Api.PrintFormat.Template[] = [
     generatedCount: 640,
     remark: '转单专用',
     lastEditor: 'admin',
-    editTime: '2026-08-03 09:30'
+    editTime: '2026-08-03 09:30',
+    designJson: '',
+    paperSize: '100×150mm'
   },
   {
     id: 4,
@@ -45,7 +51,9 @@ const mockDb: Api.PrintFormat.Template[] = [
     generatedCount: 88,
     remark: '形式发票',
     lastEditor: 'admin',
-    editTime: '2026-07-20 16:40'
+    editTime: '2026-07-20 16:40',
+    designJson: '',
+    paperSize: 'A4'
   },
   {
     id: 5,
@@ -56,7 +64,9 @@ const mockDb: Api.PrintFormat.Template[] = [
     generatedCount: 1500,
     remark: '汇总总单',
     lastEditor: 'admin',
-    editTime: '2026-08-15 11:00'
+    editTime: '2026-08-15 11:00',
+    designJson: '',
+    paperSize: '100×100mm'
   },
   {
     id: 6,
@@ -67,7 +77,9 @@ const mockDb: Api.PrintFormat.Template[] = [
     generatedCount: 210,
     remark: '',
     lastEditor: 'admin',
-    editTime: '2026-08-18 13:25'
+    editTime: '2026-08-18 13:25',
+    designJson: '',
+    paperSize: '100×100mm'
   }
 ];
 
@@ -123,6 +135,32 @@ export function fetchCopyPrintTemplate(params: Api.PrintFormat.CreateParams) {
     return Promise.resolve(row) as unknown as Promise<Api.PrintFormat.Template>;
   }
   return request<Api.PrintFormat.Template>({ url: '/print/template/copy', method: 'post', data: params });
+}
+
+/** 获取模板详情（含设计 JSON），返回裸数据，没有 { data, error } 包裹 */
+export function fetchGetPrintTemplateDetail(id: number) {
+  if (import.meta.env.DEV) {
+    const row = mockDb.find(t => t.id === id);
+    return row
+      ? (Promise.resolve(row) as unknown as Promise<Api.PrintFormat.Template>)
+      : (Promise.reject(new Error('template not found')) as unknown as Promise<Api.PrintFormat.Template>);
+  }
+  return request<Api.PrintFormat.Template>({ url: '/print/template/detail', method: 'post', data: { id } });
+}
+
+/** 保存设计器产物（模板 JSON + 纸张），返回裸数据 */
+export function fetchSavePrintTemplateDesign(params: { id: number; designJson: string; paperSize: string }) {
+  if (import.meta.env.DEV) {
+    const row = mockDb.find(t => t.id === params.id);
+    if (row) {
+      row.designJson = params.designJson;
+      row.paperSize = params.paperSize;
+      row.lastEditor = 'admin';
+      row.editTime = now();
+    }
+    return Promise.resolve(Boolean(row)) as unknown as Promise<boolean>;
+  }
+  return request<boolean>({ url: '/print/template/saveDesign', method: 'post', data: params });
 }
 
 /** 设为默认（同分类互斥） */

@@ -700,6 +700,7 @@ declare namespace App {
               newTitle: string;
               detailTitle: string;
               copyTitle: string;
+              design: string;
             };
             exportFormat: {
               title: string;
@@ -730,6 +731,37 @@ declare namespace App {
             initData: string;
             stationScan: string;
             fieldMapping: string;
+          };
+          printDesign: {
+            title: string;
+            back: string;
+            paper: string;
+            zoomOut: string;
+            zoomIn: string;
+            showGrid: string;
+            hideGrid: string;
+            clear: string;
+            clearConfirm: string;
+            clearContent: string;
+            save: string;
+            preview: string;
+            fields: string;
+            basicElements: string;
+            basicText: string;
+            basicLongText: string;
+            basicImage: string;
+            basicBarcode: string;
+            basicQrcode: string;
+            basicTable: string;
+            basicHline: string;
+            basicVline: string;
+            basicRect: string;
+            canvas: string;
+            properties: string;
+            print: string;
+            loadFailed: string;
+            saveSuccess: string;
+            noTemplate: string;
           };
         };
         dataManage: {

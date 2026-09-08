@@ -40,6 +40,9 @@ export default defineConfig(configEnv => {
     preview: {
       port: 9725
     },
+    optimizeDeps: {
+      include: ['vue-plugin-hiprint', 'jquery']
+    },
     build: {
       reportCompressedSize: false,
       sourcemap: viteEnv.VITE_SOURCE_MAP === 'Y',

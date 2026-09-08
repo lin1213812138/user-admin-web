@@ -4,6 +4,8 @@
 
 ## 2026-09-07
 
+- [标签打印模板设计器实现（vue-plugin-hiprint：三栏设计器 + 字段 provider + 预览打印，已实现待手测）](./changelog/%E6%A0%87%E7%AD%BE%E6%89%93%E5%8D%B0%E6%A8%A1%E6%9D%BF%E8%AE%BE%E8%AE%A1%E5%99%A8%E5%AE%9E%E7%8E%B0.md)
+- [标签打印模板设计器设计方案（vue-plugin-hiprint：独立路由页 + 自定义字段 provider + 浏览器预览打印）](./changelog/%E6%A0%87%E7%AD%BE%E6%89%93%E5%8D%B0%E6%A8%A1%E6%9D%BF%E8%AE%BE%E8%AE%A1%E5%99%A8%E8%AE%BE%E8%AE%A1%E6%96%B9%E6%A1%88.md)
 - [字段映射卡片头部加各模块「一键全选」按钮（每个模块一个，点击切换全选/清空，新增 disabled prop）](./changelog/%E5%AD%97%E6%AE%B5%E6%98%A0%E5%B0%84%E5%8D%A1%E7%89%87%E5%A4%B4%E9%83%A8%E5%8A%A0%E5%90%84%E6%A8%A1%E5%9D%97%E4%B8%80%E9%94%AE%E5%85%A8%E9%80%89%E6%8C%89%E9%92%AE.md)
 - [阿里巴巴普惠体字体子集化（自动提取项目文字生成 woff2，6.53MB→116KB）](./changelog/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E6%99%AE%E6%83%A0%E4%BD%93%E5%AD%97%E4%BD%93%E5%AD%90%E9%9B%86%E5%8C%96.md)
 - [表格 detail 列复制图标改为「行 hover 显示」且移出 Link 组件（图标常占位 + rowid 关联固定列）](./changelog/%E8%A1%A8%E6%A0%BCdetail%E5%88%97%E5%A4%8D%E5%88%B6%E5%9B%BE%E6%A0%87%E6%94%B9%E4%B8%BA%E8%A1%8Chover%E6%98%BE%E7%A4%BA.md)

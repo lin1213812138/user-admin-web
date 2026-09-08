@@ -11,6 +11,10 @@ declare namespace Api {
       remark: string;
       lastEditor: string;
       editTime: string;
+      /** hiprint 模板 JSON 字符串，未设计时为空串 */
+      designJson: string;
+      /** 纸张尺寸，取值与 labelSize 一致，如 100×150mm */
+      paperSize: string;
     }
 
     /** 列表返回结构（对齐 useVxeTable transform） */

@@ -149,6 +149,16 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'system-manage_print-design',
+        path: '/system-manage/print-design',
+        component: 'view.system-manage_print-design',
+        meta: {
+          title: 'system-manage_print-design',
+          i18nKey: 'route.system-manage_print-design',
+          hideInMenu: true
+        }
+      },
+      {
         name: 'system-manage_role',
         path: '/system-manage/role',
         component: 'view.system-manage_role',

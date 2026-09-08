@@ -26,6 +26,9 @@ export function setupElegantRouter() {
 
       const constantRoutes: RouteKey[] = ['login', '403', '404', '500'];
 
+      /** 只在业务页面内跳转进入、不出现在菜单里的路由 */
+      const hideInMenuRoutes: RouteKey[] = ['system-manage_print-design'];
+
       /** menu icon of the route */
       const routeIcons: Partial<Record<RouteKey, string>> = {
         'system-manage': 'ic:baseline-settings',
@@ -56,6 +59,10 @@ export function setupElegantRouter() {
 
       if (constantRoutes.includes(key)) {
         meta.constant = true;
+      }
+
+      if (hideInMenuRoutes.includes(key)) {
+        meta.hideInMenu = true;
       }
 
       if (routeIcons[key]) {

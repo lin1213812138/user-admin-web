@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { $t } from '@/locales';
+import { useRouterPush } from '@/hooks/common/router';
 import MasterDetail from '../components/MasterDetail.vue';
 import Table from '@/components/Table/table.vue';
 import TableColumnConfig from '@/components/Table/table-column-config.vue';
@@ -81,6 +82,15 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
 const columnConfigVisible = ref(false);
 const selectedRows = ref<Api.PrintFormat.Template[]>([]);
 
+const { routerPushByKey } = useRouterPush();
+
+/** 跳转到标签设计器 */
+function openDesign(row: Api.PrintFormat.Template) {
+  void routerPushByKey('system-manage_print-design', {
+    query: { id: String(row.id), categoryId: String(row.categoryId), name: row.name, paperSize: row.paperSize }
+  });
+}
+
 function handleCategoryChange(id: number | null) {
   if (id === null) return;
   selectedCategoryId.value = id;
@@ -99,7 +109,9 @@ const formModel = ref<Api.PrintFormat.CreateParams>({
   name: '',
   labelSize: '100×150mm',
   isDefault: 0,
-  remark: ''
+  remark: '',
+  designJson: '',
+  paperSize: '100×150mm'
 });
 const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
 
@@ -153,7 +165,9 @@ function openCreate() {
     name: '',
     labelSize: '100×150mm',
     isDefault: 0,
-    remark: ''
+    remark: '',
+    designJson: '',
+    paperSize: '100×150mm'
   };
   drawerVisible.value = true;
 }
@@ -164,7 +178,16 @@ function openView(row: Api.PrintFormat.Template) {
 }
 function openCopy(row: Api.PrintFormat.Template) {
   drawerMode.value = 'copy';
-  formModel.value = { ...row, isDefault: 0 };
+  // 复制时逐个取值而非展开，避免把原模板 id 等服务端字段带进提交参数
+  formModel.value = {
+    categoryId: row.categoryId,
+    name: row.name,
+    labelSize: row.labelSize,
+    isDefault: 0,
+    remark: row.remark,
+    designJson: row.designJson,
+    paperSize: row.paperSize
+  };
   drawerVisible.value = true;
 }
 
@@ -175,10 +198,12 @@ async function handleDrawerSubmit() {
   }
   const ok = await formRef.value?.validate();
   if (!ok) return;
+  // 纸张尺寸跟随标签尺寸
+  const params: Api.PrintFormat.CreateParams = { ...formModel.value, paperSize: formModel.value.labelSize };
   if (drawerMode.value === 'create') {
-    await fetchCreatePrintTemplate(formModel.value);
+    await fetchCreatePrintTemplate(params);
   } else {
-    await fetchCopyPrintTemplate(formModel.value);
+    await fetchCopyPrintTemplate(params);
   }
   drawerVisible.value = false;
   getData();
@@ -226,7 +251,7 @@ async function handleSetDefault(row: Api.PrintFormat.Template) {
         :pagination="pagination"
         show-checkbox
         show-action
-        :action-width="200"
+        :action-width="260"
         action-align="left"
         @refresh="getData"
         @selection-change="handleSelectionChange"
@@ -258,6 +283,9 @@ async function handleSetDefault(row: Api.PrintFormat.Template) {
           <NTag v-else size="small" type="default">{{ $t('page.manage.setting.printFormat.no') }}</NTag>
         </template>
         <template #action="{ row }">
+          <NButton text type="primary" @click="openDesign(row)">
+            {{ $t('page.manage.setting.printFormat.design') }}
+          </NButton>
           <NButton text type="primary" @click="openView(row)">{{ $t('page.manage.setting.printFormat.view') }}</NButton>
           <NButton text type="primary" @click="openCopy(row)">{{ $t('page.manage.setting.printFormat.copy') }}</NButton>
           <NButton text type="primary" :disabled="row.isDefault === 1" @click="handleSetDefault(row)">

@@ -291,7 +291,8 @@ const local: App.I18n.Schema = {
     'data-manage_basic': '基础资料',
     'data-manage_finance': '财务资料',
     'data-manage_business': '业务资料',
-    'system-manage_setting': '系统设置'
+    'system-manage_setting': '系统设置',
+    'system-manage_print-design': '设计标签'
   },
   page: {
     login: {
@@ -425,7 +426,8 @@ const local: App.I18n.Schema = {
           setDefault: '设为默认',
           newTitle: '新建打印模板',
           detailTitle: '打印模板详情',
-          copyTitle: '复制打印模板'
+          copyTitle: '复制打印模板',
+          design: '设计'
         },
         exportFormat: {
           title: '导出格式',
@@ -456,6 +458,37 @@ const local: App.I18n.Schema = {
         initData: '初始化数据',
         stationScan: '站点扫描配置',
         fieldMapping: '字段映射'
+      },
+      printDesign: {
+        title: '设计标签',
+        back: '返回上一页',
+        paper: '纸张尺寸',
+        zoomOut: '缩小',
+        zoomIn: '放大',
+        showGrid: '显示网格',
+        hideGrid: '隐藏网格',
+        clear: '清空',
+        clearConfirm: '确认清空',
+        clearContent: '将删除画布上所有元素，确认继续？',
+        save: '保存',
+        preview: '预览',
+        fields: '业务字段',
+        basicElements: '基础元素',
+        basicText: '文本',
+        basicLongText: '长文本',
+        basicImage: '图片',
+        basicBarcode: '条形码',
+        basicQrcode: '二维码',
+        basicTable: '表格',
+        basicHline: '横线',
+        basicVline: '竖线',
+        basicRect: '矩形',
+        canvas: '设计画布',
+        properties: '元素属性',
+        print: '打印',
+        loadFailed: '设计器加载失败',
+        saveSuccess: '保存成功',
+        noTemplate: '模板不存在'
       }
     },
     dataManage: {
