@@ -34,7 +34,7 @@ onMounted(async () => {
 
 <template>
   <div ref="rootRef" class="field-panel h-full w-full flex flex-col overflow-hidden">
-    <div class="min-h-0 flex-1 overflow-auto">
+    <NScrollbar class="min-h-0 flex-1">
       <div class="field-menu">
         <details
           v-for="group in groups"
@@ -54,7 +54,15 @@ onMounted(async () => {
               class="ep-draggable-item field-item"
               :tid="`${group.key}.${field.key}`"
             >
-              {{ field.label }}
+              <svg class="field-item-drag" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="9" cy="6" r="2" />
+                <circle cx="9" cy="12" r="2" />
+                <circle cx="9" cy="18" r="2" />
+                <circle cx="15" cy="6" r="2" />
+                <circle cx="15" cy="12" r="2" />
+                <circle cx="15" cy="18" r="2" />
+              </svg>
+              <span class="field-item-label">{{ field.label }}</span>
             </div>
           </div>
         </details>
@@ -66,12 +74,20 @@ onMounted(async () => {
           </summary>
           <div class="field-group-content">
             <div v-for="item in basicElements" :key="item.tid" class="ep-draggable-item field-item" :tid="item.tid">
-              {{ $t(item.labelKey) }}
+              <svg class="field-item-drag" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="9" cy="6" r="2" />
+                <circle cx="9" cy="12" r="2" />
+                <circle cx="9" cy="18" r="2" />
+                <circle cx="15" cy="6" r="2" />
+                <circle cx="15" cy="12" r="2" />
+                <circle cx="15" cy="18" r="2" />
+              </svg>
+              <span class="field-item-label">{{ $t(item.labelKey) }}</span>
             </div>
           </div>
         </details>
       </div>
-    </div>
+    </NScrollbar>
   </div>
 </template>
 
@@ -155,6 +171,9 @@ onMounted(async () => {
 }
 
 .field-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   cursor: move;
   border: 1px solid #e5e6eb;
   border-radius: 6px;
@@ -163,6 +182,23 @@ onMounted(async () => {
   font-size: 12px;
   color: #4e5969;
   transition: all 0.2s ease;
+}
+
+.field-item-drag {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  color: #86909c;
+  transition: color 0.2s ease;
+}
+
+.field-item-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dark .field-item {
@@ -177,9 +213,17 @@ onMounted(async () => {
   color: #165dff;
 }
 
+.field-item:hover .field-item-drag {
+  color: #165dff;
+}
+
 .dark .field-item:hover {
   border-color: #3c7eff;
   background-color: #333;
+  color: #3c7eff;
+}
+
+.dark .field-item:hover .field-item-drag {
   color: #3c7eff;
 }
 </style>

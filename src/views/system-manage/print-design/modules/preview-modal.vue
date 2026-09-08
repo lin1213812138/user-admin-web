@@ -1,51 +1,50 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import printLockCss from 'vue-plugin-hiprint/dist/print-lock.css?url';
 import { $t } from '@/locales';
-import { buildSampleData } from './print-fields';
-import { loadHiprint } from './use-hiprint';
+import { watch, nextTick } from 'vue';
 
-const props = defineProps<{ show: boolean; designJson: string }>();
+const props = defineProps<{ show: boolean; html?: string }>();
 
 const emit = defineEmits<{ 'update:show': [value: boolean] }>();
 
-const html = ref('');
-const frameRef = ref<HTMLIFrameElement | null>(null);
-
-/** getHtml 的返回值在部分版本是 DTO / 数组，这里统一取字符串 */
-function toHtmlString(result: unknown): string {
-  if (typeof result === 'string') return result;
-
-  if (Array.isArray(result)) {
-    return result.map(item => toHtmlString(item)).join('');
-  }
-
-  const target = result as { html?: () => string };
-
-  return typeof target.html === 'function' ? target.html() : '';
+function handlePrint() {
+  // 预览 iframe 内的打印由内部 window 触发，这里通过 ref 调用
+  const frame = document.querySelector<HTMLIFrameElement>('#print-preview-frame');
+  frame?.contentWindow?.print();
 }
 
+// 根据 iframe 文档内容计算高度，使其自适应、无需滚动
+function fitFrameHeight() {
+  const frame = document.querySelector<HTMLIFrameElement>('#print-preview-frame');
+  if (!frame) return;
+  try {
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const height = Math.max(
+      doc.body.scrollHeight,
+      doc.documentElement.scrollHeight,
+      doc.body.offsetHeight,
+      doc.documentElement.offsetHeight
+    );
+    frame.style.height = `${height}px`;
+  } catch {
+    /* 跨域等异常时忽略，保持默认高度 */
+  }
+}
+
+// iframe 加载完成后自适应高度（加载时若弹窗隐藏会测得 0，这里再补一次）
+function onFrameLoad() {
+  fitFrameHeight();
+}
+
+// 弹窗由隐藏变为显示时重新测量（此时元素已可见，可得到正确高度）
 watch(
-  () => [props.show, props.designJson],
-  async ([show]) => {
-    if (!show) return;
-
-    const api = await loadHiprint();
-    const template = props.designJson ? (JSON.parse(props.designJson) as unknown) : {};
-    const instance = new api.PrintTemplate({ template });
-
-    html.value = toHtmlString(instance.getHtml(buildSampleData()));
+  () => props.show,
+  val => {
+    if (val) {
+      nextTick(() => setTimeout(fitFrameHeight, 0));
+    }
   }
 );
-
-/** getHtml 返回的是纸张片段，补全为完整文档后再注入 iframe */
-function buildDocument(): string {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8" /><link rel="stylesheet" href="${printLockCss}" /></head><body>${html.value}</body></html>`;
-}
-
-function handlePrint() {
-  frameRef.value?.contentWindow?.print();
-}
 </script>
 
 <template>
@@ -56,8 +55,14 @@ function handlePrint() {
     :title="$t('page.manage.printDesign.preview')"
     @update:show="value => emit('update:show', value)"
   >
-    <div class="h-520px w-full overflow-auto bg-#f5f5f5">
-      <iframe ref="frameRef" class="h-full w-full border-0" :srcdoc="buildDocument()"></iframe>
+    <div class="w-full bg-#f5f5f5">
+      <iframe
+        id="print-preview-frame"
+        class="w-full border-0"
+        scrolling="no"
+        :srcdoc="props.html || ''"
+        @load="onFrameLoad"
+      ></iframe>
     </div>
     <template #footer>
       <div class="flex justify-end gap-8px">

@@ -2,6 +2,10 @@
 
 > 本文件维护所有 Agent 讨论/修复记录的索引，**按日期分组（最新日期在上）**。详细文档见 `changelog/` 目录。
 
+## 2026-09-08
+
+- [通用 Table 新增 headerCellConfig prop（模板已引用但 Props 未声明，补齐声明与默认值）](./changelog/%E6%96%B0%E5%A2%9EheaderCellConfig.md)
+
 ## 2026-09-07
 
 - [标签打印模板设计器实现（vue-plugin-hiprint：三栏设计器 + 字段 provider + 预览打印，已实现待手测）](./changelog/%E6%A0%87%E7%AD%BE%E6%89%93%E5%8D%B0%E6%A8%A1%E6%9D%BF%E8%AE%BE%E8%AE%A1%E5%99%A8%E5%AE%9E%E7%8E%B0.md)

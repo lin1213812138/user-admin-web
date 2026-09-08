@@ -277,6 +277,7 @@ function handleConfirm() {
           :row-config="{ isHover: true, height: 40 }"
           :column-config="{ resizable: true }"
           height="100%"
+          class="h-full"
           show-overflow="tooltip"
           @after-render="initSortable"
         >

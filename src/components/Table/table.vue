@@ -48,6 +48,8 @@ interface Props {
   checkboxConfig?: VxeTablePropTypes.CheckboxConfig;
   /** vxe-table row-config, default { isHover: true, height: 40 } */
   rowConfig?: VxeTablePropTypes.RowConfig;
+  /** vxe-table header-cell-config, e.g. { height: 35 } to align fixed columns' header */
+  headerCellConfig?: VxeTablePropTypes.HeaderCellConfig;
   /** 搜索栏配置项，传入即启用内嵌可折叠搜索栏（由所有使用本表格的页面各自配置） */
   searchItems?: FormItemConfig[];
   /** 搜索表单数据对象（按引用传递，由父页面持有并在取数时读取） */
@@ -75,6 +77,7 @@ const props = withDefaults(defineProps<Props>(), {
   treeConfig: undefined,
   checkboxConfig: undefined,
   rowConfig: undefined,
+  headerCellConfig: undefined,
   searchItems: undefined,
   searchModel: undefined,
   searchDefaultCollapsed: true,
@@ -120,6 +123,12 @@ const finalRowConfig = computed<VxeTablePropTypes.RowConfig>(() => ({
   isHover: true,
   height: 40,
   ...props.rowConfig
+}));
+
+/** 表头单元格默认高度 40（与行高一致），业务可传入 headerCellConfig 覆盖 height / padding */
+const finalHeaderCellConfig = computed<VxeTablePropTypes.HeaderCellConfig | undefined>(() => ({
+  height: 40,
+  ...props.headerCellConfig
 }));
 
 const emit = defineEmits<{
@@ -252,7 +261,7 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
 
     <div
       class="w-full min-h-0 bg-white"
-      :class="height === '100%' ? 'flex-1' : ''"
+      :class="height === '100%' ? 'flex-1 h-full' : ''"
       @mouseover="handleRowMouseOver"
       @mouseleave="handleTableMouseLeave"
     >
@@ -270,7 +279,10 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         :export-config="exportConfig"
         :tree-config="treeConfig"
         :checkbox-config="checkboxConfig"
+        :header-cell-config="finalHeaderCellConfig"
+        :scrollbar-config="{ width: 0, height: 0.0001, x: { visible: true }, y: { visible: true } }"
         class="w-full table-draggable"
+        :class="height === '100%' ? 'h-full' : ''"
         @checkbox-change="handleSelectionChange"
         @checkbox-all="handleSelectionChange"
         @after-render="$emit('afterRender')"

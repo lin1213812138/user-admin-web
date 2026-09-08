@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onActivated, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import type { Component } from 'vue';
 import { $t } from '@/locales';
 import InputFormat from './modules/InputFormat.vue';
@@ -9,6 +10,8 @@ import WaybillRule from './modules/WaybillRule.vue';
 import NotificationConfig from './modules/NotificationConfig.vue';
 import InitData from './modules/InitData.vue';
 import StationScan from './modules/StationScan.vue';
+
+const route = useRoute();
 
 const tabs = [
   { key: 'input-format', label: $t('page.manage.setting.inputFormat') },
@@ -21,6 +24,17 @@ const tabs = [
 ];
 
 const activeKey = ref('input-format');
+
+/** 从 URL query（如 ?tab=print-format，来自标签设计页「返回上一页」）切换到对应分页 */
+function syncTabFromQuery() {
+  const tab = route.query.tab;
+  if (typeof tab === 'string' && tabs.some(t => t.key === tab)) {
+    activeKey.value = tab;
+  }
+}
+
+syncTabFromQuery();
+onActivated(syncTabFromQuery);
 
 const componentMap: Record<string, Component> = {
   'input-format': InputFormat,

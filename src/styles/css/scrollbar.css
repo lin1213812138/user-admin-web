@@ -1,0 +1,124 @@
+/* vxe-table 滚动条：完全贴 Naive NScrollbar 的行为——滚动条区域浮动（不占布局）、
+   默认无任何可见痕迹、hover 表格才浮出滑块。
+   样式由 src/plugins/vxe-table.ts 运行时注入到 head 末尾，保证排在 vxe-table 自身样式之后。 */
+
+/* 0) vxe-table 根节点默认带 4px 内边距，会让 render-wrapper 比根容器矮 8px，出现一圈白边；
+   先去掉根内边距，让渲染层真正贴满容器。 */
+.vxe-table {
+  padding: 0 !important;
+}
+
+/* 0.1) vxe-table JS 会把 render-wrapper 的 height 内联写成父容器 - 8px，
+   导致上下各留 4px 白边。用 !important 强制它贴满父容器。 */
+.vxe-table .vxe-table--render-wrapper {
+  position: relative !important; /* 作为两个浮动层的定位上下文 */
+  height: 100% !important;
+}
+
+/* 0.2) 滚动条区域浮动化：两个虚拟滚动条包装层默认 position:relative + flex-shrink:0，
+   会实打实占据布局空间（右 8px / 下 8px 固定块）。改成绝对定位浮在表格边缘，不再占布局。 */
+.vxe-table .vxe-table--scroll-y-virtual {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  pointer-events: none !important;
+}
+.vxe-table .vxe-table--scroll-x-virtual {
+  position: absolute !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 0.1) 非 hover 时整个虚拟滚动条包装层直接隐藏，一个像素都不出现 */
+.vxe-table .vxe-table--scroll-y-virtual,
+.vxe-table .vxe-table--scroll-x-virtual {
+  visibility: hidden !important;
+}
+.vxe-table:hover .vxe-table--scroll-y-virtual,
+.vxe-table:hover .vxe-table--scroll-x-virtual {
+  visibility: visible !important;
+}
+
+/* 0.2) handle 尺寸压到 8px，与 Naive NScrollbar 占用一致 */
+.vxe-table .vxe-table--scroll-y-handle {
+  width: 8px !important;
+  min-width: 8px !important;
+}
+.vxe-table .vxe-table--scroll-x-handle {
+  height: 8px !important;
+  min-height: 8px !important;
+}
+
+/* 0.3) 隐藏装饰：handle-appearance 分隔线、四角元素（含 :before 画的 1px 边框） */
+.vxe-table .vxe-table--scroll-y-handle-appearance,
+.vxe-table .vxe-table--scroll-x-handle-appearance,
+.vxe-table .vxe-table--scroll-x-left-corner,
+.vxe-table .vxe-table--scroll-x-right-corner,
+.vxe-table .vxe-table--scroll-y-bottom-corner,
+.vxe-table .vxe-table--scroll-y-top-corner {
+  display: none !important;
+}
+
+/* 1) 内层滚动元素的原生滚动条保持隐藏（vxe-table 自带该规则，这里用 !important 加固） */
+.vxe-table .vxe-table--body-inner-wrapper::-webkit-scrollbar,
+.vxe-table .vxe-table--footer-inner-wrapper::-webkit-scrollbar,
+.vxe-table .vxe-table--header-inner-wrapper::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* 2) 核心：thin 滚动条（天然无箭头按钮）+ 受控颜色；默认透明，hover 表格时淡入 */
+.vxe-table .vxe-table--scroll-y-handle,
+.vxe-table .vxe-table--scroll-x-handle {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  pointer-events: none !important;
+}
+.dark .vxe-table .vxe-table--scroll-y-handle,
+.dark .vxe-table .vxe-table--scroll-x-handle {
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent !important;
+}
+.vxe-table:hover .vxe-table--scroll-y-handle,
+.vxe-table:hover .vxe-table--scroll-x-handle {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* 3) ::-webkit-scrollbar 仅作老内核兜底（支持标准属性的浏览器会自动忽略） */
+.vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar,
+.vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+  background: transparent !important;
+  -webkit-appearance: none !important;
+}
+.vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar-track,
+.vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar-button,
+.vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar-button,
+.vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar-corner,
+.vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar-corner {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+.vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar-thumb,
+.vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  border-radius: 999px !important;
+}
+.vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar-thumb:hover,
+.vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+.dark .vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar-thumb,
+.dark .vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.35) !important;
+}
