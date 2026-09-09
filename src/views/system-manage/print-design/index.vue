@@ -50,6 +50,45 @@ function toHtmlString(result: unknown): string {
 const apiRef = shallowRef<HiprintApi | null>(null);
 const templateRef = shallowRef<PrintTemplate | null>(null);
 
+/** 兼容 hiprint 两种模板结构：{ panels:[{printElements}] } 或顶层 { printElements } 或裸数组 */
+function resolvePanels(json: unknown): Array<Record<string, unknown>> {
+  if (Array.isArray(json)) return json as Array<Record<string, unknown>>;
+  const obj = json as Record<string, unknown>;
+  if (Array.isArray(obj.panels)) return obj.panels as Array<Record<string, unknown>>;
+  if (Array.isArray(obj.printElements)) return [obj];
+  return [];
+}
+
+/**
+ * 从设计器当前模板里提取各字段元素的「测试数据」作为预览填充数据。
+ * 这样在右侧属性面板修改测试数据后，预览会显示最新编辑值，而不被固定的 buildSampleData 覆盖。
+ * 未编辑（测试数据为空）的字段回退到 buildSampleData 的默认值。
+ */
+function extractPreviewData(fallback: Record<string, string>): Record<string, string> {
+  const data: Record<string, string> = { ...fallback };
+  const instance = templateRef.value;
+  if (!instance) return data;
+
+  try {
+    const json = (instance.getJson() as unknown) ?? {};
+    const panels = resolvePanels(json);
+    for (const panel of panels) {
+      const elements = (panel.printElements as unknown[]) ?? [];
+      for (const el of elements) {
+        const options = (el as { options?: Record<string, unknown> }).options;
+        const field = options?.field;
+        const testData = options?.testData;
+        if (typeof field === 'string' && field && testData != null && testData !== '') {
+          data[field] = String(testData);
+        }
+      }
+    }
+  } catch {
+    /* 解析失败时退回 fallback（固定示例数据） */
+  }
+  return data;
+}
+
 /** 字段面板拖拽注册的清理函数 */
 let unbindDraggable: (() => void) | undefined;
 
@@ -133,19 +172,36 @@ async function handleSave() {
   }
 }
 
-function handlePreview() {
-  const api = apiRef.value;
+async function handlePreview() {
   const instance = templateRef.value;
-  if (!api || !instance) return;
+  if (!instance) return;
+
+  // 强制提交属性面板中尚未保存的修改：让当前聚焦的输入框失焦，触发 hiprint 的 change 提交，
+  // 否则在面板里改了内容直接点预览时，模型仍是旧值，预览不会更新
+  (document.activeElement as HTMLElement | null)?.blur();
+
+  // 等一拍，确保 hiprint 内部模型与画布 DOM 已同步到最新编辑结果
+  await nextTick();
+  await new Promise(resolve => setTimeout(resolve, 0));
 
   currentJson.value = JSON.stringify(instance.getJson());
-  // 用已加载的 hiprint 实例直接生成预览 HTML，避免 PreviewModal 内异步加载导致首开空白、需点两次
-  const tpl = new api.PrintTemplate({ template: JSON.parse(currentJson.value) });
-  const body = toHtmlString(tpl.getHtml(buildSampleData()));
-  // 在预览文档内隐藏滚动条（保留滚轮滚动），避免预览界面出现滚动条
-  const hideScrollStyle =
-    '<style>html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0}</style>';
-  previewHtml.value = `<!DOCTYPE html><html><head><meta charset="utf-8" /><link rel="stylesheet" href="${printLockCss}" />${hideScrollStyle}</head><body>${body}</body></html>`;
+  // 直接用设计器实例生成预览 HTML，避免 getJson() → 新模板 round-trip 导致元素位置/状态丢失
+  // 设计态多余 UI（拖拽手柄、选中框、属性面板等）通过 CSS 在预览文档中隐藏
+  // 预览填充数据取自设计器各字段元素「当前的测试数据」，而非固定的 buildSampleData，
+  // 这样在右侧属性面板修改测试数据后，预览能立即反映最新编辑，而不被固定示例值覆盖
+  const body = toHtmlString(instance.getHtml(extractPreviewData(buildSampleData())));
+  // 隐藏设计态专属元素，只保留纯打印内容
+  const hideDesignStyle = [
+    '<style>',
+    'html,body{scrollbar-width:none;margin:0;padding:0}',
+    'html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0}',
+    /* 隐藏拖拽手柄、resize 控件、选中边框等设计态 UI */
+    '.hiprint-printElement-handle,.hiprint-printElement-move,.hiprint-template-printElement-div:hover::before,.hiprint-template-printElement-div:hover::after,.hiprint-printElement-table-select,.hiprint-printElement-table-selection-box{display:none!important}',
+    /* 纸张容器去掉设计态样式 */
+    '.hiprint-printPaper{border:none!important;box-shadow:none!important;outline:none!important}',
+    '</style>'
+  ].join('');
+  previewHtml.value = `<!DOCTYPE html><html><head><meta charset="utf-8" /><link rel="stylesheet" href="${printLockCss}" />${hideDesignStyle}</head><body>${body}</body></html>`;
   previewVisible.value = true;
 }
 
@@ -216,13 +272,13 @@ onBeforeUnmount(() => {
         <FieldPanel :groups="printFieldGroups" :basic-elements="basicElements" @ready="handlePanelReady" />
       </div>
 
-      <div class="min-w-0 flex-1 bg-#f5f5f5 p-16px dark:bg-#1f1f1f print-design-canvas">
+      <div class="min-w-0 flex-1 bg-#f5f5f5 dark:bg-#1f1f1f print-design-canvas">
         <NScrollbar class="h-full" x-scrollable>
           <div id="hiprint-printTemplate" :class="{ 'show-grid': showGrid }"></div>
         </NScrollbar>
       </div>
 
-      <div class="w-300px shrink-0 border-l border-#eee dark:border-#333">
+      <div class="w-400px shrink-0 border-l border-#eee dark:border-#333">
         <NScrollbar class="h-full">
           <div id="PrintElementOptionSetting"></div>
         </NScrollbar>
@@ -383,5 +439,50 @@ html:has(body.print-design-no-scroll) {
 #PrintElementOptionSetting .hiprint-option-value > * {
   flex: 1 1 120px;
   min-width: 0;
+}
+
+/* 设计态标尺：hiprint 的 .hiprint_rul_wrapper / .h_img / .v_img 样式来自其全局 CSS，
+   但本仓库只在预览 iframe 里引入 print-lock.css，设计画布拿不到这份样式，导致标尺不显示。
+   这里显式补充（仅作用于设计容器，预览在独立 iframe 中不受影响）。
+   另外给设计容器加 16px padding，让标尺通过负 margin 伸到纸张左上角外侧时，
+   仍然落在 NScrollbar content 区域内，不会被滚动容器 overflow 裁剪掉。 */
+#hiprint-printTemplate {
+  position: relative;
+  padding: 16px;
+}
+
+#hiprint-printTemplate .hiprint_rul_wrapper {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  border: 0;
+  border-top: 1px solid rgb(201, 190, 190);
+  border-left: 1px solid rgb(201, 190, 190);
+  padding-left: 15px;
+  padding-top: 15px;
+  margin: -16px;
+  box-sizing: content-box !important;
+}
+
+#hiprint-printTemplate .hiprint_rul_wrapper .h_img {
+  position: absolute;
+  top: 0;
+  left: 15px;
+  width: 400mm;
+  height: 15px;
+  max-width: none;
+}
+
+#hiprint-printTemplate .hiprint_rul_wrapper .v_img {
+  width: 400mm;
+  max-width: none;
+  transform: rotate(90deg);
+  transform-origin: 0 100%;
+  height: 15px;
+  position: absolute;
+  top: -2px;
+  left: 0;
 }
 </style>

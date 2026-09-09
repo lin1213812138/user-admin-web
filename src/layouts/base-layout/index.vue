@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from 'vue';
+import { useRoute } from 'vue-router';
 import { AdminLayout, LAYOUT_SCROLL_EL_ID } from '@sa/materials';
 import type { LayoutMode } from '@sa/materials';
 import { useAppStore } from '@/store/modules/app';
@@ -19,6 +20,10 @@ defineOptions({
 const appStore = useAppStore();
 const themeStore = useThemeStore();
 const { secondLevelMenus, childLevelMenus, isActiveFirstLevelMenuHasChildren } = provideMixMenuContext();
+
+// 打印设计页是整屏设计器，去掉 content 区域默认的 16px 外边距让其占满可视区
+const route = useRoute();
+const contentShowPadding = computed(() => route.name !== 'system-manage_print-design');
 
 const GlobalMenu = defineAsyncComponent(() => import('../modules/global-menu/index.vue'));
 
@@ -147,7 +152,7 @@ function getSiderAndCollapsedWidth(isCollapsed: boolean) {
       <GlobalSider />
     </template>
     <GlobalMenu />
-    <GlobalContent />
+    <GlobalContent :show-padding="contentShowPadding" />
     <ThemeDrawer />
     <template #footer>
       <GlobalFooter />

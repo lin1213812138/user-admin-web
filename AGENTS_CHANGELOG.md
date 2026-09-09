@@ -2,6 +2,15 @@
 
 > 本文件维护所有 Agent 讨论/修复记录的索引，**按日期分组（最新日期在上）**。详细文档见 `changelog/` 目录。
 
+## 2026-09-09
+
+- [去掉标签设计界面最外层 padding（base-layout 按路由关掉 content 的 p-16px，仅打印设计页占满可视区）](./changelog/%E5%8E%BB%E6%8E%89%E6%A0%87%E7%AD%BE%E8%AE%BE%E8%AE%A1%E7%95%8C%E9%9D%A2%E6%9C%80%E5%A4%96%E5%B1%82padding.md)
+- [预览弹窗宽度贴合标签纸（容器去 min-w-400px 改 w-fit + NModal 透传 content-style 去 NCard 左右内边距）](./changelog/%E9%A2%84%E8%A7%88%E5%BC%B9%E7%AA%97%E5%AE%BD%E5%BA%A6%E8%B4%B4%E5%90%88%E6%A0%87%E7%AD%BE%E7%BA%B8.md)
+- [预览弹窗左右留白边（content-style 左右 padding 从 0 改回 16px，让纸张两侧各留一点白边）](./changelog/%E9%A2%84%E8%A7%88%E5%BC%B9%E7%AA%97%E5%B7%A6%E5%8F%B3%E7%95%99%E7%99%BD%E8%BE%B9.md)
+- [标签预览弹窗不限制宽度（移除 w-800px 固定宽度，改为自适应 + maxWidth 95vw）](./changelog/%E6%A0%87%E7%AD%BE%E9%A2%84%E8%A7%88%E5%BC%B9%E7%AA%97%E4%B8%8D%E9%99%90%E5%88%B6%E5%AE%BD%E5%BA%A6.md)
+- [打印预览测试数据不更新（getHtml 用固定 sample 覆盖 testData，改为读取设计器当前 testData）](./changelog/%E6%89%93%E5%8D%B0%E9%A2%84%E8%A7%88%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%E4%B8%8D%E6%9B%B4%E6%96%B0.md)
+- [打印设计标尺不显示（设计画布未加载 hiprint 全局 CSS，显式补充 .hiprint_rul_wrapper 样式）](./changelog/%E6%89%93%E5%8D%B0%E8%AE%BE%E8%AE%A1%E6%A0%87%E5%B0%BA%E4%B8%8D%E6%98%BE%E7%A4%BA.md)
+
 ## 2026-09-08
 
 - [通用 Table 新增 headerCellConfig prop（模板已引用但 Props 未声明，补齐声明与默认值）](./changelog/%E6%96%B0%E5%A2%9EheaderCellConfig.md)
