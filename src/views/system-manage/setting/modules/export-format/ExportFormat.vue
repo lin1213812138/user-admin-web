@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { UploadFileInfo } from 'naive-ui';
 import { $t } from '@/locales';
-import MasterDetail from '../components/MasterDetail.vue';
+import MasterDetail from '../../components/MasterDetail.vue';
 import Table from '@/components/Table/table.vue';
 import TableColumnConfig from '@/components/Table/table-column-config.vue';
 import { useVxeTable, type VxeColumnConfig } from '@/components/Table/use-vxe-table';

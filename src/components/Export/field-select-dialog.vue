@@ -4,7 +4,7 @@
  * - 勾选决定该字段是否导出（表头全选）
  * - 「字段名称」可编辑，直接作为 Excel 表头
  * - 拖拽行调整导出列顺序
- * - 「新增字段」追加自定义列：可按数据字段取值，或整列写固定值；自定义列可删除
+ * - 「新增字段」已临时注释：恢复时取消下方 addField/removeField/操作列/按钮 的注释
  * 纯 UI 组件：确认时回传勾选且排序后的字段，真正的导出动作交给调用方。
  */
 
@@ -72,8 +72,8 @@ interface FieldItem extends ExportField {
   fixedValue: string;
 }
 
-/** 自定义字段自增序号：用于生成不重复的 id 与默认列名 */
-let customSeq = 0;
+// 自定义字段自增序号：用于生成不重复的 id 与默认列名（新增字段已注释,customSeq 暂不启用）
+// let customSeq = 0;
 
 function snapshot(): FieldItem[] {
   return props.fields.map(field => ({
@@ -110,22 +110,22 @@ function toggleSelectAll(checked: boolean) {
 }
 
 /** 新增自定义字段：默认「取数据」模式（key 留空待填），用户可切换为固定值 */
-function addField() {
-  customSeq += 1;
-  items.value.push({
-    id: `custom_${customSeq}`,
-    key: '',
-    title: `${$t('common.customField')}${customSeq}`,
-    checked: true,
-    custom: true,
-    valueMode: 'field',
-    fixedValue: ''
-  });
-}
+// function addField() {
+//   customSeq += 1;
+//   items.value.push({
+//     id: `custom_${customSeq}`,
+//     key: '',
+//     title: `${$t('common.customField')}${customSeq}`,
+//     checked: true,
+//     custom: true,
+//     valueMode: 'field',
+//     fixedValue: ''
+//   });
+// }
 
-function removeField(row: FieldItem) {
-  items.value = items.value.filter(item => item.id !== row.id);
-}
+// function removeField(row: FieldItem) {
+//   items.value = items.value.filter(item => item.id !== row.id);
+// }
 
 /** 行拖拽：vxe-table 渲染完后绑定 tbody，handle 限定拖拽图标 */
 function initSortable() {
@@ -187,7 +187,7 @@ watch(
 /** 重置：恢复传入字段的原始名称与顺序，清空新增的自定义字段 */
 function handleReset() {
   pendingDrag = null;
-  customSeq = 0;
+  // customSeq = 0;  // 新增字段已注释,customSeq 整体暂不启用
   items.value = snapshot();
   // 重置后行 DOM 会重建，下次打开前重建拖拽实例
   sortableInstance?.destroy();
@@ -246,12 +246,14 @@ function handleConfirm() {
     <div class="h-full w-full flex flex-col min-h-0">
       <div class="flex-y-center justify-between gap-12px pb-8px">
         <div class="flex-y-center gap-12px">
-          <NButton size="small" type="primary" ghost @click="addField">
+          <!--
+ <NButton size="small" type="primary" ghost @click="addField">
             <template #icon>
               <icon-mdi-plus class="text-icon" />
             </template>
             {{ $t('common.addField') }}
-          </NButton>
+          </NButton> 
+-->
           <template v-if="scopes?.length">
             <span class="text-14px">{{ $t('common.exportScope') }}</span>
             <NRadioGroup :value="currentScope" size="small" @update:value="handleScopeChange">
@@ -328,13 +330,15 @@ function handleConfirm() {
               <span v-else class="text-#909399">{{ $t('common.valueModeField') }}</span>
             </template>
           </vxe-column>
-          <vxe-column :title="$t('common.action')" :width="70" align="center">
+          <!--
+ <vxe-column :title="$t('common.action')" :width="70" align="center">
             <template #default="{ row }">
               <NButton v-if="row.custom" size="small" quaternary type="error" text @click="removeField(row)">
                 {{ $t('common.delete') }}
               </NButton>
             </template>
-          </vxe-column>
+          </vxe-column> 
+-->
         </vxe-table>
       </div>
     </div>

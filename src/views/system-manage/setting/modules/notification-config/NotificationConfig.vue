@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import MasterDetail from '../components/MasterDetail.vue';
+import MasterDetail from '../../components/MasterDetail.vue';
 
 interface Item {
   id: number;
@@ -9,8 +9,8 @@ interface Item {
 }
 
 const items = ref<Item[]>([
-  { id: 1, name: '默认扫描配置', status: 1 },
-  { id: 2, name: '高速扫描配置', status: 1 }
+  { id: 1, name: '系统通知', status: 1 },
+  { id: 2, name: '短信通知', status: 1 }
 ]);
 
 const selectedId = ref<number | null>(items.value[0]?.id ?? null);
@@ -18,7 +18,7 @@ const selectedId = ref<number | null>(items.value[0]?.id ?? null);
 
 <template>
   <MasterDetail
-    list-title="站点扫描配置列表"
+    list-title="通知配置列表"
     search-placeholder="搜索列表"
     :items="items"
     :show-status="true"

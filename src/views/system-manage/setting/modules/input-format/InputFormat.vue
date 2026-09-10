@@ -2,8 +2,8 @@
 import { computed, ref } from 'vue';
 import { $t } from '@/locales';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import MasterDetail from '../components/MasterDetail.vue';
-import FieldMapping, { type FieldMappingGroup } from '../components/FieldMapping.vue';
+import MasterDetail from '../../components/MasterDetail.vue';
+import FieldMapping, { type FieldMappingGroup } from '../../components/FieldMapping.vue';
 
 interface InputFormatItem {
   id: number;

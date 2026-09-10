@@ -26,7 +26,8 @@ export const printFieldGroups: PrintFieldGroup[] = [
     key: 'waybill',
     label: '运单信息',
     fields: [
-      { key: 'waybillNo', label: '运单号', type: 'barcode', sample: 'WM202609070001' },
+      { key: 'waybillNoCode', label: '运单号(条码)', type: 'barcode', sample: 'WM202609070001' },
+      { key: 'waybillNo', label: '运单号', type: 'text', sample: 'WM202609070001' },
       { key: 'transferNo', label: '转单号', type: 'text', sample: 'TR202609070001' },
       { key: 'channel', label: '渠道', type: 'text', sample: '中欧专线' },
       { key: 'country', label: '目的国家', type: 'text', sample: 'Germany' },

@@ -3,13 +3,13 @@ import { computed, onActivated, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Component } from 'vue';
 import { $t } from '@/locales';
-import InputFormat from './modules/InputFormat.vue';
-import PrintFormat from './modules/PrintFormat.vue';
-import ExportFormat from './modules/ExportFormat.vue';
-import WaybillRule from './modules/WaybillRule.vue';
-import NotificationConfig from './modules/NotificationConfig.vue';
-import InitData from './modules/InitData.vue';
-import StationScan from './modules/StationScan.vue';
+import InputFormat from './modules/input-format/InputFormat.vue';
+import PrintFormat from './modules/print-format/PrintFormat.vue';
+import ExportFormat from './modules/export-format/ExportFormat.vue';
+import WaybillRule from './modules/waybill-rule/WaybillRule.vue';
+import NotificationConfig from './modules/notification-config/NotificationConfig.vue';
+import InitData from './modules/init-data/InitData.vue';
+import StationScan from './modules/station-scan/StationScan.vue';
 
 const route = useRoute();
 

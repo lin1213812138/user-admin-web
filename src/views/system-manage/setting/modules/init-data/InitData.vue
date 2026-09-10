@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import MasterDetail from '../components/MasterDetail.vue';
+import MasterDetail from '../../components/MasterDetail.vue';
 
 interface Item {
   id: number;
