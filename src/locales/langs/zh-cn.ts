@@ -64,6 +64,7 @@ const local: App.I18n.Schema = {
     logout: '退出登录',
     logoutConfirm: '确认退出登录吗？',
     lookForward: '敬请期待',
+    notSupported: '该属性暂不支持在面板编辑',
     modify: '修改',
     modifySuccess: '修改成功',
     noData: '无数据',
@@ -467,6 +468,8 @@ const local: App.I18n.Schema = {
         zoomIn: '放大',
         showGrid: '显示网格',
         hideGrid: '隐藏网格',
+        showRuler: '显示刻度',
+        hideRuler: '隐藏刻度',
         clear: '清空',
         clearConfirm: '确认清空',
         clearContent: '将删除画布上所有元素，确认继续？',
@@ -488,7 +491,8 @@ const local: App.I18n.Schema = {
         print: '打印',
         loadFailed: '设计器加载失败',
         saveSuccess: '保存成功',
-        noTemplate: '模板不存在'
+        noTemplate: '模板不存在',
+        propertyEmpty: '未选中元素，请在画布中选择'
       }
     },
     dataManage: {

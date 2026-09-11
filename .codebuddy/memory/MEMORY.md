@@ -70,6 +70,15 @@
 - `handlePreview` 改为 async，生成前先 `(document.activeElement)?.blur()` 强制提交属性面板改动，再 `await nextTick()` + `setTimeout(0)` 等模型/画布同步后再 `getHtml()`，否则预览不显示最新编辑。
 - 预览弹窗尺寸：NModal 用 `width:auto + maxWidth:95vw`；iframe 由 JS 读内部 `.hiprint-printPaper` 的 `getBoundingClientRect()` 实际尺寸设置 width/height，不再用 `w-full`。
 
+## 打印设计属性面板（hiprint API 关键事实）
+
+- 元素选中事件：`template.getPrintElementSelectEventKey()`（形如 `PrintElementSelectEventKey_<id>`）。**不是** `BuildCustomOptionSettingEventKey`（后者只用于纸张/页码等全局设置）。监听错事件名会导致选中后面板无反应。
+- 字段配置读 `element.getConfigOptions()` → 原始配置含 `name/type/title/options`（简单字段可 Naive 映射）。`element.getPrintElementOptionTabs()` → 只返回按 `name` 的 item 单例（`createTarget/setValue/getValue`），**无 type/options**，仅用于复杂字段原生渲染。
+- 写回用 `element.updateOption(name, value)`（重绘 + 广播 `hiprintTemplateDataChanged`）。**禁止 `element.submitOption()`**：源码显示它依赖 `this.panel.printElements` 并会批量改同类型其它选中元素，有副作用。
+- 复杂字段（coordinate/widthHeight/border/table 列配置）Naive 无等价控件，用 hiprint 原生 `item.createTarget(el, el.options, el.printElementType)` 生成 DOM 兜底。
+
+> **决策（2026-09-11）**：用户最终决定**放弃自定义右侧属性面板**，还原回 hiprint 原生 `settingContainer: '#Setting'`（见 `use-hiprint.ts` 的 `createDesignTemplate`）。本次「混合渲染」方案 D 的实现已全部回退（删除 `property-panel.vue`、撤销类型/i18n 增补），仅保留上方技术事实供后续参考。若未来再想自定义，根因与 API 事实仍适用。
+
 ## 原则
 
 - 不要擅自回退用户已认可的方案；回退前必须先问用户。

@@ -26,13 +26,17 @@ const { routerPushByKey } = useRouterPush();
 const templateId = Number(route.query.id ?? 0);
 const templateName = String(route.query.name ?? '');
 
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 2;
+const MIN_SCALE = 0.2;
+const MAX_SCALE = 4;
 const SCALE_STEP = 0.1;
 
 const paperSize = ref('100×150mm');
 const scale = ref(1);
 const showGrid = ref(true);
+const showRuler = ref(true);
+const tx = ref(0);
+const ty = ref(0);
+const panning = ref(false);
 const saving = ref(false);
 const previewVisible = ref(false);
 const currentJson = ref('');
@@ -113,10 +117,61 @@ function handleBack() {
   void routerPushByKey('system-manage_setting', { query: { tab: 'print-format' } });
 }
 
-function handleZoom(delta: number) {
-  const next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Number((scale.value + delta).toFixed(1))));
+function applyZoom(next: number) {
+  next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Number(next.toFixed(1))));
+  if (next === scale.value) return;
+
+  // hiprint zoom 以纸张左上角为锚点缩放（scale<=1 origin "0 0"；scale>1 origin "-scale% -scale%"），
+  // 缩放后纸张布局中心向右下偏移 (布局宽高 * 增量)/2；补偿 translate 使纸张中心保持画布中心（围绕纸张中心缩放）。
+  const paper = document.querySelector<HTMLElement>('.hiprint-printPaper');
+  const pw = paper?.offsetWidth ?? 0;
+  const ph = paper?.offsetHeight ?? 0;
+  const delta = next - scale.value;
+  tx.value -= (pw * delta) / 2;
+  ty.value -= (ph * delta) / 2;
+
   scale.value = next;
   templateRef.value?.zoom(next, true);
+}
+
+function handleZoom(delta: number) {
+  applyZoom(scale.value + delta);
+}
+
+function handleWheel(e: WheelEvent) {
+  applyZoom(scale.value + (e.deltaY < 0 ? SCALE_STEP : -SCALE_STEP));
+}
+
+/**
+ * 捕获阶段拦截鼠标按下（禁用 hiprint 框选 + 平移工作区）：
+ * - 纸张内的元素 → 放行，交给 hiprint 拖拽/选中/编辑；
+ * - 其余区域（画布空白 + 纸张空白）→ stopPropagation 阻止事件到达 hiprint 的 mousedown 监听器。
+ *   hiprint 在 `.hiprint-printPaper` 上冒泡监听 mousedown（无条件置 rectDraging=true，target 是纸张时创建 mouseRect 选框），
+ *   在祖先的捕获阶段拦截即可让它收不到事件，从而禁用框选；该区域同时改为平移工作区。
+ */
+function handleCanvasMouseDown(e: MouseEvent) {
+  const target = e.target as HTMLElement | null;
+  if (target?.closest('.hiprint-printElement')) return;
+
+  e.stopPropagation();
+
+  panning.value = true;
+  const startX = e.clientX;
+  const startY = e.clientY;
+  const baseTx = tx.value;
+  const baseTy = ty.value;
+
+  const onMove = (ev: MouseEvent) => {
+    tx.value = baseTx + (ev.clientX - startX);
+    ty.value = baseTy + (ev.clientY - startY);
+  };
+  const onUp = () => {
+    panning.value = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
 }
 
 function handleToggleGrid() {
@@ -257,6 +312,8 @@ onBeforeUnmount(() => {
       :paper-size="paperSize"
       :scale="scale"
       :show-grid="showGrid"
+      :show-ruler="showRuler"
+      @toggle-ruler="showRuler = !showRuler"
       @back="handleBack"
       @update:paper-size="handlePaperChange"
       @zoom-out="handleZoom(-SCALE_STEP)"
@@ -272,17 +329,18 @@ onBeforeUnmount(() => {
         <FieldPanel :groups="printFieldGroups" :basic-elements="basicElements" @ready="handlePanelReady" />
       </div>
 
-      <div class="min-w-0 flex-1 bg-#f5f5f5 dark:bg-#1f1f1f print-design-canvas">
-        <NScrollbar class="h-full" x-scrollable>
+      <div
+        class="print-design-canvas min-w-0 flex-1 bg-#f5f5f5 dark:bg-#1f1f1f"
+        :class="{ 'hide-ruler': !showRuler, panning }"
+        @mousedown.capture="handleCanvasMouseDown"
+        @wheel.prevent="handleWheel"
+      >
+        <div class="pd-stage" :style="{ transform: `translate(${tx}px, ${ty}px)` }">
           <div id="hiprint-printTemplate" :class="{ 'show-grid': showGrid }"></div>
-        </NScrollbar>
+        </div>
       </div>
 
-      <div class="w-400px shrink-0 border-l border-#eee dark:border-#333">
-        <NScrollbar class="h-full">
-          <div id="PrintElementOptionSetting"></div>
-        </NScrollbar>
-      </div>
+      <div id="Setting" class="w-400px shrink-0 border-l border-#eee dark:border-#333 overflow-auto p-12px"></div>
     </div>
 
     <PreviewModal v-model:show="previewVisible" :html="previewHtml" />
@@ -312,140 +370,32 @@ html:has(body.print-design-no-scroll) {
   overflow: hidden !important;
 }
 
-/* 右侧属性面板：hiprint 原生 #PrintElementOptionSetting 重做成接近 Naive UI 风格。
-   复用 Naive 的 CSS 变量，自动跟随明暗主题。 */
-#PrintElementOptionSetting {
-  --pp-primary: var(--n-primary-color, #2080f0);
-  --pp-primary-hover: var(--n-primary-color-hover, #4098fc);
-  --pp-primary-suppl: var(--n-primary-color-suppl, rgba(32, 128, 240, 0.2));
-  --pp-text: var(--n-text-color, #333639);
-  --pp-text-2: var(--n-text-color-2, #646a73);
-  --pp-text-3: var(--n-text-color-3, #8a8f99);
-  --pp-border: var(--n-border-color, #e5e6eb);
-  --pp-divider: var(--n-divider-color, #f0f0f0);
-  --pp-input-bg: var(--n-input-color, #ffffff);
-  --pp-fill: var(--n-fill-color, #f7f8fa);
-  --pp-radius: var(--n-border-radius, 3px);
-  --pp-font: var(
-    --n-font-family,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'PingFang SC',
-    'Microsoft YaHei',
-    Arial,
-    sans-serif
-  );
-
-  font-family: var(--pp-font);
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--pp-text);
-  padding: 12px;
-}
-
-#PrintElementOptionSetting input[type='text'],
-#PrintElementOptionSetting input[type='number'],
-#PrintElementOptionSetting input:not([type]),
-#PrintElementOptionSetting select,
-#PrintElementOptionSetting textarea {
-  box-sizing: border-box !important;
-  width: 100% !important;
-  height: 30px !important;
-  padding: 0 10px !important;
-  font-family: var(--pp-font);
-  font-size: 13px !important;
-  color: var(--pp-text) !important;
-  background-color: var(--pp-input-bg) !important;
-  border: 1px solid var(--pp-border) !important;
-  border-radius: var(--pp-radius) !important;
-  outline: none !important;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-
-#PrintElementOptionSetting textarea {
-  height: auto !important;
-  padding: 6px 10px !important;
-  resize: vertical;
-}
-
-#PrintElementOptionSetting input:focus,
-#PrintElementOptionSetting select:focus,
-#PrintElementOptionSetting textarea:focus {
-  border-color: var(--pp-primary) !important;
-  box-shadow: 0 0 0 2px var(--pp-primary-suppl) !important;
-}
-
-#PrintElementOptionSetting input[type='checkbox'],
-#PrintElementOptionSetting input[type='radio'] {
-  width: 14px !important;
-  height: 14px !important;
-  vertical-align: -2px;
-  accent-color: var(--pp-primary);
-}
-
-#PrintElementOptionSetting input[type='color'] {
-  width: 36px !important;
-  height: 28px !important;
-  padding: 2px !important;
-  background: transparent !important;
-  border: 1px solid var(--pp-border) !important;
-  border-radius: var(--pp-radius) !important;
-  cursor: pointer;
-}
-
-#PrintElementOptionSetting label {
-  display: inline-block;
-  margin-bottom: 4px;
-  color: var(--pp-text-2);
-  font-size: 13px;
-}
-
-#PrintElementOptionSetting .hiprint-option-item,
-#PrintElementOptionSetting > div > div {
-  margin-bottom: 14px;
-}
-
-#PrintElementOptionSetting .hiprint-option-title,
-#PrintElementOptionSetting .hiprint-printElement-option-title,
-#PrintElementOptionSetting details > summary {
-  display: flex;
-  align-items: center;
-  font-weight: 500;
-  color: var(--pp-text);
-  font-size: 13px;
-  padding: 8px 0;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--pp-divider);
-  cursor: pointer;
-  user-select: none;
-  list-style: none;
-}
-
-#PrintElementOptionSetting details > summary::-webkit-details-marker {
-  display: none;
-}
-
-#PrintElementOptionSetting .hiprint-option-value {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-#PrintElementOptionSetting .hiprint-option-value > * {
-  flex: 1 1 120px;
-  min-width: 0;
-}
-
 /* 设计态标尺：hiprint 的 .hiprint_rul_wrapper / .h_img / .v_img 样式来自其全局 CSS，
    但本仓库只在预览 iframe 里引入 print-lock.css，设计画布拿不到这份样式，导致标尺不显示。
    这里显式补充（仅作用于设计容器，预览在独立 iframe 中不受影响）。
    另外给设计容器加 16px padding，让标尺通过负 margin 伸到纸张左上角外侧时，
    仍然落在 NScrollbar content 区域内，不会被滚动容器 overflow 裁剪掉。 */
+.print-design-canvas {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.print-design-canvas.panning {
+  cursor: grabbing;
+}
+
+.pd-stage {
+  will-change: transform;
+}
+
+.print-design-canvas.hide-ruler .hiprint_rul_wrapper {
+  display: none !important;
+}
+
 #hiprint-printTemplate {
   position: relative;
   padding: 16px;

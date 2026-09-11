@@ -145,11 +145,11 @@ export function buildDraggableItems(api: HiprintApi, root: HTMLElement | null): 
   return () => observer.disconnect();
 }
 
-/** 创建设计器实例（属性面板容器 #PrintElementOptionSetting 由页面提供） */
+/** 创建设计器实例。使用 hiprint 原生 settingContainer 渲染右侧属性面板（容器 #Setting）。 */
 export function createDesignTemplate(api: HiprintApi, template: unknown): PrintTemplate {
   return new api.PrintTemplate({
     template,
-    settingContainer: '#PrintElementOptionSetting',
+    settingContainer: '#Setting',
     history: true,
     dataMode: 1
   });

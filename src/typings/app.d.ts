@@ -419,6 +419,7 @@ declare namespace App {
         valueModeField: string;
         valueModeFixed: string;
         fixedValuePlaceholder: string;
+        notSupported: string;
       };
       request: {
         logout: string;
@@ -740,6 +741,8 @@ declare namespace App {
             zoomIn: string;
             showGrid: string;
             hideGrid: string;
+            showRuler: string;
+            hideRuler: string;
             clear: string;
             clearConfirm: string;
             clearContent: string;
@@ -762,6 +765,7 @@ declare namespace App {
             loadFailed: string;
             saveSuccess: string;
             noTemplate: string;
+            propertyEmpty: string;
           };
         };
         dataManage: {

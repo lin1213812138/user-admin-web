@@ -2,7 +2,7 @@
 import { $t } from '@/locales';
 import { paperOptions } from './paper-sizes';
 
-defineProps<{ title: string; paperSize: string; scale: number; showGrid: boolean }>();
+defineProps<{ title: string; paperSize: string; scale: number; showGrid: boolean; showRuler: boolean }>();
 
 const emit = defineEmits<{
   back: [];
@@ -11,6 +11,7 @@ const emit = defineEmits<{
   zoomOut: [];
   zoomIn: [];
   toggleGrid: [];
+  toggleRuler: [];
   clear: [];
   save: [];
   preview: [];
@@ -53,6 +54,15 @@ const options = paperOptions.map(item => ({ label: item.label, value: item.label
       @click="emit('toggleGrid')"
     >
       {{ showGrid ? $t('page.manage.printDesign.hideGrid') : $t('page.manage.printDesign.showGrid') }}
+    </NButton>
+
+    <NButton
+      size="small"
+      quaternary
+      :title="showRuler ? $t('page.manage.printDesign.hideRuler') : $t('page.manage.printDesign.showRuler')"
+      @click="emit('toggleRuler')"
+    >
+      {{ showRuler ? $t('page.manage.printDesign.hideRuler') : $t('page.manage.printDesign.showRuler') }}
     </NButton>
 
     <div class="flex-1"></div>

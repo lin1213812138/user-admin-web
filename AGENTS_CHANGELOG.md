@@ -2,6 +2,12 @@
 
 > 本文件维护所有 Agent 讨论/修复记录的索引，**按日期分组（最新日期在上）**。详细文档见 `changelog/` 目录。
 
+## 2026-09-11
+
+- [重写打印设计右侧属性面板（修正选中事件名 + 混合：简单字段 Naive 控件 + 复杂字段 hiprint 原生控件兜底，字段零遗漏）](./changelog/%E9%87%8D%E5%86%99%E6%89%93%E5%8D%B0%E8%AE%BE%E8%AE%A1%E5%8F%B3%E4%BE%A7%E5%B1%9E%E6%80%A7%E9%9D%A2%E6%9D%BF.md)
+- [标签设计工作区无限画布改造（中间区改造成无限工作台+浮层纸张，拖动平移/滚轮缩放、刻度显隐按钮，缩放围绕纸张中心、范围0.2–4.0）](./changelog/%E6%A0%87%E7%AD%BE%E8%AE%BE%E8%AE%A1%E5%B7%A5%E4%BD%9C%E5%8C%BA%E6%97%A0%E9%99%90%E7%94%BB%E5%B8%83%E6%94%B9%E9%80%A0.md)
+- [禁用标签设计框选（hiprint 在 .hiprint-printPaper 冒泡监听 mousedown 置 rectDraging 并创建 mouseRect 选框；改为捕获阶段拦截纸张空白 mousedown）](./changelog/%E7%A6%81%E7%94%A8%E6%A0%87%E7%AD%BE%E8%AE%BE%E8%AE%A1%E6%A1%86%E9%80%89.md)
+
 ## 2026-09-09
 
 - [去掉标签设计界面最外层 padding（base-layout 按路由关掉 content 的 p-16px，仅打印设计页占满可视区）](./changelog/%E5%8E%BB%E6%8E%89%E6%A0%87%E7%AD%BE%E8%AE%BE%E8%AE%A1%E7%95%8C%E9%9D%A2%E6%9C%80%E5%A4%96%E5%B1%82padding.md)

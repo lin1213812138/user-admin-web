@@ -64,6 +64,7 @@ const local: App.I18n.Schema = {
     logout: 'Logout',
     logoutConfirm: 'Are you sure you want to log out?',
     lookForward: 'Coming soon',
+    notSupported: 'This property is not editable in the panel',
     modify: 'Modify',
     modifySuccess: 'Modify Success',
     noData: 'No Data',
@@ -471,6 +472,8 @@ const local: App.I18n.Schema = {
         zoomIn: 'Zoom In',
         showGrid: 'Show Grid',
         hideGrid: 'Hide Grid',
+        showRuler: 'Show Ruler',
+        hideRuler: 'Hide Ruler',
         clear: 'Clear',
         clearConfirm: 'Confirm Clear',
         clearContent: 'All elements on the canvas will be removed. Continue?',
@@ -492,7 +495,8 @@ const local: App.I18n.Schema = {
         print: 'Print',
         loadFailed: 'Failed to load designer',
         saveSuccess: 'Saved successfully',
-        noTemplate: 'Template not found'
+        noTemplate: 'Template not found',
+        propertyEmpty: 'No element selected, please select one on the canvas'
       }
     },
     dataManage: {
