@@ -81,6 +81,7 @@
 
 ## 原则
 
+- **只改用户明确要求的代码**：用户让改哪就改哪，绝不顺手动其它文件/组件/依赖（哪怕觉得顺带优化也别动）。范围只限定在用户指定的文件与功能内。
 - 不要擅自回退用户已认可的方案；回退前必须先问用户。
 - **造轮子禁区（2026-09-09 重大教训）**：通用 UI / 表单 / 上传 / 选择器等**必须直接用组件库**（本仓库 Naive UI：`NUpload` / `NUploadDragger` / `NForm` / `NInput` / `NSelect` / `NDatePicker` / `NDataTable` 等），**不得从零手写**同名组件。组件库不满足的"上传逻辑 / 校验 / 数据流"等通过组件库**扩展点**（`custom-request` / `on-change` / `on-before-upload` / slot / `list-type` / 具名插槽 等）接入，而不是另造一套。即使上级任务里没明说"用组件库"，**默认按"用组件库 + 扩展点接入"实现**；只有组件库确实无法覆盖、用户**明确同意**时才考虑自研（且应先 brainstorming 写设计文档）。触发场景：上传（这次完全多余地写了 `use-upload` / `hash-worker` / `upload.vue` / `upload-cropper.vue` / `spark-md5` / `cropperjs` 全删）、表格（直接用 `NDataTable` 或现有 Table）、下拉/选择（用 `NSelect` / `NTreeSelect`）等。
 - **不要自动 subagent 启动长流程**：用户给一个不明确的需求时（"上传图片怎么显示"），**先回答问题 + 给最小演示**，不要自作主张启动 `subagent-driven-development` 跑 8 个 Task 拆解实现（这次直接催生了一整套过度造轮子）。规划性流程只应在用户明确要求"做这个功能"时启动。

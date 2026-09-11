@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui';
+import { NColorPicker } from 'naive-ui';
 import { $t } from '@/locales';
 import { type FormItemConfig } from './form-config';
 import IconPicker from '@/components/custom/icon-picker.vue';
@@ -207,6 +208,13 @@ defineExpose({
               :placeholder="item.placeholder"
               :disabled="item.disabled"
               :clearable="item.clearable || true"
+            />
+            <NColorPicker
+              v-else-if="item.type === 'color'"
+              v-model:value="model[item.key] as string"
+              :disabled="item.disabled"
+              :show-alpha="false"
+              class="w-full"
             />
             <NCheckboxGroup
               v-else-if="item.type === 'checkbox'"

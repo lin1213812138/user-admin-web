@@ -28,6 +28,7 @@ declare module "@elegant-router/types" {
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "system-manage": "/system-manage";
+    "system-manage_label-designer": "/system-manage/label-designer";
     "system-manage_menu": "/system-manage/menu";
     "system-manage_print-design": "/system-manage/print-design";
     "system-manage_role": "/system-manage/role";
@@ -97,6 +98,7 @@ declare module "@elegant-router/types" {
     | "data-manage_business"
     | "data-manage_finance"
     | "home"
+    | "system-manage_label-designer"
     | "system-manage_menu"
     | "system-manage_print-design"
     | "system-manage_role"

@@ -139,6 +139,17 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'system-manage_label-designer',
+        path: '/system-manage/label-designer',
+        component: 'view.system-manage_label-designer',
+        meta: {
+          title: 'system-manage_label-designer',
+          i18nKey: 'route.system-manage_label-designer',
+          icon: 'ic:round-label',
+          order: 5
+        }
+      },
+      {
         name: 'system-manage_menu',
         path: '/system-manage/menu',
         component: 'view.system-manage_menu',

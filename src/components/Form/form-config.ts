@@ -7,6 +7,7 @@ export type FormItemType =
   | 'number'
   | 'switch'
   | 'select'
+  | 'color'
   | 'icon-picker'
   | 'checkbox'
   | 'custom';

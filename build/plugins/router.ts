@@ -38,7 +38,8 @@ export function setupElegantRouter() {
         'data-manage': 'ic:baseline-folder',
         'data-manage_basic': 'ic:baseline-inventory',
         'data-manage_finance': 'ic:baseline-account-balance-wallet',
-        'data-manage_business': 'ic:baseline-warehouse'
+        'data-manage_business': 'ic:baseline-warehouse',
+        'system-manage_label-designer': 'ic:round-label'
       };
 
       /** menu order of the route, the smaller the value, the higher the order */
@@ -49,7 +50,8 @@ export function setupElegantRouter() {
         'system-manage_role': 1,
         'system-manage_user': 2,
         'system-manage_menu': 3,
-        'system-manage_setting': 4
+        'system-manage_setting': 4,
+        'system-manage_label-designer': 5
       };
 
       const meta: Partial<RouteMeta> = {
