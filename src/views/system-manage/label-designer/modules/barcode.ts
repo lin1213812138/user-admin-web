@@ -1,13 +1,9 @@
 import * as bwipjs from 'bwip-js/browser';
 
-type BwipRenderOptions = Parameters<typeof bwipjs.toCanvas>[1];
-type BarRenderOptions = BwipRenderOptions & {
-  textxalign?: 'offleft' | 'left' | 'center' | 'right' | 'offright' | 'justify';
-};
-type QrRenderOptions = BwipRenderOptions & { eclevel?: 'L' | 'M' | 'Q' | 'H' };
+type QrRenderOptions = Parameters<typeof bwipjs.toCanvas>[1] & { eclevel?: 'L' | 'M' | 'Q' | 'H' };
 
 /** 离屏绘制，失败返回红色 ERR 占位图，避免画布崩溃 */
-function draw(opts: BwipRenderOptions): string {
+function draw(opts: Parameters<typeof bwipjs.toCanvas>[1]): string {
   const canvas = document.createElement('canvas');
   try {
     bwipjs.toCanvas(canvas, opts);
@@ -27,22 +23,18 @@ function draw(opts: BwipRenderOptions): string {
   }
 }
 
-/** 绘制一维条码，返回 dataURL */
-export function renderBarcode(opts: {
-  symbology: string;
-  text: string;
-  displayValue: boolean;
-  fontSize: number;
-}): string {
+/**
+ * 绘制一维条码（只画条形，不含编码值文本），返回 dataURL。
+ * 编码值/标题由调用方 DOM 文本行渲染：bwip-js 内置位图字体仅覆盖 Latin-1，
+ * 中文会渲染成乱码（node 渲染 PNG 已实证），无法用 alttext 把标题拼进图内。
+ */
+export function renderBarcode(opts: { symbology: string; text: string }): string {
   return draw({
     bcid: opts.symbology,
     text: opts.text || ' ',
     scale: 3,
-    height: 10,
-    includetext: opts.displayValue,
-    textxalign: 'center',
-    textsize: opts.displayValue ? Math.max(4, Math.round(opts.fontSize)) : 4
-  } as BarRenderOptions);
+    height: 10
+  });
 }
 
 /** 绘制二维码，返回 dataURL */

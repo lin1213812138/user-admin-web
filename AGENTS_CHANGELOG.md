@@ -2,6 +2,44 @@
 
 > 本文件维护所有 Agent 讨论/修复记录的索引，**按日期分组（最新日期在上）**。详细文档见 `changelog/` 目录。
 
+## 2026-09-12
+
+- [标签预览突出显示（iframe 白纸贴白卡无对比；**最终定稿：弹窗宽高零约束完全随纸张；naive 遮罩层默认 fixed+overflow:visible 不可滚（超高直接溢出视口），覆盖 wrapper overflow-y:auto+隐藏滚动条视觉、padding 40px 放 .n-modal-scroll-content**——超高时整个弹窗滚轮上滚，滚到底 footer 下留 40px 空白，bootstrap/hiprint 模式；教训：naive 类名横/双下混用必须查源码、`flex:1 1 0` 在自适应高度容器压扁内容](./changelog/标签预览突出显示.md)
+- [标签设计拖出元素尺寸过小（非代码 bug：Vite HMR 半新半旧——.vue 组件热替换生效、store 模块未重载，裸 50×15 被 pt 渲染；整页刷新即恢复；教训：store+组件同批改动后先刷新再排查）](./changelog/标签设计拖出元素尺寸过小.md)
+- [标签设计拖放落点跳到上方（pt 迁移漏改：onDrop 落点按 mm 算出被当 pt 存，坐标缩小 2.83 倍；同类修复 moveSelected 钳制 mm/pt 混减、duplicate/paste 偏移 mmToPt(4)；教训——单位迁移须按 parsePaper 数据流核对而非字面量搜索）](./changelog/标签设计拖放落点跳到上方.md)
+- [标签设计元素几何单位mm改pt（x/y/width/height 全链路 pt，纸张保留 mm；designJson 加 unit 字段旧数据自动 ×2.8346 迁移，默认尺寸/最小边/方向键步长按物理尺寸等比换算手感不变）](./changelog/标签设计元素几何单位mm改pt.md)
+- [标签设计designJson目标格式改造（B方案：存储整体换 unit:pt+paper+key/label/style 目标格式，原生字段以独立 options 子对象全保留；export-format.ts 序列化边界转换，loadFromJson 三输入兼容（目标/旧原生 mm 迁移/非法），几何 pt 直传适配并行 pt 化；保存成功行为改 window.open Blob URL 新标签预览 JSON；typecheck+oxlint 过）](./changelog/标签设计保存导出JSON.md)
+- [标签设计默认字体大小改为8（store 新建默认 text 12→8、barcode 10→8、titleFontSize 10→8；画布/打印两端缺省回退 ??10/||10 同步 8，旧模板显式字号不受影响）](./changelog/标签设计默认字体大小改为8.md)
+- [标签条码标题与编码值同行（alttext 中文乱码实证废弃→DOM 文本行方案：条码 PNG 只画条形，「标题:编码值」DOM 行居中条形下方、统一用「字号」；画布/打印两端同步，displayValue 关且无标题时不渲染行）](./changelog/标签条码标题与编码值同行.md)
+- [标签设计默认不显示网格（store showGrid 初始值 true→false，纯内存无持久化改默认即生效；打印设计页独立状态不受影响）](./changelog/标签设计默认不显示网格.md)
+- [标签设计缩放连体与移除垂直对齐（缩放三独立控件收敛为 NButtonGroup 连体 [-|100%|+]，点击百分比仍重置；删「垂直对齐」按钮并清理 store.verticalCenterAll 与 i18n 键三处死代码；追代：quaternary 连体不可见，改 default 带边框共享边线）](./changelog/标签设计缩放连体与移除垂直对齐.md)
+- [标签设计快捷键（Ctrl+S/Z/Y/Shift+Z、X/C/V 剪切复制粘贴、Delete 删除、方向键 1/10/0.1mm 移动带长按会话与纸界钳制；工具栏加快捷键按钮 + Popover Windows/Mac 两列对照弹窗，输入框聚焦不拦截）](./changelog/标签设计快捷键.md)
+- [标签设计工具栏模板下拉改纯文本（去 NSelect 选择器，props 收敛为 templateName，页面内不再提供模板切换入口，默认仍加载列表第一个模板）](./changelog/标签设计工具栏模板下拉改纯文本.md)
+- [标签条码编码值间距样式（BarcodeOptions.textGap 透传 bwip-js textyoffset，新拖入默认 2pt、旧数据紧贴零影响，样式卡「字号」旁可调，画布/打印单点生效）](./changelog/标签条码编码值间距样式.md)
+- [标签设计工具栏按截图改造（新增返回上一页/垂直对齐=全元素整体垂直居中/清空带 dialog 确认；缩放改独立 — 100% + 三元素，网格文案改「显示网格」，预览改白底描边；撤销/重做保留）](./changelog/标签设计工具栏按截图改造.md)
+- [标签设计工具栏两行合一（去「标签设计」标题文字，模板选择+保存经 props/events 并入 tool-bar.vue 单行：模板选择|撤销重做|纸张|网格|缩放……预览 保存）](./changelog/标签设计工具栏两行合一.md)
+- [标签设计 Shift 等比缩放（Shift+角手柄锁定拖拽起始宽高比、以宽驱动高，dragState 记 shiftKey 实时切换，边手柄不参与；预览与落库同源 resizeGeometry）](./changelog/标签设计Shift等比缩放.md)
+- [标签条码编码值文本不显示（旧 designJson 缺 displayValue 字段 loadFromJson 原样还原 → includetext undefined；渲染层 displayValue!==false 兜底 + buildModel 补默认，node 实测 PNG 对比定位）](./changelog/标签条码编码值文本不显示.md)
+- [标签设计元素 hover 虚线与选中实线（hover 未选中显示 1px 虚线提示可交互、选中改 2px 实线，纯 CSS :hover 零 JS 状态；追代：缩放手柄 8px 蓝底方块改 6px 白底蓝边圆点并修正与描边线错位）](./changelog/标签设计元素hover虚线与选中实线.md)
+- [标签业务字段标题显示规则（拖入不再回退 label 当标题；FieldDef/ElementSeed 全链路增 showTitle，showTitle && title 同时为真才开关联标题，缺省全部不显示）](./changelog/标签业务字段标题显示规则.md)
+- [标签设计右侧紧凑化+字段类型自定义（FormWrap 增 size prop 透传 NForm，属性面板 small+label 12px；FieldDef 增 elementType 按字段定义创建元素，废除拖入一律 longText 硬编码）](./changelog/标签设计右侧紧凑化与字段类型自定义.md)
+- [标签选中/hover框横竖外扩不一致（outline 外扩本身均匀，扁宽元素占比差+scale 非整数缩放亚像素舍入造成观感差；offset 归零贴元素边界彻底消除）](./changelog/标签选中框横竖外扩不一致.md)
+- [标签设计器缩放控件优化（四元素松散混排改 NButtonGroup 紧凑组合 [-|80%|+]，点击百分比重置 100% 带 title 提示，删独立重置按钮）](./changelog/标签设计器缩放控件优化.md)
+- [标签设计器移除刻度（删 .ruler 元素与样式、工具栏切换按钮、store showRuler、i18n ruler 键，打印设计页不受影响）](./changelog/标签设计器移除刻度.md)
+- [标签样式移除标题对齐+新增显示边框（titleAlign 在行内流下无意义全链路删除；BorderExtras 给 text/longText/barcode/qrcode 加开关+宽度+颜色边框，默认关，画布/打印两端同步）](./changelog/标签移除标题对齐与新增显示边框.md)
+- [标签设计切换元素后输入框残留旧值（根因：新元素 title/field 为 undefined → naive NInput 走非受控分支回落实例内部值，组件实例跨元素复用残留上一元素输入；已实施方案 A：buildModel 预置受控空串）](./changelog/标签设计切换元素后输入框残留旧值.md)
+- [标签设计器左右面板折叠样式统一（右侧属性面板三区块合并为单个裸 NCollapse 与左侧同款，header flex-1 箭头贴右、去加粗；二次迭代：各折叠内容区包 NCard size=small 白底描边卡）](./changelog/标签设计器左右面板折叠样式统一.md)
+- [标签标题与内容垂直错位→行内连续排版（分栏布局被否定：baseline 对齐后用户明确要标题+内容填进同一文本流不分块；文本改行内前缀 span 排版，折行行首顶格，基线天然对齐，画布与打印两处同步）](./changelog/标签标题与内容垂直错位.md)
+- [标签设计左侧面板折叠（field-panel 两组改为 NCollapse + arrow-placement right，默认全展开，组内结构与拖拽零改动）](./changelog/标签设计左侧面板折叠.md)
+- [标签设计点击后高度被压缩（按下时 will-change:transform 提升合成层导致非整数 px 高度被栅格化舍入，视觉矮 1~2px 松手恢复；删除 will-change 两行，拖动性能不受影响）](./changelog/标签设计点击后高度被压缩.md)
+- [标签设计点击元素跑到左上角（拖动优化回归：pointerup 无条件清空内联样式后纯点击不写 store、Vue 不重渲染无人恢复；改为清空后按 store 权威值恢复定位样式）](./changelog/标签设计点击元素跑到左上角.md)
+- [标签设计数据预览栏（删「内容与绑定」卡并入数据预览：标题名称/字段类型/关联标题开关/占位文本/绑定信息条，标题渲染画布与打印同步，placeholder 回退链）](./changelog/标签设计数据预览栏.md)
+- [标签设计表单超出NCard（FormWrap 的 NGrid cols=24 产生 23×16=368px 列间隙开销压塌窄面板轨道，属性面板 grid-x-gap 调小为 8）](./changelog/标签设计表单超出NCard.md)
+
+## 2026-09-12
+
+- [标签设计器拖动卡顿优化（根因：pointermove 无 rAF 合帧全链路响应式重渲染；方案 A 设计已确认：拖动期直写 DOM transform/几何、pointerup 一次写回 store，点击不拖不产生撤销点，待实施）](./changelog/标签设计器拖动卡顿优化.md)
+
 ## 2026-09-11
 
 - [标签设计器新建独立组件（不修改现有 print-design：新建 label-designer 目录 + 路由，纯数据驱动 Vue 组件树 + bwip-js，与 hiprint 版并存）](./changelog/标签设计器新建独立组件.md)

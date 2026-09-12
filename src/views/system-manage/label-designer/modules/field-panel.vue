@@ -1,33 +1,21 @@
 <script setup lang="ts">
 import { $t } from '@/locales';
 import { basicElements } from './basic-elements';
+import { BUSINESS_FIELDS, type FieldDef } from './constant';
 import type { ElementType } from './types';
-
-interface FieldDef {
-  key: string;
-  label: string;
-  /** 拖到画布时直接作为「文本」显示的示例值 */
-  sample?: string;
-}
 
 const props = withDefaults(
   defineProps<{
     fields?: FieldDef[];
   }>(),
   {
-    fields: () => [
-      { key: 'orderNo', label: '单号', sample: 'WM202609070001' },
-      { key: 'sku', label: 'SKU', sample: 'SKU-882910' },
-      { key: 'goodsName', label: '商品名称', sample: '无线蓝牙耳机' },
-      { key: 'qty', label: '数量', sample: '100' },
-      { key: 'batch', label: '批次', sample: 'B20260907' },
-      { key: 'warehouse', label: '仓库', sample: '上海仓' },
-      { key: 'date', label: '日期', sample: '2026-09-07' }
-    ]
+    fields: () => BUSINESS_FIELDS
   }
 );
 
-type DragPayload = { kind: 'basic'; type: ElementType } | { kind: 'field'; field: string; sample?: string };
+type DragPayload =
+  | { kind: 'basic'; type: ElementType }
+  | { kind: 'field'; field: string; sample?: string; title?: string; elementType?: ElementType; showTitle?: boolean };
 
 function onDragStart(e: DragEvent, payload: DragPayload) {
   e.dataTransfer?.setData('application/x-label', JSON.stringify(payload));
@@ -36,40 +24,51 @@ function onDragStart(e: DragEvent, payload: DragPayload) {
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-12px overflow-auto p-12px">
-    <div>
-      <div class="mb-8px text-13px font-medium text-#666 dark:text-#aaa">
-        {{ $t('page.manage.labelDesign.basicElements') }}
-      </div>
-      <div class="grid grid-cols-2 gap-8px">
-        <div
-          v-for="item in basicElements"
-          :key="item.type"
-          class="cursor-grab rounded border border-#e5e7eb bg-white p-8px text-center text-13px active:cursor-grabbing dark:border-#2a2a2a dark:bg-#1f1f1f"
-          draggable="true"
-          @dragstart="onDragStart($event, { kind: 'basic', type: item.type })"
-        >
-          {{ $t(item.labelKey) }}
+  <div class="h-full overflow-auto p-12px">
+    <NCollapse :default-expanded-names="['basic', 'fields']" arrow-placement="right">
+      <NCollapseItem name="basic">
+        <template #header>
+          <!-- flex-1 让箭头贴右（naive right placement 只给箭头 margin-left，标题需自身撑满） -->
+          <span class="flex-1">{{ $t('page.manage.labelDesign.basicElements') }}</span>
+        </template>
+        <div class="grid grid-cols-2 gap-8px">
+          <div
+            v-for="item in basicElements"
+            :key="item.type"
+            class="cursor-grab rounded border border-#e5e7eb bg-white p-8px text-center text-13px active:cursor-grabbing dark:border-#2a2a2a dark:bg-#1f1f1f"
+            draggable="true"
+            @dragstart="onDragStart($event, { kind: 'basic', type: item.type })"
+          >
+            {{ $t(item.labelKey) }}
+          </div>
         </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="mb-8px text-13px font-medium text-#666 dark:text-#aaa">
-        {{ $t('page.manage.labelDesign.fields') }}
-      </div>
-      <div class="flex flex-col gap-8px">
-        <div
-          v-for="f in props.fields"
-          :key="f.key"
-          class="cursor-grab rounded border border-#e5e7eb bg-white p-8px text-13px active:cursor-grabbing dark:border-#2a2a2a dark:bg-#1f1f1f"
-          draggable="true"
-          @dragstart="onDragStart($event, { kind: 'field', field: f.key, sample: f.sample })"
-        >
-          <span class="text-#999 dark:text-#777">{{ f.label }}</span>
-          <span class="ml-4px text-#bbb">{{ f.key }}</span>
+      </NCollapseItem>
+      <NCollapseItem name="fields">
+        <template #header>
+          <span class="flex-1">{{ $t('page.manage.labelDesign.fields') }}</span>
+        </template>
+        <div class="flex flex-col gap-8px">
+          <div
+            v-for="f in props.fields"
+            :key="f.key"
+            class="cursor-grab rounded border border-#e5e7eb bg-white p-8px text-13px active:cursor-grabbing dark:border-#2a2a2a dark:bg-#1f1f1f"
+            draggable="true"
+            @dragstart="
+              onDragStart($event, {
+                kind: 'field',
+                field: f.key,
+                sample: f.sample,
+                title: f.title,
+                elementType: f.elementType,
+                showTitle: f.showTitle
+              })
+            "
+          >
+            <span class="text-#999 dark:text-#777">{{ f.label }}</span>
+            <span class="ml-4px text-#bbb">{{ f.key }}</span>
+          </div>
         </div>
-      </div>
-    </div>
+      </NCollapseItem>
+    </NCollapse>
   </div>
 </template>

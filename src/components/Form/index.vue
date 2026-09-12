@@ -29,6 +29,8 @@ interface Props {
   labelPlacement?: 'left' | 'top';
   /** 标签宽度，同 NForm */
   labelWidth?: number | string;
+  /** 控件尺寸，同 NForm（small / medium / large） */
+  size?: 'small' | 'medium' | 'large';
   /** 禁用所有字段 */
   disabled?: boolean;
 }
@@ -40,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
   gridResponsive: 'screen',
   labelPlacement: 'top',
   labelWidth: 'auto',
+  size: 'medium',
   disabled: false
 });
 
@@ -163,6 +166,7 @@ defineExpose({
     :rules="mergedRules"
     :label-placement="labelPlacement"
     :label-width="labelWidth"
+    :size="size"
     :disabled="disabled"
   >
     <template v-if="fieldItems.length">

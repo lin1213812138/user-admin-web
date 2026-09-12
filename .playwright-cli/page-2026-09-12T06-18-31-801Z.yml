@@ -1,0 +1,7 @@
+- generic [active] [ref=f3e1]:
+    - generic [ref=f3e2]:
+        - text: '编码值:'
+        - textbox [ref=f3e3]: OO202609120246541534
+        - text: '状态: ready'
+    - paragraph [ref=f3e4]: 场景1：被污染 options（text:'' + value 有值）——修复后应显示编码值文本
+    - paragraph [ref=f3e7]: 场景2：正常 options（仅 value）
