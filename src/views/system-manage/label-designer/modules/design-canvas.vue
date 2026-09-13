@@ -39,6 +39,8 @@ const pan = ref({ x: 0, y: 0 });
 let panning: { x: number; y: number; px: number; py: number } | null = null;
 let panPending: { x: number; y: number } | null = null;
 let panRaf = 0;
+/** 平移进行中的光标类名：命令式加/摘，避免为一个光标状态触发画布响应式重渲染 */
+const PANNING_CLASS = 'panning';
 
 /** 平移 rAF 帧回调：直写容器 transform，不碰响应式 */
 function applyPanFrame() {
@@ -53,8 +55,11 @@ function onViewportPointerDown(e: PointerEvent) {
   store.selectElement(null);
   panning = { x: pan.value.x, y: pan.value.y, px: e.clientX, py: e.clientY };
   panPending = { x: panning.x, y: panning.y };
+  viewportRef.value?.classList.add(PANNING_CLASS);
   window.addEventListener('pointermove', onPanMove);
   window.addEventListener('pointerup', onPanUp);
+  // 指针被系统/浏览器收回时不会走 pointerup，兜底摘掉光标类
+  window.addEventListener('pointercancel', onPanUp);
 }
 function onPanMove(e: PointerEvent) {
   if (!panning) return;
@@ -70,8 +75,10 @@ function onPanUp() {
   if (panning && panPending) pan.value = panPending;
   panning = null;
   panPending = null;
+  viewportRef.value?.classList.remove(PANNING_CLASS);
   window.removeEventListener('pointermove', onPanMove);
   window.removeEventListener('pointerup', onPanUp);
+  window.removeEventListener('pointercancel', onPanUp);
 }
 
 function onWheel(e: WheelEvent) {
@@ -223,6 +230,8 @@ onMounted(() => {
 });
 onBeforeUnmount(() => {
   viewportRef.value?.removeEventListener('wheel', onWheel);
+  // 组件销毁时兜底清掉光标类，避免残留到其它页面
+  viewportRef.value?.classList.remove(PANNING_CLASS);
 });
 </script>
 
@@ -292,12 +301,27 @@ onBeforeUnmount(() => {
 <style scoped>
 .label-designer-canvas {
   touch-action: none;
+  cursor: grab;
+}
+/*
+ * 平移进行中：容器及其所有后代一律显示握拳。
+ * cursor 是每个元素独立生效的，父级声明压不住子元素自己写死的光标；
+ * 平移途中指针会滑到纸张 / 元素 / 缩放手柄上，所以必须带 `*` + !important 兜住，
+ * 否则会出现「握拳 ↔ 箭头 ↔ 缩放」来回闪。
+ */
+.label-designer-canvas.panning,
+.label-designer-canvas.panning * {
+  cursor: grabbing !important;
 }
 .label-grid {
   background-image:
     linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
   background-size: calc(1mm) calc(1mm);
+}
+/* 元素是「移动」语义，覆盖从容器继承来的手掌光标（.resize-handle 自带缩放光标，不受影响） */
+.element-item {
+  cursor: move;
 }
 /* hover 提示可交互：细虚线，不显示缩放手柄（仅选中态渲染手柄）。
    outline 贴元素边界（offset 0）消除外扩空隙观感差；线宽除以 canvas-zoom 补偿，
