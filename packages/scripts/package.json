@@ -2,7 +2,7 @@
   "name": "@sa/scripts",
   "version": "0.0.4",
   "bin": {
-    "sa": "./bin.ts"
+    "sa": "./bin.mjs"
   },
   "typesVersions": {
     "*": {
