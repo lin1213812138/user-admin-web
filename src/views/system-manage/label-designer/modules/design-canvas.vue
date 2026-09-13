@@ -5,6 +5,7 @@ import { useLabelDesignStore } from '@/store/modules/label-design';
 import { mmToPt, PX_PER_MM, PX_PER_PT, parsePaper } from './constant';
 import ElementRenderer from './element-renderer.vue';
 import { useCanvasInteraction } from './use-canvas-interaction';
+import { markDragCreated } from './drag-ghost';
 import { basicElements } from './basic-elements';
 import type { LabelElement, ElementType } from './types';
 
@@ -178,20 +179,22 @@ function onDrop(e: DragEvent) {
     return;
   }
   const size = parsePaper(store.template.paperSize);
-  let x = 0;
-  let y = 0;
   const paperEl = paperRef.value;
-  if (paperEl) {
-    const rect = paperEl.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0) {
-      // 落点比例 × 纸张物理尺寸（mm），再换算为元素几何单位 pt
-      x = mmToPt(((e.clientX - rect.left) / rect.width) * size.w);
-      y = mmToPt(((e.clientY - rect.top) / rect.height) * size.h);
-    }
-  }
+  if (!paperEl) return;
+  const rect = paperEl.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return;
+  // 落点必须落在纸张（标签）内，否则视为无效拖放：不创建元素，拖拽项自动回到原位
+  if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+  // 落点比例 × 纸张物理尺寸（mm），再换算为元素几何单位 pt
+  const x = mmToPt(((e.clientX - rect.left) / rect.width) * size.w);
+  const y = mmToPt(((e.clientY - rect.top) / rect.height) * size.h);
   if (payload.kind === 'basic' && payload.type) {
     const def = basicElements.find(b => b.type === payload.type);
-    if (def) store.addElement(def, { x, y });
+    if (def) {
+      store.addElement(def, { x, y });
+      // 通知左侧面板：本次拖拽已落纸创建，dragend 时不再播放「回落原位」动画
+      markDragCreated();
+    }
   } else if (payload.kind === 'field' && payload.field) {
     // 业务字段按字段定义的 elementType 创建（设置什么类型就是什么类型），未设置/不支持时回退 text
     const fieldType = (FIELD_ELEMENT_TYPES as string[]).includes(payload.elementType ?? '')
@@ -210,6 +213,8 @@ function onDrop(e: DragEvent) {
       },
       { x, y }
     );
+    // 通知左侧面板：本次拖拽已落纸创建，dragend 时不再播放「回落原位」动画
+    markDragCreated();
   }
 }
 

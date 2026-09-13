@@ -12,6 +12,19 @@ export function mmToPt(v: number): number {
   return v * PT_PER_MM;
 }
 
+/** 回位动画时长（ms）：左侧面板拖拽项未落纸时回到原位的时长，兼顾「看得见」与不拖慢操作 */
+export const BACK_MS = 260;
+
+/**
+ * 回位动画曲线：cubic ease-in-out。
+ * 返回「剩余位移比例」k ∈ [0,1]：k=1 为起点（松手位置），k=0 为终点（原位）。
+ * 两端都收速——ease-out((1-t)³) 起手就打满速度，60Hz 下 61% 的距离在前 3 帧走完，观感等同瞬移。
+ */
+export function backRemain(t: number): number {
+  const p = t < 0 ? 0 : t > 1 ? 1 : t;
+  return p < 0.5 ? 1 - 4 * p ** 3 : (2 - 2 * p) ** 3 / 2;
+}
+
 /** 预设纸张尺寸（格式 W×Hmm） */
 export const PAPER_SIZES = [
   '100×150mm',

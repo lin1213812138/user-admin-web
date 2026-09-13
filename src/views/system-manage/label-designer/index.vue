@@ -200,7 +200,7 @@ onBeforeUnmount(() => {
     />
 
     <div class="flex flex-1 overflow-hidden">
-      <div class="w-220px shrink-0 overflow-hidden border-r border-#e5e7eb dark:border-#2a2a2a">
+      <div class="w-260px shrink-0 overflow-hidden border-r border-#e5e7eb dark:border-#2a2a2a">
         <FieldPanel />
       </div>
       <DesignCanvas class="flex-1" />
