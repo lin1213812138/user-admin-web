@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.0.6](https://github.com/lin1213812138/user-admin-web/compare/v0.0.5...v0.0.6) (2026-09-14)
+
+### &nbsp;&nbsp;&nbsp;🐞 Bug Fixes
+
+- **label-designer**: 画布平移补充抓手光标 &nbsp;-&nbsp; by **林翔** [<samp>(1011e)</samp>](https://github.com/lin1213812138/user-admin-web/commit/1011eef)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[林翔](mailto:2276928094@qq.com)
+
 ## [v0.0.5](https://github.com/lin1213812138/user-admin-web/compare/v0.0.4...v0.0.5) (2026-09-13)
 
 ### &nbsp;&nbsp;&nbsp;🚀 Features
