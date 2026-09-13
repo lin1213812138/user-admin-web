@@ -1,5 +1,45 @@
 # Changelog
 
+## [v0.0.5](https://github.com/lin1213812138/user-admin-web/compare/v0.0.4...v0.0.5) (2026-09-13)
+
+### &nbsp;&nbsp;&nbsp;🚀 Features
+
+- 接入阿里巴巴普惠体子集字体 &nbsp;-&nbsp; by **LINFLY** [<samp>(e3ef0)</samp>](https://github.com/lin1213812138/user-admin-web/commit/e3ef0ac)
+- **Export**:
+  - 实现共用导出组件与数据范围选项 &nbsp;-&nbsp; by **LINFLY** [<samp>(2d2df)</samp>](https://github.com/lin1213812138/user-admin-web/commit/2d2df72)
+- **label-designer**:
+  - 自研标签设计器组件及属性面板优化 &nbsp;-&nbsp; by **LINFLY** [<samp>(0e8e7)</samp>](https://github.com/lin1213812138/user-admin-web/commit/0e8e762)
+  - 拖拽越界回弹与面板拖拽回位动画 &nbsp;-&nbsp; by **林翔** [<samp>(cbafc)</samp>](https://github.com/lin1213812138/user-admin-web/commit/cbafcd6)
+- **print-design**:
+  - 实现标签打印模板设计器 &nbsp;-&nbsp; by **LINFLY** [<samp>(daccb)</samp>](https://github.com/lin1213812138/user-admin-web/commit/daccb61)
+  - 重构打印设计器布局与预览 &nbsp;-&nbsp; by **LINFLY** [<samp>(8ec0f)</samp>](https://github.com/lin1213812138/user-admin-web/commit/8ec0ff8)
+- **role**:
+  - 分配权限抽屉改为表格模式并支持按钮权限 &nbsp;-&nbsp; by **LINFLY** [<samp>(41c9e)</samp>](https://github.com/lin1213812138/user-admin-web/commit/41c9e5f)
+- **setting**:
+  - 实现打印格式界面 &nbsp;-&nbsp; by **LINFLY** [<samp>(a1c87)</samp>](https://github.com/lin1213812138/user-admin-web/commit/a1c87d7)
+  - 实现导出格式界面功能 &nbsp;-&nbsp; by **LINFLY** [<samp>(8cb50)</samp>](https://github.com/lin1213812138/user-admin-web/commit/8cb50eb)
+  - 字段映射卡片新增分组一键全选 &nbsp;-&nbsp; by **LINFLY** [<samp>(7f45e)</samp>](https://github.com/lin1213812138/user-admin-web/commit/7f45edd)
+
+### &nbsp;&nbsp;&nbsp;🐞 Bug Fixes
+
+- **print-design**: 修复预览弹窗与标尺显示问题 &nbsp;-&nbsp; by **LINFLY** [<samp>(e8f43)</samp>](https://github.com/lin1213812138/user-admin-web/commit/e8f434c)
+- **scripts**: 修复 sa CLI 在 Windows 下无法执行导致提交被拦截 &nbsp;-&nbsp; by **林翔** [<samp>(d2adf)</samp>](https://github.com/lin1213812138/user-admin-web/commit/d2adfba)
+- **setting**: 修复录单格式字段映射高度超出与必填校验 &nbsp;-&nbsp; by **LINFLY** [<samp>(08245)</samp>](https://github.com/lin1213812138/user-admin-web/commit/08245f3)
+
+### &nbsp;&nbsp;&nbsp;📖 Documentation
+
+- 记录打印设计属性面板调研与决策 &nbsp;-&nbsp; by **LINFLY** [<samp>(d03f3)</samp>](https://github.com/lin1213812138/user-admin-web/commit/d03f374)
+- 记录 pre-commit 与 commit-msg 钩子拦截的修复过程 &nbsp;-&nbsp; by **林翔** [<samp>(d0334)</samp>](https://github.com/lin1213812138/user-admin-web/commit/d033496)
+- **memory**: 更新标签设计器开发记忆与通用事实 &nbsp;-&nbsp; by **LINFLY** [<samp>(0cfd1)</samp>](https://github.com/lin1213812138/user-admin-web/commit/0cfd10b)
+
+### &nbsp;&nbsp;&nbsp;🏡 Chore
+
+- 记录开发过程并重构系统设置模块 &nbsp;-&nbsp; by **LINFLY** [<samp>(795f3)</samp>](https://github.com/lin1213812138/user-admin-web/commit/795f310)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[林翔](mailto:2276928094@qq.com)
+
 ## [v0.0.4](https://github.com/lin1213812138/user-admin-web/compare/v0.0.3...v0.0.4) (2026-09-04)
 
 ### &nbsp;&nbsp;&nbsp;📖 Documentation
