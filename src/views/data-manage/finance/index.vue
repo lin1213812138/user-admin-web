@@ -3,6 +3,16 @@ import ArchiveSwitch, { type ArchiveSwitchItem } from '@/components/MasterData/a
 
 const items: ArchiveSwitchItem[] = [
   {
+    key: 'expense-type',
+    labelKey: 'page.dataManage.finance.expenseType.title',
+    load: () => import('@/components/MasterData/archives/finance/expense-type/index.vue')
+  },
+  {
+    key: 'settlement',
+    labelKey: 'page.dataManage.finance.settlement.title',
+    load: () => import('@/components/MasterData/archives/finance/settlement/index.vue')
+  },
+  {
     key: 'account',
     labelKey: 'page.dataManage.finance.account.title',
     load: () => import('@/components/MasterData/archives/finance/account/index.vue')
@@ -11,16 +21,6 @@ const items: ArchiveSwitchItem[] = [
     key: 'currency',
     labelKey: 'page.dataManage.finance.currency.title',
     load: () => import('@/components/MasterData/archives/finance/currency/index.vue')
-  },
-  {
-    key: 'tax',
-    labelKey: 'page.dataManage.finance.tax.title',
-    load: () => import('@/components/MasterData/archives/finance/tax/index.vue')
-  },
-  {
-    key: 'settlement',
-    labelKey: 'page.dataManage.finance.settlement.title',
-    load: () => import('@/components/MasterData/archives/finance/settlement/index.vue')
   }
 ];
 </script>

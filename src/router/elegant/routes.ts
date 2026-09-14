@@ -128,6 +128,52 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'permission-manage',
+    path: '/permission-manage',
+    component: 'layout.base',
+    meta: {
+      title: 'permission-manage',
+      i18nKey: 'route.permission-manage',
+      icon: 'ic:round-lock',
+      order: 3
+    },
+    children: [
+      {
+        name: 'permission-manage_menu',
+        path: '/permission-manage/menu',
+        component: 'view.permission-manage_menu',
+        meta: {
+          title: 'permission-manage_menu',
+          i18nKey: 'route.permission-manage_menu',
+          icon: 'ic:baseline-menu',
+          order: 3
+        }
+      },
+      {
+        name: 'permission-manage_role',
+        path: '/permission-manage/role',
+        component: 'view.permission-manage_role',
+        meta: {
+          title: 'permission-manage_role',
+          i18nKey: 'route.permission-manage_role',
+          icon: 'ic:round-supervisor-account',
+          order: 2
+        }
+      },
+      {
+        name: 'permission-manage_user',
+        path: '/permission-manage/user',
+        component: 'view.permission-manage_user',
+        meta: {
+          title: 'permission-manage_user',
+          i18nKey: 'route.permission-manage_user',
+          icon: 'ic:round-person',
+          order: 1
+        }
+      }
+    ]
+  },
+  {
     name: 'system-manage',
     path: '/system-manage',
     component: 'layout.base',
@@ -138,6 +184,17 @@ export const generatedRoutes: GeneratedRoute[] = [
       order: 2
     },
     children: [
+      {
+        name: 'system-manage_customer',
+        path: '/system-manage/customer',
+        component: 'view.system-manage_customer',
+        meta: {
+          title: 'system-manage_customer',
+          i18nKey: 'route.system-manage_customer',
+          icon: 'ic:round-business',
+          order: 6
+        }
+      },
       {
         name: 'system-manage_group',
         path: '/system-manage/group',
@@ -163,16 +220,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
-        name: 'system-manage_menu',
-        path: '/system-manage/menu',
-        component: 'view.system-manage_menu',
-        meta: {
-          title: 'system-manage_menu',
-          i18nKey: 'route.system-manage_menu',
-          order: 3
-        }
-      },
-      {
         name: 'system-manage_print-design',
         path: '/system-manage/print-design',
         component: 'view.system-manage_print-design',
@@ -180,17 +227,6 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_print-design',
           i18nKey: 'route.system-manage_print-design',
           hideInMenu: true
-        }
-      },
-      {
-        name: 'system-manage_role',
-        path: '/system-manage/role',
-        component: 'view.system-manage_role',
-        meta: {
-          title: 'system-manage_role',
-          i18nKey: 'route.system-manage_role',
-          icon: 'ic:round-supervisor-account',
-          order: 2
         }
       },
       {
@@ -213,17 +249,6 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.system-manage_site',
           icon: 'ic:round-place',
           order: 4
-        }
-      },
-      {
-        name: 'system-manage_user',
-        path: '/system-manage/user',
-        component: 'view.system-manage_user',
-        meta: {
-          title: 'system-manage_user',
-          i18nKey: 'route.system-manage_user',
-          icon: 'ic:round-person',
-          order: 1
         }
       }
     ]

@@ -60,6 +60,8 @@ interface Props {
   actionExport?: boolean;
   /** actionExport 导出文件名（不含扩展名），缺省「导出_时间戳」 */
   exportFilename?: string;
+  /** vxe-table scroll-y 阈值：仅当数据行数超过该值时才启用虚拟滚动（默认 200） */
+  virtualScrollRowThreshold?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -82,7 +84,8 @@ const props = withDefaults(defineProps<Props>(), {
   searchModel: undefined,
   searchDefaultCollapsed: true,
   actionExport: false,
-  exportFilename: undefined
+  exportFilename: undefined,
+  virtualScrollRowThreshold: 200
 });
 
 /** vxe-table 实例（原生导出按钮要用它的 openExport/exportData） */
@@ -129,6 +132,12 @@ const finalRowConfig = computed<VxeTablePropTypes.RowConfig>(() => ({
 const finalHeaderCellConfig = computed<VxeTablePropTypes.HeaderCellConfig | undefined>(() => ({
   height: 40,
   ...props.headerCellConfig
+}));
+
+/** 虚拟滚动门控：仅当数据行数超过阈值时才启用虚拟渲染，否则走普通渲染（避免小数据量下虚拟滚动的额外开销） */
+const scrollYConfig = computed<VxeTablePropTypes.ScrollY>(() => ({
+  enabled: true,
+  gt: props.virtualScrollRowThreshold
 }));
 
 const emit = defineEmits<{
@@ -276,6 +285,7 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         :seq-config="{ startIndex: seqStartIndex }"
         :height="height"
         :loading="loading"
+        :scroll-y="scrollYConfig"
         show-overflow="tooltip"
         :export-config="exportConfig"
         :tree-config="treeConfig"
@@ -344,7 +354,8 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
           </template>
         </vxe-column>
         <template #empty>
-          <span class="text-14px text-#909399">{{ $t('common.noData') }}</span>
+          <NEmpty description="无数据" />
+          <!-- <span class="text-14px text-#909399">{{ $t('common.noData') }}</span> -->
         </template>
       </vxe-table>
     </div>

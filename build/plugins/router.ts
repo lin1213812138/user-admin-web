@@ -37,10 +37,13 @@ export function setupElegantRouter() {
       /** menu icon of the route */
       const routeIcons: Partial<Record<RouteKey, string>> = {
         'system-manage': 'ic:baseline-settings',
-        'system-manage_role': 'ic:round-supervisor-account',
-        'system-manage_user': 'ic:round-person',
         'system-manage_site': 'ic:round-place',
+        'permission-manage': 'ic:round-lock',
+        'permission-manage_user': 'ic:round-person',
+        'permission-manage_role': 'ic:round-supervisor-account',
+        'permission-manage_menu': 'ic:baseline-menu',
         'system-manage_group': 'ic:round-groups',
+        'system-manage_customer': 'ic:round-business',
         'system-manage_setting': 'ic:baseline-settings-applications',
         'data-manage': 'ic:baseline-folder',
         'data-manage_basic': 'ic:baseline-inventory',
@@ -55,13 +58,15 @@ export function setupElegantRouter() {
         home: 0,
         'data-manage': 1,
         'system-manage': 2,
-        // 系统管理模块
-        'system-manage_role': 2,
-        'system-manage_user': 1,
-        'system-manage_menu': 3,
+        // 权限管理模块
+        'permission-manage': 3,
+        'permission-manage_user': 1,
+        'permission-manage_role': 2,
+        'permission-manage_menu': 3,
         'system-manage_setting': 7,
         'system-manage_site': 4,
         'system-manage_group': 5,
+        'system-manage_customer': 6,
         // 同图标：hideInMenu 后排序无展示效果，保留以便日后重新开放菜单入口
         'system-manage_label-designer': 6
       };

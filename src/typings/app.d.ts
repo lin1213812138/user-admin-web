@@ -751,6 +751,39 @@ declare namespace App {
               statusPlaceholder: string;
             };
           };
+          customer: {
+            customerCode: string;
+            customerName: string;
+            customerLevel: string;
+            customerSource: string;
+            contactName: string;
+            contactPhone: string;
+            email: string;
+            address: string;
+            status: string;
+            remark: string;
+            basicInfo: string;
+            contactInfo: string;
+            levelNormal: string;
+            levelImportant: string;
+            levelVip: string;
+            sourceWebsite: string;
+            sourceReferral: string;
+            sourceAd: string;
+            updateTime: string;
+            form: {
+              customerCodePlaceholder: string;
+              customerNamePlaceholder: string;
+              customerLevelPlaceholder: string;
+              customerSourcePlaceholder: string;
+              contactNamePlaceholder: string;
+              contactPhonePlaceholder: string;
+              emailPlaceholder: string;
+              addressPlaceholder: string;
+              statusPlaceholder: string;
+              remarkPlaceholder: string;
+            };
+          };
           setting: {
             inputFormat: string;
             printFormat: {
@@ -937,38 +970,39 @@ declare namespace App {
           };
           basic: {
             title: string;
-            customer: {
+            countryRegion: {
               title: string;
               code: string;
               name: string;
-              contact: string;
-              phone: string;
+              phoneCode: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            postalRoute: {
+              title: string;
+              code: string;
+              name: string;
+              country: string;
+              form: { codePlaceholder: string; namePlaceholder: string };
+            };
+            fbaWarehouse: {
+              title: string;
+              code: string;
+              name: string;
+              country: string;
               address: string;
               form: { codePlaceholder: string; namePlaceholder: string };
             };
-            supplier: {
+            customerLevel: {
               title: string;
               code: string;
               name: string;
-              contact: string;
-              phone: string;
-              level: string;
+              discount: string;
               form: { codePlaceholder: string; namePlaceholder: string };
             };
-            goods: {
+            customerSource: {
               title: string;
               code: string;
               name: string;
-              spec: string;
-              unit: string;
-              categoryName: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
-            };
-            category: {
-              title: string;
-              code: string;
-              name: string;
-              sort: string;
               form: { codePlaceholder: string; namePlaceholder: string };
             };
           };
@@ -991,12 +1025,11 @@ declare namespace App {
               symbol: string;
               form: { codePlaceholder: string; namePlaceholder: string };
             };
-            tax: {
+            expenseType: {
               title: string;
+              code: string;
               name: string;
-              rate: string;
-              taxType: string;
-              form: { namePlaceholder: string };
+              form: { codePlaceholder: string; namePlaceholder: string };
             };
             settlement: {
               title: string;
@@ -1007,38 +1040,18 @@ declare namespace App {
           };
           business: {
             title: string;
-            warehouse: {
-              title: string;
-              code: string;
-              name: string;
-              address: string;
-              manager: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
-            };
-            location: {
-              title: string;
-              code: string;
-              name: string;
-              warehouseName: string;
-              capacity: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
-            };
-            carrier: {
-              title: string;
-              code: string;
-              name: string;
-              contact: string;
-              phone: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
-            };
-            store: {
-              title: string;
-              code: string;
-              name: string;
-              address: string;
-              owner: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
-            };
+            code: string;
+            name: string;
+            form: { codePlaceholder: string; namePlaceholder: string };
+            waybill: { title: string };
+            address: { title: string };
+            declaredGoods: { title: string };
+            problemCategory: { title: string };
+            goodsCategory: { title: string };
+            customsType: { title: string };
+            exportReason: { title: string };
+            clearanceMethod: { title: string };
+            salesTerms: { title: string };
           };
         };
       };

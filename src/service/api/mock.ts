@@ -107,12 +107,13 @@ const MENU_TREE: Api.SystemManage.RoleMenuNode[] = [
       { id: 22, title: '角色管理' },
       { id: 23, title: '菜单管理' },
       { id: 25, title: '站点管理' },
-      { id: 26, title: '组别管理' }
+      { id: 26, title: '组别管理' },
+      { id: 27, title: '客户管理' }
     ]
   }
 ];
 
-const ALL_MENU_IDS = [1, 21, 22, 23, 25, 26];
+const ALL_MENU_IDS = [1, 21, 22, 23, 25, 26, 27];
 
 /** menu ids bound to each role */
 const roleMenuMap = new Map<number, number[]>([
@@ -301,6 +302,12 @@ const menus: Api.SystemManage.Menu[] = [
     routePath: '/system-manage/group',
     componentPath: 'views/system-manage/group/index.vue',
     permission: 'system:group:list'
+  }),
+  createMenu(27, 2, 'customer', 'menu', {
+    menuName: '客户管理',
+    routePath: '/system-manage/customer',
+    componentPath: 'views/system-manage/customer/index.vue',
+    permission: 'system:customer:list'
   })
 ];
 
@@ -653,6 +660,150 @@ export function mockDeleteGroup(ids: number[]): boolean {
   for (let i = groups.length - 1; i >= 0; i -= 1) {
     if (ids.includes(groups[i].id)) {
       groups.splice(i, 1);
+    }
+  }
+
+  return true;
+}
+
+/* ------------------------------ customer ------------------------------ */
+
+/** 创建客户 mock 记录 */
+function createCustomer(
+  id: number,
+  customerCode: string,
+  customerName: string,
+  extra: Partial<Api.SystemManage.Customer> = {}
+): Api.SystemManage.Customer {
+  return {
+    id,
+    customerCode,
+    customerName,
+    customerLevel: 'normal',
+    customerSource: 'website',
+    contactName: '',
+    contactPhone: '',
+    email: '',
+    address: '',
+    remark: '',
+    createByName: 'LINFLY',
+    createTime: '2026-07-20',
+    updateByName: 'LINFLY',
+    updateTime: '2026-07-20',
+    status: 1,
+    ...extra
+  };
+}
+
+/** 客户数据（样例） */
+const customers: Api.SystemManage.Customer[] = [
+  createCustomer(1, 'C001', '顺丰供应链', {
+    customerLevel: 'vip',
+    customerSource: 'referral',
+    contactName: '王经理',
+    contactPhone: '13800000001',
+    email: 'sf@example.com',
+    address: '深圳市南山区科技园'
+  }),
+  createCustomer(2, 'C002', '京东物流', {
+    customerLevel: 'important',
+    customerSource: 'website',
+    contactName: '李经理',
+    contactPhone: '13800000002',
+    email: 'jd@example.com',
+    address: '北京市大兴区'
+  }),
+  createCustomer(3, 'C003', '中通仓储', {
+    customerLevel: 'normal',
+    customerSource: 'ad',
+    contactName: '张经理',
+    contactPhone: '13800000003',
+    address: '上海市青浦区'
+  })
+];
+
+/** 客户编号是否已被占用（excludeId 用于编辑时排除自身） */
+function customerCodeExists(customerCode: string, excludeId?: number): boolean {
+  return customers.some(item => item.customerCode === customerCode && item.id !== excludeId);
+}
+
+/** mock customer list with pagination */
+export function mockCustomerList(params: Api.SystemManage.CustomerSearchParams): Api.SystemManage.CustomerList {
+  const { current = 1, size = 20, customerCode, customerName, customerLevel, status } = params;
+
+  let filtered = customers;
+
+  if (customerCode) {
+    filtered = filtered.filter(item => item.customerCode.includes(customerCode));
+  }
+
+  if (customerName) {
+    filtered = filtered.filter(item => item.customerName.includes(customerName));
+  }
+
+  if (customerLevel) {
+    filtered = filtered.filter(item => item.customerLevel === customerLevel);
+  }
+
+  // 状态 0（禁用）也是有效筛选值，不能用真值判断
+  if (status === 0 || status === 1) {
+    filtered = filtered.filter(item => item.status === status);
+  }
+
+  const start = (current - 1) * size;
+  const records = filtered.slice(start, start + size);
+
+  return {
+    records,
+    current,
+    size,
+    total: filtered.length
+  };
+}
+
+/** mock create customer（客户编号重复时抛错） */
+export function mockCreateCustomer(params: Api.SystemManage.CustomerCreateParams): Api.SystemManage.Customer {
+  if (customerCodeExists(params.customerCode)) {
+    throw new Error('客户编号已存在');
+  }
+
+  const id = customers.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+  const newCustomer: Api.SystemManage.Customer = {
+    id,
+    ...params,
+    createByName: CURRENT_OPERATOR,
+    createTime: todayStr(),
+    updateByName: CURRENT_OPERATOR,
+    updateTime: todayStr()
+  };
+  customers.unshift(newCustomer);
+
+  return newCustomer;
+}
+
+/** mock update customer（客户编号重复时抛错） */
+export function mockUpdateCustomer(params: Api.SystemManage.CustomerUpdateParams): Api.SystemManage.Customer {
+  if (customerCodeExists(params.customerCode, params.id)) {
+    throw new Error('客户编号已存在');
+  }
+
+  const index = customers.findIndex(item => item.id === params.id);
+  const updated: Api.SystemManage.Customer = {
+    ...customers[index],
+    ...params,
+    updateByName: CURRENT_OPERATOR,
+    updateTime: todayStr()
+  };
+  customers.splice(index, 1, updated);
+
+  return updated;
+}
+
+/** mock delete customer by ids */
+export function mockDeleteCustomer(ids: number[]): boolean {
+  for (let i = customers.length - 1; i >= 0; i -= 1) {
+    if (ids.includes(customers[i].id)) {
+      customers.splice(i, 1);
     }
   }
 

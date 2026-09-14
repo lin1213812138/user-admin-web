@@ -9,18 +9,24 @@ declare namespace Api {
     }
 
     type DataManageArchiveKey =
-      | 'customer'
-      | 'supplier'
-      | 'goods'
-      | 'category'
+      | 'countryRegion'
+      | 'postalRoute'
+      | 'fbaWarehouse'
+      | 'customerLevel'
+      | 'customerSource'
       | 'account'
       | 'currency'
-      | 'tax'
+      | 'expense-type'
       | 'settlement'
-      | 'warehouse'
-      | 'location'
-      | 'carrier'
-      | 'store';
+      | 'waybill'
+      | 'address'
+      | 'declaredGoods'
+      | 'problemCategory'
+      | 'goodsCategory'
+      | 'customsType'
+      | 'exportReason'
+      | 'clearanceMethod'
+      | 'salesTerms';
 
     interface ArchiveList<T> {
       records: T[];
@@ -34,31 +40,30 @@ declare namespace Api {
       status?: Api.Common.EnableStatus | null;
     }
 
-    interface BasicCustomer extends MasterDataRow {
+    interface BasicCountryRegion extends MasterDataRow {
       code: string;
       name: string;
-      contact: string;
-      phone: string;
+      phoneCode: string;
+    }
+    interface BasicPostalRoute extends MasterDataRow {
+      code: string;
+      name: string;
+      country: string;
+    }
+    interface BasicFbaWarehouse extends MasterDataRow {
+      code: string;
+      name: string;
+      country: string;
       address: string;
     }
-    interface BasicSupplier extends MasterDataRow {
+    interface BasicCustomerLevel extends MasterDataRow {
       code: string;
       name: string;
-      contact: string;
-      phone: string;
-      level: string;
+      discount: number;
     }
-    interface BasicGoods extends MasterDataRow {
+    interface BasicCustomerSource extends MasterDataRow {
       code: string;
       name: string;
-      spec: string;
-      unit: string;
-      categoryName: string;
-    }
-    interface BasicCategory extends MasterDataRow {
-      code: string;
-      name: string;
-      sort: number;
     }
     interface FinanceAccount extends MasterDataRow {
       code: string;
@@ -73,38 +78,49 @@ declare namespace Api {
       rate: number;
       symbol: string;
     }
-    interface FinanceTax extends MasterDataRow {
+    interface FinanceExpenseType extends MasterDataRow {
+      code: string;
       name: string;
-      rate: number;
-      taxType: string;
     }
     interface FinanceSettlement extends MasterDataRow {
       name: string;
       period: string;
     }
-    interface BusinessWarehouse extends MasterDataRow {
+    interface BusinessWaybill extends MasterDataRow {
       code: string;
       name: string;
-      address: string;
-      manager: string;
     }
-    interface BusinessLocation extends MasterDataRow {
+    interface BusinessAddress extends MasterDataRow {
       code: string;
       name: string;
-      warehouseName: string;
-      capacity: number;
     }
-    interface BusinessCarrier extends MasterDataRow {
+    interface BusinessDeclaredGoods extends MasterDataRow {
       code: string;
       name: string;
-      contact: string;
-      phone: string;
     }
-    interface BusinessStore extends MasterDataRow {
+    interface BusinessProblemCategory extends MasterDataRow {
       code: string;
       name: string;
-      address: string;
-      owner: string;
+    }
+    interface BusinessGoodsCategory extends MasterDataRow {
+      code: string;
+      name: string;
+    }
+    interface BusinessCustomsType extends MasterDataRow {
+      code: string;
+      name: string;
+    }
+    interface BusinessExportReason extends MasterDataRow {
+      code: string;
+      name: string;
+    }
+    interface BusinessClearanceMethod extends MasterDataRow {
+      code: string;
+      name: string;
+    }
+    interface BusinessSalesTerms extends MasterDataRow {
+      code: string;
+      name: string;
     }
   }
 }

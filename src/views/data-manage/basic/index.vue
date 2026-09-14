@@ -3,24 +3,29 @@ import ArchiveSwitch, { type ArchiveSwitchItem } from '@/components/MasterData/a
 
 const items: ArchiveSwitchItem[] = [
   {
-    key: 'customer',
-    labelKey: 'page.dataManage.basic.customer.title',
-    load: () => import('@/components/MasterData/archives/basic/customer/index.vue')
+    key: 'countryRegion',
+    labelKey: 'page.dataManage.basic.countryRegion.title',
+    load: () => import('@/components/MasterData/archives/basic/country-region/index.vue')
   },
   {
-    key: 'supplier',
-    labelKey: 'page.dataManage.basic.supplier.title',
-    load: () => import('@/components/MasterData/archives/basic/supplier/index.vue')
+    key: 'postalRoute',
+    labelKey: 'page.dataManage.basic.postalRoute.title',
+    load: () => import('@/components/MasterData/archives/basic/postal-route/index.vue')
   },
   {
-    key: 'goods',
-    labelKey: 'page.dataManage.basic.goods.title',
-    load: () => import('@/components/MasterData/archives/basic/goods/index.vue')
+    key: 'fbaWarehouse',
+    labelKey: 'page.dataManage.basic.fbaWarehouse.title',
+    load: () => import('@/components/MasterData/archives/basic/fba-warehouse/index.vue')
   },
   {
-    key: 'category',
-    labelKey: 'page.dataManage.basic.category.title',
-    load: () => import('@/components/MasterData/archives/basic/category/index.vue')
+    key: 'customerLevel',
+    labelKey: 'page.dataManage.basic.customerLevel.title',
+    load: () => import('@/components/MasterData/archives/basic/customer-level/index.vue')
+  },
+  {
+    key: 'customerSource',
+    labelKey: 'page.dataManage.basic.customerSource.title',
+    load: () => import('@/components/MasterData/archives/basic/customer-source/index.vue')
   }
 ];
 </script>

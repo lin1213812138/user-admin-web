@@ -290,11 +290,13 @@ const local: App.I18n.Schema = {
     'iframe-page': 'Iframe',
     home: 'Home',
     'system-manage': 'System Management',
-    'system-manage_user': 'User Management',
-    'system-manage_role': 'Role Management',
-    'system-manage_menu': 'Menu Management',
+    'permission-manage': 'Permission Management',
+    'permission-manage_user': 'User Management',
+    'permission-manage_role': 'Role Management',
+    'permission-manage_menu': 'Menu Management',
     'system-manage_site': 'Site Management',
     'system-manage_group': 'Group Management',
+    'system-manage_customer': 'Customer Management',
     'data-manage': 'Data Manage',
     'data-manage_basic': 'Basic',
     'data-manage_finance': 'Finance',
@@ -485,6 +487,39 @@ const local: App.I18n.Schema = {
           statusPlaceholder: 'Please select status'
         }
       },
+      customer: {
+        customerCode: 'Customer Code',
+        customerName: 'Customer Name',
+        customerLevel: 'Level',
+        customerSource: 'Source',
+        contactName: 'Contact',
+        contactPhone: 'Phone',
+        email: 'Email',
+        address: 'Address',
+        status: 'Status',
+        remark: 'Remark',
+        basicInfo: 'Basic Info',
+        contactInfo: 'Contact Info',
+        levelNormal: 'Normal',
+        levelImportant: 'Important',
+        levelVip: 'VIP',
+        sourceWebsite: 'Website',
+        sourceReferral: 'Referral',
+        sourceAd: 'Ad',
+        updateTime: 'Last Updated',
+        form: {
+          customerCodePlaceholder: 'Please enter customer code',
+          customerNamePlaceholder: 'Please enter customer name',
+          customerLevelPlaceholder: 'Select level',
+          customerSourcePlaceholder: 'Select source',
+          contactNamePlaceholder: 'Please enter contact',
+          contactPhonePlaceholder: 'Please enter phone',
+          emailPlaceholder: 'Please enter email',
+          addressPlaceholder: 'Please enter address',
+          statusPlaceholder: 'Please select status',
+          remarkPlaceholder: 'Please enter remark'
+        }
+      },
       setting: {
         inputFormat: 'Input Format',
         printFormat: {
@@ -671,45 +706,46 @@ const local: App.I18n.Schema = {
       },
       basic: {
         title: 'Basic',
-        customer: {
-          title: 'Customer',
-          code: 'Customer Code',
-          name: 'Customer Name',
-          contact: 'Contact',
-          phone: 'Phone',
+        countryRegion: {
+          title: 'Country / Region',
+          code: 'Country/Region Code',
+          name: 'Country/Region Name',
+          phoneCode: 'Phone Code',
+          form: { codePlaceholder: 'Enter country/region code', namePlaceholder: 'Enter country/region name' }
+        },
+        postalRoute: {
+          title: 'Postal Route Code',
+          code: 'Route Code',
+          name: 'Route Name',
+          country: 'Country',
+          form: { codePlaceholder: 'Enter route code', namePlaceholder: 'Enter route name' }
+        },
+        fbaWarehouse: {
+          title: 'FBA Warehouse',
+          code: 'Warehouse Code',
+          name: 'FBA Warehouse Name',
+          country: 'Country',
           address: 'Address',
-          form: { codePlaceholder: 'Enter customer code', namePlaceholder: 'Enter customer name' }
+          form: { codePlaceholder: 'Enter warehouse code', namePlaceholder: 'Enter FBA warehouse name' }
         },
-        supplier: {
-          title: 'Supplier',
-          code: 'Supplier Code',
-          name: 'Supplier Name',
-          contact: 'Contact Person',
-          phone: 'Phone',
-          level: 'Level',
-          form: { codePlaceholder: 'Enter supplier code', namePlaceholder: 'Enter supplier name' }
+        customerLevel: {
+          title: 'Customer Level',
+          code: 'Level Code',
+          name: 'Level Name',
+          discount: 'Discount',
+          form: { codePlaceholder: 'Enter level code', namePlaceholder: 'Enter level name' }
         },
-        goods: {
-          title: 'Goods',
-          code: 'Goods Code',
-          name: 'Goods Name',
-          spec: 'Spec',
-          unit: 'Unit',
-          categoryName: 'Category',
-          form: { codePlaceholder: 'Enter goods code', namePlaceholder: 'Enter goods name' }
-        },
-        category: {
-          title: 'Category',
-          code: 'Category Code',
-          name: 'Category Name',
-          sort: 'Sort',
-          form: { codePlaceholder: 'Enter category code', namePlaceholder: 'Enter category name' }
+        customerSource: {
+          title: 'Customer Source',
+          code: 'Source Code',
+          name: 'Source Name',
+          form: { codePlaceholder: 'Enter source code', namePlaceholder: 'Enter source name' }
         }
       },
       finance: {
         title: 'Finance',
         account: {
-          title: 'Account',
+          title: 'Bank Account',
           code: 'Account Code',
           name: 'Account Name',
           accountType: 'Account Type',
@@ -718,19 +754,18 @@ const local: App.I18n.Schema = {
           form: { codePlaceholder: 'Enter account code', namePlaceholder: 'Enter account name' }
         },
         currency: {
-          title: 'Currency',
+          title: 'Currency & Rate',
           code: 'Currency Code',
           name: 'Currency Name',
           rate: 'Rate',
           symbol: 'Symbol',
           form: { codePlaceholder: 'Enter currency code', namePlaceholder: 'Enter currency name' }
         },
-        tax: {
-          title: 'Tax',
-          name: 'Plan Name',
-          rate: 'Rate',
-          taxType: 'Tax Type',
-          form: { namePlaceholder: 'Enter plan name' }
+        expenseType: {
+          title: 'Expense Type',
+          code: 'Type Code',
+          name: 'Type Name',
+          form: { codePlaceholder: 'Enter type code', namePlaceholder: 'Enter type name' }
         },
         settlement: {
           title: 'Settlement',
@@ -741,38 +776,18 @@ const local: App.I18n.Schema = {
       },
       business: {
         title: 'Business',
-        warehouse: {
-          title: 'Warehouse',
-          code: 'Warehouse Code',
-          name: 'Warehouse Name',
-          address: 'Address',
-          manager: 'Manager',
-          form: { codePlaceholder: 'Enter warehouse code', namePlaceholder: 'Enter warehouse name' }
-        },
-        location: {
-          title: 'Location',
-          code: 'Location Code',
-          name: 'Location Name',
-          warehouseName: 'Warehouse',
-          capacity: 'Capacity',
-          form: { codePlaceholder: 'Enter location code', namePlaceholder: 'Enter location name' }
-        },
-        carrier: {
-          title: 'Carrier',
-          code: 'Carrier Code',
-          name: 'Carrier Name',
-          contact: 'Contact',
-          phone: 'Phone',
-          form: { codePlaceholder: 'Enter carrier code', namePlaceholder: 'Enter carrier name' }
-        },
-        store: {
-          title: 'Store',
-          code: 'Store Code',
-          name: 'Store Name',
-          address: 'Address',
-          owner: 'Owner',
-          form: { codePlaceholder: 'Enter store code', namePlaceholder: 'Enter store name' }
-        }
+        code: 'Code',
+        name: 'Name',
+        form: { codePlaceholder: 'Enter code', namePlaceholder: 'Enter name' },
+        waybill: { title: 'Waybill Data' },
+        address: { title: 'Address Book' },
+        declaredGoods: { title: 'Declared Goods' },
+        problemCategory: { title: 'Problem Category' },
+        goodsCategory: { title: 'Goods Category' },
+        customsType: { title: 'Customs Type' },
+        exportReason: { title: 'Export Reason' },
+        clearanceMethod: { title: 'Clearance Method' },
+        salesTerms: { title: 'Sales Terms' }
       }
     },
     home: {

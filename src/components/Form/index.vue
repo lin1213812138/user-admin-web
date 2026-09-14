@@ -43,7 +43,8 @@ const props = withDefaults(defineProps<Props>(), {
   items: undefined,
   gridXGap: 16,
   gridResponsive: 'screen',
-  labelPlacement: 'top',
+  // 不设静态默认值：由 resolvedLabelPlacement 按 mode 决定（父级显式传值优先）
+  labelPlacement: undefined,
   labelWidth: 'auto',
   size: 'medium',
   disabled: false,
@@ -54,6 +55,9 @@ const formRef = ref<FormInst | null>(null);
 
 /** 是否只读展示态：值区域渲染纯文本，不渲染任何控件、不参与校验 */
 const isView = computed(() => props.mode === 'view');
+
+/** 标签位置：查看详情（view）默认左标签、宽度自适应；编辑态保持顶部。父级显式传值优先 */
+const resolvedLabelPlacement = computed<'left' | 'top'>(() => props.labelPlacement ?? (isView.value ? 'left' : 'top'));
 
 /** 只读文本的空值占位符 */
 const EMPTY_TEXT = '-';
@@ -266,20 +270,21 @@ defineExpose({
     ref="formRef"
     :model="model"
     :rules="mergedRules"
-    :label-placement="labelPlacement"
+    :label-placement="resolvedLabelPlacement"
     :label-width="labelWidth"
     :size="size"
     :disabled="disabled"
   >
     <template v-if="fieldItems.length">
-      <NGrid :cols="24" :x-gap="gridXGap" item-responsive :responsive="gridResponsive">
+      <NGrid :cols="24" :x-gap="gridXGap" :y-gap="isView ? 10 : 0" item-responsive :responsive="gridResponsive">
         <NGi v-for="item in visibleFieldItems" :key="item.key" :span="getSpan(item)">
           <!-- 区块标题：占整行、不包 NFormItem（无 label 行、不参与校验） -->
           <div v-if="item.type === 'section'" class="w-full flex items-center gap-8px py-4px">
             <span class="h-16px w-3px rounded-2px bg-primary" />
             <span class="text-15px font-600">{{ item.label }}</span>
           </div>
-          <NFormItem v-else :label="item.label" :path="item.key" :show-label="item.showLabel">
+          <!-- view 态不校验、反馈区恒为空白占位（min-height: --n-feedback-height），故关闭；编辑态保留错误提示位置 -->
+          <NFormItem v-else :label="item.label" :path="item.key" :show-label="item.showLabel" :show-feedback="!isView">
             <!-- 只读展示态：值区域渲染纯文本，不渲染控件 -->
             <template v-if="isView">
               <NImage

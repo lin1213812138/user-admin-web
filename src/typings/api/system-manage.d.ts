@@ -327,5 +327,74 @@ declare namespace Api {
     type GroupUpdateParams = GroupCreateParams & {
       id: number;
     };
+
+    /** 客户等级：普通 / 重要 / VIP */
+    type CustomerLevel = 'normal' | 'important' | 'vip';
+
+    /** 客户来源：官网 / 转介绍 / 广告 */
+    type CustomerSource = 'website' | 'referral' | 'ad';
+
+    /** 客户 */
+    interface Customer {
+      id: number;
+      /** 客户编号，唯一 */
+      customerCode: string;
+      /** 客户名称 */
+      customerName: string;
+      /** 客户等级：普通 / 重要 / VIP */
+      customerLevel: Api.SystemManage.CustomerLevel;
+      /** 客户来源：官网 / 转介绍 / 广告 */
+      customerSource: Api.SystemManage.CustomerSource;
+      /** 联系人 */
+      contactName: string;
+      /** 联系电话 */
+      contactPhone: string;
+      /** 邮箱 */
+      email: string;
+      /** 地址 */
+      address: string;
+      /** 客户状态 */
+      status: Api.Common.EnableStatus;
+      /** 备注 */
+      remark: string;
+      /** 创建人 */
+      createByName: string;
+      /** 创建时间（YYYY-MM-DD） */
+      createTime: string;
+      /** 最后更新人 */
+      updateByName: string;
+      /** 最后更新时间（YYYY-MM-DD） */
+      updateTime: string;
+    }
+
+    /** 客户列表 */
+    type CustomerList = Api.Common.PaginatingQueryRecord<Customer>;
+
+    /** 客户查询参数 */
+    type CustomerSearchParams = Api.Common.CommonSearchParams & {
+      customerCode?: string;
+      customerName?: string;
+      customerLevel?: Api.SystemManage.CustomerLevel | null;
+      status?: Api.Common.EnableStatus | null;
+    };
+
+    /** 客户新增参数 */
+    type CustomerCreateParams = {
+      customerCode: string;
+      customerName: string;
+      customerLevel: Api.SystemManage.CustomerLevel;
+      customerSource: Api.SystemManage.CustomerSource;
+      contactName: string;
+      contactPhone: string;
+      email: string;
+      address: string;
+      remark: string;
+      status: Api.Common.EnableStatus;
+    };
+
+    /** 客户更新参数 */
+    type CustomerUpdateParams = CustomerCreateParams & {
+      id: number;
+    };
   }
 }

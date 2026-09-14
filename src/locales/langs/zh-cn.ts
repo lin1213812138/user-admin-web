@@ -286,11 +286,13 @@ const local: App.I18n.Schema = {
     'iframe-page': '外链页面',
     home: '首页',
     'system-manage': '系统管理',
-    'system-manage_user': '用户管理',
-    'system-manage_role': '角色管理',
-    'system-manage_menu': '菜单管理',
+    'permission-manage': '权限管理',
+    'permission-manage_user': '用户管理',
+    'permission-manage_role': '角色管理',
+    'permission-manage_menu': '菜单管理',
     'system-manage_site': '站点管理',
     'system-manage_group': '组别管理',
+    'system-manage_customer': '客户管理',
     'data-manage': '资料管理',
     'data-manage_basic': '基础资料',
     'data-manage_finance': '财务资料',
@@ -481,6 +483,39 @@ const local: App.I18n.Schema = {
           statusPlaceholder: '请选择状态'
         }
       },
+      customer: {
+        customerCode: '客户编号',
+        customerName: '客户名称',
+        customerLevel: '客户等级',
+        customerSource: '客户来源',
+        contactName: '联系人',
+        contactPhone: '联系电话',
+        email: '邮箱',
+        address: '地址',
+        status: '状态',
+        remark: '备注',
+        basicInfo: '基本信息',
+        contactInfo: '联系信息',
+        levelNormal: '普通',
+        levelImportant: '重要',
+        levelVip: 'VIP',
+        sourceWebsite: '官网',
+        sourceReferral: '转介绍',
+        sourceAd: '广告',
+        updateTime: '最后更新',
+        form: {
+          customerCodePlaceholder: '请输入客户编号',
+          customerNamePlaceholder: '请输入客户名称',
+          customerLevelPlaceholder: '请选择客户等级',
+          customerSourcePlaceholder: '请选择客户来源',
+          contactNamePlaceholder: '请输入联系人',
+          contactPhonePlaceholder: '请输入联系电话',
+          emailPlaceholder: '请输入邮箱',
+          addressPlaceholder: '请输入地址',
+          statusPlaceholder: '请选择状态',
+          remarkPlaceholder: '请输入备注'
+        }
+      },
       setting: {
         inputFormat: '录单格式',
         printFormat: {
@@ -667,45 +702,46 @@ const local: App.I18n.Schema = {
       },
       basic: {
         title: '基础资料',
-        customer: {
-          title: '客户',
-          code: '客户编码',
-          name: '客户名称',
-          contact: '联系人',
-          phone: '联系电话',
-          address: '地址',
-          form: { codePlaceholder: '请输入客户编码', namePlaceholder: '请输入客户名称' }
+        countryRegion: {
+          title: '国家地区',
+          code: '国家/地区编码',
+          name: '国家/地区名称',
+          phoneCode: '国际电话区号',
+          form: { codePlaceholder: '请输入国家/地区编码', namePlaceholder: '请输入国家/地区名称' }
         },
-        supplier: {
-          title: '供应商',
-          code: '供应商编码',
-          name: '供应商名称',
-          contact: '对接人',
-          phone: '联系电话',
-          level: '等级',
-          form: { codePlaceholder: '请输入供应商编码', namePlaceholder: '请输入供应商名称' }
+        postalRoute: {
+          title: '邮政路由码',
+          code: '路由码',
+          name: '路由名称',
+          country: '所属国家',
+          form: { codePlaceholder: '请输入路由码', namePlaceholder: '请输入路由名称' }
         },
-        goods: {
-          title: '商品',
-          code: '商品编码',
-          name: '商品名称',
-          spec: '规格',
-          unit: '单位',
-          categoryName: '分类',
-          form: { codePlaceholder: '请输入商品编码', namePlaceholder: '请输入商品名称' }
+        fbaWarehouse: {
+          title: 'FBA仓库',
+          code: '仓库代码',
+          name: 'FBA仓库名称',
+          country: '所属国家',
+          address: '仓库地址',
+          form: { codePlaceholder: '请输入仓库代码', namePlaceholder: '请输入FBA仓库名称' }
         },
-        category: {
-          title: '商品分类',
-          code: '分类编码',
-          name: '分类名称',
-          sort: '排序',
-          form: { codePlaceholder: '请输入分类编码', namePlaceholder: '请输入分类名称' }
+        customerLevel: {
+          title: '客户等级',
+          code: '等级编码',
+          name: '等级名称',
+          discount: '折扣率',
+          form: { codePlaceholder: '请输入等级编码', namePlaceholder: '请输入等级名称' }
+        },
+        customerSource: {
+          title: '客户来源',
+          code: '来源编码',
+          name: '来源名称',
+          form: { codePlaceholder: '请输入来源编码', namePlaceholder: '请输入来源名称' }
         }
       },
       finance: {
         title: '财务资料',
         account: {
-          title: '结算账户',
+          title: '银行账户',
           code: '账户编码',
           name: '账户名称',
           accountType: '账户类型',
@@ -714,19 +750,18 @@ const local: App.I18n.Schema = {
           form: { codePlaceholder: '请输入账户编码', namePlaceholder: '请输入账户名称' }
         },
         currency: {
-          title: '币种',
+          title: '结算币种及汇率',
           code: '币种代码',
           name: '币种名称',
           rate: '汇率',
           symbol: '符号',
           form: { codePlaceholder: '请输入币种代码', namePlaceholder: '请输入币种名称' }
         },
-        tax: {
-          title: '税率',
-          name: '方案名称',
-          rate: '税率',
-          taxType: '税种',
-          form: { namePlaceholder: '请输入方案名称' }
+        expenseType: {
+          title: '费用类型',
+          code: '类型编码',
+          name: '类型名称',
+          form: { codePlaceholder: '请输入类型编码', namePlaceholder: '请输入类型名称' }
         },
         settlement: {
           title: '结算方式',
@@ -737,38 +772,18 @@ const local: App.I18n.Schema = {
       },
       business: {
         title: '业务资料',
-        warehouse: {
-          title: '仓库',
-          code: '仓库编码',
-          name: '仓库名称',
-          address: '地址',
-          manager: '管理员',
-          form: { codePlaceholder: '请输入仓库编码', namePlaceholder: '请输入仓库名称' }
-        },
-        location: {
-          title: '库位',
-          code: '库位编码',
-          name: '库位名称',
-          warehouseName: '所属仓库',
-          capacity: '容量',
-          form: { codePlaceholder: '请输入库位编码', namePlaceholder: '请输入库位名称' }
-        },
-        carrier: {
-          title: '承运商',
-          code: '承运商编码',
-          name: '承运商名称',
-          contact: '联系人',
-          phone: '联系电话',
-          form: { codePlaceholder: '请输入承运商编码', namePlaceholder: '请输入承运商名称' }
-        },
-        store: {
-          title: '门店',
-          code: '门店编码',
-          name: '门店名称',
-          address: '地址',
-          owner: '负责人',
-          form: { codePlaceholder: '请输入门店编码', namePlaceholder: '请输入门店名称' }
-        }
+        code: '编码',
+        name: '名称',
+        form: { codePlaceholder: '请输入编码', namePlaceholder: '请输入名称' },
+        waybill: { title: '单号资料管理' },
+        address: { title: '地址簿管理' },
+        declaredGoods: { title: '申报物品' },
+        problemCategory: { title: '问题类别' },
+        goodsCategory: { title: '物品类别' },
+        customsType: { title: '报关类型' },
+        exportReason: { title: '出口原因' },
+        clearanceMethod: { title: '清关方式' },
+        salesTerms: { title: '销售条款' }
       }
     },
     home: {

@@ -173,15 +173,17 @@ const routeMap: RouteMap = {
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
+  "permission-manage": "/permission-manage",
+  "permission-manage_menu": "/permission-manage/menu",
+  "permission-manage_role": "/permission-manage/role",
+  "permission-manage_user": "/permission-manage/user",
   "system-manage": "/system-manage",
+  "system-manage_customer": "/system-manage/customer",
   "system-manage_group": "/system-manage/group",
   "system-manage_label-designer": "/system-manage/label-designer",
-  "system-manage_menu": "/system-manage/menu",
   "system-manage_print-design": "/system-manage/print-design",
-  "system-manage_role": "/system-manage/role",
   "system-manage_setting": "/system-manage/setting",
-  "system-manage_site": "/system-manage/site",
-  "system-manage_user": "/system-manage/user"
+  "system-manage_site": "/system-manage/site"
 };
 
 /**

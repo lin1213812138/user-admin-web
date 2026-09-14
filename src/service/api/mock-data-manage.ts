@@ -3,47 +3,50 @@ import type { MasterDataRow } from '@/components/MasterData/types';
 type RowFactory = (i: number) => MasterDataRow;
 
 const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
-  customer: i => ({
+  countryRegion: i => ({
     id: i,
-    code: `C${String(i).padStart(4, '0')}`,
-    name: `客户${i}`,
-    contact: `联系人${i}`,
-    phone: `138${String(10000000 + i).padStart(8, '0')}`,
-    address: `上海市浦东新区世纪大道 ${i} 号`,
+    code: `CR${String(i).padStart(4, '0')}`,
+    name: `国家地区${i}`,
+    phoneCode: `+${String(1 + i)}`,
     status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-01 09:00:00`
   }),
-  supplier: i => ({
+  postalRoute: i => ({
     id: i,
-    code: `S${String(i).padStart(4, '0')}`,
-    name: `供应商${i}`,
-    contact: `对接人${i}`,
-    phone: `139${String(10000000 + i).padStart(8, '0')}`,
-    level: i % 3 === 0 ? 'A' : 'B',
+    code: `PR${String(i).padStart(4, '0')}`,
+    name: `路由码${i}`,
+    country: `国家${i % 5}`,
     status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-02 10:00:00`
   }),
-  goods: i => ({
+  fbaWarehouse: i => ({
     id: i,
-    code: `G${String(i).padStart(4, '0')}`,
-    name: `商品${i}`,
-    spec: `规格${i}`,
-    unit: i % 2 === 0 ? '件' : '箱',
-    categoryName: `分类${i % 5}`,
-    status: i % 6 === 0 ? 0 : 1,
+    code: `FBA${String(i).padStart(4, '0')}`,
+    name: `FBA仓库${i}`,
+    country: `国家${i % 5}`,
+    address: `仓储区 ${i} 栋`,
+    status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-03 11:00:00`
   }),
-  category: i => ({
+  customerLevel: i => ({
     id: i,
-    code: `CAT${String(i).padStart(3, '0')}`,
-    name: `商品分类${i}`,
-    sort: i,
-    status: 1,
+    code: `CL${String(i).padStart(4, '0')}`,
+    name: `客户等级${i}`,
+    discount: Number((1 - i * 0.01).toFixed(2)),
+    status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-04 12:00:00`
+  }),
+  customerSource: i => ({
+    id: i,
+    code: `CS${String(i).padStart(4, '0')}`,
+    name: `客户来源${i}`,
+    status: 1,
+    remark: '',
+    createTime: `2026-0${(i % 9) + 1}-05 13:00:00`
   }),
   account: i => ({
     id: i,
@@ -66,11 +69,10 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-06 14:00:00`
   }),
-  tax: i => ({
+  'expense-type': i => ({
     id: i,
-    name: `税率方案${i}`,
-    rate: 0.13,
-    taxType: i % 2 === 0 ? '增值税' : '附加税',
+    code: `ET${String(i).padStart(3, '0')}`,
+    name: `费用类型${i}`,
     status: 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-07 15:00:00`
@@ -83,45 +85,77 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-08 16:00:00`
   }),
-  warehouse: i => ({
+  waybill: i => ({
     id: i,
-    code: `W${String(i).padStart(3, '0')}`,
-    name: `仓库${i}`,
-    address: `仓储区 ${i} 栋`,
-    manager: `仓管${i}`,
+    code: `WB${String(i).padStart(4, '0')}`,
+    name: `单号资料${i}`,
     status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-09 17:00:00`
   }),
-  location: i => ({
+  address: i => ({
     id: i,
-    code: `L${String(i).padStart(4, '0')}`,
-    name: `库位${i}`,
-    warehouseName: `仓库${i % 3}`,
-    capacity: i * 100,
+    code: `ADDR${String(i).padStart(4, '0')}`,
+    name: `地址簿${i}`,
     status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-10 18:00:00`
   }),
-  carrier: i => ({
+  declaredGoods: i => ({
     id: i,
-    code: `CAR${String(i).padStart(3, '0')}`,
-    name: `承运商${i}`,
-    contact: `调度${i}`,
-    phone: `137${String(10000000 + i).padStart(8, '0')}`,
+    code: `DG${String(i).padStart(4, '0')}`,
+    name: `申报物品${i}`,
     status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-11 19:00:00`
   }),
-  store: i => ({
+  problemCategory: i => ({
     id: i,
-    code: `ST${String(i).padStart(3, '0')}`,
-    name: `门店${i}`,
-    address: `商圈 ${i} 号`,
-    owner: `店长${i}`,
+    code: `PC${String(i).padStart(4, '0')}`,
+    name: `问题类别${i}`,
     status: i % 4 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-12 20:00:00`
+  }),
+  goodsCategory: i => ({
+    id: i,
+    code: `GC${String(i).padStart(4, '0')}`,
+    name: `物品类别${i}`,
+    status: i % 5 === 0 ? 0 : 1,
+    remark: '',
+    createTime: `2026-0${(i % 9) + 1}-13 21:00:00`
+  }),
+  customsType: i => ({
+    id: i,
+    code: `CT${String(i).padStart(4, '0')}`,
+    name: `报关类型${i}`,
+    status: i % 4 === 0 ? 0 : 1,
+    remark: '',
+    createTime: `2026-0${(i % 9) + 1}-14 22:00:00`
+  }),
+  exportReason: i => ({
+    id: i,
+    code: `ER${String(i).padStart(4, '0')}`,
+    name: `出口原因${i}`,
+    status: i % 5 === 0 ? 0 : 1,
+    remark: '',
+    createTime: `2026-0${(i % 9) + 1}-15 23:00:00`
+  }),
+  clearanceMethod: i => ({
+    id: i,
+    code: `CM${String(i).padStart(4, '0')}`,
+    name: `清关方式${i}`,
+    status: i % 4 === 0 ? 0 : 1,
+    remark: '',
+    createTime: `2026-0${(i % 9) + 1}-16 10:00:00`
+  }),
+  salesTerms: i => ({
+    id: i,
+    code: `ST${String(i).padStart(4, '0')}`,
+    name: `销售条款${i}`,
+    status: i % 5 === 0 ? 0 : 1,
+    remark: '',
+    createTime: `2026-0${(i % 9) + 1}-17 11:00:00`
   })
 };
 
