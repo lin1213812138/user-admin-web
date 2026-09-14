@@ -95,9 +95,9 @@ function handleConfirm() {
 }
 
 function handleReset() {
-  // 重置为初始状态
+  // 恢复默认列配置由父级（页面）执行：那里才有默认配置与缓存 key。
+  // 本次会话的拖拽/编辑一并丢弃，父级改完 props.columns 后由下方 watch 同步回本地副本。
   pendingDrag = null;
-  localColumns.value = jsonClone(props.columns);
   emit('reset');
 }
 
@@ -135,6 +135,16 @@ watch(innerVisible, val => {
     sortableInstance = null;
   }
 });
+
+// 弹窗打开期间父级列配置变化（重置恢复默认 / 确认写回）时，把本地副本同步为最新值
+watch(
+  () => props.columns,
+  () => {
+    if (!innerVisible.value) return;
+    pendingDrag = null;
+    localColumns.value = jsonClone(props.columns);
+  }
+);
 </script>
 
 <template>

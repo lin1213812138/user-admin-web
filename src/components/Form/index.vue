@@ -5,6 +5,7 @@ import { NColorPicker, NDatePicker, NUpload } from 'naive-ui';
 import { $t } from '@/locales';
 import { type FormItemConfig } from './form-config';
 import IconPicker from '@/components/custom/icon-picker.vue';
+import IconRenderer from '@/components/custom/icon-renderer.vue';
 
 export type { FormItemConfig } from './form-config';
 
@@ -33,6 +34,8 @@ interface Props {
   size?: 'small' | 'medium' | 'large';
   /** 禁用所有字段 */
   disabled?: boolean;
+  /** 展示模式：edit = 控件编辑，view = 只读文本（详情 / 查看场景） */
+  mode?: 'edit' | 'view';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -43,10 +46,63 @@ const props = withDefaults(defineProps<Props>(), {
   labelPlacement: 'top',
   labelWidth: 'auto',
   size: 'medium',
-  disabled: false
+  disabled: false,
+  mode: 'edit'
 });
 
 const formRef = ref<FormInst | null>(null);
+
+/** 是否只读展示态：值区域渲染纯文本，不渲染任何控件、不参与校验 */
+const isView = computed(() => props.mode === 'view');
+
+/** 只读文本的空值占位符 */
+const EMPTY_TEXT = '-';
+
+/** 空值判定：0 / false 都是有效值，不算空 */
+function isEmptyValue(value: unknown): boolean {
+  return value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0);
+}
+
+/** 值是否为可直接加载的 URL（图片详情态据此决定显示缩略图还是文件名） */
+function isUrlValue(value: unknown): boolean {
+  return typeof value === 'string' && /^(https?:|data:|blob:)/.test(value);
+}
+
+/** 用选项列表把值反查为展示文案（查不到时回退原值） */
+function optionLabel(options: SelectOption[] | undefined, value: unknown): string {
+  const matched = (options ?? []).find(opt => opt.value === value);
+
+  return matched ? String(matched.label ?? value) : String(value);
+}
+
+/** 只读文本：按控件类型把值映射为展示文案（空值统一占位符） */
+function viewText(item: FormItemConfig): string {
+  const value = props.model[item.key];
+
+  if (isEmptyValue(value)) return EMPTY_TEXT;
+
+  switch (item.type) {
+    // 密码固定脱敏，详情态不暴露明文
+    case 'password':
+      return '••••••';
+    case 'select':
+      return optionLabel(item.options, value);
+    case 'checkbox':
+      return (value as unknown[]).map(v => optionLabel(item.options, v)).join('、');
+    case 'switch': {
+      const checked = item.checkedValue === undefined ? value === true : value === item.checkedValue;
+
+      return checked ? item.checkedText || $t('common.enable') : item.uncheckedText || $t('common.disable');
+    }
+    default:
+      return String(value);
+  }
+}
+
+/** 只读文本的样式类：空值用灰色占位符 */
+function viewTextClass(item: FormItemConfig): string {
+  return `text-14px leading-22px${isEmptyValue(props.model[item.key]) ? ' text-gray-400' : ''}`;
+}
 
 /** field items (exclude slot-only action items) */
 const fieldItems = computed<FormItemConfig[]>(() => (props.items ?? []).filter(i => !i.slot));
@@ -145,6 +201,9 @@ const visibleFieldItems = computed<FormItemConfig[]>(() => {
 });
 
 const mergedRules = computed<FormRules>(() => {
+  // 只读展示态不参与校验（同时避免 NFormItem 显示必填星号）
+  if (isView.value) return {};
+
   const base: FormRules = { ...props.rules };
   for (const item of fieldItems.value) {
     if (item.required && !base[item.key]) {
@@ -221,115 +280,138 @@ defineExpose({
             <span class="text-15px font-600">{{ item.label }}</span>
           </div>
           <NFormItem v-else :label="item.label" :path="item.key" :show-label="item.showLabel">
-            <NInput
-              v-if="item.type === 'input' || !item.type"
-              v-model:value="model[item.key] as string"
-              :placeholder="item.placeholder"
-              :disabled="item.disabled"
-              :clearable="item.clearable || true"
-            />
-            <NInput
-              v-else-if="item.type === 'textarea'"
-              v-model:value="model[item.key] as string"
-              type="textarea"
-              :placeholder="item.placeholder"
-              :disabled="item.disabled"
-            />
-            <NInput
-              v-else-if="item.type === 'password'"
-              v-model:value="model[item.key] as string"
-              type="password"
-              show-password-on="click"
-              :placeholder="item.placeholder"
-              :disabled="item.disabled"
-            />
-            <NInputNumber
-              v-else-if="item.type === 'number'"
-              v-model:value="model[item.key] as number"
-              :placeholder="item.placeholder"
-              :disabled="item.disabled"
-              :clearable="item.clearable || true"
-              class="w-full"
-            />
-            <NSwitch
-              v-else-if="item.type === 'switch'"
-              v-model:value="model[item.key] as string | number | boolean"
-              :disabled="item.disabled"
-              :checked-value="item.checkedValue"
-              :unchecked-value="item.uncheckedValue"
-            >
-              <template v-if="item.checkedText" #checked>{{ item.checkedText }}</template>
-              <template v-if="item.uncheckedText" #unchecked>{{ item.uncheckedText }}</template>
-            </NSwitch>
-            <NSelect
-              v-else-if="item.type === 'select'"
-              v-model:value="model[item.key] as string | number"
-              :options="item.options"
-              :placeholder="item.placeholder"
-              :disabled="item.disabled"
-              :clearable="item.clearable || true"
-              :filterable="item.filterable ?? true"
-            />
-            <NDatePicker
-              v-else-if="item.type === 'date'"
-              :formatted-value="dateValue(item.key)"
-              value-format="yyyy-MM-dd"
-              type="date"
-              clearable
-              :placeholder="item.placeholder"
-              :disabled="item.disabled"
-              class="w-full"
-              @update:formatted-value="handleDateChange(item.key, $event)"
-            />
-            <NUpload
-              v-else-if="item.type === 'file'"
-              :file-list="uploadFileList(item.key, false)"
-              :max="1"
-              :default-upload="false"
-              :disabled="item.disabled"
-              @change="handleUploadChange(item.key, $event)"
-            >
-              <NButton size="small" :disabled="item.disabled">
-                <template #icon>
-                  <icon-mdi-upload class="text-icon" />
-                </template>
-                {{ $t('common.chooseFile') }}
-              </NButton>
-            </NUpload>
-            <NUpload
-              v-else-if="item.type === 'image'"
-              :file-list="uploadFileList(item.key, true)"
-              list-type="image-card"
-              :max="1"
-              :default-upload="false"
-              :disabled="item.disabled"
-              @change="handleUploadChange(item.key, $event)"
-            />
-            <NColorPicker
-              v-else-if="item.type === 'color'"
-              v-model:value="model[item.key] as string"
-              :disabled="item.disabled"
-              :show-alpha="false"
-              class="w-full"
-            />
-            <NCheckboxGroup
-              v-else-if="item.type === 'checkbox'"
-              v-model:value="model[item.key] as (string | number)[]"
-              :disabled="item.disabled"
-            >
-              <NSpace>
-                <NCheckbox v-for="opt in item.options ?? []" :key="String(opt.value)" :value="cbValue(opt)">
-                  {{ opt.label }}
-                </NCheckbox>
-              </NSpace>
-            </NCheckboxGroup>
-            <IconPicker
-              v-else-if="item.type === 'icon-picker'"
-              v-model:value="model[item.key] as string"
-              :placeholder="item.placeholder"
-              :disabled="item.disabled"
-            />
-            <slot v-else-if="item.type === 'custom'" :name="item.key" :model="model" :item="item" />
+            <!-- 只读展示态：值区域渲染纯文本，不渲染控件 -->
+            <template v-if="isView">
+              <NImage
+                v-if="item.type === 'image' && isUrlValue(model[item.key])"
+                :src="String(model[item.key])"
+                width="80"
+              />
+              <span v-else-if="item.type === 'icon-picker'" class="flex items-center gap-6px">
+                <IconRenderer v-if="model[item.key]" :icon="String(model[item.key])" :size="16" />
+                <span :class="viewTextClass(item)">{{ viewText(item) }}</span>
+              </span>
+              <span v-else-if="item.type === 'color'" class="flex items-center gap-8px">
+                <span
+                  class="h-16px w-16px shrink-0 rounded-2px border border-solid border-#e5e7eb dark:border-#2a2a2a"
+                  :style="{ backgroundColor: String(model[item.key]) }"
+                />
+                <span :class="viewTextClass(item)">{{ viewText(item) }}</span>
+              </span>
+              <slot v-else-if="item.type === 'custom'" :name="item.key" :model="model" :item="item" />
+              <span v-else :class="viewTextClass(item)">{{ viewText(item) }}</span>
+            </template>
+            <template v-else>
+              <NInput
+                v-if="item.type === 'input' || !item.type"
+                v-model:value="model[item.key] as string"
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+                :clearable="item.clearable || true"
+              />
+              <NInput
+                v-else-if="item.type === 'textarea'"
+                v-model:value="model[item.key] as string"
+                type="textarea"
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+              />
+              <NInput
+                v-else-if="item.type === 'password'"
+                v-model:value="model[item.key] as string"
+                type="password"
+                show-password-on="click"
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+              />
+              <NInputNumber
+                v-else-if="item.type === 'number'"
+                v-model:value="model[item.key] as number"
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+                :clearable="item.clearable || true"
+                class="w-full"
+              />
+              <NSwitch
+                v-else-if="item.type === 'switch'"
+                v-model:value="model[item.key] as string | number | boolean"
+                :disabled="item.disabled"
+                :checked-value="item.checkedValue"
+                :unchecked-value="item.uncheckedValue"
+              >
+                <template v-if="item.checkedText" #checked>{{ item.checkedText }}</template>
+                <template v-if="item.uncheckedText" #unchecked>{{ item.uncheckedText }}</template>
+              </NSwitch>
+              <NSelect
+                v-else-if="item.type === 'select'"
+                v-model:value="model[item.key] as string | number"
+                :options="item.options"
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+                :clearable="item.clearable || true"
+                :filterable="item.filterable ?? true"
+              />
+              <NDatePicker
+                v-else-if="item.type === 'date'"
+                :formatted-value="dateValue(item.key)"
+                value-format="yyyy-MM-dd"
+                type="date"
+                clearable
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+                class="w-full"
+                @update:formatted-value="handleDateChange(item.key, $event)"
+              />
+              <NUpload
+                v-else-if="item.type === 'file'"
+                :file-list="uploadFileList(item.key, false)"
+                :max="1"
+                :default-upload="false"
+                :disabled="item.disabled"
+                @change="handleUploadChange(item.key, $event)"
+              >
+                <NButton size="small" :disabled="item.disabled">
+                  <template #icon>
+                    <icon-mdi-upload class="text-icon" />
+                  </template>
+                  {{ $t('common.chooseFile') }}
+                </NButton>
+              </NUpload>
+              <NUpload
+                v-else-if="item.type === 'image'"
+                :file-list="uploadFileList(item.key, true)"
+                list-type="image-card"
+                :max="1"
+                :default-upload="false"
+                :disabled="item.disabled"
+                @change="handleUploadChange(item.key, $event)"
+              />
+              <NColorPicker
+                v-else-if="item.type === 'color'"
+                v-model:value="model[item.key] as string"
+                :disabled="item.disabled"
+                :show-alpha="false"
+                class="w-full"
+              />
+              <NCheckboxGroup
+                v-else-if="item.type === 'checkbox'"
+                v-model:value="model[item.key] as (string | number)[]"
+                :disabled="item.disabled"
+              >
+                <NSpace>
+                  <NCheckbox v-for="opt in item.options ?? []" :key="String(opt.value)" :value="cbValue(opt)">
+                    {{ opt.label }}
+                  </NCheckbox>
+                </NSpace>
+              </NCheckboxGroup>
+              <IconPicker
+                v-else-if="item.type === 'icon-picker'"
+                v-model:value="model[item.key] as string"
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+              />
+              <slot v-else-if="item.type === 'custom'" :name="item.key" :model="model" :item="item" />
+            </template>
           </NFormItem>
         </NGi>
       </NGrid>

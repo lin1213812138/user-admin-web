@@ -26,7 +26,7 @@ const categories = [
 
 const selectedCategoryId = ref<number>(categories[0].id);
 
-const { data, loading, columnConfigs, columns, pagination, getData, persistColumns } = useVxeTable<
+const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   Api.PrintFormat.List,
   Api.PrintFormat.Template
 >({
@@ -274,6 +274,7 @@ async function handleSetDefault(row: Api.PrintFormat.Template) {
             v-model:visible="columnConfigVisible"
             v-model:columns="columnConfigs"
             @confirm="persistColumns"
+            @reset="resetColumns"
           />
         </template>
         <template #isDefault="{ row }">
@@ -301,7 +302,7 @@ async function handleSetDefault(row: Api.PrintFormat.Template) {
       :footer="drawerMode !== 'view'"
       @submit="handleDrawerSubmit"
     >
-      <NFormWrap ref="formRef" :model="formModel" :items="formItems" :disabled="drawerMode === 'view'" />
+      <NFormWrap ref="formRef" :model="formModel" :items="formItems" :mode="drawerMode === 'view' ? 'view' : 'edit'" />
     </Drawer>
   </MasterDetail>
 </template>

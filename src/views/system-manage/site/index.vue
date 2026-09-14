@@ -44,7 +44,7 @@ const searchItems = computed<FormItemConfig[]>(() => [
   { key: 'actions', label: ' ', slot: 'actions', span: 6 }
 ]);
 
-const { data, loading, columnConfigs, columns, pagination, getData, persistColumns } = useVxeTable<
+const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   Api.SystemManage.SiteList,
   Api.SystemManage.Site
 >({
@@ -230,7 +230,12 @@ function handleSubmitted() {
       </Table>
     </div>
 
-    <TableColumnConfig v-model:visible="configVisible" v-model:columns="columnConfigs" @confirm="persistColumns" />
+    <TableColumnConfig
+      v-model:visible="configVisible"
+      v-model:columns="columnConfigs"
+      @confirm="persistColumns"
+      @reset="resetColumns"
+    />
 
     <SiteOperateDrawer
       v-model:show="operateVisible"

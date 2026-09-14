@@ -19,7 +19,7 @@ interface UserItem {
   createTime: string;
 }
 
-const { data, loading, columnConfigs, columns, pagination, getData, persistColumns } = useVxeTable<
+const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   Api.SystemManage.UserList,
   UserItem
 >({
@@ -176,7 +176,12 @@ async function fetchAllUsers(): Promise<UserItem[]> {
       </template>
     </Table>
 
-    <TableColumnConfig v-model:visible="configVisible" v-model:columns="columnConfigs" @confirm="persistColumns" />
+    <TableColumnConfig
+      v-model:visible="configVisible"
+      v-model:columns="columnConfigs"
+      @confirm="persistColumns"
+      @reset="resetColumns"
+    />
 
     <UserOperateDrawer v-model:show="operateVisible" :mode="operateMode" :row="operateRow" @submitted="handleCreated" />
   </div>

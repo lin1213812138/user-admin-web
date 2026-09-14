@@ -351,10 +351,18 @@ watch(
     :title="title"
     :loading="submitting"
     :footer="!isDetail"
-    width="50%"
+    width="70%"
     @submit="handleSubmit"
   >
-    <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :disabled="isDetail" />
+    <NFormWrap
+      ref="formRef"
+      :model="model"
+      :items="formItems"
+      :grid-x-gap="16"
+      :mode="isDetail ? 'view' : 'edit'"
+      label-placement="left"
+      label-width="auto"
+    />
   </UserDrawer>
 </template>
 

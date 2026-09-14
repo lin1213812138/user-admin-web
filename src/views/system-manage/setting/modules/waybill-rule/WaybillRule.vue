@@ -52,7 +52,7 @@ const mockRules: WaybillRule[] = [
   }
 ];
 
-const { data, loading, columnConfigs, columns, pagination, getData, persistColumns } = useVxeTable<
+const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   { records: WaybillRule[]; total: number },
   WaybillRule
 >({
@@ -171,7 +171,12 @@ function handleDelete(row: WaybillRule) {
       </template>
     </Table>
 
-    <TableColumnConfig v-model:visible="configVisible" v-model:columns="columnConfigs" @confirm="persistColumns" />
+    <TableColumnConfig
+      v-model:visible="configVisible"
+      v-model:columns="columnConfigs"
+      @confirm="persistColumns"
+      @reset="resetColumns"
+    />
 
     <WaybillRuleForm v-model:show="drawerVisible" :row="editRow" @submit="handleSubmit" />
   </div>

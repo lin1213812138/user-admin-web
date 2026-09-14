@@ -33,7 +33,7 @@ const categories = [
 
 const selectedCategoryId = ref<number>(categories[0].id);
 
-const { data, loading, columnConfigs, columns, pagination, getData, persistColumns } = useVxeTable<
+const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   Api.ExportFormat.List,
   Api.ExportFormat.Template
 >({
@@ -239,6 +239,7 @@ function handleDownloadFields() {
             v-model:visible="columnConfigVisible"
             v-model:columns="columnConfigs"
             @confirm="persistColumns"
+            @reset="resetColumns"
           />
         </template>
         <template #action="{ row }">

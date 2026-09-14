@@ -26,7 +26,7 @@ function buildMenuTree(list: MenuItem[]): MenuItem[] {
   return tree;
 }
 
-const { data, loading, columns, columnConfigs, getData, persistColumns } = useVxeTable<
+const { data, loading, columns, columnConfigs, getData, persistColumns, resetColumns } = useVxeTable<
   Api.SystemManage.MenuList,
   MenuItem
 >({
@@ -224,7 +224,12 @@ const menuTypeLabel: Record<Api.SystemManage.MenuType, string> = {
         </template>
       </Table>
 
-      <TableColumnConfig v-model:visible="configVisible" v-model:columns="columnConfigs" @confirm="persistColumns" />
+      <TableColumnConfig
+        v-model:visible="configVisible"
+        v-model:columns="columnConfigs"
+        @confirm="persistColumns"
+        @reset="resetColumns"
+      />
     </div>
 
     <MenuOperateDrawer

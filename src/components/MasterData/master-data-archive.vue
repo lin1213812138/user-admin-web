@@ -20,7 +20,7 @@ for (const it of props.config.searchItems) {
   searchParams[it.key] = it.type === 'select' ? null : '';
 }
 
-const { data, loading, columnConfigs, columns, pagination, getData, persistColumns } = useVxeTable<
+const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   Api.DataManage.ArchiveList<T>,
   T
 >({
@@ -208,7 +208,12 @@ async function handleSubmit() {
       </Table>
     </div>
 
-    <TableColumnConfig v-model:visible="configVisible" v-model:columns="columnConfigs" @confirm="persistColumns" />
+    <TableColumnConfig
+      v-model:visible="configVisible"
+      v-model:columns="columnConfigs"
+      @confirm="persistColumns"
+      @reset="resetColumns"
+    />
 
     <Drawer
       v-model:show="drawerVisible"

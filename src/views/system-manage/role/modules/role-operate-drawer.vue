@@ -155,6 +155,6 @@ watch(
     :footer="!isDetail"
     @submit="handleSubmit"
   >
-    <NForm ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :disabled="isDetail" />
+    <NForm ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :mode="isDetail ? 'view' : 'edit'" />
   </CommonDrawer>
 </template>

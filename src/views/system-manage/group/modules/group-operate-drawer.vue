@@ -168,7 +168,7 @@ watch(
     width="520"
     @submit="handleSubmit"
   >
-    <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :disabled="isDetail" />
+    <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :mode="isDetail ? 'view' : 'edit'" />
   </GroupDrawer>
 </template>
 
