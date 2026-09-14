@@ -27,3 +27,10 @@
 - 同一文件多处编辑必须串行，不同文件可并行。
 - `pnpm gen-route` 不可用（交互式新建路由向导）；重新生成用 `pnpm dev`（先删 `node_modules/.vite-temp`）。
 - elegant-router 生成路由的坑：`zh-cn/en-us` 的 `route` 段新增 key 须在路由生成后补（否则 `route: Record<I18nRouteKey,string>` 字面量 excess property 报错，生成后即合法）；`pnpm dev` 后台生成若在 elegant 写 `routes.ts` 途中 `Stop-Process`，文件末尾会被截断（残留 `nMenuRoute(route));`）。`build`/`dev` 重新生成前会先用 babel/recast 解析旧 `routes.ts`，**若旧文件残缺则解析失败、生成直接中止**（报 `Missing semicolon (266:17)` 等），此时须先手修残缺行使语法合法，再 `pnpm build` 让 elegant 重新生成完整文件覆盖（修复后会被覆盖，属损坏修复例外）。
+
+## 独立列表页范式（不套 MasterDataArchive）
+
+- 当页面是「普通 CRUD 列表页」且用户要求不套 `MasterDataArchive` 通用归档组件时，每个 `views/<模块>/<页面>/index.vue` 自包含实现：直接用 `Table` + `useVxeTable` + `Drawer` + `NFormWrap`，逻辑各自独立（不抽共享 composable）。
+- service 函数 `request` 分支必须 `as unknown as Promise<T>` 强转（匹配 `useVxeTable` 的 api 返回类型，避免与 FlatResponseData 联合冲突）；DEV mock 分支同样 `as unknown as`。
+- 视图内 `searchItems`/`formItems` 用 `computed<FormItemConfig[]>` 注解（否则 `type:'input'` 推宽为 `string` 导致 FormItemConfig 不兼容）；`statusOptions` 显式 `SelectOption[]`。
+- 模板 `#action` 插槽里的 `row` 是 `any`，直接 `openDrawer('edit', row)` / `row.id`，避免 `row as Api.X` 触发 eslint `vue/no-undef-properties` 误报 Api 未定义。

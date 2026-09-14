@@ -49,6 +49,36 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'channel-quote',
+    path: '/channel-quote',
+    component: 'layout.base',
+    meta: {
+      title: 'channel-quote',
+      i18nKey: 'route.channel-quote',
+      order: 1
+    },
+    children: [
+      {
+        name: 'channel-quote_receive',
+        path: '/channel-quote/receive',
+        component: 'view.channel-quote_receive',
+        meta: {
+          title: 'channel-quote_receive',
+          i18nKey: 'route.channel-quote_receive'
+        }
+      },
+      {
+        name: 'channel-quote_ship',
+        path: '/channel-quote/ship',
+        component: 'view.channel-quote_ship',
+        meta: {
+          title: 'channel-quote_ship',
+          i18nKey: 'route.channel-quote_ship'
+        }
+      }
+    ]
+  },
+  {
     name: 'data-manage',
     path: '/data-manage',
     component: 'layout.base',

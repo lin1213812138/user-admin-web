@@ -303,7 +303,10 @@ const local: App.I18n.Schema = {
     'data-manage_business': 'Business',
     'system-manage_setting': 'System Settings',
     'system-manage_print-design': 'Design Label',
-    'system-manage_label-designer': 'Label Designer'
+    'system-manage_label-designer': 'Label Designer',
+    'channel-quote': 'Channel Quote',
+    'channel-quote_receive': 'Receive Channel',
+    'channel-quote_ship': 'Ship Channel'
   },
   page: {
     login: {
@@ -788,6 +791,24 @@ const local: App.I18n.Schema = {
         exportReason: { title: 'Export Reason' },
         clearanceMethod: { title: 'Clearance Method' },
         salesTerms: { title: 'Sales Terms' }
+      }
+    },
+    channelQuote: {
+      common: {
+        createTime: 'Created Time',
+        keywordPlaceholder: 'Please enter name or code'
+      },
+      receive: {
+        title: 'Receive Channel',
+        code: 'Channel Code',
+        name: 'Channel Name',
+        form: { codePlaceholder: 'Please enter channel code', namePlaceholder: 'Please enter channel name' }
+      },
+      ship: {
+        title: 'Ship Channel',
+        code: 'Channel Code',
+        name: 'Channel Name',
+        form: { codePlaceholder: 'Please enter channel code', namePlaceholder: 'Please enter channel name' }
       }
     },
     home: {

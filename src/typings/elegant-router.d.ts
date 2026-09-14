@@ -20,6 +20,9 @@ declare module "@elegant-router/types" {
     "403": "/403";
     "404": "/404";
     "500": "/500";
+    "channel-quote": "/channel-quote";
+    "channel-quote_receive": "/channel-quote/receive";
+    "channel-quote_ship": "/channel-quote/ship";
     "data-manage": "/data-manage";
     "data-manage_basic": "/data-manage/basic";
     "data-manage_business": "/data-manage/business";
@@ -72,6 +75,7 @@ declare module "@elegant-router/types" {
     | "403"
     | "404"
     | "500"
+    | "channel-quote"
     | "data-manage"
     | "home"
     | "iframe-page"
@@ -99,6 +103,8 @@ declare module "@elegant-router/types" {
     | "500"
     | "iframe-page"
     | "login"
+    | "channel-quote_receive"
+    | "channel-quote_ship"
     | "data-manage_basic"
     | "data-manage_business"
     | "data-manage_finance"

@@ -56,10 +56,11 @@ export function setupElegantRouter() {
       /** menu order of the route, the smaller the value, the higher the order */
       const routeOrders: Partial<Record<RouteKey, number>> = {
         home: 0,
-        'data-manage': 1,
-        'system-manage': 2,
+        'channel-quote': 1,
+        'data-manage': 2,
+        'system-manage': 3,
         // 权限管理模块
-        'permission-manage': 3,
+        'permission-manage': 4,
         'permission-manage_user': 1,
         'permission-manage_role': 2,
         'permission-manage_menu': 3,

@@ -1054,6 +1054,24 @@ declare namespace App {
             salesTerms: { title: string };
           };
         };
+        channelQuote: {
+          common: {
+            createTime: string;
+            keywordPlaceholder: string;
+          };
+          receive: {
+            title: string;
+            code: string;
+            name: string;
+            form: { codePlaceholder: string; namePlaceholder: string };
+          };
+          ship: {
+            title: string;
+            code: string;
+            name: string;
+            form: { codePlaceholder: string; namePlaceholder: string };
+          };
+        };
       };
       form: {
         required: string;

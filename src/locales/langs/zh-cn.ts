@@ -299,7 +299,10 @@ const local: App.I18n.Schema = {
     'data-manage_business': '业务资料',
     'system-manage_setting': '系统设置',
     'system-manage_print-design': '设计标签',
-    'system-manage_label-designer': '标签设计'
+    'system-manage_label-designer': '标签设计',
+    'channel-quote': '渠道报价',
+    'channel-quote_receive': '收货渠道',
+    'channel-quote_ship': '发货渠道'
   },
   page: {
     login: {
@@ -784,6 +787,24 @@ const local: App.I18n.Schema = {
         exportReason: { title: '出口原因' },
         clearanceMethod: { title: '清关方式' },
         salesTerms: { title: '销售条款' }
+      }
+    },
+    channelQuote: {
+      common: {
+        createTime: '创建时间',
+        keywordPlaceholder: '请输入名称或编码'
+      },
+      receive: {
+        title: '收货渠道',
+        code: '渠道编码',
+        name: '渠道名称',
+        form: { codePlaceholder: '请输入渠道编码', namePlaceholder: '请输入渠道名称' }
+      },
+      ship: {
+        title: '发货渠道',
+        code: '渠道编码',
+        name: '渠道名称',
+        form: { codePlaceholder: '请输入渠道编码', namePlaceholder: '请输入渠道名称' }
       }
     },
     home: {
