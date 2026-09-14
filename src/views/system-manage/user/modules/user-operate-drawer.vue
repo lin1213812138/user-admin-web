@@ -351,7 +351,7 @@ watch(
     :title="title"
     :loading="submitting"
     :footer="!isDetail"
-    width="760"
+    width="50%"
     @submit="handleSubmit"
   >
     <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :disabled="isDetail" />

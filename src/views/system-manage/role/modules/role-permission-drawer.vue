@@ -71,21 +71,8 @@ const allIds = computed(() => collectIds(allRows.value));
 
 const isAllChecked = computed(() => allIds.value.length > 0 && checkedIds.value.length >= allIds.value.length);
 
-const menuTypeTag: Record<Api.SystemManage.MenuType, 'warning' | 'success'> = {
-  catalog: 'warning',
-  menu: 'success'
-};
-
-const menuTypeLabel = computed<Record<Api.SystemManage.MenuType, string>>(() => ({
-  catalog: $t('page.manage.menu.catalog'),
-  menu: $t('page.manage.menu.menu')
-}));
-
 const columns = computed<VxeColumnRenderColumn[]>(() => [
   { key: 'title', title: $t('page.manage.menu.menuName'), treeNode: true, minWidth: 220, sortable: false },
-  { key: 'menuType', title: $t('page.manage.menu.type'), width: 90, align: 'center', sortable: false },
-  { key: 'routePath', title: $t('page.manage.menu.routePath'), minWidth: 180, sortable: false },
-  { key: 'permission', title: $t('page.manage.menu.permission'), minWidth: 180, sortable: false },
   { key: 'buttons', title: '操作权限', minWidth: 280, sortable: false }
 ]);
 
@@ -504,25 +491,6 @@ watch(keyword, () => {
             />
             <span>{{ (menuRow as RoleMenuRow).title }}</span>
           </div>
-        </template>
-
-        <template #menuType="{ row: menuRow }">
-          <NTag
-            v-if="(menuRow as RoleMenuRow).menuType"
-            size="small"
-            :type="menuTypeTag[(menuRow as RoleMenuRow).menuType!]"
-          >
-            {{ menuTypeLabel[(menuRow as RoleMenuRow).menuType!] }}
-          </NTag>
-          <span v-else>-</span>
-        </template>
-
-        <template #routePath="{ row: menuRow }">
-          <span>{{ (menuRow as RoleMenuRow).routePath || '-' }}</span>
-        </template>
-
-        <template #permission="{ row: menuRow }">
-          <span>{{ (menuRow as RoleMenuRow).permission || '-' }}</span>
         </template>
 
         <template #buttons="{ row: menuRow }">

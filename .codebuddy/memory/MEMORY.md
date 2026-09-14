@@ -41,6 +41,7 @@
 ## 系统管理模块
 
 - **站点管理（2026-09-14）**：`views/system-manage/site/`（独立菜单 `system-manage_site`、icon `ic:round-place`、order 6 排系统设置后）；接口 `fetchGetSiteList|Create|Update|Delete`（DEV mock，生产 `/system/site/*`）；mock 编号查重抛「站点编号已存在」（抽屉 catch 兜底，真实接口错误由拦截器提示）；电话不校验；备注列默认隐藏；最后更新列插槽渲染「更新人 - 日期」；按钮权限 `system:site:*`（mock menus/MENU_TREE 已补菜单 id 25）。
+- **部门管理：页面从未实现**（`views/system-manage/dept/` 空目录），其在权限树（MENU_TREE）/ 菜单管理（menus）/ 按钮权限清单里的显示已于 2026-09-14 全部移除，**勿再加回**（除非真正实现该模块）。
 - **组别管理（2026-09-14）**：`views/system-manage/group/`（`system-manage_group`、icon `ic:round-groups`、order 7 排站点管理后）；「所属站点」下拉关联站点（存 `siteId`，`siteName` 由 mock `withSiteName()` 按 siteId 实时解析、站点改名同步；页面与抽屉分别拉 `fetchGetSiteList({current:1,size:100})` 全量选项，抽屉每次打开刷新）；名称查重抛「组别名称已存在」；表格「创建」「最后更新」两列均按「人名 - 日期」插槽渲染；按钮权限 `system:group:*`（菜单 id 26）。
 - **用户管理（2026-09-14 字段大改）**：User 扩至 25 字段（用户账号/用户名称/密码/用户角色/所属站点/所属组别/状态 + 个人档案 13 项）；旧 `userPhone`/`userEmail`/`role` 移除；`withUserNames()` 按 id 解析 roleName/siteName/groupName；抽屉两区块三列（`section` 分区、width 760）、密码编辑回显必填、状态改下拉；列表 8 列；角色/站点/组别下拉全量选项（`Promise.all` + 类型断言，每次打开刷新）。
 - 状态筛选坑：`status` 的 0 是有效值，搜索参数用 `?? undefined`、mock 用 `=== 0 || === 1` 判断（旧页面 `status || undefined` 会吞「禁用」筛选）。
@@ -81,6 +82,7 @@
 ## 按钮权限
 
 - 角色权限抽屉「操作权限」列；清单 `src/constants/button-permissions.ts`，code `system:{模块}:{操作}`；状态 `rowButtonChecks`，随 `menuIds` 提交 `buttonCodes`；后端落库/回显待实现。
+- 角色权限抽屉的菜单树**只显示「菜单名称 + 操作权限」两列**（菜单类型/路由地址/权限标识三列已于 2026-09-14 按要求隐藏）；行数据里的 `routePath`/`permission` 仍用于按钮权限匹配与「首页必选」判定，搜索框仍按三者匹配。
 
 ## 工具链 / 环境
 

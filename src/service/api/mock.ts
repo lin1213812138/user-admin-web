@@ -106,14 +106,13 @@ const MENU_TREE: Api.SystemManage.RoleMenuNode[] = [
       { id: 21, title: '用户管理' },
       { id: 22, title: '角色管理' },
       { id: 23, title: '菜单管理' },
-      { id: 24, title: '部门管理' },
       { id: 25, title: '站点管理' },
       { id: 26, title: '组别管理' }
     ]
   }
 ];
 
-const ALL_MENU_IDS = [1, 21, 22, 23, 24, 25, 26];
+const ALL_MENU_IDS = [1, 21, 22, 23, 25, 26];
 
 /** menu ids bound to each role */
 const roleMenuMap = new Map<number, number[]>([
@@ -290,12 +289,6 @@ const menus: Api.SystemManage.Menu[] = [
     routePath: '/system-manage/menu',
     componentPath: 'views/system-manage/menu/index.vue',
     permission: 'system:menu:list'
-  }),
-  createMenu(24, 2, 'dept', 'menu', {
-    menuName: '部门管理',
-    routePath: '/system-manage/dept',
-    componentPath: 'views/system-manage/dept/index.vue',
-    permission: 'system:dept:list'
   }),
   createMenu(25, 2, 'site', 'menu', {
     menuName: '站点管理',

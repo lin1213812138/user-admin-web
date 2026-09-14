@@ -40,7 +40,6 @@ const op = (module: string) => ({
 const user = op('user');
 const role = op('role');
 const menu = op('menu');
-const dept = op('dept');
 const site = op('site');
 const group = op('group');
 const dataBasic = op('dataBasic');
@@ -83,11 +82,6 @@ const MENU_BUTTON_CONFIGS: MenuButtonConfig[] = [
     permission: 'system:menu:list',
     routePath: '/system-manage/menu',
     buttons: [menu.add, menu.edit, menu.delete]
-  },
-  {
-    permission: 'system:dept:list',
-    routePath: '/system-manage/dept',
-    buttons: [dept.add, dept.edit, dept.delete]
   },
   {
     permission: 'system:site:list',
