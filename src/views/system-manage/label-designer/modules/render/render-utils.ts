@@ -1,4 +1,4 @@
-import type { ElementOptions } from './types';
+import type { ElementOptions } from '../core/types';
 
 /**
  * 解析元素最终显示/编码的文本。
@@ -6,6 +6,13 @@ import type { ElementOptions } from './types';
  * 不能按「键是否存在」取值：旧版属性面板曾不分类型给条码/二维码 options 回写空 text 键，
  * 键存在优先会让空 text 永远遮蔽 value（编码值），导致改编码值画布也不更新。
  */
+/** 垂直对齐 → flex justify-content 值（画布与打印共用的文本纵向定位；缺省按 top） */
+export function vAlignToJustify(v: unknown): 'flex-start' | 'center' | 'flex-end' {
+  if (v === 'middle') return 'center';
+  if (v === 'bottom') return 'flex-end';
+  return 'flex-start';
+}
+
 export function resolveDisplayText(opts: ElementOptions): string {
   let direct = '';
   if ('text' in opts && opts.text) direct = opts.text;

@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import { $t } from '@/locales';
 import { useLabelDesignStore } from '@/store/modules/label-design';
-import { renderPrintDocument } from './render-element-html';
-import { PX_PER_MM, parsePaper } from './constant';
+import { renderPrintDocument } from '../render/render-element-html';
+import { PX_PER_MM, parsePaper } from '../core/constant';
 
 defineProps<{ show: boolean }>();
 const emit = defineEmits<{ 'update:show': [boolean] }>();

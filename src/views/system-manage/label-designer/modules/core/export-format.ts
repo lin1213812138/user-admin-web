@@ -71,6 +71,10 @@ function pickAlign(v: unknown): 'left' | 'center' | 'right' {
   return v === 'center' || v === 'right' ? v : 'left';
 }
 
+function pickVAlign(v: unknown): 'top' | 'middle' | 'bottom' {
+  return v === 'middle' || v === 'bottom' ? v : 'top';
+}
+
 /** id 兜底生成（外部数据可能缺 id；与 store 内 uid 同规则） */
 function genId(): string {
   return `el_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -92,7 +96,7 @@ function buildStyle(el: LabelElement): ExportStyle {
     fontWeight: str(o.fontWeight) || 'normal',
     fontStyle: 'normal',
     textAlign: str(o.align) || 'left',
-    verticalAlign: 'top',
+    verticalAlign: str(o.verticalAlign) || 'top',
     color: str(o.color) || '#000000',
     backgroundColor: 'transparent',
     textDecoration: 'none',
@@ -209,6 +213,7 @@ function fromExportElement(el: ExportElement): LabelElement {
         color: str(style.color) || '#000000',
         fontWeight: style.fontWeight === 'bold' ? 'bold' : 'normal',
         align: pickAlign(style.textAlign),
+        verticalAlign: pickVAlign(style.verticalAlign),
         lineHeight: num(style.lineHeight, 1.2),
         ...data,
         titleFontSize: 8,

@@ -172,7 +172,7 @@ defineExpose({
     <template v-if="fieldItems.length">
       <NGrid :cols="24" :x-gap="gridXGap" item-responsive :responsive="gridResponsive">
         <NGi v-for="item in visibleFieldItems" :key="item.key" :span="getSpan(item)">
-          <NFormItem :label="item.label" :path="item.key">
+          <NFormItem :label="item.label" :path="item.key" :show-label="item.showLabel">
             <NInput
               v-if="item.type === 'input' || !item.type"
               v-model:value="model[item.key] as string"

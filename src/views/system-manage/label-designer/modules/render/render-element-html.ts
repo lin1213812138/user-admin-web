@@ -1,7 +1,7 @@
-import type { LabelElement, LabelTemplate } from './types';
+import type { LabelElement, LabelTemplate } from '../core/types';
 import { renderBarcode, renderQrcode } from './barcode';
-import { resolveDisplayText } from './render-utils';
-import { parsePaper } from './constant';
+import { resolveDisplayText, vAlignToJustify } from './render-utils';
+import { parsePaper } from '../core/constant';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -36,14 +36,14 @@ function elementHtml(el: LabelElement): string {
     return `<div style="${pos}${borderCss}display:flex;align-items:flex-start;">${titleHtml}<div style="flex:1;min-width:0;height:100%;overflow:hidden;">${body}</div></div>`;
   };
 
-  // 文本：标题作为行内前缀与内容连续排版（同一文本流基线天然对齐，折行行首顶格填满元素框）
+  // 文本：标题作为行内前缀与内容连续排版（同一文本流基线天然对齐、折行行首顶格、整块内容随 verticalAlign 纵向定位）
   if ((el.type === 'text' || el.type === 'longText') && 'text' in o) {
     const inner = escapeHtml(resolveDisplayText(o));
     const style = `font-size:${o.fontSize}pt;color:${o.color};font-weight:${o.fontWeight};text-align:${o.align};line-height:${o.lineHeight};word-break:break-all;`;
-    if (!showTitle) {
-      return `<div style="${pos}${style}${borderCss}">${inner}</div>`;
-    }
-    return `<div style="${pos}${style}${borderCss}">${titleHtml}${inner}</div>`;
+    const body = showTitle ? `${titleHtml}${inner}` : inner;
+    // 外层 flex column 只做纵向定位；内层 100% 宽 div 保持「标题前缀+内容」同一文本流，不被 flex 拆成两块
+    const justify = vAlignToJustify('verticalAlign' in o ? o.verticalAlign : undefined);
+    return `<div style="${pos}${borderCss}display:flex;flex-direction:column;justify-content:${justify};"><div style="width:100%;${style}">${body}</div></div>`;
   }
   if (el.type === 'image' && 'src' in o) {
     return wrapContent('object-fit:contain;', '', o.src);

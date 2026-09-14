@@ -2,17 +2,17 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { $t } from '@/locales';
 import { useLabelDesignStore } from '@/store/modules/label-design';
-import { mmToPt, parsePaper } from './modules/constant';
+import { mmToPt, parsePaper } from './modules/core/constant';
 import {
   fetchGetPrintTemplateList,
   fetchGetPrintTemplateDetail,
   fetchSavePrintTemplateDesign
 } from '@/service/api/print-format';
-import ToolBar from './modules/tool-bar.vue';
-import FieldPanel from './modules/field-panel.vue';
-import DesignCanvas from './modules/design-canvas.vue';
-import PropertyPanel from './modules/property-panel.vue';
-import PreviewModal from './modules/preview-modal.vue';
+import ToolBar from './modules/panels/tool-bar.vue';
+import FieldPanel from './modules/panels/field-panel.vue';
+import DesignCanvas from './modules/canvas/design-canvas.vue';
+import PropertyPanel from './modules/panels/property-panel.vue';
+import PreviewModal from './modules/panels/preview-modal.vue';
 
 const store = useLabelDesignStore();
 const previewVisible = ref(false);
@@ -204,7 +204,7 @@ onBeforeUnmount(() => {
         <FieldPanel />
       </div>
       <DesignCanvas class="flex-1" />
-      <div class="w-300px shrink-0 overflow-hidden border-l border-#e5e7eb dark:border-#2a2a2a">
+      <div class="w-300px shrink-0 overflow-hidden border-l border-#e5e7eb bg-container dark:border-#2a2a2a">
         <PropertyPanel />
       </div>
     </div>

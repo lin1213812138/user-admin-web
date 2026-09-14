@@ -732,6 +732,7 @@ declare namespace App {
             initData: string;
             stationScan: string;
             fieldMapping: string;
+            fieldMappingRequired: string;
           };
           printDesign: {
             title: string;
@@ -789,8 +790,17 @@ declare namespace App {
             propFontSize: string;
             propColor: string;
             propWeight: string;
-            propAlign: string;
+            propAlignH: string;
+            propAlignV: string;
             propLineHeight: string;
+            weightNormal: string;
+            weightBold: string;
+            alignLeft: string;
+            alignCenter: string;
+            alignRight: string;
+            valignTop: string;
+            valignMiddle: string;
+            valignBottom: string;
             propSrc: string;
             propValue: string;
             propTextGap: string;

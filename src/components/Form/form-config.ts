@@ -40,6 +40,8 @@ export interface FormItemConfig {
   uncheckedValue?: string | number | boolean;
   /** 使用具名插槽自定义渲染内容，插槽名为 key */
   slot?: string;
+  /** 是否渲染 label 行（透传 NFormItem 的 show-label）：label 为空的 custom 项需显式 false，否则会留一行空 label 高度 */
+  showLabel?: boolean;
   /** 禁用该项 */
   disabled?: boolean;
   /** 表单项是否清空 */

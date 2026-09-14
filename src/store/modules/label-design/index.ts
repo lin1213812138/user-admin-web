@@ -1,19 +1,21 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { SetupStoreId } from '@/enum';
-import { mmToPt } from '@/views/system-manage/label-designer/modules/constant';
+import { mmToPt } from '@/views/system-manage/label-designer/modules/core/constant';
 import type {
   ElementDescriptor,
+  ElementType,
   LabelElement,
   LabelTemplate
-} from '@/views/system-manage/label-designer/modules/types';
-import { parseTemplateJson, toExportTemplate } from '@/views/system-manage/label-designer/modules/export-format';
+} from '@/views/system-manage/label-designer/modules/core/types';
+import { parseTemplateJson, toExportTemplate } from '@/views/system-manage/label-designer/modules/core/export-format';
 
 function uid(): string {
   return `el_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function defaultOptionsFor(desc: ElementDescriptor): LabelElement['options'] {
+/** 构建默认 options（导出供拖拽预览复用：预览内容必须与拖入创建的元素同源） */
+export function defaultOptionsFor(desc: Pick<ElementDescriptor, 'type' | 'defaultOptions'>): LabelElement['options'] {
   const seed = desc.defaultOptions ?? {};
   switch (desc.type) {
     case 'text':
@@ -23,6 +25,7 @@ function defaultOptionsFor(desc: ElementDescriptor): LabelElement['options'] {
         color: '#000000',
         fontWeight: 'normal',
         align: 'left',
+        verticalAlign: 'top',
         lineHeight: 1.2,
         field: seed.field,
         testData: seed.testData,
@@ -80,11 +83,13 @@ function defaultOptionsFor(desc: ElementDescriptor): LabelElement['options'] {
   }
 }
 
-function defaultSize(type: ElementDescriptor['type']): { width: number; height: number } {
+/** 元素默认尺寸（导出供拖拽预览复用，保证预览与落纸后的元素尺寸一致） */
+export function defaultSize(type: ElementDescriptor['type']): { width: number; height: number } {
   // 默认宽高保持旧 mm 版物理尺寸不变，仅换算为 pt 存储（1mm ≈ 2.8346pt）
   switch (type) {
     case 'text':
-      return { width: mmToPt(40), height: mmToPt(8) };
+      // 宽度固定 50mm；高度为兜底值，拖入落纸时会被「预览实测的内容高度」覆盖（见 addElement 的 size 参数）
+      return { width: mmToPt(50), height: mmToPt(8) };
     case 'longText':
       return { width: mmToPt(50), height: mmToPt(16) };
     case 'image':
@@ -101,6 +106,22 @@ function defaultSize(type: ElementDescriptor['type']): { width: number; height: 
       return { width: mmToPt(2), height: mmToPt(40) };
   }
 }
+
+/** 类型切换时内容键互迁表：文本类 text ↔ 编码类 value（图片 src 是资源地址，不参与互迁） */
+const SWITCH_CONTENT_KEY: Partial<Record<ElementType, string>> = {
+  text: 'text',
+  longText: 'text',
+  barcode: 'value',
+  qrcode: 'value'
+};
+
+/** 各数据类支持、但 defaultOptionsFor 未显式写出的可选键（类型切换保留时兜底），如占位文本 placeholder */
+const EXTRA_OPTION_KEYS: Partial<Record<ElementType, string[]>> = {
+  text: ['placeholder'],
+  longText: ['placeholder'],
+  barcode: ['placeholder'],
+  qrcode: ['placeholder']
+};
 
 export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
   const template = ref<LabelTemplate>({ paperSize: '100×150mm', elements: [] });
@@ -128,16 +149,17 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     future.value = [];
   }
 
-  function addElement(desc: ElementDescriptor, at: { x: number; y: number }) {
+  function addElement(desc: ElementDescriptor, at: { x: number; y: number }, size?: { width: number; height: number }) {
     commit();
-    const size = defaultSize(desc.type);
+    // size 供「高度按内容自适应」等场景覆盖类型默认尺寸；缺省用 defaultSize
+    const finalSize = size ?? defaultSize(desc.type);
     const el: LabelElement = {
       id: uid(),
       type: desc.type,
       x: at.x,
       y: at.y,
-      width: size.width,
-      height: size.height,
+      width: finalSize.width,
+      height: finalSize.height,
       options: defaultOptionsFor(desc)
     };
     elements.value.push(el);
@@ -154,6 +176,39 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     const el = elements.value.find(e => e.id === id);
     if (!el) return;
     el.options = { ...el.options, ...patch } as LabelElement['options'];
+  }
+
+  /**
+   * 切换元素类型：保留两类型共有的配置、内容互迁（文本 text ↔ 编码 value）、新类型独有键补默认，
+   * 尺寸重置为新类型默认（位置不变）；入撤销栈。
+   */
+  function updateElementType(id: string, type: ElementType) {
+    const el = elements.value.find(e => e.id === id);
+    if (!el || el.type === type) return;
+    commit();
+    const prev = el.options as unknown as Record<string, unknown>;
+    const defaults = defaultOptionsFor({ type, defaultOptions: {} }) as unknown as Record<string, unknown>;
+
+    // 内容互迁：仅新旧内容键不同且旧值非空时迁移，避免用 undefined / 空串覆盖新类型默认值
+    const prevContentKey = SWITCH_CONTENT_KEY[el.type];
+    const nextContentKey = SWITCH_CONTENT_KEY[type];
+    const migrated: Record<string, unknown> = {};
+    if (prevContentKey && nextContentKey && prevContentKey !== nextContentKey && prev[prevContentKey] != null) {
+      migrated[nextContentKey] = prev[prevContentKey];
+    }
+
+    // 保留共有键：新类型默认 options 里存在的键（同名字义兼容，如 fontSize），或该类型支持但默认未写出的可选键；
+    // 已迁移的内容键不重复保留（默认值展开可能覆盖迁移值）
+    const extras = EXTRA_OPTION_KEYS[type] ?? [];
+    const kept = Object.fromEntries(
+      Object.entries(prev).filter(([k]) => (k in defaults || extras.includes(k)) && !(k in migrated))
+    );
+
+    el.options = { ...defaults, ...kept, ...migrated } as unknown as LabelElement['options'];
+    el.type = type;
+    const size = defaultSize(type);
+    el.width = size.width;
+    el.height = size.height;
   }
 
   function removeElement(id: string) {
@@ -290,6 +345,7 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     addElement,
     updateElement,
     updateElementOptions,
+    updateElementType,
     removeElement,
     selectElement,
     duplicateElement,

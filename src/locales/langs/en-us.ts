@@ -463,7 +463,8 @@ const local: App.I18n.Schema = {
         notificationConfig: 'Notification Config',
         initData: 'Init Data',
         stationScan: 'Station Scan Config',
-        fieldMapping: 'Field Mapping'
+        fieldMapping: 'Field Mapping',
+        fieldMappingRequired: 'Required'
       },
       printDesign: {
         title: 'Design Label',
@@ -521,8 +522,17 @@ const local: App.I18n.Schema = {
         propFontSize: 'Font Size',
         propColor: 'Color',
         propWeight: 'Weight',
-        propAlign: 'Align',
+        propAlignH: 'Horizontal Align',
+        propAlignV: 'Vertical Align',
         propLineHeight: 'Line Height',
+        weightNormal: 'Normal',
+        weightBold: 'Bold',
+        alignLeft: 'Left',
+        alignCenter: 'Center',
+        alignRight: 'Right',
+        valignTop: 'Top',
+        valignMiddle: 'Middle',
+        valignBottom: 'Bottom',
         propSrc: 'Image URL',
         propValue: 'Value',
         propSymbology: 'Symbology',

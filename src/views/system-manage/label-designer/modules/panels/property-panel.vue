@@ -4,8 +4,9 @@ import { NCard } from 'naive-ui';
 import { $t } from '@/locales';
 import NFormWrap from '@/components/Form/index.vue';
 import type { FormItemConfig } from '@/components/Form/form-config';
-import type { ElementType } from './types';
-import { getFieldLabel } from './constant';
+import type { ElementType, LabelElement } from '../core/types';
+import { getFieldLabel } from '../core/constant';
+import { measureElementHeight } from '../canvas/measure-element';
 import { useLabelDesignStore } from '@/store/modules/label-design';
 
 const store = useLabelDesignStore();
@@ -14,8 +15,8 @@ const selected = computed(() => store.selected);
 const model = ref<Record<string, unknown>>({});
 let syncing = false;
 
-/** 仅用于面板展示、不写回元素 options 的 model key */
-const UI_ONLY_KEYS = ['fieldTypeDisplay'];
+/** 仅用于面板展示、不写回元素 options 的 model key（fieldTypeSelect 存 ElementType 值，切换走 updateElementType） */
+const UI_ONLY_KEYS = ['fieldTypeSelect'];
 
 /** 元素类型 → 字段类型文案 */
 const TYPE_LABEL_KEYS: Partial<Record<ElementType, App.I18n.I18nKey>> = {
@@ -25,6 +26,9 @@ const TYPE_LABEL_KEYS: Partial<Record<ElementType, App.I18n.I18nKey>> = {
   barcode: 'page.manage.labelDesign.fieldTypeBarcode',
   qrcode: 'page.manage.labelDesign.fieldTypeQrcode'
 };
+
+/** 字段类型下拉可选范围：5 种数据类；矩形 / 线条无数据语义，不参与互转 */
+const SWITCHABLE_TYPES: ElementType[] = ['text', 'longText', 'image', 'barcode', 'qrcode'];
 
 function typeLabel(type: ElementType): string {
   const key = TYPE_LABEL_KEYS[type];
@@ -41,7 +45,7 @@ function buildModel() {
     model.value = {};
     return;
   }
-  const base: Record<string, unknown> = { ...el.options, fieldTypeDisplay: typeLabel(el.type) };
+  const base: Record<string, unknown> = { ...el.options, fieldTypeSelect: el.type };
   // 受控空值兜底，必须在展开 options 之后：defaultOptionsFor 会写入显式为 undefined 的键
   // （title: seed.title 等），展开时 undefined 会覆盖掉前置空串；undefined 会让 naive
   // 输入组件回落到实例内部非受控值，残留上一元素显示的旧值。
@@ -58,6 +62,8 @@ function buildModel() {
   };
   const contentKey = contentKeyMap[el.type];
   if (contentKey) base[contentKey] ??= '';
+  // 旧 designJson 的文本元素可能缺 verticalAlign：补受控默认值，避免 NSelect 走非受控分支残留上一元素的选中项
+  if (el.type === 'text' || el.type === 'longText') base.verticalAlign ??= 'top';
   // 旧 designJson 的 barcode 可能缺 displayValue：补默认开，保证「显示值」开关与渲染兜底一致
   if (el.type === 'barcode' && !('displayValue' in el.options)) base.displayValue = true;
   model.value = {
@@ -115,6 +121,27 @@ watch(
     if (syncing) return;
     const el = store.selected;
     if (!el) return;
+    // 类型切换是结构性变更（迁移 options + 重置尺寸）：单独处理，不落入下方几何 + options 的常规写回
+    const nextType = model.value.fieldTypeSelect;
+    if (nextType && nextType !== el.type) {
+      syncing = true;
+      store.updateElementType(el.id, nextType as ElementType);
+      // 切到文本：高度按内容实测自适应（与拖拽落纸同口径）；测量异步、只写回 height，
+      // 不再额外入撤销栈（与类型切换同属一次操作），undo 一步即可恢复切换前状态
+      if (nextType === 'text') {
+        const snapshot = JSON.parse(JSON.stringify(el)) as LabelElement;
+        measureElementHeight(snapshot).then(h => {
+          // 测量期间元素可能被删除或再次切换类型，写回前校验仍是该元素的文本形态
+          if (h && store.selected?.id === el.id && store.selected.type === 'text') {
+            store.updateElement(el.id, { height: h });
+          }
+        });
+      }
+      // 迁移后元素 options / 尺寸已变，重建面板受控值（新类型各项默认全部写入 model）
+      buildModel();
+      nextTick(() => (syncing = false));
+      return;
+    }
     const reservedKeys = ['x', 'y', 'width', 'height', ...UI_ONLY_KEYS];
     const rest = Object.fromEntries(Object.entries(model.value).filter(([key]) => !reservedKeys.includes(key)));
     store.updateElement(el.id, {
@@ -148,14 +175,12 @@ const showDataPreview = computed(() => {
 const dataItems = computed<FormItemConfig[]>(() => {
   const type = selected.value?.type;
   if (!type) return [];
-  const label = typeLabel(type);
   const fieldTypeItem: FormItemConfig = {
-    key: 'fieldTypeDisplay',
+    key: 'fieldTypeSelect',
     label: $t('page.manage.labelDesign.propFieldType'),
     type: 'select',
     span: 24,
-    disabled: true,
-    options: label ? [{ label, value: label }] : []
+    options: SWITCHABLE_TYPES.map(t => ({ label: typeLabel(t), value: t }))
   };
   const titleItems: FormItemConfig[] = [
     { key: 'title', label: $t('page.manage.labelDesign.propTitleName'), type: 'custom', span: 24 },
@@ -173,13 +198,13 @@ const dataItems = computed<FormItemConfig[]>(() => {
     case 'longText':
       return [
         ...titleItems,
-        { key: 'text', label: $t('page.manage.labelDesign.propText'), type: 'input', span: 24 },
+        { key: 'text', label: $t('page.manage.labelDesign.propTestData'), type: 'input', span: 24 },
         fieldItem
       ];
     case 'barcode':
       return [
         ...titleItems,
-        { key: 'value', label: $t('page.manage.labelDesign.propValue'), type: 'input', span: 24 },
+        { key: 'value', label: $t('page.manage.labelDesign.propTestData'), type: 'input', span: 24 },
         // 「显示编码值」开关紧跟编码值输入（控制条码下方人读文本，从样式卡挪入，状态一目了然）
         { key: 'displayValue', label: $t('page.manage.labelDesign.propDisplayValue'), type: 'switch', span: 24 },
         fieldItem
@@ -187,7 +212,7 @@ const dataItems = computed<FormItemConfig[]>(() => {
     case 'qrcode':
       return [
         ...titleItems,
-        { key: 'value', label: $t('page.manage.labelDesign.propValue'), type: 'input', span: 24 },
+        { key: 'value', label: $t('page.manage.labelDesign.propTestData'), type: 'input', span: 24 },
         fieldItem
       ];
     case 'image':
@@ -226,10 +251,24 @@ const titleStyleItems = computed<FormItemConfig[]>(() => [
     type: 'select',
     span: 12,
     options: [
-      { label: 'normal', value: 'normal' },
-      { label: 'bold', value: 'bold' }
+      { label: $t('page.manage.labelDesign.weightNormal'), value: 'normal' },
+      { label: $t('page.manage.labelDesign.weightBold'), value: 'bold' }
     ]
   }
+]);
+
+/** 水平对齐选项（样式区由 custom slot 渲染两列，抽为常量避免模板内重复定义） */
+const alignOptions = computed(() => [
+  { label: $t('page.manage.labelDesign.alignLeft'), value: 'left' },
+  { label: $t('page.manage.labelDesign.alignCenter'), value: 'center' },
+  { label: $t('page.manage.labelDesign.alignRight'), value: 'right' }
+]);
+
+/** 垂直对齐选项 */
+const valignOptions = computed(() => [
+  { label: $t('page.manage.labelDesign.valignTop'), value: 'top' },
+  { label: $t('page.manage.labelDesign.valignMiddle'), value: 'middle' },
+  { label: $t('page.manage.labelDesign.valignBottom'), value: 'bottom' }
 ]);
 
 /** 「显示边框」是否开启：关闭时边框宽度/颜色项随之隐藏 */
@@ -264,21 +303,13 @@ const styleItems = computed<FormItemConfig[]>(() => {
           type: 'select',
           span: 12,
           options: [
-            { label: 'normal', value: 'normal' },
-            { label: 'bold', value: 'bold' }
+            { label: $t('page.manage.labelDesign.weightNormal'), value: 'normal' },
+            { label: $t('page.manage.labelDesign.weightBold'), value: 'bold' }
           ]
         },
-        {
-          key: 'align',
-          label: $t('page.manage.labelDesign.propAlign'),
-          type: 'select',
-          span: 12,
-          options: [
-            { label: 'left', value: 'left' },
-            { label: 'center', value: 'center' },
-            { label: 'right', value: 'right' }
-          ]
-        },
+        // 水平 / 垂直对齐合并为一个整行（custom slot 内两列并排），避免被标题样式项的奇偶变化拆到两行；
+        // label 为空必须显式 showLabel:false，否则 naive 的 mergedShowLabel 默认为 true，会留一行空 label 高度
+        { key: 'alignGroup', label: '', type: 'custom', span: 24, showLabel: false },
         { key: 'lineHeight', label: $t('page.manage.labelDesign.propLineHeight'), type: 'number', span: 12 },
         ...borderStyleItems.value
       ];
@@ -404,7 +435,35 @@ function handleDelete() {
                   label-placement="top"
                   grid-responsive="self"
                   :grid-x-gap="8"
-                />
+                >
+                  <!-- 对齐组：水平 / 垂直对齐并排一行，两个 NFormItem 各带 label、样式与其它项一致 -->
+                  <template #alignGroup>
+                    <div class="w-full flex gap-8px">
+                      <NFormItem
+                        class="min-w-0 flex-1"
+                        :label="$t('page.manage.labelDesign.propAlignH')"
+                        :show-feedback="false"
+                      >
+                        <NSelect
+                          v-model:value="model.align as 'left' | 'center' | 'right'"
+                          size="small"
+                          :options="alignOptions"
+                        />
+                      </NFormItem>
+                      <NFormItem
+                        class="min-w-0 flex-1"
+                        :label="$t('page.manage.labelDesign.propAlignV')"
+                        :show-feedback="false"
+                      >
+                        <NSelect
+                          v-model:value="model.verticalAlign as 'top' | 'middle' | 'bottom'"
+                          size="small"
+                          :options="valignOptions"
+                        />
+                      </NFormItem>
+                    </div>
+                  </template>
+                </NFormWrap>
               </NCard>
             </NCollapseItem>
           </NCollapse>

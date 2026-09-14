@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { $t } from '@/locales';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 import MasterDetail from '../../components/MasterDetail.vue';
-import FieldMapping, { type FieldMappingGroup } from '../../components/FieldMapping.vue';
+import FieldMapping, { type FieldMappingGroup, type FieldMappingValue } from '../../components/FieldMapping.vue';
 
 interface InputFormatItem {
   id: number;
@@ -11,7 +11,7 @@ interface InputFormatItem {
   status: Api.Common.EnableStatus;
   scope: ('internal' | 'customer' | 'wechat')[];
   remark: string;
-  fields: Record<string, string[]>;
+  fields: Record<string, FieldMappingValue>;
 }
 
 const navGroups: FieldMappingGroup[] = [
@@ -34,8 +34,8 @@ const navGroups: FieldMappingGroup[] = [
     fields: [
       { key: 'receiverName', label: '收件人姓名' },
       { key: 'receiverPhone', label: '电话' },
-      { key: 'receiverAddress', label: '地址', span: 4 },
-      { key: 'receiverCompany', label: '公司', span: 4 }
+      { key: 'receiverAddress', label: '地址' },
+      { key: 'receiverCompany', label: '公司' }
     ]
   },
   {
@@ -116,11 +116,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer', 'wechat'],
     remark: '',
     fields: {
-      waybill: ['bizRemark', 'innerRemark'],
-      receiver: [],
-      sender: [],
-      goods: ['subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
-      subItem: ['singleVolume', 'chargeWeight']
+      waybill: { show: ['bizRemark', 'innerRemark'], required: ['bizRemark'] },
+      receiver: { show: [], required: [] },
+      sender: { show: [], required: [] },
+      goods: { show: ['subtotal', 'netWeight', 'goodsCount', 'length', 'width'], required: ['goodsCount'] },
+      subItem: { show: ['singleVolume', 'chargeWeight'], required: ['chargeWeight'] }
     }
   },
   {
@@ -130,11 +130,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer'],
     remark: '',
     fields: {
-      waybill: ['bizRemark'],
-      receiver: ['receiverName'],
-      sender: [],
-      goods: ['netWeight', 'goodsCount'],
-      subItem: []
+      waybill: { show: ['bizRemark'], required: ['bizRemark'] },
+      receiver: { show: ['receiverName'], required: ['receiverName'] },
+      sender: { show: [], required: [] },
+      goods: { show: ['netWeight', 'goodsCount'], required: ['netWeight', 'goodsCount'] },
+      subItem: { show: [], required: [] }
     }
   },
   {
@@ -144,11 +144,17 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal'],
     remark: '跨境电商专用，字段最全',
     fields: {
-      waybill: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
-      receiver: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
-      sender: ['senderName', 'senderPhone', 'senderAddress'],
-      goods: ['goodsName', 'quantity', 'weight', 'volume'],
-      subItem: ['singleVolume', 'chargeWeight', 'singleWeight']
+      waybill: {
+        show: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
+        required: ['bizRemark']
+      },
+      receiver: {
+        show: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
+        required: ['receiverName', 'receiverPhone', 'receiverAddress']
+      },
+      sender: { show: ['senderName', 'senderPhone', 'senderAddress'], required: ['senderName'] },
+      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: ['goodsName', 'quantity'] },
+      subItem: { show: ['singleVolume', 'chargeWeight', 'singleWeight'], required: [] }
     }
   },
   {
@@ -158,11 +164,14 @@ const formats = ref<InputFormatItem[]>([
     scope: ['wechat'],
     remark: '微信小程序同城下单',
     fields: {
-      waybill: ['bizRemark'],
-      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
-      sender: ['senderName', 'senderPhone'],
-      goods: ['goodsName', 'quantity'],
-      subItem: []
+      waybill: { show: ['bizRemark'], required: [] },
+      receiver: {
+        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
+        required: ['receiverName', 'receiverPhone', 'receiverAddress']
+      },
+      sender: { show: ['senderName', 'senderPhone'], required: [] },
+      goods: { show: ['goodsName', 'quantity'], required: ['goodsName'] },
+      subItem: { show: [], required: [] }
     }
   },
   {
@@ -172,11 +181,14 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer'],
     remark: '冷链运输，需记录体积与重量',
     fields: {
-      waybill: ['bizRemark', 'innerRemark', 'netWeight', 'goodsCount'],
-      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
-      sender: ['senderName', 'senderPhone'],
-      goods: ['goodsName', 'quantity', 'weight', 'volume'],
-      subItem: ['singleVolume', 'singleWeight']
+      waybill: { show: ['bizRemark', 'innerRemark', 'netWeight', 'goodsCount'], required: ['netWeight'] },
+      receiver: {
+        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
+        required: ['receiverName', 'receiverPhone']
+      },
+      sender: { show: ['senderName', 'senderPhone'], required: [] },
+      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: ['goodsName', 'weight', 'volume'] },
+      subItem: { show: ['singleVolume', 'singleWeight'], required: [] }
     }
   },
   {
@@ -186,11 +198,14 @@ const formats = ref<InputFormatItem[]>([
     scope: ['customer', 'wechat'],
     remark: '收件人付运费（暂时停用）',
     fields: {
-      waybill: ['bizRemark', 'subtotal'],
-      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
-      sender: ['senderName'],
-      goods: ['goodsName', 'quantity', 'weight'],
-      subItem: []
+      waybill: { show: ['bizRemark', 'subtotal'], required: ['subtotal'] },
+      receiver: {
+        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
+        required: ['receiverName', 'receiverPhone']
+      },
+      sender: { show: ['senderName'], required: [] },
+      goods: { show: ['goodsName', 'quantity', 'weight'], required: ['goodsName', 'quantity'] },
+      subItem: { show: [], required: [] }
     }
   },
   {
@@ -200,11 +215,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal'],
     remark: '内部临时使用，已废弃',
     fields: {
-      waybill: ['bizRemark'],
-      receiver: ['receiverName'],
-      sender: [],
-      goods: ['goodsName'],
-      subItem: []
+      waybill: { show: ['bizRemark'], required: ['bizRemark'] },
+      receiver: { show: ['receiverName'], required: [] },
+      sender: { show: [], required: [] },
+      goods: { show: ['goodsName'], required: [] },
+      subItem: { show: [], required: [] }
     }
   },
   {
@@ -214,11 +229,17 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal', 'customer', 'wechat'],
     remark: '大件/重货，需长宽与体积',
     fields: {
-      waybill: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
-      receiver: ['receiverName', 'receiverPhone', 'receiverAddress'],
-      sender: ['senderName', 'senderPhone', 'senderAddress'],
-      goods: ['goodsName', 'quantity', 'weight', 'volume'],
-      subItem: ['singleVolume', 'chargeWeight']
+      waybill: {
+        show: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
+        required: ['netWeight', 'goodsCount', 'length', 'width']
+      },
+      receiver: {
+        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
+        required: ['receiverName', 'receiverPhone']
+      },
+      sender: { show: ['senderName', 'senderPhone', 'senderAddress'], required: [] },
+      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: ['goodsName', 'quantity', 'volume'] },
+      subItem: { show: ['singleVolume', 'chargeWeight'], required: ['chargeWeight'] }
     }
   },
   {
@@ -228,11 +249,14 @@ const formats = ref<InputFormatItem[]>([
     scope: ['customer', 'wechat'],
     remark: '电商平台客户下单',
     fields: {
-      waybill: ['bizRemark'],
-      receiver: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
-      sender: [],
-      goods: ['goodsName', 'quantity', 'weight'],
-      subItem: []
+      waybill: { show: ['bizRemark'], required: [] },
+      receiver: {
+        show: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
+        required: ['receiverName', 'receiverPhone', 'receiverAddress']
+      },
+      sender: { show: [], required: [] },
+      goods: { show: ['goodsName', 'quantity', 'weight'], required: ['goodsName', 'quantity'] },
+      subItem: { show: [], required: [] }
     }
   },
   {
@@ -242,11 +266,11 @@ const formats = ref<InputFormatItem[]>([
     scope: ['internal'],
     remark: '字段映射测试用',
     fields: {
-      waybill: ['bizRemark', 'innerRemark', 'subtotal'],
-      receiver: [],
-      sender: [],
-      goods: [],
-      subItem: []
+      waybill: { show: ['bizRemark', 'innerRemark', 'subtotal'], required: ['bizRemark'] },
+      receiver: { show: [], required: [] },
+      sender: { show: [], required: [] },
+      goods: { show: [], required: [] },
+      subItem: { show: [], required: [] }
     }
   },
   ...Array.from({ length: 30 }, (_, i) => ({
@@ -256,11 +280,14 @@ const formats = ref<InputFormatItem[]>([
     scope: extraScopes[i % extraScopes.length],
     remark: '',
     fields: {
-      waybill: ['bizRemark', 'innerRemark'],
-      receiver: i % 2 === 0 ? ['receiverName', 'receiverPhone', 'receiverAddress'] : [],
-      sender: i % 2 === 0 ? ['senderName', 'senderPhone', 'senderAddress'] : [],
-      goods: ['goodsName', 'quantity', 'weight', 'volume'],
-      subItem: i % 3 === 0 ? ['singleVolume', 'chargeWeight'] : []
+      waybill: { show: ['bizRemark', 'innerRemark'], required: ['bizRemark'] },
+      receiver: {
+        show: i % 2 === 0 ? ['receiverName', 'receiverPhone', 'receiverAddress'] : [],
+        required: i % 2 === 0 ? ['receiverName', 'receiverPhone'] : []
+      },
+      sender: { show: i % 2 === 0 ? ['senderName', 'senderPhone', 'senderAddress'] : [], required: [] },
+      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: i % 3 === 0 ? ['goodsName'] : [] },
+      subItem: { show: i % 3 === 0 ? ['singleVolume', 'chargeWeight'] : [], required: [] }
     }
   }))
 ]);
@@ -278,7 +305,7 @@ const formModel = ref<{
   remark: string;
 }>({ name: '', status: 1, scope: [], remark: '' });
 
-const fieldModel = ref<Record<string, string[]>>({});
+const fieldModel = ref<Record<string, FieldMappingValue>>({});
 
 function loadCurrent() {
   const c = current.value;

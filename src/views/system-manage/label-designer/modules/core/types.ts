@@ -49,7 +49,10 @@ export interface TextOptions extends DataPreviewExtras {
   fontSize: number;
   color: string;
   fontWeight: 'normal' | 'bold';
+  /** 水平对齐（CSS text-align） */
   align: 'left' | 'center' | 'right';
+  /** 垂直对齐（内容在元素框内的纵向定位），缺省 top */
+  verticalAlign?: 'top' | 'middle' | 'bottom';
   lineHeight: number;
   field?: string;
   testData?: string;

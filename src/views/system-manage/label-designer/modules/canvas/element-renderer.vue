@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { CSSProperties } from 'vue';
-import type { LabelElement } from './types';
-import { renderBarcode, renderQrcode } from './barcode';
-import { resolveDisplayText } from './render-utils';
+import type { LabelElement } from '../core/types';
+import { renderBarcode, renderQrcode } from '../render/barcode';
+import { resolveDisplayText, vAlignToJustify } from '../render/render-utils';
 
 const props = defineProps<{ element: LabelElement }>();
 
@@ -74,6 +74,12 @@ const textStyle = computed<CSSProperties>(() => {
   return {};
 });
 
+/** 文本元素纵向定位（verticalAlign → flex justify-content）；外层只定位，内层 div 保持行内文本流 */
+const textBoxStyle = computed<CSSProperties>(() => {
+  const o = props.element.options;
+  return { justifyContent: vAlignToJustify('verticalAlign' in o ? o.verticalAlign : undefined) };
+});
+
 /** 可选边框（文本 / 条码 / 二维码开启「显示边框」时生效；rect/line 自带边框不在此列） */
 const borderStyle = computed<CSSProperties>(() => {
   const o = props.element.options;
@@ -109,10 +115,12 @@ const lineStyle = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <!-- 文本：标题作为行内前缀与内容排在同一文本流（基线天然对齐、内容折行行首顶格、填满元素框不分块） -->
-  <div v-if="isText" class="h-full w-full overflow-hidden break-all" :style="[textStyle, borderStyle]">
-    <span v-if="titleText" class="whitespace-nowrap" :style="titleStyle">{{ titleText }}:</span>
-    {{ text }}
+  <!-- 文本：外层 flex column 只做纵向定位（verticalAlign）；内层 100% 宽 div 保持标题行内前缀 + 内容同一文本流 -->
+  <div v-if="isText" class="flex h-full w-full flex-col overflow-hidden" :style="[borderStyle, textBoxStyle]">
+    <div class="w-full break-all" :style="textStyle">
+      <span v-if="titleText" class="whitespace-nowrap" :style="titleStyle">{{ titleText }}:</span>
+      {{ text }}
+    </div>
   </div>
   <!-- 条码：PNG 只画条形，标题+编码值合为下方 DOM 文本行（与编码值同字号居中）；显示文本关闭且无标题时不渲染行 -->
   <div v-else-if="isBarcode" class="flex h-full w-full flex-col overflow-hidden" :style="borderStyle">

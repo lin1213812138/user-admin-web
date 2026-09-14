@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { NDropdown } from 'naive-ui';
-import { useLabelDesignStore } from '@/store/modules/label-design';
-import { mmToPt, PX_PER_MM, PX_PER_PT, parsePaper } from './constant';
+import { defaultSize, useLabelDesignStore } from '@/store/modules/label-design';
+import { mmToPt, PX_PER_MM, PX_PER_PT, parsePaper } from '../core/constant';
 import ElementRenderer from './element-renderer.vue';
 import { useCanvasInteraction } from './use-canvas-interaction';
-import { markDragCreated } from './drag-ghost';
-import { basicElements } from './basic-elements';
-import type { LabelElement, ElementType } from './types';
+import { getDragOffset, getPreviewHeight, markDragCreated } from './drag-ghost';
+import { basicElements } from '../core/basic-elements';
+import type { LabelElement, ElementType } from '../core/types';
 
 const store = useLabelDesignStore();
 const paperRef = ref<HTMLElement | null>(null);
@@ -192,13 +192,15 @@ function onDrop(e: DragEvent) {
   if (rect.width <= 0 || rect.height <= 0) return;
   // 落点必须落在纸张（标签）内，否则视为无效拖放：不创建元素，拖拽项自动回到原位
   if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
-  // 落点比例 × 纸张物理尺寸（mm），再换算为元素几何单位 pt
-  const x = mmToPt(((e.clientX - rect.left) / rect.width) * size.w);
-  const y = mmToPt(((e.clientY - rect.top) / rect.height) * size.h);
+  // 按「拖拽预览当前所在位置」创建元素（预览左上角 = 指针 − 抓取偏移），而不是把指针当元素左上角，
+  // 这样松手瞬间元素正好出现在预览所在的位置、不会错开一截；预览左上角可能落在纸外，钳到纸张左上边界
+  const grab = getDragOffset();
+  const x = Math.max(0, mmToPt(((e.clientX - grab.x - rect.left) / rect.width) * size.w));
+  const y = Math.max(0, mmToPt(((e.clientY - grab.y - rect.top) / rect.height) * size.h));
   if (payload.kind === 'basic' && payload.type) {
     const def = basicElements.find(b => b.type === payload.type);
     if (def) {
-      store.addElement(def, { x, y });
+      store.addElement(def, { x, y }, textDropSize(def.type));
       // 通知左侧面板：本次拖拽已落纸创建，dragend 时不再播放「回落原位」动画
       markDragCreated();
     }
@@ -218,11 +220,22 @@ function onDrop(e: DragEvent) {
           showTitle: payload.showTitle
         }
       },
-      { x, y }
+      { x, y },
+      textDropSize(fieldType)
     );
     // 通知左侧面板：本次拖拽已落纸创建，dragend 时不再播放「回落原位」动画
     markDragCreated();
   }
+}
+
+/**
+ * 文本类型落纸尺寸：宽度用默认（50mm）、高度用「按下即预览」实测的内容高度（高度自适应）；
+ * 未测到（异常路径未走预览）时返回 undefined，落纸回退类型默认尺寸。
+ */
+function textDropSize(type: ElementType) {
+  if (type !== 'text') return undefined;
+  const measured = getPreviewHeight();
+  return measured ? { width: defaultSize('text').width, height: measured } : undefined;
 }
 
 onMounted(() => {
@@ -330,10 +343,15 @@ onBeforeUnmount(() => {
   outline: calc(1px / var(--canvas-zoom, 1)) dashed var(--n-primary-color, #2080f0);
   outline-offset: 0;
 }
+/*
+ * 选中态不提升 z-index：元素多为透明背景（矩形/线条），一旦提升，选中元素会盖住其上方
+ * 重叠元素的点击命中——表现为「矩形置于底层并选中后，点中间的文本永远只能反复选中矩形」。
+ * 命中必须遵循真实堆叠顺序；手柄自带 z-index:5 已浮在上层可拖
+ * （唯一折中：选中描边可能被上层元素遮挡，可接受）。
+ */
 .is-selected {
   outline: calc(1px / var(--canvas-zoom, 1)) solid var(--n-primary-color, #2080f0);
   outline-offset: 0;
-  z-index: 10;
 }
 /* 缩放手柄：6px 实心主题色小方块，与描边同色连成一体。
    对齐：贴边描边（offset 0）宽 1px/zoom，中心线在盒外 0.5px/zoom；

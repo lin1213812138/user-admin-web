@@ -459,7 +459,8 @@ const local: App.I18n.Schema = {
         notificationConfig: '通知配置',
         initData: '初始化数据',
         stationScan: '站点扫描配置',
-        fieldMapping: '字段映射'
+        fieldMapping: '字段映射',
+        fieldMappingRequired: '必填'
       },
       printDesign: {
         title: '设计标签',
@@ -517,8 +518,17 @@ const local: App.I18n.Schema = {
         propFontSize: '字号',
         propColor: '颜色',
         propWeight: '字重',
-        propAlign: '对齐',
+        propAlignH: '水平对齐',
+        propAlignV: '垂直对齐',
         propLineHeight: '行高',
+        weightNormal: '正常',
+        weightBold: '加粗',
+        alignLeft: '左对齐',
+        alignCenter: '居中对齐',
+        alignRight: '右对齐',
+        valignTop: '顶部对齐',
+        valignMiddle: '居中对齐',
+        valignBottom: '底部对齐',
         propSrc: '图片地址',
         propValue: '编码值',
         propSymbology: '条码类型',

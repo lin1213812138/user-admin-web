@@ -84,11 +84,11 @@ export const BUSINESS_FIELDS: FieldDef[] = [
     showTitle: false
   },
   { key: 'sku', label: 'SKU', title: 'SKU', sample: 'SKU-882910', elementType: 'text' },
-  { key: 'goodsName', label: '商品名称', title: '商品名称', sample: '无线蓝牙耳机', elementType: 'longText' },
+  { key: 'goodsName', label: '商品名称', title: '商品名称', sample: '无线蓝牙耳机', elementType: 'text' },
   { key: 'qty', label: '数量', title: '数量', sample: '100', elementType: 'text' },
   { key: 'batch', label: '批次', title: '批次', sample: 'B20260907', elementType: 'text' },
   { key: 'warehouse', label: '仓库', title: '仓库', sample: '上海仓', elementType: 'text' },
-  { key: 'date', label: '日期', title: '日期', sample: '2026-09-07', elementType: 'text' }
+  { key: 'date', label: '日期', title: '日期', sample: '2026-09-14', elementType: 'text' }
 ];
 
 /** 按字段 key 取中文名称，未定义时返回空串 */

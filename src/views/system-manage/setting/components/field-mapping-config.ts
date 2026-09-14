@@ -4,7 +4,7 @@ export interface FieldMappingField {
   key: string;
   /** 展示文案 */
   label: string;
-  /** 24 栅格宽度（1..24），同 FormItemConfig.span；缺省 8 */
+  /** 24 栅格宽度（1..24），同 FormItemConfig.span；缺省 6（一行 4 个） */
   span?: number;
 }
 
@@ -15,4 +15,12 @@ export interface FieldMappingGroup {
   /** 分组标题 */
   title: string;
   fields: FieldMappingField[];
+}
+
+/** 某个分组下的字段映射：显示 / 必填两个维度各自独立存储 */
+export interface FieldMappingValue {
+  /** 显示该字段的 key 列表 */
+  show: string[];
+  /** 设为必填的字段 key 列表 */
+  required: string[];
 }

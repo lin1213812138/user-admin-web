@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { $t } from '@/locales';
 import { useLabelDesignStore } from '@/store/modules/label-design';
-import { PAPER_SIZES } from './constant';
+import { PAPER_SIZES } from '../core/constant';
 import ShortcutHelp from './shortcut-help.vue';
 
 defineProps<{

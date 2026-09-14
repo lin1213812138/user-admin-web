@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import { useLabelDesignStore } from '@/store/modules/label-design';
-import { mmToPt, PX_PER_PT, parsePaper } from './constant';
+import { mmToPt, PX_PER_PT, parsePaper } from '../core/constant';
 
 type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 
