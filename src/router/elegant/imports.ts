@@ -24,6 +24,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "data-manage_business": () => import("@/views/data-manage/business/index.vue"),
   "data-manage_finance": () => import("@/views/data-manage/finance/index.vue"),
   home: () => import("@/views/home/index.vue"),
+  "system-manage_group": () => import("@/views/system-manage/group/index.vue"),
   "system-manage_label-designer": () => import("@/views/system-manage/label-designer/index.vue"),
   "system-manage_menu": () => import("@/views/system-manage/menu/index.vue"),
   "system-manage_print-design": () => import("@/views/system-manage/print-design/index.vue"),

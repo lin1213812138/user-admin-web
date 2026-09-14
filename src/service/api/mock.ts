@@ -7,15 +7,46 @@ function createUser(i: number): Api.SystemManage.User {
     id: i,
     userName: `user_${i}`,
     nickName: `用户${i}`,
-    userPhone: `1380000${String(i).padStart(4, '0')}`,
-    userEmail: `user${i}@example.com`,
+    password: '123456',
+    roleId: (i % 3) + 1,
+    roleName: '',
+    siteId: (i % 6) + 1,
+    siteName: '',
+    groupId: (i % 5) + 1,
+    groupName: '',
     status: STATUS[i % 2],
-    role: i % 3 === 0 ? 1 : null,
+    realName: `姓名${i}`,
+    contactPhone: `1380000${String(i).padStart(4, '0')}`,
+    position: '操作员',
+    gender: i % 2 === 0 ? '女' : '男',
+    email: `user${i}@example.com`,
+    hireDate: '2026-03-01',
+    birthday: '1996-06-15',
+    wechat: `wx_user_${i}`,
+    attachment: '',
+    homeAddress: `示例省示例市示例区示例路${i}号`,
+    otherContact: '',
+    remark: '',
+    wechatQrcode: '',
     createTime: '2026-08-28 10:00:00'
   };
 }
 
 const users: Api.SystemManage.User[] = Array.from({ length: 57 }, (_, idx) => createUser(idx + 1));
+
+/** 按 id 解析用户关联的角色 / 站点 / 组别名（改名后展示同步） */
+function withUserNames(user: Api.SystemManage.User): Api.SystemManage.User {
+  const role = roles.find(item => item.id === user.roleId);
+  const site = sites.find(item => item.id === user.siteId);
+  const group = groups.find(item => item.id === user.groupId);
+
+  return {
+    ...user,
+    roleName: role?.roleName ?? '',
+    siteName: site?.siteName ?? '',
+    groupName: group?.groupName ?? ''
+  };
+}
 
 /** mock user list with pagination */
 export function mockUserList(params: Api.SystemManage.UserSearchParams): Api.SystemManage.UserList {
@@ -32,7 +63,7 @@ export function mockUserList(params: Api.SystemManage.UserSearchParams): Api.Sys
   }
 
   const start = (current - 1) * size;
-  const records = filtered.slice(start, start + size);
+  const records = filtered.slice(start, start + size).map(withUserNames);
 
   return {
     records,
@@ -76,12 +107,13 @@ const MENU_TREE: Api.SystemManage.RoleMenuNode[] = [
       { id: 22, title: '角色管理' },
       { id: 23, title: '菜单管理' },
       { id: 24, title: '部门管理' },
-      { id: 25, title: '站点管理' }
+      { id: 25, title: '站点管理' },
+      { id: 26, title: '组别管理' }
     ]
   }
 ];
 
-const ALL_MENU_IDS = [1, 21, 22, 23, 24, 25];
+const ALL_MENU_IDS = [1, 21, 22, 23, 24, 25, 26];
 
 /** menu ids bound to each role */
 const roleMenuMap = new Map<number, number[]>([
@@ -183,20 +215,30 @@ export function mockAssignRoleMenu(params: Api.SystemManage.RoleAssignMenuParams
 
 /** mock create user */
 export function mockCreateUser(params: Api.SystemManage.UserCreateParams): Api.SystemManage.User {
-  const id = users.length + 1;
+  const id = users.reduce((max, item) => Math.max(max, item.id), 0) + 1;
   const newUser: Api.SystemManage.User = {
     id,
-    userName: params.userName,
-    nickName: params.nickName,
-    userPhone: params.userPhone,
-    userEmail: params.userEmail,
-    status: params.status,
-    role: null,
-    createTime: '2026-08-28 10:00:00'
+    ...params,
+    roleName: '',
+    siteName: '',
+    groupName: '',
+    createTime: todayStr()
   };
   users.unshift(newUser);
 
-  return newUser;
+  return withUserNames(newUser);
+}
+
+/** mock update user（角色 / 站点 / 组别名由 withUserNames 解析） */
+export function mockUpdateUser(params: Api.SystemManage.UserUpdateParams): Api.SystemManage.User {
+  const index = users.findIndex(item => item.id === params.id);
+  const updated: Api.SystemManage.User = {
+    ...users[index],
+    ...params
+  };
+  users.splice(index, 1, updated);
+
+  return withUserNames(updated);
 }
 
 /** create menu mock record */
@@ -260,6 +302,12 @@ const menus: Api.SystemManage.Menu[] = [
     routePath: '/system-manage/site',
     componentPath: 'views/system-manage/site/index.vue',
     permission: 'system:site:list'
+  }),
+  createMenu(26, 2, 'group', 'menu', {
+    menuName: '组别管理',
+    routePath: '/system-manage/group',
+    componentPath: 'views/system-manage/group/index.vue',
+    permission: 'system:group:list'
   })
 ];
 
@@ -485,6 +533,133 @@ export function mockDeleteSite(ids: number[]): boolean {
   for (let i = sites.length - 1; i >= 0; i -= 1) {
     if (ids.includes(sites[i].id)) {
       sites.splice(i, 1);
+    }
+  }
+
+  return true;
+}
+
+/* ------------------------------ group ------------------------------ */
+
+/** 按 siteId 解析站点名（站点改名后组别展示同步） */
+function withSiteName(group: Api.SystemManage.Group): Api.SystemManage.Group {
+  const site = sites.find(item => item.id === group.siteId);
+
+  return { ...group, siteName: site?.siteName ?? '' };
+}
+
+/** 创建组别 mock 记录 */
+function createGroup(
+  id: number,
+  groupName: string,
+  siteId: number,
+  remark: string,
+  extra: Partial<Api.SystemManage.Group> = {}
+): Api.SystemManage.Group {
+  return {
+    id,
+    groupName,
+    siteId,
+    siteName: '',
+    remark,
+    createByName: 'LINFLY',
+    createTime: '2026-07-15',
+    updateByName: 'LINFLY',
+    updateTime: '2026-07-15',
+    status: 1,
+    ...extra
+  };
+}
+
+/** 组别数据（首条为用户提供的样例：岳阳 / 上海销售二组 / 所属站点上海） */
+const groups: Api.SystemManage.Group[] = [
+  createGroup(1, 'LINFLY', 4, '上海销售二组'),
+  createGroup(2, '深圳南山', 1, '深圳销售一组'),
+  createGroup(3, '广州天河', 2, '广州销售一组'),
+  createGroup(4, '东莞虎门', 3, '东莞销售组', { status: 0 }),
+  createGroup(5, '北京朝阳', 5, '北京销售一组')
+];
+
+/** 组别名称是否已被占用（excludeId 用于编辑时排除自身） */
+function groupNameExists(groupName: string, excludeId?: number): boolean {
+  return groups.some(item => item.groupName === groupName && item.id !== excludeId);
+}
+
+/** mock group list with pagination（siteName 按 siteId 实时解析） */
+export function mockGroupList(params: Api.SystemManage.GroupSearchParams): Api.SystemManage.GroupList {
+  const { current = 1, size = 20, groupName, siteId, status } = params;
+
+  let filtered = groups;
+
+  if (groupName) {
+    filtered = filtered.filter(item => item.groupName.includes(groupName));
+  }
+
+  // 站点 id 用非空判断（0 不合法但保持与 status 一致的严谨写法）
+  if (siteId !== undefined && siteId !== null) {
+    filtered = filtered.filter(item => item.siteId === siteId);
+  }
+
+  // 状态 0（禁用）也是有效筛选值，不能用真值判断
+  if (status === 0 || status === 1) {
+    filtered = filtered.filter(item => item.status === status);
+  }
+
+  const start = (current - 1) * size;
+  const records = filtered.slice(start, start + size).map(withSiteName);
+
+  return {
+    records,
+    current,
+    size,
+    total: filtered.length
+  };
+}
+
+/** mock create group（组别名称重复时抛错） */
+export function mockCreateGroup(params: Api.SystemManage.GroupCreateParams): Api.SystemManage.Group {
+  if (groupNameExists(params.groupName)) {
+    throw new Error('组别名称已存在');
+  }
+
+  const id = groups.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+  const newGroup: Api.SystemManage.Group = {
+    id,
+    ...params,
+    siteName: '',
+    createByName: CURRENT_OPERATOR,
+    createTime: todayStr(),
+    updateByName: CURRENT_OPERATOR,
+    updateTime: todayStr()
+  };
+  groups.unshift(newGroup);
+
+  return withSiteName(newGroup);
+}
+
+/** mock update group（组别名称重复时抛错） */
+export function mockUpdateGroup(params: Api.SystemManage.GroupUpdateParams): Api.SystemManage.Group {
+  if (groupNameExists(params.groupName, params.id)) {
+    throw new Error('组别名称已存在');
+  }
+
+  const index = groups.findIndex(item => item.id === params.id);
+  const updated: Api.SystemManage.Group = {
+    ...groups[index],
+    ...params,
+    updateByName: CURRENT_OPERATOR,
+    updateTime: todayStr()
+  };
+  groups.splice(index, 1, updated);
+
+  return withSiteName(updated);
+}
+
+/** mock delete group by ids */
+export function mockDeleteGroup(ids: number[]): boolean {
+  for (let i = groups.length - 1; i >= 0; i -= 1) {
+    if (ids.includes(groups[i].id)) {
+      groups.splice(i, 1);
     }
   }
 

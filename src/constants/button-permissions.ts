@@ -42,6 +42,7 @@ const role = op('role');
 const menu = op('menu');
 const dept = op('dept');
 const site = op('site');
+const group = op('group');
 const dataBasic = op('dataBasic');
 const dataBusiness = op('dataBusiness');
 const dataFinance = op('dataFinance');
@@ -92,6 +93,11 @@ const MENU_BUTTON_CONFIGS: MenuButtonConfig[] = [
     permission: 'system:site:list',
     routePath: '/system-manage/site',
     buttons: [site.query, site.reset, site.add, site.edit, site.delete]
+  },
+  {
+    permission: 'system:group:list',
+    routePath: '/system-manage/group',
+    buttons: [group.query, group.reset, group.add, group.edit, group.delete]
   },
   {
     routePath: '/system-manage/setting',

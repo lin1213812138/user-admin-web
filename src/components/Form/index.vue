@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui';
-import { NColorPicker } from 'naive-ui';
+import { computed, reactive, ref } from 'vue';
+import type { FormInst, FormItemRule, FormRules, SelectOption, UploadFileInfo } from 'naive-ui';
+import { NColorPicker, NDatePicker, NUpload } from 'naive-ui';
 import { $t } from '@/locales';
 import { type FormItemConfig } from './form-config';
 import IconPicker from '@/components/custom/icon-picker.vue';
@@ -56,6 +56,50 @@ const actionItems = computed<FormItemConfig[]>(() => (props.items ?? []).filter(
 /** checkbox 选项值（SelectOption.value 可能为数组/null，这里收敛为 string | number） */
 function cbValue(opt: SelectOption): string | number {
   return opt.value as string | number;
+}
+
+/** 上传控件的本地预览地址（blob），model 值本身只存文件名/URL */
+const uploadPreview = reactive<Record<string, string>>({});
+
+/** 上传控件的 file-list（由 model 值派生，受控模式保证编辑切换时正确回显） */
+function uploadFileList(key: string, isImage: boolean): UploadFileInfo[] {
+  const value = props.model[key];
+
+  if (typeof value !== 'string' || !value) return [];
+
+  const remoteUrl = /^(https?:|data:)/.test(value) ? value : undefined;
+  const url = isImage ? uploadPreview[key] || remoteUrl : undefined;
+
+  return [{ id: `${key}-${value}`, name: value, status: 'finished', url }];
+}
+
+/** 日期控件的值：model 中的空串需转 null（NDatePicker 收到 `''` 会抛 "Invalid time value"） */
+function dateValue(key: string): string | null {
+  const value = props.model[key];
+
+  return typeof value === 'string' && value ? value : null;
+}
+
+/** 日期控件变更：null 写回空串（与其它文本字段的空值口径一致） */
+function handleDateChange(key: string, value: string | null) {
+  // FormWrap 的契约是「父级传入响应式 model、按字段写回」（模板 v-model 同此约定）
+  // eslint-disable-next-line vue/no-mutating-props
+  Object.assign(props.model, { [key]: value ?? '' });
+}
+
+/** 上传控件变更：文件名写回 model（单选场景取最后一个），图片额外记录本地预览地址 */
+function handleUploadChange(key: string, options: { fileList: UploadFileInfo[] }) {
+  const last = options.fileList[options.fileList.length - 1];
+
+  // FormWrap 的契约是「父级传入响应式 model、按字段写回」（模板 v-model 同此约定），此处按契约写回
+  // eslint-disable-next-line vue/no-mutating-props
+  Object.assign(props.model, { [key]: last?.name ?? '' });
+
+  if (last?.url?.startsWith('blob:')) {
+    uploadPreview[key] = last.url;
+  } else if (!last) {
+    uploadPreview[key] = '';
+  }
 }
 
 /** total rows by span accumulation (24 per row) */
@@ -113,14 +157,13 @@ const mergedRules = computed<FormRules>(() => {
         // `trigger` is set, the built-in rule falls back to the `string` validator, which
         // wrongly treats a valid number (e.g. 0) as empty. `required: true` here only drives
         // naive-ui's required mark (rules.some(r => r.required)), not the empty check.
-        validator: (_rule, value, callback) => {
+        // 注意：不用 callback 风格而直接返回 `Error | undefined`——naive 的 FormItemRuleValidator
+        // 返回类型不含 void，callback 风格会报 TS2322。
+        validator: (_rule, value) => {
           const empty =
             value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0);
-          if (empty) {
-            callback(new Error(message));
-          } else {
-            callback();
-          }
+
+          return empty ? new Error(message) : undefined;
         }
       };
       base[item.key] = [rule];
@@ -172,7 +215,12 @@ defineExpose({
     <template v-if="fieldItems.length">
       <NGrid :cols="24" :x-gap="gridXGap" item-responsive :responsive="gridResponsive">
         <NGi v-for="item in visibleFieldItems" :key="item.key" :span="getSpan(item)">
-          <NFormItem :label="item.label" :path="item.key" :show-label="item.showLabel">
+          <!-- 区块标题：占整行、不包 NFormItem（无 label 行、不参与校验） -->
+          <div v-if="item.type === 'section'" class="w-full flex items-center gap-8px py-4px">
+            <span class="h-16px w-3px rounded-2px bg-primary" />
+            <span class="text-15px font-600">{{ item.label }}</span>
+          </div>
+          <NFormItem v-else :label="item.label" :path="item.key" :show-label="item.showLabel">
             <NInput
               v-if="item.type === 'input' || !item.type"
               v-model:value="model[item.key] as string"
@@ -184,6 +232,14 @@ defineExpose({
               v-else-if="item.type === 'textarea'"
               v-model:value="model[item.key] as string"
               type="textarea"
+              :placeholder="item.placeholder"
+              :disabled="item.disabled"
+            />
+            <NInput
+              v-else-if="item.type === 'password'"
+              v-model:value="model[item.key] as string"
+              type="password"
+              show-password-on="click"
               :placeholder="item.placeholder"
               :disabled="item.disabled"
             />
@@ -212,6 +268,42 @@ defineExpose({
               :placeholder="item.placeholder"
               :disabled="item.disabled"
               :clearable="item.clearable || true"
+              :filterable="item.filterable ?? true"
+            />
+            <NDatePicker
+              v-else-if="item.type === 'date'"
+              :formatted-value="dateValue(item.key)"
+              value-format="yyyy-MM-dd"
+              type="date"
+              clearable
+              :placeholder="item.placeholder"
+              :disabled="item.disabled"
+              class="w-full"
+              @update:formatted-value="handleDateChange(item.key, $event)"
+            />
+            <NUpload
+              v-else-if="item.type === 'file'"
+              :file-list="uploadFileList(item.key, false)"
+              :max="1"
+              :default-upload="false"
+              :disabled="item.disabled"
+              @change="handleUploadChange(item.key, $event)"
+            >
+              <NButton size="small" :disabled="item.disabled">
+                <template #icon>
+                  <icon-mdi-upload class="text-icon" />
+                </template>
+                {{ $t('common.chooseFile') }}
+              </NButton>
+            </NUpload>
+            <NUpload
+              v-else-if="item.type === 'image'"
+              :file-list="uploadFileList(item.key, true)"
+              list-type="image-card"
+              :max="1"
+              :default-upload="false"
+              :disabled="item.disabled"
+              @change="handleUploadChange(item.key, $event)"
             />
             <NColorPicker
               v-else-if="item.type === 'color'"

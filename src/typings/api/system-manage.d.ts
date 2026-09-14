@@ -8,14 +8,52 @@ declare namespace Api {
     /** user */
     interface User {
       id: number;
+      /** 用户账号（系统登录用户名） */
       userName: string;
+      /** 用户名称 */
       nickName: string;
-      userPhone: string;
-      userEmail: string;
+      /** 用户密码（mock 阶段明文，仅演示） */
+      password: string;
+      /** 用户角色 id */
+      roleId: number | null;
+      /** 用户角色名称（由数据层按 roleId 解析） */
+      roleName: string;
+      /** 所属站点 id */
+      siteId: number | null;
+      /** 所属站点名称（由数据层按 siteId 解析） */
+      siteName: string;
+      /** 所属组别 id */
+      groupId: number | null;
+      /** 所属组别名称（由数据层按 groupId 解析） */
+      groupName: string;
       /** user status */
       status: Api.Common.EnableStatus;
-      /** user role */
-      role: number | null;
+      /** 姓名 */
+      realName: string;
+      /** 联系电话 */
+      contactPhone: string;
+      /** 职位 */
+      position: string;
+      /** 性别 */
+      gender: string;
+      /** 邮箱 */
+      email: string;
+      /** 入职时间（YYYY-MM-DD） */
+      hireDate: string;
+      /** 出生日期（YYYY-MM-DD） */
+      birthday: string;
+      /** 微信 */
+      wechat: string;
+      /** 附件（文件名） */
+      attachment: string;
+      /** 家庭住址 */
+      homeAddress: string;
+      /** 其他联系方式 */
+      otherContact: string;
+      /** 备注 */
+      remark: string;
+      /** 微信二维码（文件名 / URL） */
+      wechatQrcode: string;
       createTime: string;
     }
 
@@ -32,9 +70,24 @@ declare namespace Api {
     type UserCreateParams = {
       userName: string;
       nickName: string;
-      userPhone: string;
-      userEmail: string;
+      password: string;
+      roleId: number | null;
+      siteId: number | null;
+      groupId: number | null;
       status: Api.Common.EnableStatus;
+      realName: string;
+      contactPhone: string;
+      position: string;
+      gender: string;
+      email: string;
+      hireDate: string;
+      birthday: string;
+      wechat: string;
+      attachment: string;
+      homeAddress: string;
+      otherContact: string;
+      remark: string;
+      wechatQrcode: string;
     };
 
     /** user update params */
@@ -226,6 +279,52 @@ declare namespace Api {
 
     /** 站点更新参数 */
     type SiteUpdateParams = SiteCreateParams & {
+      id: number;
+    };
+
+    /** 组别 */
+    interface Group {
+      id: number;
+      /** 组别名称，唯一 */
+      groupName: string;
+      /** 所属站点 id */
+      siteId: number | null;
+      /** 所属站点名称（由数据层按 siteId 解析，站点改名后同步） */
+      siteName: string;
+      /** 组别备注 */
+      remark: string;
+      /** 创建人 */
+      createByName: string;
+      /** 创建时间（YYYY-MM-DD） */
+      createTime: string;
+      /** 最后更新人 */
+      updateByName: string;
+      /** 最后更新时间（YYYY-MM-DD） */
+      updateTime: string;
+      /** 组别状态 */
+      status: Api.Common.EnableStatus;
+    }
+
+    /** 组别列表 */
+    type GroupList = Api.Common.PaginatingQueryRecord<Group>;
+
+    /** 组别查询参数 */
+    type GroupSearchParams = Api.Common.CommonSearchParams & {
+      groupName?: string;
+      siteId?: number | null;
+      status?: Api.Common.EnableStatus | null;
+    };
+
+    /** 组别新增参数 */
+    type GroupCreateParams = {
+      groupName: string;
+      siteId: number | null;
+      remark: string;
+      status: Api.Common.EnableStatus;
+    };
+
+    /** 组别更新参数 */
+    type GroupUpdateParams = GroupCreateParams & {
       id: number;
     };
   }

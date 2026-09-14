@@ -139,16 +139,27 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
+        name: 'system-manage_group',
+        path: '/system-manage/group',
+        component: 'view.system-manage_group',
+        meta: {
+          title: 'system-manage_group',
+          i18nKey: 'route.system-manage_group',
+          icon: 'ic:round-groups',
+          order: 5
+        }
+      },
+      {
         name: 'system-manage_label-designer',
         path: '/system-manage/label-designer',
         component: 'view.system-manage_label-designer',
         meta: {
           title: 'system-manage_label-designer',
           i18nKey: 'route.system-manage_label-designer',
-          icon: 'ic:round-label',
-          order: 5,
           hideInMenu: true,
-          activeMenu: 'system-manage_setting'
+          activeMenu: 'system-manage_setting',
+          icon: 'ic:round-label',
+          order: 6
         }
       },
       {
@@ -189,8 +200,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-manage_setting',
           i18nKey: 'route.system-manage_setting',
-          order: 4,
-          icon: 'ic:baseline-settings-applications'
+          icon: 'ic:baseline-settings-applications',
+          order: 7
         }
       },
       {
@@ -201,7 +212,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_site',
           i18nKey: 'route.system-manage_site',
           icon: 'ic:round-place',
-          order: 6
+          order: 4
         }
       },
       {

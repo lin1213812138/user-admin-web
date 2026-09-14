@@ -361,6 +361,7 @@ declare namespace App {
         deleteSuccess: string;
         confirmDelete: string;
         copy: string;
+        chooseFile: string;
         copySuccess: string;
         copyFailed: string;
         createSuccess: string;
@@ -619,15 +620,48 @@ declare namespace App {
           user: {
             userName: string;
             nickName: string;
-            userPhone: string;
-            userEmail: string;
+            roleName: string;
+            password: string;
+            siteName: string;
+            groupName: string;
             status: string;
+            basicInfo: string;
+            profileInfo: string;
+            realName: string;
+            contactPhone: string;
+            position: string;
+            gender: string;
+            male: string;
+            female: string;
+            email: string;
+            hireDate: string;
+            birthday: string;
+            wechat: string;
+            attachment: string;
+            homeAddress: string;
+            otherContact: string;
+            remark: string;
+            wechatQrcode: string;
             createTime: string;
             form: {
               userNamePlaceholder: string;
               nickNamePlaceholder: string;
-              userPhonePlaceholder: string;
-              userEmailPlaceholder: string;
+              roleNamePlaceholder: string;
+              passwordPlaceholder: string;
+              siteNamePlaceholder: string;
+              groupNamePlaceholder: string;
+              statusPlaceholder: string;
+              realNamePlaceholder: string;
+              contactPhonePlaceholder: string;
+              positionPlaceholder: string;
+              genderPlaceholder: string;
+              emailPlaceholder: string;
+              hireDatePlaceholder: string;
+              birthdayPlaceholder: string;
+              wechatPlaceholder: string;
+              homeAddressPlaceholder: string;
+              otherContactPlaceholder: string;
+              remarkPlaceholder: string;
             };
           };
           role: {
@@ -699,6 +733,20 @@ declare namespace App {
               workTimePlaceholder: string;
               defaultOriginPlaceholder: string;
               warehouseAddressPlaceholder: string;
+              remarkPlaceholder: string;
+              statusPlaceholder: string;
+            };
+          };
+          group: {
+            groupName: string;
+            siteName: string;
+            remark: string;
+            createTime: string;
+            updateTime: string;
+            status: string;
+            form: {
+              groupNamePlaceholder: string;
+              siteNamePlaceholder: string;
               remarkPlaceholder: string;
               statusPlaceholder: string;
             };

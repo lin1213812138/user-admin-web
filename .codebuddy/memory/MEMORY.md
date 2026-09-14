@@ -18,6 +18,11 @@
 
 - `Api.Common.EnableStatus = 0 | 1`（number）；NSwitch 绑数字须显式 `checkedValue`/`uncheckedValue`；status 列 `activeValue` 用 number `1`。
 - FormWrap：必填仅 `null/undefined/''` 算空；`size` 透传 NForm（小尺寸用 `small`）。
+- FormWrap 的 `select` **默认 `filterable`**（`FormItemConfig.filterable?: boolean`，`:filterable="item.filterable ?? true"`）→ 所有表单 + 搜索栏（SearchBar 复用 FormWrap）下拉都可输入搜索，个别传 `filterable: false` 关闭（2026-09-14）。
+- FormWrap 控件类型（2026-09-14 扩容）：input/textarea/number/switch/select/color/checkbox/icon-picker/custom + **`section`（区块标题行，占整行、不包 NFormItem 不参与校验）/ `date`（NDatePicker，formatted-value + `yyyy-MM-dd`）/ `password` / `file` / `image`（NUpload，`default-upload=false` 单文件、值=文件名、受控 `file-list` 按 model 派生保回显、图片用内部 blob `uploadPreview` 预览）**。
+- FormWrap 契约 = 父级传入响应式 `model`、子组件按字段写回；script 内写回会触发 `vue/no-mutating-props`，需局部 `eslint-disable` + 注明契约（模板 v-model 不触发该规则）。
+- **`NDatePicker` 的 `formatted-value` 只接受 `string | null`**：传空串 `''` 会在 setup 抛 `RangeError: Invalid time value`（naive 内部 parseDate('')→Invalid Date→format 抛错）→ 整个表单/抽屉子树渲染中断（2026-09-14 用户报「点新增打不开弹窗」的根因）→ FormWrap 统一 `dateValue()`（空串→null）传入 + `@update:formatted-value` 回写空串。**通用教训：给 naive 受控组件传值前必须做空值口径转换（`''` ≠ `null`/`undefined`）**。
+- **`FormItemRule.validator` 不要用 callback 风格**：naive 的 `FormItemRuleValidator` 返回类型 `boolean | Error | Promise<void> | Error[] | undefined` 不含 `void`，callback 风格（`callback(new Error())`）会触发 IDE TS2322；`pnpm typecheck` 带 `--skipLibCheck` **不报此错**（易漏）→ 统一写 `(_rule, value) => empty ? new Error(msg) : undefined`。**遇「IDE 报错但 pnpm typecheck 不报」用 `npx vue-tsc --noEmit` 严格口径复验**（2026-09-14）。
 - naive 输入类组件 value===undefined 走非受控分支会残留旧值；buildModel 须补受控空值，**兜底 `??=` 放对象展开之后**（展开会拷贝显式 undefined）。
 - NGrid `cols=24 + x-gap` 硬开销 = 23×gap（与 span 无关）；窄容器（<~370px）调小 `grid-x-gap`（属性面板 8）；`NGi` 用 `:deep(.n-grid > div)` 选中。
 - NCollapse `arrow-placement="right"`：header slot 自身 `flex-1`。
@@ -36,6 +41,8 @@
 ## 系统管理模块
 
 - **站点管理（2026-09-14）**：`views/system-manage/site/`（独立菜单 `system-manage_site`、icon `ic:round-place`、order 6 排系统设置后）；接口 `fetchGetSiteList|Create|Update|Delete`（DEV mock，生产 `/system/site/*`）；mock 编号查重抛「站点编号已存在」（抽屉 catch 兜底，真实接口错误由拦截器提示）；电话不校验；备注列默认隐藏；最后更新列插槽渲染「更新人 - 日期」；按钮权限 `system:site:*`（mock menus/MENU_TREE 已补菜单 id 25）。
+- **组别管理（2026-09-14）**：`views/system-manage/group/`（`system-manage_group`、icon `ic:round-groups`、order 7 排站点管理后）；「所属站点」下拉关联站点（存 `siteId`，`siteName` 由 mock `withSiteName()` 按 siteId 实时解析、站点改名同步；页面与抽屉分别拉 `fetchGetSiteList({current:1,size:100})` 全量选项，抽屉每次打开刷新）；名称查重抛「组别名称已存在」；表格「创建」「最后更新」两列均按「人名 - 日期」插槽渲染；按钮权限 `system:group:*`（菜单 id 26）。
+- **用户管理（2026-09-14 字段大改）**：User 扩至 25 字段（用户账号/用户名称/密码/用户角色/所属站点/所属组别/状态 + 个人档案 13 项）；旧 `userPhone`/`userEmail`/`role` 移除；`withUserNames()` 按 id 解析 roleName/siteName/groupName；抽屉两区块三列（`section` 分区、width 760）、密码编辑回显必填、状态改下拉；列表 8 列；角色/站点/组别下拉全量选项（`Promise.all` + 类型断言，每次打开刷新）。
 - 状态筛选坑：`status` 的 0 是有效值，搜索参数用 `?? undefined`、mock 用 `=== 0 || === 1` 判断（旧页面 `status || undefined` 会吞「禁用」筛选）。
 
 ## 系统设置页
@@ -80,7 +87,7 @@
 - 只用 **pnpm**；WebStorm `node-safe-delete-shim` 拦截 vite rm / pnpm install → PowerShell 先 `$env:NODE_OPTIONS=""`。
 - **elegant-router 扫描规则**：仅 `**/index.vue`、`**/[[]*[]].vue` 生成路由；`pageExcludePatterns = ["**/components/**"]` → `views/**/modules/` 下任意嵌套 .vue 安全。
 - **`pnpm gen-route` 现不可用**（`.bin/sa.cmd` 指向已删 `bin.ts`）→ 路由重新生成用 `pnpm dev` 触发；勿用 `node @sa/scripts/bin.mjs gen-route`（交互式向导）。
-- **elegant-router 生成行为（2026-09-14 实战）**：① 改 `build/plugins/router.ts`（routeIcons/routeOrders）后**必须先删 `node_modules/.vite-temp`** 再跑 dev，否则 vite 复用缓存的旧配置生成（新路由无 meta、旧 order 不更新）；② 生成器**保留已存在条目的旧 meta**（改配置里的 order 对已有路由不生效），仅新条目按配置写；③ **order 与已有值重复会顺移**（site:5 撞 label-designer:5 → 实际生成 6）⇒ 以产物为准把配置对齐（配置=生成结果）；④ 生成偶发把 `routes.ts` 末行写坏（重复残片）→ 下次 dev 启动 Babel `MissingSemicolon` 直接失败，修复 = `git checkout -- src/router/elegant/routes.ts` + 清 `.vite-temp` + 重跑 dev；⑤ `routes.ts` 尾部 `nonMenuRoutes`/`menuRoutes` 段是项目定制（HEAD 即有），生成器会保留。
+- **elegant-router 生成行为（2026-09-14 实战）**：① 改 `build/plugins/router.ts`（routeIcons/routeOrders）后**必须先删 `node_modules/.vite-temp`** 再跑 dev，否则 vite 复用缓存的旧配置生成（新路由无 meta、旧 order 不更新）；② 生成器**保留已存在条目的旧 meta**（改配置里的 order 对已有路由不生效），仅新条目按配置写；③ **order 与已有值重复会顺移**（site:5 撞 label-designer:5 → 实际生成 6）⇒ 以产物为准把配置对齐（配置=生成结果）；④ 生成偶发把 `routes.ts` 末行写坏（重复残片）→ 下次 dev 启动 Babel `MissingSemicolon` 直接失败，修复 = `git checkout -- src/router/elegant/routes.ts` + 清 `.vite-temp` + 重跑 dev；⑤ `routes.ts` 尾部 `nonMenuRoutes`/`menuRoutes` 段是项目定制（HEAD 即有），生成器会保留；⑥ **想让配置改动对已有路由生效**：从 `routes.ts` 删除目标条目 → 清 `.vite-temp` → 跑 dev（重新作为新条目按配置写入；比全量删文件安全，定制段不丢）——2026-09-14 已实战验证（站点/组别/设置 order 重建）。
 - **sa shim / commit-msg 报 `ERR_MODULE_NOT_FOUND ... bin.ts` 正解 = `pnpm install --force`**（先清 `NODE_OPTIONS`）重建全部 shim；普通 install 会跳过，手改 shim 是假象。
 - pre-commit = `typecheck && lint && fmt && git diff --exit-code`（工作区不能有未暂存改动）。
 - 推送 GitHub TLS/EOF 正解：`$env:HTTPS_PROXY="http://127.0.0.1:7897"; git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=300 push`（AI 不代改 git config）。

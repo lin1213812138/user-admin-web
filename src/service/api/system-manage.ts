@@ -1,20 +1,25 @@
 import { request } from '../request';
 import {
   mockAssignRoleMenu,
+  mockCreateGroup,
   mockCreateMenu,
   mockCreateRole,
   mockCreateSite,
   mockCreateUser,
+  mockDeleteGroup,
   mockDeleteMenu,
   mockDeleteRole,
   mockDeleteSite,
   mockGetRoleMenuTree,
+  mockGroupList,
   mockMenuList,
   mockRoleList,
   mockSiteList,
+  mockUpdateGroup,
   mockUpdateMenu,
   mockUpdateRole,
   mockUpdateSite,
+  mockUpdateUser,
   mockUserList
 } from './mock';
 
@@ -47,7 +52,7 @@ export function fetchCreateUser(params: Api.SystemManage.UserCreateParams) {
 /** update user */
 export function fetchUpdateUser(params: Api.SystemManage.UserUpdateParams) {
   if (import.meta.env.DEV) {
-    return Promise.resolve({ ...params } as unknown as Api.SystemManage.User);
+    return mockUpdateUser(params) as unknown as Promise<Api.SystemManage.User>;
   }
 
   return request<Api.SystemManage.User>({
@@ -234,6 +239,58 @@ export function fetchDeleteSite(ids: number[]) {
 
   return request<boolean>({
     url: '/system/site/delete',
+    method: 'post',
+    data: { ids }
+  });
+}
+
+/** get group list */
+export function fetchGetGroupList(params: Api.SystemManage.GroupSearchParams) {
+  if (import.meta.env.DEV) {
+    return mockGroupList(params) as unknown as Promise<Api.SystemManage.GroupList>;
+  }
+
+  return request<Api.SystemManage.GroupList>({
+    url: '/system/group/list',
+    method: 'post',
+    data: params
+  });
+}
+
+/** create group */
+export function fetchCreateGroup(params: Api.SystemManage.GroupCreateParams) {
+  if (import.meta.env.DEV) {
+    return mockCreateGroup(params) as unknown as Promise<Api.SystemManage.Group>;
+  }
+
+  return request<Api.SystemManage.Group>({
+    url: '/system/group/create',
+    method: 'post',
+    data: params
+  });
+}
+
+/** update group */
+export function fetchUpdateGroup(params: Api.SystemManage.GroupUpdateParams) {
+  if (import.meta.env.DEV) {
+    return mockUpdateGroup(params) as unknown as Promise<Api.SystemManage.Group>;
+  }
+
+  return request<Api.SystemManage.Group>({
+    url: '/system/group/update',
+    method: 'post',
+    data: params
+  });
+}
+
+/** delete group by ids */
+export function fetchDeleteGroup(ids: number[]) {
+  if (import.meta.env.DEV) {
+    return mockDeleteGroup(ids) as unknown as Promise<boolean>;
+  }
+
+  return request<boolean>({
+    url: '/system/group/delete',
     method: 'post',
     data: { ids }
   });

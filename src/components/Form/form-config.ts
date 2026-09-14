@@ -10,6 +10,11 @@ export type FormItemType =
   | 'color'
   | 'icon-picker'
   | 'checkbox'
+  | 'date'
+  | 'password'
+  | 'file'
+  | 'image'
+  | 'section'
   | 'custom';
 
 /** 单个表单项配置，驱动 FormWrap 自动渲染 */
@@ -46,4 +51,6 @@ export interface FormItemConfig {
   disabled?: boolean;
   /** 表单项是否清空 */
   clearable?: boolean;
+  /** 下拉是否可输入搜索（type 为 select 时使用），默认 true；个别下拉不需要搜索框时显式传 false */
+  filterable?: boolean;
 }

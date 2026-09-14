@@ -11,8 +11,10 @@ interface UserItem {
   id: number;
   userName: string;
   nickName: string;
-  userPhone: string;
-  userEmail: string;
+  siteName: string;
+  groupName: string;
+  contactPhone: string;
+  roleName: string;
   status: Api.Common.EnableStatus;
   createTime: string;
 }
@@ -25,10 +27,19 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
   transform: r => ({ records: r.records, total: r.total }),
   columns: () =>
     [
-      { key: 'userName', title: $t('page.manage.user.userName'), type: 'detail', visible: true, sortable: false },
-      { key: 'nickName', title: $t('page.manage.user.nickName'), visible: true, sortable: false },
-      { key: 'userPhone', title: $t('page.manage.user.userPhone'), visible: true, sortable: false },
-      { key: 'userEmail', title: $t('page.manage.user.userEmail'), visible: true, sortable: false },
+      {
+        key: 'userName',
+        title: $t('page.manage.user.userName'),
+        type: 'detail',
+        visible: true,
+        width: 140,
+        sortable: false
+      },
+      { key: 'nickName', title: $t('page.manage.user.nickName'), visible: true, width: 120, sortable: false },
+      { key: 'siteName', title: $t('page.manage.user.siteName'), visible: true, width: 120, sortable: false },
+      { key: 'groupName', title: $t('page.manage.user.groupName'), visible: true, width: 140, sortable: false },
+      { key: 'contactPhone', title: $t('page.manage.user.contactPhone'), visible: true, width: 140, sortable: false },
+      { key: 'roleName', title: $t('page.manage.user.roleName'), visible: true, minWidth: 140, sortable: false },
       {
         key: 'status',
         title: $t('page.manage.user.status'),
