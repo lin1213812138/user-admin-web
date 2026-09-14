@@ -80,9 +80,10 @@
 - i18n 新增键同步 `zh-cn.ts` / `en-us.ts` / `typings/app.d.ts`。
 - **elegant-router 扫描规则（源码级确认）**：`pagePatterns = ["**/index.vue", "**/[[]*[]].vue"]`（仅 index.vue / [param].vue 生成路由），`pageExcludePatterns = ["**/components/**"]`；故 `views/**/modules/` 下任意嵌套 .vue 都安全、不会生成路由。
 - **`pnpm gen-route` 现不可用**：`.bin/sa.cmd` shim 被重新生成回指向已删除的 `bin.ts` → `ERR_MODULE_NOT_FOUND`（复发坑）；路由重新生成**改用 `pnpm dev` 触发**（日志出现 `[elegant-router] watcher ready` 即完成）；勿用 `node @sa/scripts/bin.mjs gen-route`（那是交互式「新建路由」向导）。
-- **提交被 commit-msg 拦截的修复（2026-09-14，根因已查清）**：`simple-git-hooks` 配置 = `pre-commit: pnpm typecheck && pnpm lint && pnpm fmt && git diff --exit-code`（**工作区必须无未暂存改动**，否则拦截）+ `commit-msg: pnpm sa git-commit-verify`。sa CLI 报 `ERR_MODULE_NOT_FOUND ... bin.ts` 时：**`node_modules/.bin/` 下有 3 个平台 shim，必须全部改** —— `sa`（shell，2 处）、`sa.CMD`（cmd，2 处）、**`sa.ps1`（PowerShell，4 处）**，把 `bin.ts` 一律改为 `bin.mjs`（用**文件编辑工具**改；PowerShell `Set-Content` 会被编码安全检查拦截）。改完 `pnpm sa --version` 应输出 `soybean-admin/x.x.x`。
-  **根因（非"每次被重新生成"）**：9/11 `pnpm install` 生成 shim 时 `packages/scripts` 的 bin 还是 `./bin.ts`；9/13 改成 `./bin.mjs` 并删除 `bin.ts` 后**没有再跑 install**，三个 shim 因此一直残留错误的 `bin.ts` 指向（`sa.ps1` 时间戳停留在 9/11 可证）。只改其中一两个 shim 会表现为"修了又坏"（不同调用环境走不同 shim：git 钩子走 shell/cmd，PowerShell/IDE 走 ps1）。
-  **根治**：`pnpm install` 重新生成三个 shim（bin 配置已正确；注意 WebStorm node-safe-delete-shim 需先清 `NODE_OPTIONS`）。
+- **提交被 commit-msg 拦截（sa shim 问题，2026-09-14 定案）**：`simple-git-hooks` = `pre-commit: pnpm typecheck && pnpm lint && pnpm fmt && git diff --exit-code`（**工作区不能有未暂存改动**）+ `commit-msg: pnpm sa git-commit-verify`。sa 报 `ERR_MODULE_NOT_FOUND ... bin.ts` 时的**正解**：**`pnpm install --force`**（先 `$env:NODE_OPTIONS=""`）——强制丢弃缓存、按当前 `packages/scripts/package.json` 的 bin（`./bin.mjs`）重建全部 shim（已验证：三个平台 shim `sa`/`sa.CMD`/`sa.ps1` 与 `sass` 同批时间戳、全部指向 `bin.mjs`）。
+  **为什么普通 install 无效**：pnpm 判定 workspace "已最新" 时**跳过 shim 重建**（`Already up to date`），只刷新时间戳；此时**手改 shim 是假象**，后续任何一次真正重写都会还原成旧的 `bin.ts`（本次实测：手改后又被写成 `bin.ts`，时间戳差 10 秒）。
+  **历史成因**：9/11 装依赖时 bin 还是 `./bin.ts`，9/13 改名 `./bin.mjs` 并删 `bin.ts` 后从未重装 → shim 残留错误指向；不同调用环境走不同 shim（git 钩子 → shell/cmd，PowerShell/IDE → ps1），只修一两个会表现为"修了又坏"。
+  **应急手段（不推荐）**：手改 `.bin/sa`、`.bin/sa.CMD`、`.bin/sa.ps1` 三个文件的 `bin.ts` → `bin.mjs`（须用文件编辑工具，shell 文本替换会被编码安全检查拦截）。
 - 阿里巴巴普惠体子集化：`scripts/font/extract-i18n-charset.mjs` + `pyftsubset`；全局字体覆盖三处（reset.css 的 html、Naive theme-overrides、`--vxe-ui-font-family`）；源 otf 被 gitignore。
 
 ## 原则
