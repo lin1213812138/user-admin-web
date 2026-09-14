@@ -172,5 +172,61 @@ declare namespace Api {
       /** 角色分配的按钮权限码（前端按菜单勾选，需后端支持接收） */
       buttonCodes?: string[];
     };
+
+    /** 站点 */
+    interface Site {
+      id: number;
+      /** 站点编号，唯一 */
+      siteCode: string;
+      /** 站点名称 */
+      siteName: string;
+      /** 联系人 */
+      contactName: string;
+      /** 联系电话 */
+      contactPhone: string;
+      /** 工作时间，如「周一至周六 9:00-20:00」 */
+      workTime: string;
+      /** 默认出发地 */
+      defaultOrigin: string;
+      /** 仓库地址 */
+      warehouseAddress: string;
+      /** 站点备注 */
+      remark: string;
+      /** 最后更新人 */
+      updateByName: string;
+      /** 最后更新时间（YYYY-MM-DD） */
+      updateTime: string;
+      /** 站点状态 */
+      status: Api.Common.EnableStatus;
+      createTime: string;
+    }
+
+    /** 站点列表 */
+    type SiteList = Api.Common.PaginatingQueryRecord<Site>;
+
+    /** 站点查询参数 */
+    type SiteSearchParams = Api.Common.CommonSearchParams & {
+      siteCode?: string;
+      siteName?: string;
+      status?: Api.Common.EnableStatus | null;
+    };
+
+    /** 站点新增参数 */
+    type SiteCreateParams = {
+      siteCode: string;
+      siteName: string;
+      contactName: string;
+      contactPhone: string;
+      workTime: string;
+      defaultOrigin: string;
+      warehouseAddress: string;
+      remark: string;
+      status: Api.Common.EnableStatus;
+    };
+
+    /** 站点更新参数 */
+    type SiteUpdateParams = SiteCreateParams & {
+      id: number;
+    };
   }
 }

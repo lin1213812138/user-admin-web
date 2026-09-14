@@ -41,6 +41,7 @@ const user = op('user');
 const role = op('role');
 const menu = op('menu');
 const dept = op('dept');
+const site = op('site');
 const dataBasic = op('dataBasic');
 const dataBusiness = op('dataBusiness');
 const dataFinance = op('dataFinance');
@@ -86,6 +87,11 @@ const MENU_BUTTON_CONFIGS: MenuButtonConfig[] = [
     permission: 'system:dept:list',
     routePath: '/system-manage/dept',
     buttons: [dept.add, dept.edit, dept.delete]
+  },
+  {
+    permission: 'system:site:list',
+    routePath: '/system-manage/site',
+    buttons: [site.query, site.reset, site.add, site.edit, site.delete]
   },
   {
     routePath: '/system-manage/setting',

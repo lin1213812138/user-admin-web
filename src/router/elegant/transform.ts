@@ -179,6 +179,7 @@ const routeMap: RouteMap = {
   "system-manage_print-design": "/system-manage/print-design",
   "system-manage_role": "/system-manage/role",
   "system-manage_setting": "/system-manage/setting",
+  "system-manage_site": "/system-manage/site",
   "system-manage_user": "/system-manage/user"
 };
 

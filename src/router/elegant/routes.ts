@@ -194,6 +194,17 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'system-manage_site',
+        path: '/system-manage/site',
+        component: 'view.system-manage_site',
+        meta: {
+          title: 'system-manage_site',
+          i18nKey: 'route.system-manage_site',
+          icon: 'ic:round-place',
+          order: 6
+        }
+      },
+      {
         name: 'system-manage_user',
         path: '/system-manage/user',
         component: 'view.system-manage_user',

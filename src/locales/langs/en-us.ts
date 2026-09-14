@@ -292,6 +292,7 @@ const local: App.I18n.Schema = {
     'system-manage_user': 'User Management',
     'system-manage_role': 'Role Management',
     'system-manage_menu': 'Menu Management',
+    'system-manage_site': 'Site Management',
     'data-manage': 'Data Manage',
     'data-manage_basic': 'Basic',
     'data-manage_finance': 'Finance',
@@ -409,6 +410,30 @@ const local: App.I18n.Schema = {
           componentPlaceholder: 'Please enter component path, e.g. views/system-manage/menu/index.vue',
           permissionPlaceholder: 'Please enter permission code, e.g. system:menu:list',
           redirectPlaceholder: 'Please enter redirect path'
+        }
+      },
+      site: {
+        siteCode: 'Site Code',
+        siteName: 'Site Name',
+        contactName: 'Contact',
+        contactPhone: 'Phone',
+        workTime: 'Working Hours',
+        defaultOrigin: 'Default Origin',
+        warehouseAddress: 'Warehouse Address',
+        remark: 'Site Remark',
+        updateTime: 'Last Updated',
+        status: 'Status',
+        createTime: 'Create Time',
+        form: {
+          siteCodePlaceholder: 'Please enter site code',
+          siteNamePlaceholder: 'Please enter site name',
+          contactNamePlaceholder: 'Please enter contact',
+          contactPhonePlaceholder: 'Please enter phone',
+          workTimePlaceholder: 'e.g. Mon-Sat 9:00-20:00',
+          defaultOriginPlaceholder: 'Please enter default origin',
+          warehouseAddressPlaceholder: 'Please enter warehouse address',
+          remarkPlaceholder: 'Please enter site remark',
+          statusPlaceholder: 'Please select status'
         }
       },
       setting: {

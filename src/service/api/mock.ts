@@ -75,12 +75,13 @@ const MENU_TREE: Api.SystemManage.RoleMenuNode[] = [
       { id: 21, title: '用户管理' },
       { id: 22, title: '角色管理' },
       { id: 23, title: '菜单管理' },
-      { id: 24, title: '部门管理' }
+      { id: 24, title: '部门管理' },
+      { id: 25, title: '站点管理' }
     ]
   }
 ];
 
-const ALL_MENU_IDS = [1, 21, 22, 23, 24];
+const ALL_MENU_IDS = [1, 21, 22, 23, 24, 25];
 
 /** menu ids bound to each role */
 const roleMenuMap = new Map<number, number[]>([
@@ -253,6 +254,12 @@ const menus: Api.SystemManage.Menu[] = [
     routePath: '/system-manage/dept',
     componentPath: 'views/system-manage/dept/index.vue',
     permission: 'system:dept:list'
+  }),
+  createMenu(25, 2, 'site', 'menu', {
+    menuName: '站点管理',
+    routePath: '/system-manage/site',
+    componentPath: 'views/system-manage/site/index.vue',
+    permission: 'system:site:list'
   })
 ];
 
@@ -326,6 +333,158 @@ export function mockDeleteMenu(ids: number[]): boolean {
   for (let i = menus.length - 1; i >= 0; i -= 1) {
     if (toRemove.has(menus[i].id)) {
       menus.splice(i, 1);
+    }
+  }
+
+  return true;
+}
+
+/* ------------------------------ site ------------------------------ */
+
+/** 当天日期（YYYY-MM-DD），用于「最后更新」 */
+function todayStr(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** 模拟当前操作人（真实环境由后端记录最后更新人） */
+const CURRENT_OPERATOR = '王恒';
+
+/** 创建站点 mock 记录 */
+function createSite(
+  id: number,
+  siteCode: string,
+  siteName: string,
+  contactName: string,
+  extra: Partial<Api.SystemManage.Site> = {}
+): Api.SystemManage.Site {
+  return {
+    id,
+    siteCode,
+    siteName,
+    contactName,
+    contactPhone: `1862166${String(3100 + id)}`,
+    workTime: '周一至周六 9:00-20:00',
+    defaultOrigin: siteName,
+    warehouseAddress: `${siteName}市示例仓库地址`,
+    remark: '--',
+    updateByName: contactName,
+    updateTime: '2026-07-04',
+    status: id === 5 ? 0 : 1,
+    createTime: '2026-07-04 10:00:00',
+    ...extra
+  };
+}
+
+/** 站点数据（首条为用户提供的样例） */
+const sites: Api.SystemManage.Site[] = [
+  createSite(1, '75501', '深圳', 'LINFLY', {
+    contactPhone: '18621663103',
+    defaultOrigin: '深圳宝安',
+    warehouseAddress: '深圳市宝安区福永街道福永社区福海工业区A1栋三层',
+    status: 1
+  }),
+  createSite(2, '75502', '广州', '陈志强', {
+    defaultOrigin: '广州白云',
+    warehouseAddress: '广州市白云区太和镇物流园B栋101'
+  }),
+  createSite(3, '75503', '东莞', '李明', {
+    defaultOrigin: '东莞虎门',
+    warehouseAddress: '东莞市虎门镇北栅社区工业大道88号'
+  }),
+  createSite(4, '75504', '上海', '赵雅', {
+    defaultOrigin: '上海嘉定',
+    warehouseAddress: '上海市嘉定区南翔镇沪宜公路1234号'
+  }),
+  createSite(5, '75505', '北京', '周涛', {
+    defaultOrigin: '北京大兴',
+    warehouseAddress: '北京市大兴区黄村镇物流基地A区'
+  }),
+  createSite(6, '75506', '杭州', '孙倩', {
+    defaultOrigin: '杭州萧山',
+    warehouseAddress: '杭州市萧山区宁围街道物流园3号库'
+  })
+];
+
+/** 站点编号是否已被占用（excludeId 用于编辑时排除自身） */
+function siteCodeExists(siteCode: string, excludeId?: number): boolean {
+  return sites.some(item => item.siteCode === siteCode && item.id !== excludeId);
+}
+
+/** mock site list with pagination */
+export function mockSiteList(params: Api.SystemManage.SiteSearchParams): Api.SystemManage.SiteList {
+  const { current = 1, size = 20, siteCode, siteName, status } = params;
+
+  let filtered = sites;
+
+  if (siteCode) {
+    filtered = filtered.filter(item => item.siteCode.includes(siteCode));
+  }
+
+  if (siteName) {
+    filtered = filtered.filter(item => item.siteName.includes(siteName));
+  }
+
+  // 状态 0（禁用）也是有效筛选值，不能用真值判断
+  if (status === 0 || status === 1) {
+    filtered = filtered.filter(item => item.status === status);
+  }
+
+  const start = (current - 1) * size;
+  const records = filtered.slice(start, start + size);
+
+  return {
+    records,
+    current,
+    size,
+    total: filtered.length
+  };
+}
+
+/** mock create site（站点编号重复时抛错） */
+export function mockCreateSite(params: Api.SystemManage.SiteCreateParams): Api.SystemManage.Site {
+  if (siteCodeExists(params.siteCode)) {
+    throw new Error('站点编号已存在');
+  }
+
+  const id = sites.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+  const newSite: Api.SystemManage.Site = {
+    id,
+    ...params,
+    updateByName: CURRENT_OPERATOR,
+    updateTime: todayStr(),
+    createTime: todayStr()
+  };
+  sites.unshift(newSite);
+
+  return newSite;
+}
+
+/** mock update site（站点编号重复时抛错） */
+export function mockUpdateSite(params: Api.SystemManage.SiteUpdateParams): Api.SystemManage.Site {
+  if (siteCodeExists(params.siteCode, params.id)) {
+    throw new Error('站点编号已存在');
+  }
+
+  const index = sites.findIndex(item => item.id === params.id);
+  const updated: Api.SystemManage.Site = {
+    ...sites[index],
+    ...params,
+    updateByName: CURRENT_OPERATOR,
+    updateTime: todayStr()
+  };
+  sites.splice(index, 1, updated);
+
+  return updated;
+}
+
+/** mock delete site by ids */
+export function mockDeleteSite(ids: number[]): boolean {
+  for (let i = sites.length - 1; i >= 0; i -= 1) {
+    if (ids.includes(sites[i].id)) {
+      sites.splice(i, 1);
     }
   }
 

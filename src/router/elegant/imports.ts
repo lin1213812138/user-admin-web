@@ -29,5 +29,6 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "system-manage_print-design": () => import("@/views/system-manage/print-design/index.vue"),
   "system-manage_role": () => import("@/views/system-manage/role/index.vue"),
   "system-manage_setting": () => import("@/views/system-manage/setting/index.vue"),
+  "system-manage_site": () => import("@/views/system-manage/site/index.vue"),
   "system-manage_user": () => import("@/views/system-manage/user/index.vue"),
 };

@@ -39,6 +39,7 @@ export function setupElegantRouter() {
         'system-manage': 'ic:baseline-settings',
         'system-manage_role': 'ic:round-supervisor-account',
         'system-manage_user': 'ic:round-person',
+        'system-manage_site': 'ic:round-place',
         'system-manage_setting': 'ic:baseline-settings-applications',
         'data-manage': 'ic:baseline-folder',
         'data-manage_basic': 'ic:baseline-inventory',
@@ -57,6 +58,7 @@ export function setupElegantRouter() {
         'system-manage_user': 1,
         'system-manage_menu': 3,
         'system-manage_setting': 4,
+        'system-manage_site': 6,
         // 同图标：hideInMenu 后排序无展示效果，保留以便日后重新开放菜单入口
         'system-manage_label-designer': 5
       };

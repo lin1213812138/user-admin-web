@@ -679,6 +679,30 @@ declare namespace App {
               redirectPlaceholder: string;
             };
           };
+          site: {
+            siteCode: string;
+            siteName: string;
+            contactName: string;
+            contactPhone: string;
+            workTime: string;
+            defaultOrigin: string;
+            warehouseAddress: string;
+            remark: string;
+            updateTime: string;
+            status: string;
+            createTime: string;
+            form: {
+              siteCodePlaceholder: string;
+              siteNamePlaceholder: string;
+              contactNamePlaceholder: string;
+              contactPhonePlaceholder: string;
+              workTimePlaceholder: string;
+              defaultOriginPlaceholder: string;
+              warehouseAddressPlaceholder: string;
+              remarkPlaceholder: string;
+              statusPlaceholder: string;
+            };
+          };
           setting: {
             inputFormat: string;
             printFormat: {

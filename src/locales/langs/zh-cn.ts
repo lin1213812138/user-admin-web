@@ -288,6 +288,7 @@ const local: App.I18n.Schema = {
     'system-manage_user': '用户管理',
     'system-manage_role': '角色管理',
     'system-manage_menu': '菜单管理',
+    'system-manage_site': '站点管理',
     'data-manage': '资料管理',
     'data-manage_basic': '基础资料',
     'data-manage_finance': '财务资料',
@@ -405,6 +406,30 @@ const local: App.I18n.Schema = {
           componentPlaceholder: '请输入组件路径，如 views/system-manage/menu/index.vue',
           permissionPlaceholder: '请输入权限标识，如 system:menu:list',
           redirectPlaceholder: '请输入重定向地址'
+        }
+      },
+      site: {
+        siteCode: '站点编号',
+        siteName: '站点名称',
+        contactName: '联系人',
+        contactPhone: '联系电话',
+        workTime: '工作时间',
+        defaultOrigin: '默认出发地',
+        warehouseAddress: '仓库地址',
+        remark: '站点备注',
+        updateTime: '最后更新',
+        status: '状态',
+        createTime: '创建时间',
+        form: {
+          siteCodePlaceholder: '请输入站点编号',
+          siteNamePlaceholder: '请输入站点名称',
+          contactNamePlaceholder: '请输入联系人',
+          contactPhonePlaceholder: '请输入联系电话',
+          workTimePlaceholder: '如：周一至周六 9:00-20:00',
+          defaultOriginPlaceholder: '请输入默认出发地',
+          warehouseAddressPlaceholder: '请输入仓库地址',
+          remarkPlaceholder: '请输入站点备注',
+          statusPlaceholder: '请选择状态'
         }
       },
       setting: {

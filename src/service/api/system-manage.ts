@@ -3,14 +3,18 @@ import {
   mockAssignRoleMenu,
   mockCreateMenu,
   mockCreateRole,
+  mockCreateSite,
   mockCreateUser,
   mockDeleteMenu,
   mockDeleteRole,
+  mockDeleteSite,
   mockGetRoleMenuTree,
   mockMenuList,
   mockRoleList,
+  mockSiteList,
   mockUpdateMenu,
   mockUpdateRole,
+  mockUpdateSite,
   mockUserList
 } from './mock';
 
@@ -178,6 +182,58 @@ export function fetchDeleteMenu(ids: number[]) {
 
   return request<boolean>({
     url: '/system/menu/delete',
+    method: 'post',
+    data: { ids }
+  });
+}
+
+/** get site list */
+export function fetchGetSiteList(params: Api.SystemManage.SiteSearchParams) {
+  if (import.meta.env.DEV) {
+    return mockSiteList(params) as unknown as Promise<Api.SystemManage.SiteList>;
+  }
+
+  return request<Api.SystemManage.SiteList>({
+    url: '/system/site/list',
+    method: 'post',
+    data: params
+  });
+}
+
+/** create site */
+export function fetchCreateSite(params: Api.SystemManage.SiteCreateParams) {
+  if (import.meta.env.DEV) {
+    return mockCreateSite(params) as unknown as Promise<Api.SystemManage.Site>;
+  }
+
+  return request<Api.SystemManage.Site>({
+    url: '/system/site/create',
+    method: 'post',
+    data: params
+  });
+}
+
+/** update site */
+export function fetchUpdateSite(params: Api.SystemManage.SiteUpdateParams) {
+  if (import.meta.env.DEV) {
+    return mockUpdateSite(params) as unknown as Promise<Api.SystemManage.Site>;
+  }
+
+  return request<Api.SystemManage.Site>({
+    url: '/system/site/update',
+    method: 'post',
+    data: params
+  });
+}
+
+/** delete site by ids */
+export function fetchDeleteSite(ids: number[]) {
+  if (import.meta.env.DEV) {
+    return mockDeleteSite(ids) as unknown as Promise<boolean>;
+  }
+
+  return request<boolean>({
+    url: '/system/site/delete',
     method: 'post',
     data: { ids }
   });
