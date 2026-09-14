@@ -84,10 +84,10 @@ const selectedRows = ref<Api.PrintFormat.Template[]>([]);
 
 const { routerPushByKey } = useRouterPush();
 
-/** 跳转到标签设计器 */
+/** 跳转到自研标签设计器（设计器按 query.id 拉取模板详情，name 仅用于加载完成前的标题展示） */
 function openDesign(row: Api.PrintFormat.Template) {
-  void routerPushByKey('system-manage_print-design', {
-    query: { id: String(row.id), categoryId: String(row.categoryId), name: row.name, paperSize: row.paperSize }
+  void routerPushByKey('system-manage_label-designer', {
+    query: { id: String(row.id), name: row.name }
   });
 }
 

@@ -146,7 +146,9 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_label-designer',
           i18nKey: 'route.system-manage_label-designer',
           icon: 'ic:round-label',
-          order: 5
+          order: 5,
+          hideInMenu: true,
+          activeMenu: 'system-manage_setting'
         }
       },
       {
@@ -177,7 +179,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_role',
           i18nKey: 'route.system-manage_role',
           icon: 'ic:round-supervisor-account',
-          order: 1
+          order: 2
         }
       },
       {
@@ -199,7 +201,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_user',
           i18nKey: 'route.system-manage_user',
           icon: 'ic:round-person',
-          order: 2
+          order: 1
         }
       }
     ]

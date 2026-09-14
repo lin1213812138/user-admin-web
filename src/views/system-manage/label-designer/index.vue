@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRoute } from 'vue-router';
 import { $t } from '@/locales';
 import { useLabelDesignStore } from '@/store/modules/label-design';
 import { mmToPt, parsePaper } from './modules/core/constant';
@@ -15,13 +16,15 @@ import PropertyPanel from './modules/panels/property-panel.vue';
 import PreviewModal from './modules/panels/preview-modal.vue';
 
 const store = useLabelDesignStore();
+const route = useRoute();
 const previewVisible = ref(false);
 
+/** 打印格式列表「设计」带 query.id 进来时直接打开该模板；无 id（手输地址/调试）回退到分类下首个模板 */
+const queryId = Number(route.query.id ?? 0);
+const currentName = ref(String(route.query.name ?? ''));
 const templates = ref<{ label: string; value: number }[]>([]);
-const currentId = ref<number | null>(null);
+const currentId = ref<number | null>(queryId || null);
 const loading = ref(false);
-
-const currentTemplateName = computed(() => templates.value.find(t => t.value === currentId.value)?.label ?? '');
 
 async function loadTemplates() {
   // DEV 下 print-format service 直接返回裸数据（与 prod 的 request 包裹形态不同），此处按裸数据消费
@@ -41,6 +44,8 @@ async function loadTemplate(id: number) {
   loading.value = true;
   try {
     const detail = (await fetchGetPrintTemplateDetail(id)) as unknown as Api.PrintFormat.Template;
+    // 标题以详情为准回填，详情缺名称时保留 query 带入的名字
+    currentName.value = detail.name || currentName.value;
     store.loadFromJson(detail.designJson || '');
     if (detail.paperSize) store.setPaper(detail.paperSize);
   } catch {
@@ -178,7 +183,11 @@ function onKeyup(e: KeyboardEvent) {
 
 onMounted(() => {
   toggleBodyScroll(true);
-  loadTemplates();
+  if (currentId.value === null) {
+    loadTemplates();
+  } else {
+    loadTemplate(currentId.value);
+  }
   window.addEventListener('keydown', onKeydown);
   window.addEventListener('keyup', onKeyup);
 });
@@ -193,7 +202,7 @@ onBeforeUnmount(() => {
   <div class="flex h-full w-full flex-col" style="padding: 0">
     <ToolBar
       class="shrink-0"
-      :template-name="currentTemplateName"
+      :template-name="currentName"
       :loading="loading"
       @save="handleSave"
       @preview="previewVisible = true"
