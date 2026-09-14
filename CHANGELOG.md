@@ -1,5 +1,23 @@
 # Changelog
 
+## [v0.0.7](https://github.com/lin1213812138/user-admin-web/compare/v0.0.6...v0.0.7) (2026-09-14)
+
+### &nbsp;&nbsp;&nbsp;🚀 Features
+
+- **label-designer**: 标签设计器完善与录单格式字段映射必填配置 &nbsp;-&nbsp; by **LINFLY** [<samp>(82c02)</samp>](https://github.com/lin1213812138/user-admin-web/commit/82c0268)
+
+### &nbsp;&nbsp;&nbsp;📖 Documentation
+
+- **memory**:
+  - 记录提交踩坑、sa shim 修复与卡死排查状态 &nbsp;-&nbsp; by **LINFLY** [<samp>(2b9d8)</samp>](https://github.com/lin1213812138/user-admin-web/commit/2b9d8b1)
+  - 补记 sa shim 根因与依赖重建验证 &nbsp;-&nbsp; by **LINFLY** [<samp>(7c0a8)</samp>](https://github.com/lin1213812138/user-admin-web/commit/7c0a83a)
+  - 定案 sa shim 问题（--force 为正解） &nbsp;-&nbsp; by **LINFLY** [<samp>(8c275)</samp>](https://github.com/lin1213812138/user-admin-web/commit/8c27553)
+  - 记录 GitHub 推送 TLS 中断的解法 &nbsp;-&nbsp; by **LINFLY** [<samp>(a8b0b)</samp>](https://github.com/lin1213812138/user-admin-web/commit/a8b0bbd)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[LINFLY](mailto:2276928094@qq.com)
+
 ## [v0.0.6](https://github.com/lin1213812138/user-admin-web/compare/v0.0.5...v0.0.6) (2026-09-14)
 
 ### &nbsp;&nbsp;&nbsp;🐞 Bug Fixes

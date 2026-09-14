@@ -1,6 +1,6 @@
 {
   "name": "@sa/uno-preset",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "typesVersions": {
     "*": {
       "*": [
