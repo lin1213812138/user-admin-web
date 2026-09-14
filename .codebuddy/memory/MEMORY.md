@@ -75,6 +75,7 @@
 
 ## 工具链 / 环境
 
+- **推送 GitHub 报 TLS/EOF 的解法（2026-09-14 实测有效）**：remote = `https://github.com/lin1213812138/user-admin-web.git`，git 已配 `http(s).proxy = http://127.0.0.1:7897`（Clash 类代理，端口常开）。**直连与代理都能通但极慢（单请求 13~18s）** → push 大包时易被 Git 的「低速中断」掐断（`TLS connect error: ... unexpected eof while reading`）。**正解**：`$env:HTTPS_PROXY="http://127.0.0.1:7897"; git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=300 push`（临时参数、不改持久配置）。若要一劳永逸，用户可自行 `git config --global http.lowSpeedTime 300`（**AI 不代改 git config**）。
 - 只用 **pnpm**，禁止 npm/yarn。
 - WebStorm `node-safe-delete-shim` 拦截 vite rm / pnpm install；PowerShell 用 `$env:NODE_OPTIONS=""` 清空后执行。
 - i18n 新增键同步 `zh-cn.ts` / `en-us.ts` / `typings/app.d.ts`。
