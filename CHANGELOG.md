@@ -1,5 +1,32 @@
 # Changelog
 
+## [v0.0.8](https://github.com/lin1213812138/user-admin-web/compare/v0.0.7...v0.0.8) (2026-09-15)
+
+### &nbsp;&nbsp;&nbsp;🚀 Features
+
+- **channel-quote**:
+  - 新增收货/发货渠道报价模块 &nbsp;-&nbsp; by **LINFLY** [<samp>(2aced)</samp>](https://github.com/lin1213812138/user-admin-web/commit/2acedbe)
+- **form**:
+  - 新增 mode 只读文本展示模式 &nbsp;-&nbsp; by **LINFLY** [<samp>(be8cb)</samp>](https://github.com/lin1213812138/user-admin-web/commit/be8cbda)
+- **setting**:
+  - 新增轨迹抓取配置与初始化数据界面 &nbsp;-&nbsp; by **LINFLY** [<samp>(33755)</samp>](https://github.com/lin1213812138/user-admin-web/commit/3375561)
+- **system-manage**:
+  - 打印格式设计跳转标签设计器并隐藏菜单 &nbsp;-&nbsp; by **LINFLY** [<samp>(c46a5)</samp>](https://github.com/lin1213812138/user-admin-web/commit/c46a54a)
+  - 新增站点管理模块 &nbsp;-&nbsp; by **LINFLY** [<samp>(381ca)</samp>](https://github.com/lin1213812138/user-admin-web/commit/381ca81)
+  - 新增组别管理模块并扩展表单控件 &nbsp;-&nbsp; by **LINFLY** [<samp>(51234)</samp>](https://github.com/lin1213812138/user-admin-web/commit/51234dc)
+
+### &nbsp;&nbsp;&nbsp;💅 Refactors
+
+- **权限管理**: 移除部门管理菜单并精简权限抽屉列 &nbsp;-&nbsp; by **LINFLY** [<samp>(02975)</samp>](https://github.com/lin1213812138/user-admin-web/commit/0297595)
+
+### &nbsp;&nbsp;&nbsp;🏡 Chore
+
+- **memory**: 精简 2026-09-14 开发记忆文档 &nbsp;-&nbsp; by **LINFLY** [<samp>(504f5)</samp>](https://github.com/lin1213812138/user-admin-web/commit/504f53c)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[LINFLY](mailto:2276928094@qq.com)
+
 ## [v0.0.7](https://github.com/lin1213812138/user-admin-web/compare/v0.0.6...v0.0.7) (2026-09-14)
 
 ### &nbsp;&nbsp;&nbsp;🚀 Features
