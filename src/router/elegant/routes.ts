@@ -55,7 +55,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'channel-quote',
       i18nKey: 'route.channel-quote',
-      order: 1
+      order: 1,
+      icon: 'ic:baseline-sell'
     },
     children: [
       {
@@ -64,7 +65,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.channel-quote_receive',
         meta: {
           title: 'channel-quote_receive',
-          i18nKey: 'route.channel-quote_receive'
+          i18nKey: 'route.channel-quote_receive',
+          icon: 'ic:baseline-move-to-inbox'
         }
       },
       {
@@ -73,7 +75,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.channel-quote_ship',
         meta: {
           title: 'channel-quote_ship',
-          i18nKey: 'route.channel-quote_ship'
+          i18nKey: 'route.channel-quote_ship',
+          icon: 'ic:baseline-local-shipping'
         }
       }
     ]

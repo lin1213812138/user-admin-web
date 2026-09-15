@@ -49,6 +49,9 @@ export function setupElegantRouter() {
         'data-manage_basic': 'ic:baseline-inventory',
         'data-manage_finance': 'ic:baseline-account-balance-wallet',
         'data-manage_business': 'ic:baseline-warehouse',
+        'channel-quote': 'ic:baseline-sell',
+        'channel-quote_receive': 'ic:baseline-move-to-inbox',
+        'channel-quote_ship': 'ic:baseline-local-shipping',
         // 该路由已 hideInMenu，图标/排序暂时无展示效果，保留以便日后重新开放菜单入口
         'system-manage_label-designer': 'ic:round-label'
       };

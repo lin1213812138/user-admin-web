@@ -24,7 +24,25 @@ import {
   mockUpdateRole,
   mockUpdateSite,
   mockUpdateUser,
-  mockUserList
+  mockUserList,
+  mockGetInitDataList,
+  mockCreateInitData,
+  mockUpdateInitData,
+  mockDeleteInitData,
+  mockGetTraceConfigList,
+  mockCreateTraceConfig,
+  mockUpdateTraceConfig,
+  mockGetTraceTransformList,
+  mockCreateTraceTransform,
+  mockUpdateTraceTransform,
+  mockDeleteTraceTransform,
+  mockGetTraceKeywordList,
+  mockCreateTraceKeyword,
+  mockUpdateTraceKeyword,
+  mockDeleteTraceKeyword,
+  mockGetOperationTraceList,
+  mockCreateOperationTrace,
+  mockUpdateOperationTrace
 } from './mock';
 
 /** get user list */
@@ -349,5 +367,227 @@ export function fetchDeleteCustomer(ids: number[]) {
     url: '/system/customer/delete',
     method: 'post',
     data: { ids }
+  });
+}
+
+/** get init data list */
+export function fetchGetInitDataList(params: Api.SystemManage.InitDataSearchParams) {
+  if (import.meta.env.DEV) {
+    return mockGetInitDataList(params) as unknown as Promise<Api.SystemManage.InitDataList>;
+  }
+
+  return request<Api.SystemManage.InitDataList>({
+    url: '/system/init-data/list',
+    method: 'post',
+    data: params
+  });
+}
+
+/** create init data */
+export function fetchCreateInitData(params: Api.SystemManage.InitDataCreateParams) {
+  if (import.meta.env.DEV) {
+    return mockCreateInitData(params) as unknown as Promise<Api.SystemManage.InitDataItem>;
+  }
+
+  return request<Api.SystemManage.InitDataItem>({
+    url: '/system/init-data/create',
+    method: 'post',
+    data: params
+  });
+}
+
+/** update init data */
+export function fetchUpdateInitData(params: Api.SystemManage.InitDataUpdateParams) {
+  if (import.meta.env.DEV) {
+    return mockUpdateInitData(params) as unknown as Promise<Api.SystemManage.InitDataItem>;
+  }
+
+  return request<Api.SystemManage.InitDataItem>({
+    url: '/system/init-data/update',
+    method: 'post',
+    data: params
+  });
+}
+
+/** delete init data by ids */
+export function fetchDeleteInitData(ids: number[]) {
+  if (import.meta.env.DEV) {
+    return mockDeleteInitData(ids) as unknown as Promise<boolean>;
+  }
+
+  return request<boolean>({
+    url: '/system/init-data/delete',
+    method: 'post',
+    data: { ids }
+  });
+}
+
+/** get trace config list (前 4 个同构子 tab) */
+export function fetchGetTraceConfigList(params: Api.SystemManage.TraceConfigSearchParams) {
+  if (import.meta.env.DEV) {
+    return mockGetTraceConfigList(params) as unknown as Promise<Api.SystemManage.TraceConfigList>;
+  }
+  return request<Api.SystemManage.TraceConfigList>({
+    url: '/system/trace-config/list',
+    method: 'post',
+    data: params
+  });
+}
+
+/** create trace config */
+export function fetchCreateTraceConfig(params: Api.SystemManage.TraceConfigCreateParams) {
+  if (import.meta.env.DEV) {
+    return mockCreateTraceConfig(params) as unknown as Promise<Api.SystemManage.TraceConfigItem>;
+  }
+  return request<Api.SystemManage.TraceConfigItem>({
+    url: '/system/trace-config/create',
+    method: 'post',
+    data: params
+  });
+}
+
+/** update trace config */
+export function fetchUpdateTraceConfig(params: Api.SystemManage.TraceConfigUpdateParams) {
+  if (import.meta.env.DEV) {
+    return mockUpdateTraceConfig(params) as unknown as Promise<Api.SystemManage.TraceConfigItem>;
+  }
+  return request<Api.SystemManage.TraceConfigItem>({
+    url: '/system/trace-config/update',
+    method: 'post',
+    data: params
+  });
+}
+
+/** get trace transform list（轨迹改造 - 异常状态定义） */
+export function fetchGetTraceTransformList(params: Api.SystemManage.TraceTransformSearchParams) {
+  if (import.meta.env.DEV) {
+    return mockGetTraceTransformList(params) as unknown as Promise<Api.SystemManage.TraceTransformList>;
+  }
+  return request<Api.SystemManage.TraceTransformList>({
+    url: '/system/trace-transform/list',
+    method: 'post',
+    data: params
+  });
+}
+
+/** create trace transform */
+export function fetchCreateTraceTransform(params: Api.SystemManage.TraceTransformCreateParams) {
+  if (import.meta.env.DEV) {
+    return mockCreateTraceTransform(params) as unknown as Promise<Api.SystemManage.TraceTransformItem>;
+  }
+  return request<Api.SystemManage.TraceTransformItem>({
+    url: '/system/trace-transform/create',
+    method: 'post',
+    data: params
+  });
+}
+
+/** update trace transform */
+export function fetchUpdateTraceTransform(params: Api.SystemManage.TraceTransformUpdateParams) {
+  if (import.meta.env.DEV) {
+    return mockUpdateTraceTransform(params) as unknown as Promise<Api.SystemManage.TraceTransformItem>;
+  }
+  return request<Api.SystemManage.TraceTransformItem>({
+    url: '/system/trace-transform/update',
+    method: 'post',
+    data: params
+  });
+}
+
+/** delete trace transform by ids */
+export function fetchDeleteTraceTransform(ids: number[]) {
+  if (import.meta.env.DEV) {
+    return mockDeleteTraceTransform(ids) as unknown as Promise<boolean>;
+  }
+
+  return request<boolean>({
+    url: '/system/trace-transform/delete',
+    method: 'post',
+    data: { ids }
+  });
+}
+
+/** get trace keyword list（轨迹关键词 - 匹配规则） */
+export function fetchGetTraceKeywordList(params: Api.SystemManage.TraceKeywordSearchParams) {
+  if (import.meta.env.DEV) {
+    return mockGetTraceKeywordList(params) as unknown as Promise<Api.SystemManage.TraceKeywordList>;
+  }
+  return request<Api.SystemManage.TraceKeywordList>({
+    url: '/system/trace-keyword/list',
+    method: 'post',
+    data: params
+  });
+}
+
+/** create trace keyword */
+export function fetchCreateTraceKeyword(params: Api.SystemManage.TraceKeywordCreateParams) {
+  if (import.meta.env.DEV) {
+    return mockCreateTraceKeyword(params) as unknown as Promise<Api.SystemManage.TraceKeywordItem>;
+  }
+  return request<Api.SystemManage.TraceKeywordItem>({
+    url: '/system/trace-keyword/create',
+    method: 'post',
+    data: params
+  });
+}
+
+/** update trace keyword */
+export function fetchUpdateTraceKeyword(params: Api.SystemManage.TraceKeywordUpdateParams) {
+  if (import.meta.env.DEV) {
+    return mockUpdateTraceKeyword(params) as unknown as Promise<Api.SystemManage.TraceKeywordItem>;
+  }
+  return request<Api.SystemManage.TraceKeywordItem>({
+    url: '/system/trace-keyword/update',
+    method: 'post',
+    data: params
+  });
+}
+
+/** delete trace keyword by ids */
+export function fetchDeleteTraceKeyword(ids: number[]) {
+  if (import.meta.env.DEV) {
+    return mockDeleteTraceKeyword(ids) as unknown as Promise<boolean>;
+  }
+
+  return request<boolean>({
+    url: '/system/trace-keyword/delete',
+    method: 'post',
+    data: { ids }
+  });
+}
+
+/** get operation trace list */
+export function fetchGetOperationTraceList(params: Api.SystemManage.OperationTraceSearchParams) {
+  if (import.meta.env.DEV) {
+    return mockGetOperationTraceList(params) as unknown as Promise<Api.SystemManage.OperationTraceList>;
+  }
+  return request<Api.SystemManage.OperationTraceList>({
+    url: '/system/operation-trace/list',
+    method: 'post',
+    data: params
+  });
+}
+
+/** create operation trace */
+export function fetchCreateOperationTrace(params: Api.SystemManage.OperationTraceCreateParams) {
+  if (import.meta.env.DEV) {
+    return mockCreateOperationTrace(params) as unknown as Promise<Api.SystemManage.OperationTraceItem>;
+  }
+  return request<Api.SystemManage.OperationTraceItem>({
+    url: '/system/operation-trace/create',
+    method: 'post',
+    data: params
+  });
+}
+
+/** update operation trace */
+export function fetchUpdateOperationTrace(params: Api.SystemManage.OperationTraceUpdateParams) {
+  if (import.meta.env.DEV) {
+    return mockUpdateOperationTrace(params) as unknown as Promise<Api.SystemManage.OperationTraceItem>;
+  }
+  return request<Api.SystemManage.OperationTraceItem>({
+    url: '/system/operation-trace/update',
+    method: 'post',
+    data: params
   });
 }

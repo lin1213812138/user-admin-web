@@ -396,5 +396,162 @@ declare namespace Api {
     type CustomerUpdateParams = CustomerCreateParams & {
       id: number;
     };
+
+    /** 初始化数据分类：渠道类别 / 承运网络 / 计泡规则 / 操作配置 */
+    type InitDataCategory = 'channel' | 'network' | 'bubble' | 'operation';
+
+    /** 初始化数据项 */
+    interface InitDataItem {
+      id: number;
+      /** 所属分类 */
+      category: Api.SystemManage.InitDataCategory;
+      /** 中文名称 */
+      cnName: string;
+      /** 英文名称 */
+      enName: string;
+      /** 备注 */
+      remark: string;
+      /** 创建人 */
+      createByName: string;
+      /** 创建时间（YYYY-MM-DD） */
+      createTime: string;
+      /** 最后更新人 */
+      updateByName: string;
+      /** 最后更新时间（YYYY-MM-DD） */
+      updateTime: string;
+    }
+
+    /** 初始化数据列表 */
+    type InitDataList = Api.Common.PaginatingQueryRecord<InitDataItem>;
+
+    /** 初始化数据查询参数 */
+    type InitDataSearchParams = Api.Common.CommonSearchParams & {
+      category: Api.SystemManage.InitDataCategory;
+      cnName?: string;
+    };
+
+    /** 初始化数据新增参数 */
+    type InitDataCreateParams = {
+      category: Api.SystemManage.InitDataCategory;
+      cnName: string;
+      enName: string;
+      remark: string;
+    };
+
+    /** 初始化数据更新参数 */
+    type InitDataUpdateParams = InitDataCreateParams & {
+      id: number;
+    };
+
+    /** 轨迹抓取 - 前 4 个同构子 tab 分类 */
+    type TraceCaptureCategory = 'track-network' | 'track-transform' | 'track-keyword' | 'capture-time';
+
+    interface TraceConfigItem {
+      id: number;
+      category: Api.SystemManage.TraceCaptureCategory;
+      name: string;
+      serverAddress: string;
+      systemType: string;
+      lastEditor: string;
+      editTime: string;
+    }
+
+    type TraceConfigList = Api.Common.PaginatingQueryRecord<TraceConfigItem>;
+
+    type TraceConfigSearchParams = Api.Common.CommonSearchParams & {
+      category: Api.SystemManage.TraceCaptureCategory;
+    };
+
+    type TraceConfigCreateParams = {
+      category: Api.SystemManage.TraceCaptureCategory;
+      name: string;
+      serverAddress: string;
+      systemType: string;
+    };
+
+    type TraceConfigUpdateParams = TraceConfigCreateParams & { id: number };
+
+    /** 轨迹改造 - 时间格式预设：年月日 / 年-月-日 时分 / 年-月-日 时分:秒 */
+    type TraceTransformTimeFormat = 'ymd' | 'ymd-hm' | 'ymd-hms';
+
+    /** 轨迹改造 - 异常状态定义（按关键词判断映射的标准化轨迹状态） */
+    interface TraceTransformItem {
+      id: number;
+      /** 状态名称 */
+      statusName: string;
+      /** 时间格式 */
+      timeFormat: Api.SystemManage.TraceTransformTimeFormat;
+      /** 服务地点 */
+      location: string;
+      /** 详细描述 */
+      description: string;
+      /** 抓取轨迹关键词判断定义（多个关键词用中文逗号分隔） */
+      keywordDefinition: string;
+    }
+
+    type TraceTransformList = Api.Common.PaginatingQueryRecord<TraceTransformItem>;
+
+    type TraceTransformSearchParams = Api.Common.CommonSearchParams;
+
+    type TraceTransformCreateParams = Omit<Api.SystemManage.TraceTransformItem, 'id'>;
+
+    type TraceTransformUpdateParams = Api.SystemManage.TraceTransformItem;
+
+    /** 轨迹关键词 - 使用范围 */
+    type TraceKeywordScope = 'global' | 'site' | 'customer';
+
+    /** 轨迹关键词 - 运单状态 */
+    type TraceKeywordWaybillStatus = 'in-transit' | 'delivered' | 'exception' | 'returned';
+
+    /** 轨迹关键词 - 匹配规则（命中关键词组时把运单状态置为指定值） */
+    interface TraceKeywordItem {
+      id: number;
+      /** 规则名称 */
+      ruleName: string;
+      /** 使用范围 */
+      scope: Api.SystemManage.TraceKeywordScope;
+      /** 关键词组（多个关键词用中文逗号分隔） */
+      keywordGroup: string;
+      /** 运单状态 */
+      waybillStatus: Api.SystemManage.TraceKeywordWaybillStatus;
+      /** 启用状态：1 启用 / 0 禁用 */
+      enabled: Api.Common.EnableStatus;
+      /** 最后编辑 */
+      lastEditor: string;
+      /** 编辑时间 */
+      editTime: string;
+    }
+
+    type TraceKeywordList = Api.Common.PaginatingQueryRecord<TraceKeywordItem>;
+
+    type TraceKeywordSearchParams = Api.Common.CommonSearchParams;
+
+    /** 轨迹关键词新增参数（审计字段由数据层生成） */
+    type TraceKeywordCreateParams = {
+      ruleName: string;
+      scope: Api.SystemManage.TraceKeywordScope;
+      keywordGroup: string;
+      waybillStatus: Api.SystemManage.TraceKeywordWaybillStatus;
+      enabled: Api.Common.EnableStatus;
+    };
+
+    type TraceKeywordUpdateParams = Api.SystemManage.TraceKeywordCreateParams & { id: number };
+
+    interface OperationTraceItem {
+      id: number;
+      node: string;
+      timeFormat: string;
+      location: string;
+      description: string;
+      published: Api.Common.EnableStatus;
+    }
+
+    type OperationTraceList = Api.Common.PaginatingQueryRecord<OperationTraceItem>;
+
+    type OperationTraceSearchParams = Api.Common.CommonSearchParams;
+
+    type OperationTraceCreateParams = Omit<Api.SystemManage.OperationTraceItem, 'id'>;
+
+    type OperationTraceUpdateParams = Api.SystemManage.OperationTraceItem;
   }
 }

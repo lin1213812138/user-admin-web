@@ -392,6 +392,7 @@ declare namespace App {
         trigger: string;
         update: string;
         updateSuccess: string;
+        save: string;
         userCenter: string;
         yesOrNo: {
           yes: string;
@@ -833,9 +834,110 @@ declare namespace App {
               downloadFieldsToast: string;
             };
             waybillRule: string;
-            notificationConfig: string;
-            initData: string;
-            stationScan: string;
+            traceCapture: {
+              title: string;
+              subTab: {
+                trackNetwork: string;
+                trackTransform: string;
+                trackKeyword: string;
+                captureTime: string;
+                operationTrace: string;
+              };
+              col: {
+                name: string;
+                serverAddress: string;
+                systemType: string;
+                lastEditor: string;
+                editTime: string;
+                node: string;
+                timeFormat: string;
+                location: string;
+                description: string;
+                published: string;
+                statusName: string;
+                keywordDefinition: string;
+                ruleName: string;
+                scope: string;
+                keywordGroup: string;
+                waybillStatus: string;
+                enabled: string;
+              };
+              form: {
+                name: string;
+                namePlaceholder: string;
+                serverAddress: string;
+                serverAddressPlaceholder: string;
+                systemType: string;
+                systemTypePlaceholder: string;
+                node: string;
+                nodePlaceholder: string;
+                timeFormat: string;
+                timeFormatPlaceholder: string;
+                location: string;
+                locationPlaceholder: string;
+                description: string;
+                descriptionPlaceholder: string;
+                published: string;
+                statusName: string;
+                statusNamePlaceholder: string;
+                keywordDefinition: string;
+                keywordDefinitionPlaceholder: string;
+                ruleName: string;
+                ruleNamePlaceholder: string;
+                scope: string;
+                keywordGroup: string;
+                keywordGroupPlaceholder: string;
+                waybillStatus: string;
+                enabled: string;
+              };
+              addRow: string;
+              scopeOption: {
+                global: string;
+                site: string;
+                customer: string;
+              };
+              waybillStatusOption: {
+                inTransit: string;
+                delivered: string;
+                exception: string;
+                returned: string;
+              };
+              timeFormatOption: {
+                ymd: string;
+                ymdHm: string;
+                ymdHms: string;
+              };
+              createTitle: string;
+              editTitle: string;
+            };
+            initData: {
+              title: string;
+              basicInfoTitle: string;
+              basicInit: string;
+              businessInit: string;
+              channel: string;
+              network: string;
+              bubble: string;
+              operation: string;
+              cnName: string;
+              enName: string;
+              remark: string;
+              cnNamePlaceholder: string;
+              enNamePlaceholder: string;
+              remarkPlaceholder: string;
+              addRow: string;
+              info: {
+                companyName: string;
+                companyAddress: string;
+                companyUrl: string;
+                systemName: string;
+                contactPhone: string;
+                staffLogin: string;
+                companyLogo: string;
+                defaultOrigin: string;
+                customerLogin: string;
+              };
+            };
             fieldMapping: string;
             fieldMappingRequired: string;
           };

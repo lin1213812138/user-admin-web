@@ -7,9 +7,8 @@ import InputFormat from './modules/input-format/InputFormat.vue';
 import PrintFormat from './modules/print-format/PrintFormat.vue';
 import ExportFormat from './modules/export-format/ExportFormat.vue';
 import WaybillRule from './modules/waybill-rule/WaybillRule.vue';
-import NotificationConfig from './modules/notification-config/NotificationConfig.vue';
+import TraceCapture from './modules/trace-capture/TraceCapture.vue';
 import InitData from './modules/init-data/InitData.vue';
-import StationScan from './modules/station-scan/StationScan.vue';
 
 const route = useRoute();
 
@@ -18,9 +17,8 @@ const tabs = [
   { key: 'print-format', label: $t('page.manage.setting.printFormat.title') },
   { key: 'export-format', label: $t('page.manage.setting.exportFormat.title') },
   { key: 'waybill-rule', label: $t('page.manage.setting.waybillRule') },
-  { key: 'notification-config', label: $t('page.manage.setting.notificationConfig') },
-  { key: 'init-data', label: $t('page.manage.setting.initData') },
-  { key: 'station-scan', label: $t('page.manage.setting.stationScan') }
+  { key: 'trace-capture', label: $t('page.manage.setting.traceCapture.title') },
+  { key: 'init-data', label: $t('page.manage.setting.initData.title') }
 ];
 
 const activeKey = ref('input-format');
@@ -41,9 +39,8 @@ const componentMap: Record<string, Component> = {
   'print-format': PrintFormat,
   'export-format': ExportFormat,
   'waybill-rule': WaybillRule,
-  'notification-config': NotificationConfig,
-  'init-data': InitData,
-  'station-scan': StationScan
+  'trace-capture': TraceCapture,
+  'init-data': InitData
 };
 
 const activeComponent = computed<Component>(() => componentMap[activeKey.value] ?? InputFormat);

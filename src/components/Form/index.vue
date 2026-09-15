@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref } from 'vue';
 import type { FormInst, FormItemRule, FormRules, SelectOption, UploadFileInfo } from 'naive-ui';
 import { NColorPicker, NDatePicker, NUpload } from 'naive-ui';
 import { $t } from '@/locales';
@@ -147,6 +147,15 @@ function handleDateChange(key: string, value: string | null) {
   Object.assign(props.model, { [key]: value ?? '' });
 }
 
+/** 解析上传项的可预览地址：文件项已有地址直接用，否则由本地 File 生成对象 URL */
+function resolveUploadPreview(file?: UploadFileInfo): string {
+  if (!file) return '';
+  if (file.url) return file.url;
+  if (file.file instanceof File) return URL.createObjectURL(file.file);
+
+  return '';
+}
+
 /** 上传控件变更：文件名写回 model（单选场景取最后一个），图片额外记录本地预览地址 */
 function handleUploadChange(key: string, options: { fileList: UploadFileInfo[] }) {
   const last = options.fileList[options.fileList.length - 1];
@@ -155,12 +164,24 @@ function handleUploadChange(key: string, options: { fileList: UploadFileInfo[] }
   // eslint-disable-next-line vue/no-mutating-props
   Object.assign(props.model, { [key]: last?.name ?? '' });
 
-  if (last?.url?.startsWith('blob:')) {
-    uploadPreview[key] = last.url;
-  } else if (!last) {
-    uploadPreview[key] = '';
+  // naive 在 default-upload=false 时不会给文件生成 url（pending 项 url/thumbnailUrl 均为 null），
+  // 而缩略图与预览按钮要求「status=finished 且 url 非空」，故这里自行用 File 生成 blob 预览地址
+  const previous = uploadPreview[key];
+  const next = resolveUploadPreview(last);
+
+  if (previous?.startsWith('blob:') && previous !== next) {
+    URL.revokeObjectURL(previous);
   }
+
+  uploadPreview[key] = next;
 }
+
+// 组件卸载时回收本组件创建的 blob 地址，避免内存泄漏
+onBeforeUnmount(() => {
+  Object.values(uploadPreview).forEach(url => {
+    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+  });
+});
 
 /** total rows by span accumulation (24 per row) */
 const totalRows = computed<number>(() => {
