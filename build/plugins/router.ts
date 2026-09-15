@@ -62,17 +62,18 @@ export function setupElegantRouter() {
         'channel-quote': 1,
         'data-manage': 2,
         'system-manage': 3,
-        // 权限管理模块
         'permission-manage': 4,
+        // 权限管理模块
         'permission-manage_user': 1,
         'permission-manage_role': 2,
         'permission-manage_menu': 3,
-        'system-manage_setting': 7,
-        'system-manage_site': 4,
-        'system-manage_group': 5,
-        'system-manage_customer': 6,
+        // 系统管理模块
+        'system-manage_setting': 4,
+        'system-manage_site': 1,
+        'system-manage_group': 2,
+        'system-manage_customer': 3,
         // 同图标：hideInMenu 后排序无展示效果，保留以便日后重新开放菜单入口
-        'system-manage_label-designer': 6
+        'system-manage_label-designer': 5
       };
 
       const meta: Partial<RouteMeta> = {

@@ -37,48 +37,51 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <Transition name="search-fade">
-    <NCard v-show="!collapsed" :bordered="false" class="card-wrapper shrink-0">
-      <NFormWrap
-        :model="model"
-        :items="items"
-        :grid-x-gap="gridXGap"
-        :grid-responsive="gridResponsive"
-        :label-placement="labelPlacement"
-        :label-width="labelWidth"
-      >
-        <template #actions>
-          <div class="flex items-center gap-8px">
-            <NButton type="primary" ghost @click="emit('search')">
-              <template #icon><icon-ic-round-search class="text-icon" /></template>
-              {{ $t('common.search') }}
-            </NButton>
-            <NButton @click="emit('reset')">
-              <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-              {{ $t('common.reset') }}
-            </NButton>
-          </div>
-        </template>
-      </NFormWrap>
-    </NCard>
-  </Transition>
+  <div class="search-collapse" :class="{ 'is-collapsed': collapsed }">
+    <div class="search-collapse-inner">
+      <NCard :bordered="false" class="card-wrapper shrink-0 mb-12px">
+        <NFormWrap
+          :model="model"
+          :items="items"
+          :grid-x-gap="gridXGap"
+          :grid-responsive="gridResponsive"
+          :label-placement="labelPlacement"
+          :label-width="labelWidth"
+        >
+          <template #actions>
+            <div class="flex items-center gap-8px">
+              <NButton type="primary" ghost @click="emit('search')">
+                <template #icon><icon-ic-round-search class="text-icon" /></template>
+                {{ $t('common.search') }}
+              </NButton>
+              <NButton @click="emit('reset')">
+                <template #icon><icon-ic-round-refresh class="text-icon" /></template>
+                {{ $t('common.reset') }}
+              </NButton>
+            </div>
+          </template>
+        </NFormWrap>
+      </NCard>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-/* 仅动画 opacity + transform（合成器属性，走 GPU，不触发重排），
-   高度变化由 v-show 切换 display 在瞬间完成一次，避免逐帧布局卡顿 */
-.search-fade-enter-active,
-.search-fade-leave-active {
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  /* 动画期间提升为独立合成层，避免大表单（输入框/下拉）逐帧主线程重绘导致卡顿 */
-  will-change: opacity, transform;
+/* 收展用 grid 行高（1fr ↔ 0fr）做过场：纯 CSS，无 JS 测量、无合成层，
+   高度本身被平滑动画，表格随之被推开 / 收回而不是瞬间跳变；
+   收起后行高为 0，卡片连同它的下间距一起被裁掉，不留空隙。 */
+.search-collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.2s ease;
 }
 
-.search-fade-enter-from,
-.search-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
+.search-collapse.is-collapsed {
+  grid-template-rows: 0fr;
+}
+
+.search-collapse-inner {
+  min-height: 0;
+  overflow: hidden;
 }
 </style>

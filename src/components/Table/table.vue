@@ -234,7 +234,7 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
 
 <template>
   <div class="h-full w-full flex flex-col min-h-0">
-    <div v-if="searchItems?.length" :class="{ 'mb-12px': !searchCollapsed }">
+    <div v-if="searchItems?.length">
       <SearchBar
         :items="searchItems"
         :model="searchModel ?? {}"
@@ -268,8 +268,9 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
       </div>
     </div>
 
+    <!-- overflow-hidden：高度动画期间 vxe 表格内部高度仍是旧值，不裁剪会溢出顶出整体滚动条 -->
     <div
-      class="w-full min-h-0 bg-white"
+      class="w-full min-h-0 overflow-hidden bg-white"
       :class="height === '100%' ? 'flex-1 h-full' : ''"
       @mouseover="handleRowMouseOver"
       @mouseleave="handleTableMouseLeave"
