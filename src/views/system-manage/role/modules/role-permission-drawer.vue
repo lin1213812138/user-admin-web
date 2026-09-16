@@ -2,7 +2,8 @@
 import { computed, nextTick, ref, watch } from 'vue';
 import type { VxeTablePropTypes } from 'vxe-table';
 import { $t } from '@/locales';
-import { fetchAssignRoleMenu, fetchGetMenuList, fetchGetRoleMenuTree } from '@/service/api/system-manage';
+import { fetchAssignRoleMenu, fetchGetRoleMenuTree } from '@/service/api/role';
+import { fetchGetMenuList } from '@/service/api/menu';
 import { getMenuButtons, type ButtonPermission } from '@/constants/button-permissions';
 import CommonDrawer from '@/components/common/drawer.vue';
 import { Table } from '@/components/Table';
@@ -50,7 +51,7 @@ const drawerVisible = computed({
 });
 
 const title = computed(() =>
-  props.row ? `${$t('page.manage.role.permission')} - ${props.row.roleName}` : $t('page.manage.role.permission')
+  props.row ? `${$t('page.manage.role.permission')} - ${props.row.name}` : $t('page.manage.role.permission')
 );
 
 const submitting = ref(false);
@@ -304,7 +305,7 @@ async function loadData() {
   loading.value = true;
   try {
     const [treeResult, menuResult] = await Promise.allSettled([
-      fetchGetRoleMenuTree(props.row.id) as Promise<Api.SystemManage.RoleMenuTree>,
+      fetchGetRoleMenuTree(props.row._id) as Promise<Api.SystemManage.RoleMenuTree>,
       fetchGetMenuList({}) as Promise<Api.SystemManage.MenuList>
     ]);
 
@@ -409,7 +410,7 @@ async function handleSubmit() {
   try {
     // 收集所有菜单勾选的按钮权限码（去重）
     const buttonCodes = [...new Set(Object.values(rowButtonChecks.value).flat())];
-    await fetchAssignRoleMenu({ roleId: props.row.id, menuIds: checkedIds.value, buttonCodes });
+    await fetchAssignRoleMenu({ roleId: props.row._id, menuIds: checkedIds.value, buttonCodes });
     window.$message?.success($t('common.updateSuccess'));
     drawerVisible.value = false;
     emit('submitted');

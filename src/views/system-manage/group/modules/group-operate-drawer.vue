@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import { fetchCreateGroup, fetchGetSiteList, fetchUpdateGroup } from '@/service/api/system-manage';
+import { fetchCreateGroup, fetchUpdateGroup } from '@/service/api/group';
+import { fetchGetSiteList } from '@/service/api/site';
 import GroupDrawer from '@/components/common/drawer.vue';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 
@@ -58,15 +59,14 @@ onMounted(() => {
 });
 
 const model = reactive<Api.SystemManage.GroupCreateParams>({
-  groupName: '',
-  siteId: null,
-  remark: '',
-  status: 1
+  name: '',
+  siteId: '',
+  desc: ''
 });
 
 const formItems = computed<FormItemConfig[]>(() => [
   {
-    key: 'groupName',
+    key: 'name',
     label: $t('page.manage.group.groupName'),
     type: 'input',
     required: true,
@@ -83,37 +83,25 @@ const formItems = computed<FormItemConfig[]>(() => [
     placeholder: $t('page.manage.group.form.siteNamePlaceholder')
   },
   {
-    key: 'remark',
+    key: 'desc',
     label: $t('page.manage.group.remark'),
     type: 'textarea',
     span: 24,
     placeholder: $t('page.manage.group.form.remarkPlaceholder')
-  },
-  {
-    key: 'status',
-    label: $t('page.manage.group.status'),
-    type: 'switch',
-    span: 24,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable'),
-    checkedValue: 1,
-    uncheckedValue: 0
   }
 ]);
 
 function fillFormByRow() {
   if (!props.row) return;
-  model.groupName = props.row.groupName;
+  model.name = props.row.name;
   model.siteId = props.row.siteId;
-  model.remark = props.row.remark;
-  model.status = props.row.status;
+  model.desc = props.row.desc ?? '';
 }
 
 function resetForm() {
-  model.groupName = '';
-  model.siteId = null;
-  model.remark = '';
-  model.status = 1;
+  model.name = '';
+  model.siteId = '';
+  model.desc = '';
 }
 
 async function handleSubmit() {
@@ -124,19 +112,21 @@ async function handleSubmit() {
   submitting.value = true;
 
   try {
+    const { error } = isCreate.value
+      ? await fetchCreateGroup({ ...model })
+      : await fetchUpdateGroup({ _id: props.row!._id, ...model });
+
+    // 真实接口错误已由 request 拦截器统一提示，这里只负责不再继续走成功流程
+    if (error) return;
+
     if (isCreate.value) {
-      await fetchCreateGroup({ ...model });
       window.$message?.success($t('common.addSuccess'));
     } else {
-      await fetchUpdateGroup({ id: props.row!.id, ...model });
       window.$message?.success($t('common.updateSuccess'));
     }
 
     drawerVisible.value = false;
     emit('submitted');
-  } catch (error) {
-    // 本地 mock 校验（如组别名称重复）会抛错需自行提示；真实接口错误已由 request 拦截器统一提示
-    window.$message?.error(error instanceof Error ? error.message : String(error));
   } finally {
     submitting.value = false;
   }

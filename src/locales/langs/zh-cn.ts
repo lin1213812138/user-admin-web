@@ -365,6 +365,9 @@ const local: App.I18n.Schema = {
         siteName: '所属站点',
         groupName: '所属组别',
         status: '状态',
+        keyword: '关键字',
+        idCard: '身份证号',
+        unknown: '未知',
         basicInfo: '基本信息',
         profileInfo: '个人档案',
         realName: '姓名',
@@ -384,20 +387,23 @@ const local: App.I18n.Schema = {
         wechatQrcode: '微信二维码',
         createTime: '创建时间',
         form: {
-          userNamePlaceholder: '请输入系统登录用户名',
-          nickNamePlaceholder: '请输入',
-          roleNamePlaceholder: '请输入',
+          userNamePlaceholder: '请输入账号',
+          nickNamePlaceholder: '请输入用户名称',
+          roleNamePlaceholder: '请选择用户角色',
           passwordPlaceholder: '请输入密码',
-          siteNamePlaceholder: '请输入',
-          groupNamePlaceholder: '请输入',
+          passwordEditPlaceholder: '留空则不修改密码',
+          siteNamePlaceholder: '请选择所属站点',
+          groupNamePlaceholder: '请选择所属组别',
           statusPlaceholder: '请选择状态',
+          keywordPlaceholder: '账号 / 用户名称 / 姓名模糊搜索',
+          idCardPlaceholder: '请输入身份证号码',
           realNamePlaceholder: '请输入',
           contactPhonePlaceholder: '请输入',
           positionPlaceholder: '请输入',
-          genderPlaceholder: '请输入',
+          genderPlaceholder: '请选择性别',
           emailPlaceholder: '请输入',
-          hireDatePlaceholder: '请输入',
-          birthdayPlaceholder: '请输入',
+          hireDatePlaceholder: '请选择日期',
+          birthdayPlaceholder: '请选择日期',
           wechatPlaceholder: '请输入',
           homeAddressPlaceholder: '请输入',
           otherContactPlaceholder: '请输入',
@@ -406,21 +412,43 @@ const local: App.I18n.Schema = {
       },
       role: {
         roleName: '角色名称',
-        roleCode: '角色标识',
-        remark: '角色描述',
-        sort: '排序',
-        status: '状态',
+        roleType: '角色类型',
+        desc: '角色描述',
+        refId: '权限套用',
+        dataAuths: '数据权限',
+        order: '排序',
+        creator: '创建人',
         createTime: '创建时间',
+        updateBy: '编辑人',
+        updateTime: '更新时间',
+        roleTypes: {
+          service: '客服',
+          sales: '销售',
+          operation: '操作',
+          finance: '财务',
+          manager: '经理',
+          admin: '管理员'
+        },
+        dataAuthOptions: {
+          user: '仅查看专属客户业务',
+          group: '仅查看所属组别客户业务'
+        },
+        ctrls: {
+          sendOrder: '出库后允许修改运单',
+          sendCtrl: '出库必须称重',
+          orderCol: '允许设置运单列表字段',
+          editInfo: '允许修改个人信息'
+        },
         permission: '分配权限',
         permissionTip: '勾选该角色可访问的菜单',
         searchMenuPlaceholder: '搜索菜单名称 / 路由地址 / 权限标识',
         loadMenuFailed: '菜单权限加载失败',
         form: {
           roleNamePlaceholder: '请输入角色名称',
-          roleCodePlaceholder: '请输入角色标识',
-          sortPlaceholder: '请输入排序值',
-          statusPlaceholder: '请选择状态',
-          remarkPlaceholder: '请输入角色描述'
+          roleTypePlaceholder: '请选择角色类型',
+          refIdPlaceholder: '请选择要套用权限的角色',
+          orderPlaceholder: '请输入排序值',
+          descPlaceholder: '请输入角色描述'
         }
       },
       menu: {
@@ -524,14 +552,14 @@ const local: App.I18n.Schema = {
         groupName: '组别名称',
         siteName: '所属站点',
         remark: '组别备注',
+        creator: '创建人',
         createTime: '创建',
+        updateBy: '编辑人',
         updateTime: '最后更新',
-        status: '状态',
         form: {
           groupNamePlaceholder: '请输入组别名称',
           siteNamePlaceholder: '请选择所属站点',
-          remarkPlaceholder: '请输入组别备注',
-          statusPlaceholder: '请选择状态'
+          remarkPlaceholder: '请输入组别备注'
         }
       },
       customer: {

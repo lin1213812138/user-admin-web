@@ -1,10 +1,5 @@
-import { request } from '../request';
-import {
-  mockChannelQuoteCreate,
-  mockChannelQuoteDelete,
-  mockChannelQuoteList,
-  mockChannelQuoteUpdate
-} from './mock-channel-quote';
+import { request } from '../../request';
+import { mockChannelQuoteCreate, mockChannelQuoteDelete, mockChannelQuoteList, mockChannelQuoteUpdate } from './mock';
 
 /** get channel quote list (DEV: mock; PROD: /channel-quote/:archive/list) */
 export function fetchGetChannelQuoteList<T extends Api.ChannelQuote.ChannelQuoteRow>(

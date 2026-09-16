@@ -260,9 +260,10 @@ function getSpan(item: FormItemConfig): number | string {
   return item.span ?? 24;
 }
 
-function toggleExpand() {
-  expanded.value = !expanded.value;
-}
+// 展开收起功能暂时下线（恢复时一并取消注释）
+// function toggleExpand() {
+//   expanded.value = !expanded.value;
+// }
 
 /** 校验表单，通过后返回 true */
 async function validate(): Promise<boolean> {
@@ -445,11 +446,14 @@ defineExpose({
         <template v-for="it in actionItems" :key="it.key">
           <slot :name="it.slot" :model="model" :item="it" />
         </template>
-        <NButton v-if="showToggle" text type="primary" @click="toggleExpand">
+        <!-- 展开收起按钮暂时下线（恢复时一并取消注释，同时恢复 script 中的 toggleExpand） -->
+        <!--
+ <NButton v-if="showToggle" text type="primary" @click="toggleExpand">
           {{ expanded ? $t('common.collapseFilter') : $t('common.expandFilter') }}
           <icon-ic-baseline-keyboard-arrow-up v-if="expanded" class="text-icon" />
           <icon-ic-baseline-keyboard-arrow-down v-else class="text-icon" />
-        </NButton>
+        </NButton> 
+-->
       </div>
     </template>
     <slot v-else />

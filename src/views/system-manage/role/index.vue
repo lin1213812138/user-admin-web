@@ -1,83 +1,124 @@
 <script setup lang="ts">
+import dayjs from 'dayjs';
 import { computed, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteRole, fetchGetRoleList } from '@/service/api/system-manage';
+import { fetchDeleteRole, fetchGetRoleList } from '@/service/api/role';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
 import RoleOperateDrawer from './modules/role-operate-drawer.vue';
 import RolePermissionDrawer from './modules/role-permission-drawer.vue';
 
-const searchParams = reactive<Omit<Api.SystemManage.RoleSearchParams, 'current' | 'size'>>({
-  roleName: '',
-  roleCode: '',
-  status: null
+const searchParams = reactive<{ name: string; roleType: Api.SystemManage.RoleType | null }>({
+  name: '',
+  roleType: null
 });
 
-const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() => [
-  { label: $t('common.enable'), value: 1 },
-  { label: $t('common.disable'), value: 0 }
+/** 角色类型下拉选项（后端 RoleType：0-客服 1-销售 2-操作 3-财务 4-经理 5-管理员） */
+const roleTypeOptions = computed<CommonType.Option<Api.SystemManage.RoleType>[]>(() => [
+  { label: $t('page.manage.role.roleTypes.service'), value: 0 },
+  { label: $t('page.manage.role.roleTypes.sales'), value: 1 },
+  { label: $t('page.manage.role.roleTypes.operation'), value: 2 },
+  { label: $t('page.manage.role.roleTypes.finance'), value: 3 },
+  { label: $t('page.manage.role.roleTypes.manager'), value: 4 },
+  { label: $t('page.manage.role.roleTypes.admin'), value: 5 }
 ]);
 
 const searchItems = computed<FormItemConfig[]>(() => [
   {
-    key: 'roleName',
+    key: 'name',
     label: $t('page.manage.role.roleName'),
     type: 'input',
     span: 6,
     placeholder: $t('page.manage.role.form.roleNamePlaceholder')
   },
   {
-    key: 'roleCode',
-    label: $t('page.manage.role.roleCode'),
-    type: 'input',
-    span: 6,
-    placeholder: $t('page.manage.role.form.roleCodePlaceholder')
-  },
-  {
-    key: 'status',
-    label: $t('page.manage.role.status'),
+    key: 'roleType',
+    label: $t('page.manage.role.roleType'),
     type: 'select',
     span: 6,
-    options: statusOptions.value,
-    placeholder: $t('page.manage.role.form.statusPlaceholder')
+    options: roleTypeOptions.value,
+    placeholder: $t('page.manage.role.form.roleTypePlaceholder')
   },
   { key: 'actions', label: ' ', slot: 'actions', span: 6 }
 ]);
 
 const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
-  Api.SystemManage.RoleList,
+  { records: Api.SystemManage.Role[]; total: number },
   Api.SystemManage.Role
 >({
-  api: ({ current, size }) =>
-    fetchGetRoleList({
-      current,
-      size,
-      roleName: searchParams.roleName?.trim() || undefined,
-      roleCode: searchParams.roleCode?.trim() || undefined,
-      status: searchParams.status || undefined
-    }) as Promise<Api.SystemManage.RoleList>,
+  // 真实接口 /role/query 为 queryAllCommon 全量查询（无分页），这里拉全量后本地分页
+  api: async ({ current, size }) => {
+    const { data: res, error } = await fetchGetRoleList({
+      // 角色名走 keyword 正则模糊匹配；角色类型精确过滤（null 需 ?? 兜底）
+      where: { roleType: searchParams.roleType ?? undefined },
+      keyword: searchParams.name?.trim() || undefined,
+      keywordFields: ['name']
+    });
+
+    if (error || !res) return { records: [], total: 0 };
+
+    const start = (current - 1) * size;
+    return { records: res.list.slice(start, start + size), total: res.list.length };
+  },
   transform: r => ({ records: r.records, total: r.total }),
   columns: () =>
     [
-      { key: 'roleName', title: $t('page.manage.role.roleName'), type: 'detail', visible: true, sortable: false },
-      { key: 'roleCode', title: $t('page.manage.role.roleCode'), visible: true, sortable: false },
-      { key: 'remark', title: $t('page.manage.role.remark'), visible: true, minWidth: 200, sortable: false },
-      { key: 'sort', title: $t('page.manage.role.sort'), visible: true, width: 80, align: 'center', sortable: true },
       {
-        key: 'status',
-        title: $t('page.manage.role.status'),
-        type: 'status',
+        key: 'name',
+        title: $t('page.manage.role.roleName'),
+        type: 'detail',
+        visible: true,
+        width: 140,
+        sortable: false
+      },
+      {
+        key: 'roleType',
+        title: $t('page.manage.role.roleType'),
         visible: true,
         width: 100,
-        fixed: 'right',
-        sortable: false,
-        align: 'center'
+        align: 'center',
+        sortable: false
       },
-      { key: 'createTime', title: $t('page.manage.role.createTime'), visible: true, width: 180, sortable: true }
+      { key: 'desc', title: $t('page.manage.role.desc'), visible: true, minWidth: 160, sortable: false },
+      { key: 'order', title: $t('page.manage.role.order'), visible: true, width: 80, align: 'center', sortable: true },
+      { key: 'dataAuths', title: $t('page.manage.role.dataAuths'), visible: true, minWidth: 180, sortable: false },
+      { key: 'creator', title: $t('page.manage.role.creator'), visible: true, width: 100, sortable: false },
+      { key: 'createDate', title: $t('page.manage.role.createTime'), visible: true, width: 180, sortable: false },
+      { key: 'updateBy', title: $t('page.manage.role.updateBy'), visible: true, width: 100, sortable: false },
+      { key: 'updateDate', title: $t('page.manage.role.updateTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  cacheKey: 'system-manage-role'
+  // 字段结构对齐后端（name/desc/_id），换新缓存 key 避免旧列配置（roleName/status 等）残留
+  cacheKey: 'system-manage-role-v2'
 });
+
+/** 毫秒时间戳格式化展示 */
+function formatDate(ts?: number) {
+  return ts ? dayjs(ts).format('YYYY-MM-DD HH:mm') : '--';
+}
+
+/** 角色类型文案 */
+function roleTypeLabel(roleType?: Api.SystemManage.RoleType) {
+  const map: Record<Api.SystemManage.RoleType, string> = {
+    0: $t('page.manage.role.roleTypes.service'),
+    1: $t('page.manage.role.roleTypes.sales'),
+    2: $t('page.manage.role.roleTypes.operation'),
+    3: $t('page.manage.role.roleTypes.finance'),
+    4: $t('page.manage.role.roleTypes.manager'),
+    5: $t('page.manage.role.roleTypes.admin')
+  };
+  return roleType === undefined ? '--' : map[roleType];
+}
+
+/** 数据权限文案 */
+function dataAuthLabels(dataAuths?: Api.SystemManage.RoleDataAuth[]) {
+  if (!dataAuths?.length) return '--';
+  const map: Record<Api.SystemManage.RoleDataAuth, string> = {
+    0: $t('page.manage.role.dataAuthOptions.user'),
+    1: $t('page.manage.role.dataAuthOptions.group')
+  };
+  return dataAuths.map(item => map[item]).join('、');
+}
 
 const configVisible = ref(false);
 const checkedRows = ref<Api.SystemManage.Role[]>([]);
@@ -98,14 +139,14 @@ function handleSearch() {
 }
 
 function handleReset() {
-  searchParams.roleName = '';
-  searchParams.roleCode = '';
-  searchParams.status = null;
+  searchParams.name = '';
+  searchParams.roleType = null;
   handleSearch();
 }
 
-async function handleDelete(ids: number[]) {
-  await fetchDeleteRole(ids);
+async function handleDelete(ids: string[]) {
+  // 后端 /role/delete 为单条删除，批量时逐条调用
+  await Promise.all(ids.map(id => fetchDeleteRole(id)));
   window.$message?.success($t('common.deleteSuccess'));
   checkedRows.value = [];
   getData();
@@ -163,6 +204,22 @@ function handleSubmitted() {
         @selection-change="handleSelectionChange"
         @detail="handleDetail"
       >
+        <template #roleType="{ row }">
+          <NTag size="small" :bordered="false">{{ roleTypeLabel(row.roleType) }}</NTag>
+        </template>
+
+        <template #dataAuths="{ row }">
+          <span>{{ dataAuthLabels(row.dataAuths) }}</span>
+        </template>
+
+        <template #createDate="{ row }">
+          <span>{{ formatDate(row.createDate) }}</span>
+        </template>
+
+        <template #updateDate="{ row }">
+          <span>{{ formatDate(row.updateDate) }}</span>
+        </template>
+
         <template #operation-left>
           <NSpace justify="start" wrap>
             <NButton size="small" type="primary" ghost @click="openDrawer('create')">
@@ -173,7 +230,7 @@ function handleSubmitted() {
             </NButton>
             <NPopconfirm
               :disabled="checkedRows.length === 0"
-              @positive-click="handleDelete(checkedRows.map(i => i.id))"
+              @positive-click="handleDelete(checkedRows.map(i => i._id))"
             >
               <template #trigger>
                 <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
@@ -209,7 +266,7 @@ function handleSubmitted() {
           <NButton size="small" type="info" text @click="openPermissionDrawer(row)">
             {{ $t('page.manage.role.permission') }}
           </NButton>
-          <NPopconfirm @positive-click="handleDelete([row.id])">
+          <NPopconfirm @positive-click="handleDelete([row._id])">
             <template #trigger>
               <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
             </template>

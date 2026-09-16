@@ -2,7 +2,7 @@
 import { computed, reactive, ref, watch } from 'vue';
 import type { SelectOption } from 'naive-ui';
 import { $t } from '@/locales';
-import { fetchCreateTraceKeyword, fetchUpdateTraceKeyword } from '@/service/api/system-manage';
+import { fetchCreateTraceKeyword, fetchUpdateTraceKeyword } from '@/service/api/trace-keyword';
 import SiteDrawer from '@/components/common/drawer.vue';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 

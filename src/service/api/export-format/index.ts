@@ -1,4 +1,4 @@
-import { request } from '../request';
+import { request } from '../../request';
 
 /** 内存 mock 库（DEV 持久化增删） */
 let mockSeq = 300;

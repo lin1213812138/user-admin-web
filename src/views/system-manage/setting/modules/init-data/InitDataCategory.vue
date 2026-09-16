@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteInitData, fetchGetInitDataList } from '@/service/api/system-manage';
+import { fetchDeleteInitData, fetchGetInitDataList } from '@/service/api/init-data';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import InitDataFormDrawer from './init-data-form-drawer.vue';

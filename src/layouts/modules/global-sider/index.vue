@@ -32,9 +32,10 @@ const menuWrapperClass = computed(() => (showLogo.value ? 'flex-1-hidden' : 'h-f
       :style="{ height: themeStore.header.height + 'px' }"
     />
     <div :id="GLOBAL_SIDER_MENU_ID" :class="menuWrapperClass"></div>
-    <!-- 底部用户区：收起时仅显示图标（见 user-avatar.vue） -->
+    <!-- 底部用户区：收起时仅显示图标（见 user-avatar.vue）；inverted 深色侧栏下文字/分隔线需用浅色 -->
     <div
-      class="flex-y-center justify-center border-t border-gray-200 dark:border-gray-700"
+      class="flex-y-center justify-center border-t"
+      :class="darkMenu ? 'sider-footer--inverted border-white/10' : 'border-gray-200 dark:border-gray-700'"
       :style="{ height: themeStore.header.height + 'px' }"
     >
       <UserAvatar />
@@ -42,4 +43,13 @@ const menuWrapperClass = computed(() => (showLogo.value ? 'flex-1-hidden' : 'h-f
   </DarkModeContainer>
 </template>
 
-<style scoped></style>
+<style scoped>
+.sider-footer--inverted {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* NButton 通过内联 CSS 变量设置文字颜色（浅色主题为深色），深色侧栏下需强制覆盖为浅色 */
+.sider-footer--inverted :deep(.n-button) {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+</style>

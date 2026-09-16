@@ -628,6 +628,9 @@ declare namespace App {
             siteName: string;
             groupName: string;
             status: string;
+            keyword: string;
+            idCard: string;
+            unknown: string;
             basicInfo: string;
             profileInfo: string;
             realName: string;
@@ -651,9 +654,12 @@ declare namespace App {
               nickNamePlaceholder: string;
               roleNamePlaceholder: string;
               passwordPlaceholder: string;
+              passwordEditPlaceholder: string;
               siteNamePlaceholder: string;
               groupNamePlaceholder: string;
               statusPlaceholder: string;
+              keywordPlaceholder: string;
+              idCardPlaceholder: string;
               realNamePlaceholder: string;
               contactPhonePlaceholder: string;
               positionPlaceholder: string;
@@ -669,21 +675,43 @@ declare namespace App {
           };
           role: {
             roleName: string;
-            roleCode: string;
-            remark: string;
-            sort: string;
-            status: string;
+            roleType: string;
+            desc: string;
+            refId: string;
+            dataAuths: string;
+            order: string;
+            creator: string;
             createTime: string;
+            updateBy: string;
+            updateTime: string;
+            roleTypes: {
+              service: string;
+              sales: string;
+              operation: string;
+              finance: string;
+              manager: string;
+              admin: string;
+            };
+            dataAuthOptions: {
+              user: string;
+              group: string;
+            };
+            ctrls: {
+              sendOrder: string;
+              sendCtrl: string;
+              orderCol: string;
+              editInfo: string;
+            };
             permission: string;
             permissionTip: string;
             searchMenuPlaceholder: string;
             loadMenuFailed: string;
             form: {
               roleNamePlaceholder: string;
-              roleCodePlaceholder: string;
-              sortPlaceholder: string;
-              statusPlaceholder: string;
-              remarkPlaceholder: string;
+              roleTypePlaceholder: string;
+              refIdPlaceholder: string;
+              orderPlaceholder: string;
+              descPlaceholder: string;
             };
           };
           menu: {
@@ -787,14 +815,14 @@ declare namespace App {
             groupName: string;
             siteName: string;
             remark: string;
+            creator: string;
             createTime: string;
+            updateBy: string;
             updateTime: string;
-            status: string;
             form: {
               groupNamePlaceholder: string;
               siteNamePlaceholder: string;
               remarkPlaceholder: string;
-              statusPlaceholder: string;
             };
           };
           customer: {

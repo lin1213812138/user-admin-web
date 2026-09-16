@@ -2,7 +2,7 @@
 import dayjs from 'dayjs';
 import { computed, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteSite, fetchGetSiteList } from '@/service/api/system-manage';
+import { fetchDeleteSite, fetchGetSiteList } from '@/service/api/site';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';

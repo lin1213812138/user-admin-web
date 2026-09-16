@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import { fetchCreateSite, fetchGetSite, fetchUpdateSite } from '@/service/api/system-manage';
+import { fetchCreateSite, fetchGetSite, fetchUpdateSite } from '@/service/api/site';
 import SiteDrawer from '@/components/common/drawer.vue';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 

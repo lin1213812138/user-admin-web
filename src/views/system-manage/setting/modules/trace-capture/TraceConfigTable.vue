@@ -4,7 +4,7 @@ import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import { NButton } from 'naive-ui';
-import { fetchGetTraceConfigList } from '@/service/api/system-manage';
+import { fetchGetTraceConfigList } from '@/service/api/trace-config';
 import TraceConfigDrawer from './TraceConfigDrawer.vue';
 
 const props = defineProps<{ category: Api.SystemManage.TraceCaptureCategory }>();

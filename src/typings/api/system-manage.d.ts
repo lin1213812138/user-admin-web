@@ -5,135 +5,219 @@ declare namespace Api {
    * backend api module: "system manage"
    */
   namespace SystemManage {
-    /** user */
+    /** 用户性别：0-未知 1-男 2-女 */
+    type UserSex = 0 | 1 | 2;
+
+    /** 账号类型：0-用户 1-管理员 */
+    type UserAccountType = 0 | 1;
+
+    /** 用户（tms-user 真实实体，接口 /user/*；hashedPassword/salt 等后端域字段前端不使用） */
     interface User {
-      id: number;
-      /** 用户账号（系统登录用户名） */
-      userName: string;
-      /** 用户名称 */
-      nickName: string;
-      /** 用户密码（mock 阶段明文，仅演示） */
-      password: string;
-      /** 用户角色 id */
-      roleId: number | null;
-      /** 用户角色名称（由数据层按 roleId 解析） */
-      roleName: string;
-      /** 所属站点 id */
-      siteId: number | null;
-      /** 所属站点名称（由数据层按 siteId 解析） */
-      siteName: string;
-      /** 所属组别 id */
-      groupId: number | null;
-      /** 所属组别名称（由数据层按 groupId 解析） */
-      groupName: string;
-      /** user status */
-      status: Api.Common.EnableStatus;
+      /** 主键（MongoId 字符串） */
+      _id: string;
+      /** 用户账号，唯一，登录用 */
+      account: string;
+      /** 大写账号（后端按 account 自动生成，仅查询返回） */
+      upperAccount?: string;
+      /** 用户名称，唯一 */
+      name: string;
+      /** 所属站点 id（MongoId 字符串） */
+      siteId: string;
+      /** 用户角色 id 列表 */
+      roleIds?: string[];
+      /** 所属组别 id 列表 */
+      groupIds?: string[];
       /** 姓名 */
-      realName: string;
-      /** 联系电话 */
-      contactPhone: string;
-      /** 职位 */
-      position: string;
-      /** 性别 */
-      gender: string;
-      /** 邮箱 */
-      email: string;
-      /** 入职时间（YYYY-MM-DD） */
-      hireDate: string;
-      /** 出生日期（YYYY-MM-DD） */
-      birthday: string;
-      /** 微信 */
-      wechat: string;
-      /** 附件（文件名） */
-      attachment: string;
+      fullName?: string;
+      /** 性别 0-未知 1-男 2-女 */
+      sex?: Api.SystemManage.UserSex;
+      /** 出生日期（毫秒时间戳） */
+      birthday?: number;
+      /** 身份证（后端为 Number，18 位长号码有精度损失） */
+      idCard?: number;
       /** 家庭住址 */
-      homeAddress: string;
+      address?: string;
+      /** 联系电话 */
+      phone?: string;
+      /** 邮箱 */
+      email?: string;
+      /** 微信 */
+      wx?: string;
       /** 其他联系方式 */
-      otherContact: string;
+      contact?: string;
+      /** 职位 */
+      job?: string;
+      /** 入职时间（毫秒时间戳） */
+      entryDate?: number;
+      /** 微信二维码（URL） */
+      qrCodeUrl?: string;
+      /** 附件（文件名） */
+      file?: string;
+      /** 附件地址 */
+      fileUrl?: string;
       /** 备注 */
-      remark: string;
-      /** 微信二维码（文件名 / URL） */
-      wechatQrcode: string;
-      createTime: string;
+      note?: string;
+      /** 是否启用 0-否 1-是 */
+      status: Api.Common.EnableStatus;
+      /** 账号类型 0-用户 1-管理员 */
+      accountType?: Api.SystemManage.UserAccountType;
+      /** 所属站点名称（后端 fillName 回填） */
+      site?: string;
+      /** 所属组别名称（后端 fillName 回填，多个用「、」分隔） */
+      group?: string;
+      /** 用户角色名称（后端 fillName 回填，多个用「、」分隔） */
+      role?: string;
+      creatorId?: string;
+      creator?: string;
+      updateId?: string;
+      updateBy?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate: number;
     }
 
-    /** user list */
-    type UserList = Api.Common.PaginatingQueryRecord<User>;
-
-    /** user search params */
-    type UserSearchParams = Api.Common.CommonSearchParams & {
-      userName?: string;
-      status?: Api.Common.EnableStatus | null;
+    /** user list（/user/query 返回 ret：{ list, total }） */
+    type UserList = {
+      list: User[];
+      total: number;
     };
 
-    /** user create params */
+    /** user search params（/user/query，keyword 固定匹配 name/fullName/account） */
+    type UserSearchParams = {
+      page: number;
+      size: number;
+      keyword?: string;
+      keywordFields?: string[];
+      /** 其他查询条件（站点 / 状态精确过滤） */
+      where?: {
+        siteId?: string;
+        status?: Api.Common.EnableStatus;
+      };
+    };
+
+    /** user create params（/user/create，后端必填 account/password/siteId，account + name 唯一） */
     type UserCreateParams = {
-      userName: string;
-      nickName: string;
+      account: string;
+      name: string;
       password: string;
-      roleId: number | null;
-      siteId: number | null;
-      groupId: number | null;
-      status: Api.Common.EnableStatus;
-      realName: string;
-      contactPhone: string;
-      position: string;
-      gender: string;
-      email: string;
-      hireDate: string;
-      birthday: string;
-      wechat: string;
-      attachment: string;
-      homeAddress: string;
-      otherContact: string;
-      remark: string;
-      wechatQrcode: string;
+      siteId: string;
+      roleIds?: string[];
+      groupIds?: string[];
+      fullName?: string;
+      sex?: Api.SystemManage.UserSex;
+      birthday?: number;
+      idCard?: number;
+      address?: string;
+      phone?: string;
+      email?: string;
+      wx?: string;
+      contact?: string;
+      job?: string;
+      entryDate?: number;
+      qrCodeUrl?: string;
+      file?: string;
+      fileUrl?: string;
+      note?: string;
+      status?: Api.Common.EnableStatus;
     };
 
-    /** user update params */
-    type UserUpdateParams = UserCreateParams & {
-      id: number;
+    /** user update params（/user/update，password 缺省则不改密码；改自己密码后端会强制重新登录） */
+    type UserUpdateParams = Omit<UserCreateParams, 'password'> & {
+      _id: string;
+      password?: string;
     };
 
-    /** role */
+    /** 角色类型 0-客服 1-销售 2-操作 3-财务 4-经理 5-管理员 */
+    type RoleType = 0 | 1 | 2 | 3 | 4 | 5;
+
+    /** 角色数据权限 0-仅查看专属客户业务 1-仅查看所属组别客户业务 */
+    type RoleDataAuth = 0 | 1;
+
+    /** 角色开关类控制值 0-不允许/不启用 1-允许/启用 */
+    type RoleCtrl = 0 | 1;
+
+    /** 角色（tms-user 真实实体，字段名以后端 Role Schema 为准） */
     interface Role {
-      id: number;
-      /** role name */
-      roleName: string;
-      /** role code */
-      roleCode: string;
-      /** role remark */
-      remark: string;
-      /** role sort */
-      sort: number;
-      /** role status */
-      status: Api.Common.EnableStatus;
-      createTime: string;
+      /** 主键（MongoId 字符串） */
+      _id: string;
+      /** 角色名称，全局唯一 */
+      name: string;
+      /** 角色类型 */
+      roleType?: Api.SystemManage.RoleType;
+      /** 角色描述 */
+      desc?: string;
+      /** 操作权限码 */
+      auths?: string[];
+      /** 权限套用（被套用角色的 MongoId） */
+      refId?: string;
+      /** 数据权限 */
+      dataAuths?: Api.SystemManage.RoleDataAuth[];
+      /** 可见的录单格式 id */
+      orderTemplateIds?: string[];
+      /** 出库后允许修改运单 0-不允许 1-允许 */
+      sendOrderCtrl?: Api.SystemManage.RoleCtrl;
+      /** 出库必须称重 0-不启用 1-启用 */
+      sendCtrl?: Api.SystemManage.RoleCtrl;
+      /** 允许设置运单列表字段 0-不允许 1-允许 */
+      orderColCtrl?: Api.SystemManage.RoleCtrl;
+      /** 允许修改个人信息 0-不允许 1-允许 */
+      editInfoCtrl?: Api.SystemManage.RoleCtrl;
+      /** 排序 */
+      order?: number;
+      creatorId?: string;
+      /** 创建人名称 */
+      creator?: string;
+      updateId?: string;
+      /** 编辑人名称 */
+      updateBy?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate: number;
     }
 
-    /** role list */
-    type RoleList = Api.Common.PaginatingQueryRecord<Role>;
-
-    /** role search params */
-    type RoleSearchParams = Api.Common.CommonSearchParams & {
-      roleName?: string;
-      roleCode?: string;
-      status?: Api.Common.EnableStatus | null;
+    /** 角色列表（/role/query 为 queryAllCommon 全量查询，无分页） */
+    type RoleList = {
+      list: Role[];
+      total?: number;
     };
 
-    /** role create params */
+    /** 角色查询参数（keyword 对 keywordFields 正则模糊匹配，其余走 where 精确过滤） */
+    type RoleSearchParams = {
+      where?: {
+        name?: string;
+        roleType?: Api.SystemManage.RoleType;
+      };
+      keyword?: string;
+      keywordFields?: string[];
+    };
+
+    /** 角色新增参数（审计字段由后端按登录用户填充；传 refId 时后端复制被套用角色的 auths） */
     type RoleCreateParams = {
-      roleName: string;
-      roleCode: string;
-      remark: string;
-      sort: number;
-      status: Api.Common.EnableStatus;
+      name: string;
+      roleType?: Api.SystemManage.RoleType;
+      desc?: string;
+      refId?: string;
+      dataAuths?: Api.SystemManage.RoleDataAuth[];
+      orderTemplateIds?: string[];
+      sendOrderCtrl?: Api.SystemManage.RoleCtrl;
+      sendCtrl?: Api.SystemManage.RoleCtrl;
+      orderColCtrl?: Api.SystemManage.RoleCtrl;
+      editInfoCtrl?: Api.SystemManage.RoleCtrl;
+      order?: number;
     };
 
-    /** role update params */
+    /** 角色更新参数 */
     type RoleUpdateParams = RoleCreateParams & {
-      id: number;
+      _id: string;
     };
+
+    /** 角色查询项（与 Role 同构，保留别名兼容用户管理等模块） */
+    type RoleQueryItem = Role;
+
+    /** 角色查询列表（与 RoleList 同构） */
+    type RoleQueryList = RoleList;
 
     /** menu type */
     type MenuType = 'catalog' | 'menu';
@@ -220,7 +304,8 @@ declare namespace Api {
 
     /** role assign menu params */
     type RoleAssignMenuParams = {
-      roleId: number;
+      /** 角色 MongoId */
+      roleId: string;
       menuIds: number[];
       /** 角色分配的按钮权限码（前端按菜单勾选，需后端支持接收） */
       buttonCodes?: string[];
@@ -374,50 +459,58 @@ declare namespace Api {
       };
     };
 
-    /** 组别 */
+    /** 组别（tms-user Group，后端接口 /group/*） */
     interface Group {
-      id: number;
-      /** 组别名称，唯一 */
-      groupName: string;
-      /** 所属站点 id */
-      siteId: number | null;
-      /** 所属站点名称（由数据层按 siteId 解析，站点改名后同步） */
-      siteName: string;
+      /** MongoId 字符串 */
+      _id: string;
+      /** 组别名称，全局唯一 */
+      name: string;
       /** 组别备注 */
-      remark: string;
-      /** 创建人 */
-      createByName: string;
-      /** 创建时间（YYYY-MM-DD） */
-      createTime: string;
-      /** 最后更新人 */
-      updateByName: string;
-      /** 最后更新时间（YYYY-MM-DD） */
-      updateTime: string;
-      /** 组别状态 */
-      status: Api.Common.EnableStatus;
+      desc?: string;
+      /** 所属站点 id（MongoId 字符串） */
+      siteId: string;
+      /** 所属站点名称（后端 fillName 回填） */
+      site?: string;
+      /** 创建人名称 */
+      creator?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate: number;
+      /** 编辑人名称 */
+      updateBy?: string;
+      /** 更新时间（毫秒时间戳） */
+      updateDate: number;
+      /** 组内用户数（仅 /group/get 返回） */
+      userCount?: number;
+      /** 组内客户数（仅 /group/get 返回） */
+      customerCount?: number;
     }
 
-    /** 组别列表 */
-    type GroupList = Api.Common.PaginatingQueryRecord<Group>;
-
-    /** 组别查询参数 */
-    type GroupSearchParams = Api.Common.CommonSearchParams & {
-      groupName?: string;
-      siteId?: number | null;
-      status?: Api.Common.EnableStatus | null;
+    /** 组别列表（/group/query 为 queryAllCommon 全量查询，无分页） */
+    type GroupList = {
+      list: Group[];
+      total?: number;
     };
 
-    /** 组别新增参数 */
+    /** 组别查询参数（keyword 对 name 正则模糊匹配） */
+    type GroupSearchParams = {
+      where?: {
+        name?: string;
+        siteId?: string;
+      };
+      keyword?: string;
+      keywordFields?: string[];
+    };
+
+    /** 组别新增参数（审计字段由后端按登录用户填充） */
     type GroupCreateParams = {
-      groupName: string;
-      siteId: number | null;
-      remark: string;
-      status: Api.Common.EnableStatus;
+      name: string;
+      siteId: string;
+      desc?: string;
     };
 
     /** 组别更新参数 */
     type GroupUpdateParams = GroupCreateParams & {
-      id: number;
+      _id: string;
     };
 
     /** 客户等级：普通 / 重要 / VIP */

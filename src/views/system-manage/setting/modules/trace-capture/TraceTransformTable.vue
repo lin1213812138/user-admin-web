@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import { fetchDeleteTraceTransform, fetchGetTraceTransformList } from '@/service/api/system-manage';
+import { fetchDeleteTraceTransform, fetchGetTraceTransformList } from '@/service/api/trace-transform';
 import TraceTransformDrawer from './TraceTransformDrawer.vue';
 
 /** 时间格式枚举 → 展示文案（走 i18n，不落库中文串） */

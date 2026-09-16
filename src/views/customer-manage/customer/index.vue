@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteCustomer, fetchGetCustomerList } from '@/service/api/system-manage';
+import { fetchDeleteCustomer, fetchGetCustomerList } from '@/service/api/customer';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';

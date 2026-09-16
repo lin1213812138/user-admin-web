@@ -1,4 +1,4 @@
-import { request } from '../request';
+import { request } from '../../request';
 import { md5 } from '@/utils/crypto';
 
 /**

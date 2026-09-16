@@ -4,7 +4,7 @@ import { $t } from '@/locales';
 import CommonDrawer from '@/components/common/drawer.vue';
 import NFormWrap from '@/components/Form/index.vue';
 import type { FormItemConfig } from '@/components/Form/form-config';
-import { fetchCreateMenu, fetchUpdateMenu } from '@/service/api/system-manage';
+import { fetchCreateMenu, fetchUpdateMenu } from '@/service/api/menu';
 
 type MenuItem = Api.SystemManage.Menu;
 type MenuType = Api.SystemManage.MenuType;

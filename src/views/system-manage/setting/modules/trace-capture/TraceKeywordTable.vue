@@ -4,7 +4,7 @@ import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import { NTag } from 'naive-ui';
-import { fetchDeleteTraceKeyword, fetchGetTraceKeywordList } from '@/service/api/system-manage';
+import { fetchDeleteTraceKeyword, fetchGetTraceKeywordList } from '@/service/api/trace-keyword';
 import TraceKeywordDrawer from './TraceKeywordDrawer.vue';
 
 /** 使用范围枚举 → 展示文案（走 i18n，不落库中文串） */

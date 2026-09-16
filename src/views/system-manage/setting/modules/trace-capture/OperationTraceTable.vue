@@ -4,7 +4,7 @@ import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import { NButton, NTag } from 'naive-ui';
-import { fetchGetOperationTraceList } from '@/service/api/system-manage';
+import { fetchGetOperationTraceList } from '@/service/api/operation-trace';
 import OperationTraceDrawer from './OperationTraceDrawer.vue';
 
 const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<

@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import { $t } from '@/locales';
-import { fetchDeleteMenu, fetchGetMenuList } from '@/service/api/system-manage';
+import { fetchDeleteMenu, fetchGetMenuList } from '@/service/api/menu';
 import MenuOperateDrawer from './modules/menu-operate-drawer.vue';
 
 type MenuItem = Api.SystemManage.Menu;

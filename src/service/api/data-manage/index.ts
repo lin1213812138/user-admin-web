@@ -1,6 +1,6 @@
-import { request } from '../request';
+import { request } from '../../request';
 import type { MasterDataRow } from '@/components/MasterData/types';
-import { mockArchiveCreate, mockArchiveDelete, mockArchiveList, mockArchiveUpdate } from './mock-data-manage';
+import { mockArchiveCreate, mockArchiveDelete, mockArchiveList, mockArchiveUpdate } from './mock';
 
 /** get archive list (DEV: mock; PROD: /data-manage/:archive/list) */
 export function fetchGetDataManageList<T extends MasterDataRow>(

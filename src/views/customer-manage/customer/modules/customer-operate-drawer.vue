@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import { fetchCreateCustomer, fetchUpdateCustomer } from '@/service/api/system-manage';
+import { fetchCreateCustomer, fetchUpdateCustomer } from '@/service/api/customer';
 import GroupDrawer from '@/components/common/drawer.vue';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 

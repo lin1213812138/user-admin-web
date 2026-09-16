@@ -369,6 +369,9 @@ const local: App.I18n.Schema = {
         siteName: 'Site',
         groupName: 'Group',
         status: 'Status',
+        keyword: 'Keyword',
+        idCard: 'ID Card',
+        unknown: 'Unknown',
         basicInfo: 'Basic Information',
         profileInfo: 'Personal Profile',
         realName: 'Full Name',
@@ -388,20 +391,23 @@ const local: App.I18n.Schema = {
         wechatQrcode: 'WeChat QR Code',
         createTime: 'Create Time',
         form: {
-          userNamePlaceholder: 'Please enter login account',
-          nickNamePlaceholder: 'Please enter',
-          roleNamePlaceholder: 'Please select',
+          userNamePlaceholder: 'Please enter account',
+          nickNamePlaceholder: 'Please enter user name',
+          roleNamePlaceholder: 'Please select roles',
           passwordPlaceholder: 'Please enter password',
-          siteNamePlaceholder: 'Please select',
-          groupNamePlaceholder: 'Please select',
+          passwordEditPlaceholder: 'Leave blank to keep current password',
+          siteNamePlaceholder: 'Please select site',
+          groupNamePlaceholder: 'Please select groups',
           statusPlaceholder: 'Please select status',
+          keywordPlaceholder: 'Search by account / user name / full name',
+          idCardPlaceholder: 'Please enter ID card number',
           realNamePlaceholder: 'Please enter',
           contactPhonePlaceholder: 'Please enter',
           positionPlaceholder: 'Please enter',
           genderPlaceholder: 'Please select',
           emailPlaceholder: 'Please enter',
-          hireDatePlaceholder: 'Please select',
-          birthdayPlaceholder: 'Please select',
+          hireDatePlaceholder: 'Please select date',
+          birthdayPlaceholder: 'Please select date',
           wechatPlaceholder: 'Please enter',
           homeAddressPlaceholder: 'Please enter',
           otherContactPlaceholder: 'Please enter',
@@ -410,21 +416,43 @@ const local: App.I18n.Schema = {
       },
       role: {
         roleName: 'Role Name',
-        roleCode: 'Role Code',
-        remark: 'Description',
-        sort: 'Sort',
-        status: 'Status',
+        roleType: 'Role Type',
+        desc: 'Description',
+        refId: 'Inherit Permissions',
+        dataAuths: 'Data Permissions',
+        order: 'Sort',
+        creator: 'Creator',
         createTime: 'Create Time',
+        updateBy: 'Editor',
+        updateTime: 'Update Time',
+        roleTypes: {
+          service: 'Service',
+          sales: 'Sales',
+          operation: 'Operation',
+          finance: 'Finance',
+          manager: 'Manager',
+          admin: 'Admin'
+        },
+        dataAuthOptions: {
+          user: 'Only own customers',
+          group: 'Only own group customers'
+        },
+        ctrls: {
+          sendOrder: 'Allow editing after outbound',
+          sendCtrl: 'Weighing required for outbound',
+          orderCol: 'Allow configuring waybill columns',
+          editInfo: 'Allow editing personal info'
+        },
         permission: 'Assign Permission',
         permissionTip: 'Check the menus that the role can access',
         searchMenuPlaceholder: 'Search menu name / route / permission',
         loadMenuFailed: 'Failed to load menu permissions',
         form: {
           roleNamePlaceholder: 'Please enter role name',
-          roleCodePlaceholder: 'Please enter role code',
-          sortPlaceholder: 'Please enter sort value',
-          statusPlaceholder: 'Please select status',
-          remarkPlaceholder: 'Please enter role description'
+          roleTypePlaceholder: 'Please select role type',
+          refIdPlaceholder: 'Please select a role to inherit permissions from',
+          orderPlaceholder: 'Please enter sort value',
+          descPlaceholder: 'Please enter role description'
         }
       },
       menu: {
@@ -528,14 +556,14 @@ const local: App.I18n.Schema = {
         groupName: 'Group Name',
         siteName: 'Site',
         remark: 'Group Remark',
+        creator: 'Creator',
         createTime: 'Created',
+        updateBy: 'Editor',
         updateTime: 'Last Updated',
-        status: 'Status',
         form: {
           groupNamePlaceholder: 'Please enter group name',
           siteNamePlaceholder: 'Please select site',
-          remarkPlaceholder: 'Please enter group remark',
-          statusPlaceholder: 'Please select status'
+          remarkPlaceholder: 'Please enter group remark'
         }
       },
       customer: {

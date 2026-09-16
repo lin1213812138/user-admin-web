@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
-import { fetchGetOpLogList } from '@/service/api/system-manage';
+import { fetchGetOpLogList } from '@/service/api/op-log';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import OpLogDetailDrawer from './modules/op-log-detail-drawer.vue';
