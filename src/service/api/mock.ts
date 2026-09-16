@@ -398,7 +398,7 @@ function todayStr(): string {
 }
 
 /** 模拟当前操作人（真实环境由后端记录最后更新人） */
-const CURRENT_OPERATOR = '王恒';
+const CURRENT_OPERATOR = '测试';
 
 /** 创建站点 mock 记录 */
 function createSite(
@@ -1160,7 +1160,7 @@ const traceKeywordItems: Api.SystemManage.TraceKeywordItem[] = [
     keywordGroup: '配送完成',
     waybillStatus: 'delivered',
     enabled: 1,
-    lastEditor: '王恒',
+    lastEditor: '测试',
     editTime: '2026-09-04 16:42:34'
   },
   {

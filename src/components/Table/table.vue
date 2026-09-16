@@ -47,7 +47,8 @@ interface Props {
   /** vxe-table checkbox-config, e.g. { checkStrictly: false, checkField: 'checked' } for cascaded tree checkbox */
   checkboxConfig?: VxeTablePropTypes.CheckboxConfig;
   /** vxe-table row-config, default { isHover: true, height: 40 } */
-  rowConfig?: VxeTablePropTypes.RowConfig;
+  // rowConfig?: VxeTablePropTypes.RowConfig;
+  cellConfig?: VxeTablePropTypes.CellConfig;
   /** vxe-table header-cell-config, e.g. { height: 35 } to align fixed columns' header */
   headerCellConfig?: VxeTablePropTypes.HeaderCellConfig;
   /** 搜索栏配置项，传入即启用内嵌可折叠搜索栏（由所有使用本表格的页面各自配置） */
@@ -62,6 +63,8 @@ interface Props {
   exportFilename?: string;
   /** vxe-table scroll-y 阈值：仅当数据行数超过该值时才启用虚拟滚动（默认 200） */
   virtualScrollRowThreshold?: number;
+  /** vxe-table show-overflow，默认 'tooltip'；树表行高自适应场景需传 false 以允许 vxe 实测内容高度 */
+  showOverflow?: VxeTablePropTypes.ShowOverflow;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,13 +82,15 @@ const props = withDefaults(defineProps<Props>(), {
   treeConfig: undefined,
   checkboxConfig: undefined,
   rowConfig: undefined,
+  cellConfig: undefined,
   headerCellConfig: undefined,
   searchItems: undefined,
   searchModel: undefined,
   searchDefaultCollapsed: true,
   actionExport: false,
   exportFilename: undefined,
-  virtualScrollRowThreshold: 200
+  virtualScrollRowThreshold: 200,
+  showOverflow: 'tooltip'
 });
 
 /** vxe-table 实例（原生导出按钮要用它的 openExport/exportData） */
@@ -122,10 +127,10 @@ const actionJustify = computed(() => {
   return 'justify-start';
 });
 
-const finalRowConfig = computed<VxeTablePropTypes.RowConfig>(() => ({
+const finalCellConfig = computed<VxeTablePropTypes.CellConfig>(() => ({
   isHover: true,
   height: 40,
-  ...props.rowConfig
+  ...props.cellConfig
 }));
 
 /** 表头单元格默认高度 40（与行高一致），业务可传入 headerCellConfig 覆盖 height / padding */
@@ -280,17 +285,17 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         :data="data"
         :border="border"
         :stripe="stripe"
-        :cell-config="finalRowConfig"
+        :cell-config="finalCellConfig"
         :column-config="{ resizable: true }"
         :sort-config="{ trigger: 'cell' }"
         :seq-config="{ startIndex: seqStartIndex }"
         :height="height"
         :loading="loading"
         :scroll-y="scrollYConfig"
-        show-overflow="tooltip"
         :export-config="exportConfig"
         :tree-config="treeConfig"
         :checkbox-config="checkboxConfig"
+        :show-overflow="showOverflow"
         :header-cell-config="finalHeaderCellConfig"
         :scrollbar-config="{ width: 0, height: 0.0001, x: { visible: true }, y: { visible: true } }"
         class="w-full table-draggable"

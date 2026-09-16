@@ -78,14 +78,16 @@ const columns = computed<VxeColumnRenderColumn[]>(() => [
 
 const expandedKeys = ref<number[]>([]);
 
-/** 行高自适应：vxe 中 row-config.height=0 即「自适应」（>0 才是固定行高），让按钮较多的行自动撑高 */
-const autoRowConfig = { height: 'auto' } as any;
+/** 行高自适应：height=0 让 cellOpts.height 为空，vxe 改用实测内容高度（rowRest.height），按钮较多的行自动撑高 */
+const autoRowConfig: VxeTablePropTypes.CellConfig = { height: 0 };
 
 const treeConfig = computed<VxeTablePropTypes.TreeConfig>(() => ({
   rowField: 'id',
   childrenField: 'children',
   expandRowKeys: expandedKeys.value,
-  expandAll: false
+  expandAll: false,
+  // showLine 是 vxe 逐行实测内容高度的开关（calcCellHeight 条件），连接线本身用下方 CSS 隐藏
+  showLine: true
 }));
 
 /**
@@ -458,7 +460,8 @@ watch(keyword, () => {
         :show-checkbox="true"
         :tree-config="treeConfig"
         :checkbox-config="checkboxConfig"
-        :row-config="autoRowConfig"
+        :cell-config="autoRowConfig"
+        :show-overflow="false"
         @selection-change="handleSelectionChange"
         @toggle-tree-expand="onToggleTreeExpand"
       >
@@ -523,3 +526,10 @@ watch(keyword, () => {
     </div>
   </CommonDrawer>
 </template>
+
+<style scoped>
+/* 仅借 tree-config.showLine 触发 vxe 行高实测，视觉上隐藏树形引导线（测量对象是 .vxe-cell--wrapper，不受影响） */
+:deep(.vxe-tree--line-wrapper) {
+  display: none;
+}
+</style>
