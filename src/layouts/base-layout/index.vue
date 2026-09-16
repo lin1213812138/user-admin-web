@@ -5,11 +5,13 @@ import { AdminLayout, LAYOUT_SCROLL_EL_ID } from '@sa/materials';
 import type { LayoutMode } from '@sa/materials';
 import { useAppStore } from '@/store/modules/app';
 import { useThemeStore } from '@/store/modules/theme';
-import GlobalHeader from '../modules/global-header/index.vue';
+// header 栏已下线（用户区移至侧栏底部），恢复时取消下行注释
+// import GlobalHeader from '../modules/global-header/index.vue';
 import GlobalSider from '../modules/global-sider/index.vue';
 import GlobalTab from '../modules/global-tab/index.vue';
 import GlobalContent from '../modules/global-content/index.vue';
 import GlobalFooter from '../modules/global-footer/index.vue';
+// 主题配置抽屉入口在标签栏右侧（global-tab），header 恢复后可复用同一抽屉
 import ThemeDrawer from '../modules/theme-drawer/index.vue';
 import { provideMixMenuContext } from '../modules/global-menu/context';
 
@@ -33,6 +35,8 @@ const layoutMode = computed(() => {
   return themeStore.layout.mode.includes(vertical) ? vertical : horizontal;
 });
 
+// header 已下线，恢复时取消下方注释
+/*
 const headerProps = computed(() => {
   const { mode } = themeStore.layout;
 
@@ -71,6 +75,7 @@ const headerProps = computed(() => {
 
   return headerPropsConfig[mode];
 });
+*/
 
 const siderVisible = computed(() => themeStore.layout.mode !== 'horizontal');
 
@@ -124,6 +129,7 @@ function getSiderAndCollapsedWidth(isCollapsed: boolean) {
 <template>
   <AdminLayout
     v-model:sider-collapse="appStore.siderCollapse"
+    :header-visible="false"
     :mode="layoutMode"
     :scroll-el-id="LAYOUT_SCROLL_EL_ID"
     :scroll-mode="themeStore.layout.scrollMode"
@@ -142,9 +148,12 @@ function getSiderAndCollapsedWidth(isCollapsed: boolean) {
     :fixed-footer="themeStore.footer.fixed"
     :right-footer="themeStore.footer.right"
   >
-    <template #header>
+    <!-- header 栏已下线（用户区移至侧栏底部），恢复时取消下方注释 -->
+    <!--
+ <template #header>
       <GlobalHeader v-bind="headerProps" />
-    </template>
+    </template> 
+-->
     <template #tab>
       <GlobalTab />
     </template>

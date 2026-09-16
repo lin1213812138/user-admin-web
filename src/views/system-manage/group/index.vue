@@ -13,12 +13,12 @@ const searchParams = reactive<Omit<Api.SystemManage.GroupSearchParams, 'current'
   status: null
 });
 
-/** 所属站点下拉选项（来自站点管理） */
-const siteOptions = ref<CommonType.Option<number>[]>([]);
+/** 所属站点下拉选项（来自站点管理真实接口，站点主键为字符串 _id） */
+const siteOptions = ref<CommonType.Option<string>[]>([]);
 
 async function loadSiteOptions() {
-  const siteList = (await fetchGetSiteList({ current: 1, size: 100 })) as Api.SystemManage.SiteList;
-  siteOptions.value = siteList.records.map(item => ({ label: item.siteName, value: item.id }));
+  const { data } = await fetchGetSiteList({ page: 1, size: 100 });
+  siteOptions.value = (data?.list ?? []).map(item => ({ label: item.name, value: item._id }));
 }
 
 onMounted(() => {
@@ -96,7 +96,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         align: 'center'
       }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: 'system-manage-group'
 });
 

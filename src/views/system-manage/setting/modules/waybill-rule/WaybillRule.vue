@@ -80,7 +80,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       },
       { key: 'createTime', title: '创建时间', visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: 'system-manage-setting-waybill-rule'
 });
 

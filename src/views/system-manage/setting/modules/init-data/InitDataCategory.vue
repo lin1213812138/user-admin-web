@@ -33,7 +33,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       },
       { key: 'remark', title: $t('page.manage.setting.initData.remark'), visible: true, minWidth: 200, sortable: false }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: `init-data-${props.category}`
 });
 

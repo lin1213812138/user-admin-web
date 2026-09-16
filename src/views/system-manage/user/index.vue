@@ -52,7 +52,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       },
       { key: 'createTime', title: $t('page.manage.user.createTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: 'system-manage-user'
 });
 
@@ -114,7 +113,7 @@ async function fetchAllUsers(): Promise<UserItem[]> {
       :show-checkbox="true"
       :show-action="true"
       action-export
-      :export-filename="$t('route.permission-manage_user')"
+      :export-filename="$t('route.system-manage_user')"
       @refresh="getData"
       @page-change="handlePageChange"
       @selection-change="handleSelectionChange"
@@ -139,7 +138,7 @@ async function fetchAllUsers(): Promise<UserItem[]> {
             :data="data"
             :checked-data="checkedRows"
             :fetch-all="fetchAllUsers"
-            :filename="$t('route.permission-manage_user')"
+            :filename="$t('route.system-manage_user')"
           />
         </NSpace>
       </template>

@@ -92,7 +92,8 @@ export function useVxeTable<ResponseData, ApiData>(options: UseVxeTableOptions<R
 
   const pagination = reactive<VxePagination>({
     current: 1,
-    size: options.defaultPageSize ?? 20,
+    // 全局默认每页条数（页面可通过 defaultPageSize 覆盖）；与 Table 分页条选项首项 50 对齐
+    size: options.defaultPageSize ?? 50,
     total: 0
   });
 

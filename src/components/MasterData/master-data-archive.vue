@@ -52,7 +52,7 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         sortable: true
       }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
+  // 默认分页走 useVxeTable 全局兜底（50）
   cacheKey: props.config.cacheKey
 });
 

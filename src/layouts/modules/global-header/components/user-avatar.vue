@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { VNode } from 'vue';
 import { useAuthStore } from '@/store/modules/auth';
+import { useAppStore } from '@/store/modules/app';
 import { useRouterPush } from '@/hooks/common/router';
 import { useSvgIcon } from '@/hooks/common/icon';
 import { $t } from '@/locales';
@@ -11,6 +12,7 @@ defineOptions({
 });
 
 const authStore = useAuthStore();
+const appStore = useAppStore();
 const { routerPushByKey, toLogin } = useRouterPush();
 const { SvgIconVNode } = useSvgIcon();
 
@@ -69,11 +71,13 @@ function handleDropdown(key: DropdownKey) {
   <NButton v-if="!authStore.isLogin" quaternary @click="loginOrRegister">
     {{ $t('page.login.common.loginOrRegister') }}
   </NButton>
-  <NDropdown v-else placement="bottom" trigger="click" :options="options" @select="handleDropdown">
+  <NDropdown v-else placement="top" trigger="click" :options="options" @select="handleDropdown">
     <div>
       <ButtonIcon>
         <SvgIcon icon="ph:user-circle" class="text-icon-large" />
-        <span class="text-16px font-medium">{{ authStore.userInfo.userName }}</span>
+        <span v-if="!appStore.siderCollapse" class="text-16px font-medium whitespace-nowrap">
+          {{ authStore.userInfo.userName }}
+        </span>
       </ButtonIcon>
     </div>
   </NDropdown>

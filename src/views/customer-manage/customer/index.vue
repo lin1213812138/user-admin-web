@@ -133,7 +133,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       },
       { key: 'updateTime', title: $t('page.manage.customer.updateTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: 'system-manage-customer'
 });
 

@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'TMS 管理系统',
+    title: '牛迈物流专线系统',
     updateTitle: '系统版本更新通知',
     updateContent: '检测到系统有新版本发布，是否立即刷新页面？',
     updateConfirm: '立即刷新',
@@ -24,6 +24,7 @@ const local: App.I18n.Schema = {
     columnSetting: '列设置',
     config: '配置',
     confirm: '确认',
+    login: '登录',
     drag: '拖拽',
     iconPicker: {
       placeholder: '请选择图标',
@@ -288,12 +289,14 @@ const local: App.I18n.Schema = {
     home: '首页',
     'system-manage': '系统管理',
     'permission-manage': '权限管理',
-    'permission-manage_user': '用户管理',
-    'permission-manage_role': '角色管理',
     'permission-manage_menu': '菜单管理',
     'system-manage_site': '站点管理',
     'system-manage_group': '组别管理',
-    'system-manage_customer': '客户管理',
+    'system-manage_user': '用户管理',
+    'system-manage_role': '角色管理',
+    'system-manage_log': '系统日志',
+    'customer-manage': '客户管理',
+    'customer-manage_customer': '客户列表',
     'data-manage': '资料管理',
     'data-manage_basic': '基础资料',
     'data-manage_finance': '财务资料',
@@ -319,7 +322,8 @@ const local: App.I18n.Schema = {
         back: '返回',
         validateSuccess: '验证成功',
         loginSuccess: '登录成功',
-        welcomeBack: '欢迎回来，{userName} ！'
+        welcomeBack: '欢迎回来，{userName} ！',
+        title: '用户登录'
       },
       pwdLogin: {
         title: '密码登录',
@@ -450,27 +454,70 @@ const local: App.I18n.Schema = {
         }
       },
       site: {
-        siteCode: '站点编号',
-        siteName: '站点名称',
-        contactName: '联系人',
-        contactPhone: '联系电话',
+        code: '站点编号',
+        name: '站点名称',
+        concat: '联系人',
+        phone: '联系电话',
         workTime: '工作时间',
-        defaultOrigin: '默认出发地',
-        warehouseAddress: '仓库地址',
-        remark: '站点备注',
-        updateTime: '最后更新',
-        status: '状态',
-        createTime: '创建时间',
+        startPlace: '默认出发地',
+        address: '仓库地址',
+        note: '站点备注',
+        siteType: '站点类型',
+        siteTypeBranch: '分公司',
+        siteTypeHeadquarters: '总公司',
+        updateDate: '最后更新',
+        keyword: '关键字',
         form: {
-          siteCodePlaceholder: '请输入站点编号',
-          siteNamePlaceholder: '请输入站点名称',
-          contactNamePlaceholder: '请输入联系人',
-          contactPhonePlaceholder: '请输入联系电话',
+          codePlaceholder: '请输入站点编号',
+          namePlaceholder: '请输入站点名称',
+          concatPlaceholder: '请输入联系人',
+          phonePlaceholder: '请输入联系电话',
           workTimePlaceholder: '如：周一至周六 9:00-20:00',
-          defaultOriginPlaceholder: '请输入默认出发地',
-          warehouseAddressPlaceholder: '请输入仓库地址',
-          remarkPlaceholder: '请输入站点备注',
-          statusPlaceholder: '请选择状态'
+          startPlacePlaceholder: '请输入默认出发地',
+          addressPlaceholder: '请输入仓库地址',
+          notePlaceholder: '请输入站点备注',
+          siteTypePlaceholder: '请选择站点类型',
+          keywordPlaceholder: '请输入编号/名称关键字'
+        }
+      },
+      opLog: {
+        opName: '操作名称',
+        creator: '操作人',
+        client: '操作端',
+        opType: '操作类型',
+        refNames: '关联实体',
+        ip: 'IP 地址',
+        desc: '摘要',
+        createDate: '操作时间',
+        detail: '日志明细',
+        logTitle: '变更明细',
+        noDetail: '该日志无变更明细',
+        clientOption: {
+          tms: 'TMS',
+          pc: 'PC',
+          pda: 'PDA',
+          oms: 'OMS'
+        },
+        opTypeOption: {
+          login: '登录',
+          update: '修改',
+          del: '删除',
+          logout: '退出'
+        },
+        form: {
+          dateRange: '操作时间',
+          opType: '操作类型',
+          client: '操作端',
+          keyword: '关键字',
+          keywordPlaceholder: '请输入关联实体名称',
+          opTypePlaceholder: '请选择操作类型',
+          clientPlaceholder: '请选择操作端'
+        },
+        log: {
+          name: '变更项',
+          oldValue: '旧值',
+          newValue: '新值',
+          desc: '说明'
         }
       },
       group: {
@@ -951,7 +998,7 @@ const local: App.I18n.Schema = {
     },
     pwd: {
       required: '请输入密码',
-      invalid: '密码格式不正确，3-18位字符，包含字母、数字、下划线'
+      invalid: '密码格式不正确，3-18位字符，包含字母、数字、特殊字符'
     },
     confirmPwd: {
       required: '请输入确认密码',

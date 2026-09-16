@@ -226,60 +226,152 @@ declare namespace Api {
       buttonCodes?: string[];
     };
 
-    /** 站点 */
+    /** 站点类型：0-分公司 1-总公司 */
+    type SiteType = 0 | 1;
+
+    /** 站点（wms-user 真实实体，字段名以后端 Schema 为准；联系人类字段可能缺省） */
     interface Site {
-      id: number;
+      /** 主键（字符串 uuid） */
+      _id: string;
       /** 站点编号，唯一 */
-      siteCode: string;
+      code: string;
       /** 站点名称 */
-      siteName: string;
-      /** 联系人 */
-      contactName: string;
+      name: string;
+      /** 联系人（后端字段名为 concat） */
+      concat?: string;
       /** 联系电话 */
-      contactPhone: string;
+      phone?: string;
       /** 工作时间，如「周一至周六 9:00-20:00」 */
-      workTime: string;
+      workTime?: string;
       /** 默认出发地 */
-      defaultOrigin: string;
+      startPlace?: string;
       /** 仓库地址 */
-      warehouseAddress: string;
+      address?: string;
       /** 站点备注 */
-      remark: string;
-      /** 最后更新人 */
-      updateByName: string;
-      /** 最后更新时间（YYYY-MM-DD） */
-      updateTime: string;
-      /** 站点状态 */
-      status: Api.Common.EnableStatus;
-      createTime: string;
+      note?: string;
+      /** 站点类型 */
+      siteType: Api.SystemManage.SiteType;
+      /** 创建人 id */
+      creatorId?: string;
+      /** 创建人名称 */
+      creator?: string;
+      /** 修改人 id */
+      updateId?: string;
+      /** 修改人名称 */
+      updateBy?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate: number;
     }
 
-    /** 站点列表 */
-    type SiteList = Api.Common.PaginatingQueryRecord<Site>;
+    /** 站点列表（wms-user 返回 ret：{ list, total }） */
+    type SiteList = {
+      list: Site[];
+      total: number;
+    };
 
-    /** 站点查询参数 */
-    type SiteSearchParams = Api.Common.CommonSearchParams & {
-      siteCode?: string;
-      siteName?: string;
-      status?: Api.Common.EnableStatus | null;
+    /** 站点查询参数（/site/query） */
+    type SiteSearchParams = {
+      page: number;
+      size: number;
+      /** 关键字，按 code/name 模糊查询 */
+      keyword?: string;
+      /** 关键字匹配字段，缺省时后端按 code + name 查 */
+      fields?: string[];
+      /** 其他查询条件 */
+      where?: Record<string, unknown>;
     };
 
     /** 站点新增参数 */
     type SiteCreateParams = {
-      siteCode: string;
-      siteName: string;
-      contactName: string;
-      contactPhone: string;
+      code: string;
+      name: string;
+      concat: string;
+      phone: string;
       workTime: string;
-      defaultOrigin: string;
-      warehouseAddress: string;
-      remark: string;
-      status: Api.Common.EnableStatus;
+      startPlace: string;
+      address: string;
+      note: string;
+      siteType: Api.SystemManage.SiteType;
     };
 
     /** 站点更新参数 */
     type SiteUpdateParams = SiteCreateParams & {
-      id: number;
+      _id: string;
+    };
+
+    /** 操作端（tms-user OpLog.client） */
+    type OpLogClient = 0 | 1 | 2 | 3; // 0-TMS 1-PC 2-PDA 3-OMS
+
+    /** 操作类型（tms-user OpLog.opType） */
+    type OpLogOpType = 0 | 1 | 2 | 3; // 0-登录 1-修改 2-删除 3-退出
+
+    /** 操作日志变更明细（OpLog.logs 项） */
+    interface OpLogDetail {
+      /** 变更项名称，如「修改联系人」 */
+      name: string;
+      /** 旧值 */
+      oldValue: string;
+      /** 新值 */
+      newValue: string;
+      /** 旧值关联实体 id（值为关联实体时存在） */
+      oldId?: string;
+      /** 新值关联实体 id */
+      newId?: string;
+      /** 说明 */
+      desc?: string;
+    }
+
+    /** 操作日志（tms-user 真实实体，POST /op-log/query） */
+    interface OpLog {
+      /** 主键 */
+      _id: string;
+      /** 操作名称（服务端拼好，如「登录系统」「修改用户」） */
+      name: string;
+      /** 关联实体 id 列表 */
+      refIds?: string[];
+      /** 关联实体名称列表 */
+      refNames?: string[];
+      /** 操作端 */
+      client?: Api.SystemManage.OpLogClient;
+      /** 操作类型 */
+      opType?: Api.SystemManage.OpLogOpType;
+      /** 变更明细 */
+      logs?: Api.SystemManage.OpLogDetail[];
+      /** 操作 IP */
+      ip?: string;
+      /** 日志摘要 */
+      desc?: string;
+      /** 操作人 id */
+      creatorId?: string;
+      /** 操作人名称 */
+      creator?: string;
+      /** 操作时间（毫秒时间戳） */
+      createDate: number;
+    }
+
+    /** 操作日志列表（wms-user 返回 ret：{ list, total }） */
+    type OpLogList = {
+      list: OpLog[];
+      total: number;
+    };
+
+    /** 操作日志查询参数（/op-log/query，keyword 只模糊匹配 refNames，时间按 createDate 毫秒时间戳过滤） */
+    type OpLogSearchParams = {
+      page: number;
+      size: number;
+      /** 关键字（后端 keywordFields 固定为 refNames） */
+      keyword?: string;
+      /** 开始时间（毫秒时间戳，缺省后端默认近 12 个月） */
+      startDate?: number;
+      /** 结束时间（毫秒时间戳） */
+      endDate?: number;
+      /** 其他查询条件（opType / client 精确匹配） */
+      where?: {
+        opType?: Api.SystemManage.OpLogOpType;
+        client?: Api.SystemManage.OpLogClient;
+      };
     };
 
     /** 组别 */

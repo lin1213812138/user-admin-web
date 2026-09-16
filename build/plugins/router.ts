@@ -38,12 +38,14 @@ export function setupElegantRouter() {
       const routeIcons: Partial<Record<RouteKey, string>> = {
         'system-manage': 'ic:baseline-settings',
         'system-manage_site': 'ic:round-place',
+        'system-manage_user': 'ic:round-person',
+        'system-manage_role': 'ic:round-supervisor-account',
+        'system-manage_log': 'ic:round-article',
         'permission-manage': 'ic:round-lock',
-        'permission-manage_user': 'ic:round-person',
-        'permission-manage_role': 'ic:round-supervisor-account',
         'permission-manage_menu': 'ic:baseline-menu',
+        'customer-manage': 'ic:round-business',
+        'customer-manage_customer': 'ic:round-contacts',
         'system-manage_group': 'ic:round-groups',
-        'system-manage_customer': 'ic:round-business',
         'system-manage_setting': 'ic:baseline-settings-applications',
         'data-manage': 'ic:baseline-folder',
         'data-manage_basic': 'ic:baseline-inventory',
@@ -58,20 +60,24 @@ export function setupElegantRouter() {
 
       /** menu order of the route, the smaller the value, the higher the order */
       const routeOrders: Partial<Record<RouteKey, number>> = {
+        // 一级菜单（系统管理/权限管理与生成文件历史生效值对齐，客户管理追加在最后）
         home: 0,
-        'channel-quote': 1,
-        'data-manage': 2,
-        'system-manage': 3,
-        'permission-manage': 4,
+        'customer-manage': 1,
+        'channel-quote': 2,
+        'data-manage': 3,
+        'system-manage': 4,
+        'permission-manage': 5,
         // 权限管理模块
-        'permission-manage_user': 1,
-        'permission-manage_role': 2,
-        'permission-manage_menu': 3,
+        'permission-manage_menu': 1,
         // 系统管理模块
-        'system-manage_setting': 4,
-        'system-manage_site': 1,
-        'system-manage_group': 2,
-        'system-manage_customer': 3,
+        'system-manage_user': 1,
+        'system-manage_role': 2,
+        'system-manage_group': 3,
+        'system-manage_site': 4,
+        'system-manage_setting': 5,
+        'system-manage_log': 6,
+        // 客户管理模块
+        'customer-manage_customer': 1,
         // 同图标：hideInMenu 后排序无展示效果，保留以便日后重新开放菜单入口
         'system-manage_label-designer': 5
       };

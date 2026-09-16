@@ -13,7 +13,7 @@ import { md5 } from '@/utils/crypto';
  */
 export function fetchLogin(userName: string, password: string) {
   return request<Api.Auth.LoginResult>({
-    url: '/api/v1/user/login',
+    url: '/user/login',
     method: 'post',
     data: {
       account: userName,
@@ -28,7 +28,7 @@ export function fetchLogin(userName: string, password: string) {
  * The backend registers this route as POST only; a GET is answered with 404.
  */
 export function fetchGetUserInfo() {
-  return request<Api.Auth.SessionUser>({ url: '/api/v1/user/session/get', method: 'post' });
+  return request<Api.Auth.SessionUser>({ url: '/user/session/get', method: 'post' });
 }
 
 /**

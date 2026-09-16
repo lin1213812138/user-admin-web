@@ -24,6 +24,7 @@ const local: App.I18n.Schema = {
     columnSetting: 'Column Setting',
     config: 'Config',
     confirm: 'Confirm',
+    login: 'Login',
     drag: 'Drag',
     iconPicker: {
       placeholder: 'Select an icon',
@@ -292,12 +293,14 @@ const local: App.I18n.Schema = {
     home: 'Home',
     'system-manage': 'System Management',
     'permission-manage': 'Permission Management',
-    'permission-manage_user': 'User Management',
-    'permission-manage_role': 'Role Management',
     'permission-manage_menu': 'Menu Management',
     'system-manage_site': 'Site Management',
     'system-manage_group': 'Group Management',
-    'system-manage_customer': 'Customer Management',
+    'system-manage_user': 'User Management',
+    'system-manage_role': 'Role Management',
+    'system-manage_log': 'System Logs',
+    'customer-manage': 'Customer Management',
+    'customer-manage_customer': 'Customer List',
     'data-manage': 'Data Manage',
     'data-manage_basic': 'Basic',
     'data-manage_finance': 'Finance',
@@ -319,11 +322,12 @@ const local: App.I18n.Schema = {
         passwordPlaceholder: 'Please enter password',
         confirmPasswordPlaceholder: 'Please enter password again',
         codeLogin: 'Verification code login',
-        confirm: 'Confirm',
+        confirm: 'Login',
         back: 'Back',
         validateSuccess: 'Verification passed',
         loginSuccess: 'Login successfully',
-        welcomeBack: 'Welcome back, {userName} !'
+        welcomeBack: 'Welcome back, {userName} !',
+        title: 'TMS User Login'
       },
       pwdLogin: {
         title: 'Password Login',
@@ -454,27 +458,70 @@ const local: App.I18n.Schema = {
         }
       },
       site: {
-        siteCode: 'Site Code',
-        siteName: 'Site Name',
-        contactName: 'Contact',
-        contactPhone: 'Phone',
+        code: 'Site Code',
+        name: 'Site Name',
+        concat: 'Contact',
+        phone: 'Phone',
         workTime: 'Working Hours',
-        defaultOrigin: 'Default Origin',
-        warehouseAddress: 'Warehouse Address',
-        remark: 'Site Remark',
-        updateTime: 'Last Updated',
-        status: 'Status',
-        createTime: 'Create Time',
+        startPlace: 'Default Origin',
+        address: 'Warehouse Address',
+        note: 'Site Remark',
+        siteType: 'Site Type',
+        siteTypeBranch: 'Branch',
+        siteTypeHeadquarters: 'Headquarters',
+        updateDate: 'Last Updated',
+        keyword: 'Keyword',
         form: {
-          siteCodePlaceholder: 'Please enter site code',
-          siteNamePlaceholder: 'Please enter site name',
-          contactNamePlaceholder: 'Please enter contact',
-          contactPhonePlaceholder: 'Please enter phone',
+          codePlaceholder: 'Please enter site code',
+          namePlaceholder: 'Please enter site name',
+          concatPlaceholder: 'Please enter contact',
+          phonePlaceholder: 'Please enter phone',
           workTimePlaceholder: 'e.g. Mon-Sat 9:00-20:00',
-          defaultOriginPlaceholder: 'Please enter default origin',
-          warehouseAddressPlaceholder: 'Please enter warehouse address',
-          remarkPlaceholder: 'Please enter site remark',
-          statusPlaceholder: 'Please select status'
+          startPlacePlaceholder: 'Please enter default origin',
+          addressPlaceholder: 'Please enter warehouse address',
+          notePlaceholder: 'Please enter site remark',
+          siteTypePlaceholder: 'Please select site type',
+          keywordPlaceholder: 'Please enter code/name keyword'
+        }
+      },
+      opLog: {
+        opName: 'Operation',
+        creator: 'Operator',
+        client: 'Client',
+        opType: 'Type',
+        refNames: 'Related Entities',
+        ip: 'IP Address',
+        desc: 'Summary',
+        createDate: 'Operation Time',
+        detail: 'Log Details',
+        logTitle: 'Change Details',
+        noDetail: 'No change details',
+        clientOption: {
+          tms: 'TMS',
+          pc: 'PC',
+          pda: 'PDA',
+          oms: 'OMS'
+        },
+        opTypeOption: {
+          login: 'Login',
+          update: 'Update',
+          del: 'Delete',
+          logout: 'Logout'
+        },
+        form: {
+          dateRange: 'Operation Time',
+          opType: 'Operation Type',
+          client: 'Client',
+          keyword: 'Keyword',
+          keywordPlaceholder: 'Please enter related entity name',
+          opTypePlaceholder: 'Please select operation type',
+          clientPlaceholder: 'Please select client'
+        },
+        log: {
+          name: 'Field',
+          oldValue: 'Old Value',
+          newValue: 'New Value',
+          desc: 'Description'
         }
       },
       group: {
@@ -955,7 +1002,7 @@ const local: App.I18n.Schema = {
     },
     pwd: {
       required: 'Please enter password',
-      invalid: '3-18 characters, including letters, numbers, and underscores'
+      invalid: '3-18 characters, including letters, numbers, and special characters'
     },
     confirmPwd: {
       required: 'Please enter password again',

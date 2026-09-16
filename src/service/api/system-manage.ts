@@ -4,7 +4,6 @@ import {
   mockCreateGroup,
   mockCreateMenu,
   mockCreateRole,
-  mockCreateSite,
   mockCreateUser,
   mockDeleteGroup,
   mockCustomerList,
@@ -13,16 +12,13 @@ import {
   mockDeleteCustomer,
   mockDeleteMenu,
   mockDeleteRole,
-  mockDeleteSite,
   mockGetRoleMenuTree,
   mockGroupList,
   mockMenuList,
   mockRoleList,
-  mockSiteList,
   mockUpdateGroup,
   mockUpdateMenu,
   mockUpdateRole,
-  mockUpdateSite,
   mockUpdateUser,
   mockUserList,
   mockGetInitDataList,
@@ -214,53 +210,46 @@ export function fetchDeleteMenu(ids: number[]) {
   });
 }
 
-/** get site list */
+/** get site list（真实接口 /site/query，返回 ret:{ list, total }，flat 请求需调用方解包 { data, error }） */
 export function fetchGetSiteList(params: Api.SystemManage.SiteSearchParams) {
-  if (import.meta.env.DEV) {
-    return mockSiteList(params) as unknown as Promise<Api.SystemManage.SiteList>;
-  }
-
   return request<Api.SystemManage.SiteList>({
-    url: '/system/site/list',
+    url: '/site/query',
     method: 'post',
     data: params
   });
 }
 
-/** create site */
+/** get site detail by id（真实接口 /site/get） */
+export function fetchGetSite(id: string) {
+  return request<Api.SystemManage.Site>({
+    url: '/site/get',
+    method: 'post',
+    data: { _id: id }
+  });
+}
+
+/** create site（真实接口 /site/create） */
 export function fetchCreateSite(params: Api.SystemManage.SiteCreateParams) {
-  if (import.meta.env.DEV) {
-    return mockCreateSite(params) as unknown as Promise<Api.SystemManage.Site>;
-  }
-
   return request<Api.SystemManage.Site>({
-    url: '/system/site/create',
+    url: '/site/create',
     method: 'post',
     data: params
   });
 }
 
-/** update site */
+/** update site（真实接口 /site/update） */
 export function fetchUpdateSite(params: Api.SystemManage.SiteUpdateParams) {
-  if (import.meta.env.DEV) {
-    return mockUpdateSite(params) as unknown as Promise<Api.SystemManage.Site>;
-  }
-
   return request<Api.SystemManage.Site>({
-    url: '/system/site/update',
+    url: '/site/update',
     method: 'post',
     data: params
   });
 }
 
-/** delete site by ids */
-export function fetchDeleteSite(ids: number[]) {
-  if (import.meta.env.DEV) {
-    return mockDeleteSite(ids) as unknown as Promise<boolean>;
-  }
-
+/** delete site by ids（真实接口 /site/delete，_id 字符串数组） */
+export function fetchDeleteSite(ids: string[]) {
   return request<boolean>({
-    url: '/system/site/delete',
+    url: '/site/delete',
     method: 'post',
     data: { ids }
   });
@@ -587,6 +576,15 @@ export function fetchUpdateOperationTrace(params: Api.SystemManage.OperationTrac
   }
   return request<Api.SystemManage.OperationTraceItem>({
     url: '/system/operation-trace/update',
+    method: 'post',
+    data: params
+  });
+}
+
+/** get op-log list（真实接口 /op-log/query，返回 ret:{ list, total }，flat 请求需调用方解包 { data, error }；无 mock） */
+export function fetchGetOpLogList(params: Api.SystemManage.OpLogSearchParams) {
+  return request<Api.SystemManage.OpLogList>({
+    url: '/op-log/query',
     method: 'post',
     data: params
   });

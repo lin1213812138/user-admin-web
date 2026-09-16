@@ -51,20 +51,20 @@ const submitting = ref(false);
 
 const formRef = ref<InstanceType<typeof NFormWrap>>();
 
-/** 下拉选项：用户角色 / 所属站点 / 所属组别 */
+/** 下拉选项：用户角色 / 所属站点 / 所属组别（站点走真实接口，主键为字符串 _id） */
 const roleOptions = ref<CommonType.Option<number>[]>([]);
-const siteOptions = ref<CommonType.Option<number>[]>([]);
+const siteOptions = ref<CommonType.Option<string>[]>([]);
 const groupOptions = ref<CommonType.Option<number>[]>([]);
 
 async function loadOptions() {
-  const [roleList, siteList, groupList] = await Promise.all([
+  const [roleList, siteRes, groupList] = await Promise.all([
     fetchGetRoleList({ current: 1, size: 100 }) as Promise<Api.SystemManage.RoleList>,
-    fetchGetSiteList({ current: 1, size: 100 }) as Promise<Api.SystemManage.SiteList>,
+    fetchGetSiteList({ page: 1, size: 100 }),
     fetchGetGroupList({ current: 1, size: 100 }) as Promise<Api.SystemManage.GroupList>
   ]);
 
   roleOptions.value = roleList.records.map(item => ({ label: item.roleName, value: item.id }));
-  siteOptions.value = siteList.records.map(item => ({ label: item.siteName, value: item.id }));
+  siteOptions.value = (siteRes.data?.list ?? []).map(item => ({ label: item.name, value: item._id }));
   groupOptions.value = groupList.records.map(item => ({ label: item.groupName, value: item.id }));
 }
 

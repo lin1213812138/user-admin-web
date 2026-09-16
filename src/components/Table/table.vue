@@ -196,7 +196,7 @@ async function handleCopy(text: string) {
 }
 
 function handlePageChange(current: number) {
-  emit('pageChange', { current, size: props.pagination?.size ?? 20 });
+  emit('pageChange', { current, size: props.pagination?.size ?? 50 });
 }
 
 function handlePageSizeChange(size: number) {
@@ -204,7 +204,7 @@ function handlePageSizeChange(size: number) {
 }
 
 const seqStartIndex = computed(() => {
-  const { current, size } = props.pagination ?? { current: 1, size: 20 };
+  const { current, size } = props.pagination ?? { current: 1, size: 50 };
   return (current - 1) * size;
 });
 
@@ -239,6 +239,19 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
 
 <template>
   <div class="h-full w-full flex flex-col min-h-0">
+    <!--
+ search-action 快速搜索栏插槽：内容由业务页面完全自定义（输入框/下拉/按钮），
+         与 searchItems/SearchBar 完整搜索栏互不依赖，二者可并存（插槽在上、完整搜索栏在下）；
+         想用自己的搜索栏时不传 searchItems 即不会出现默认搜索/重置按钮。
+         卡片阴影用 shadow-sm；圆角不写死（不用 card-wrapper，其 rd-8px 会覆盖主题圆角），
+         跟随 NCard 主题圆角（themeRadius），暗黑模式自动适配
+-->
+    <div v-if="$slots['search-action']" class="mb-12px">
+      <NCard :bordered="false" class="shadow-sm" :content-style="{ padding: '12px 16px' }">
+        <slot name="search-action" :refresh="refresh" />
+      </NCard>
+    </div>
+
     <div v-if="searchItems?.length">
       <SearchBar
         :items="searchItems"
@@ -249,7 +262,10 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
       />
     </div>
 
-    <div class="mb-12px flex-y-center justify-between gap-12px">
+    <div
+      v-if="$slots['operation-left'] || $slots['operation-right']"
+      class="mb-12px flex-y-center justify-between gap-12px"
+    >
       <div class="flex-y-center gap-8px flex-wrap">
         <slot name="operation-left" :refresh="refresh" />
       </div>
@@ -371,7 +387,7 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         :page="pagination.current"
         :page-size="pagination.size"
         :item-count="pagination.total"
-        :page-sizes="[10, 20, 50, 100]"
+        :page-sizes="[50, 100, 200, 500, 1000, 2000, 5000]"
         :show-size-picker="true"
         show-quick-jumper
         @update:page="handlePageChange"

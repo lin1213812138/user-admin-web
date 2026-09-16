@@ -338,6 +338,7 @@ declare namespace App {
         columnSetting: string;
         config: string;
         confirm: string;
+        login: string;
         drag: string;
         iconPicker: {
           placeholder: string;
@@ -557,6 +558,7 @@ declare namespace App {
             validateSuccess: string;
             loginSuccess: string;
             welcomeBack: string;
+            title: string;
           };
           pwdLogin: {
             title: string;
@@ -715,27 +717,70 @@ declare namespace App {
             };
           };
           site: {
-            siteCode: string;
-            siteName: string;
-            contactName: string;
-            contactPhone: string;
+            code: string;
+            name: string;
+            concat: string;
+            phone: string;
             workTime: string;
-            defaultOrigin: string;
-            warehouseAddress: string;
-            remark: string;
-            updateTime: string;
-            status: string;
-            createTime: string;
+            startPlace: string;
+            address: string;
+            note: string;
+            siteType: string;
+            siteTypeBranch: string;
+            siteTypeHeadquarters: string;
+            updateDate: string;
+            keyword: string;
             form: {
-              siteCodePlaceholder: string;
-              siteNamePlaceholder: string;
-              contactNamePlaceholder: string;
-              contactPhonePlaceholder: string;
+              codePlaceholder: string;
+              namePlaceholder: string;
+              concatPlaceholder: string;
+              phonePlaceholder: string;
               workTimePlaceholder: string;
-              defaultOriginPlaceholder: string;
-              warehouseAddressPlaceholder: string;
-              remarkPlaceholder: string;
-              statusPlaceholder: string;
+              startPlacePlaceholder: string;
+              addressPlaceholder: string;
+              notePlaceholder: string;
+              siteTypePlaceholder: string;
+              keywordPlaceholder: string;
+            };
+          };
+          opLog: {
+            opName: string;
+            creator: string;
+            client: string;
+            opType: string;
+            refNames: string;
+            ip: string;
+            desc: string;
+            createDate: string;
+            detail: string;
+            logTitle: string;
+            noDetail: string;
+            clientOption: {
+              tms: string;
+              pc: string;
+              pda: string;
+              oms: string;
+            };
+            opTypeOption: {
+              login: string;
+              update: string;
+              del: string;
+              logout: string;
+            };
+            form: {
+              dateRange: string;
+              opType: string;
+              client: string;
+              keyword: string;
+              keywordPlaceholder: string;
+              opTypePlaceholder: string;
+              clientPlaceholder: string;
+            };
+            log: {
+              name: string;
+              oldValue: string;
+              newValue: string;
+              desc: string;
             };
           };
           group: {

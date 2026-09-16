@@ -90,7 +90,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         sortable: false
       }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: 'trace-keyword'
 });
 

@@ -56,7 +56,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       { key: 'remark', title: $t('common.remark'), visible: true, sortable: false },
       { key: 'createTime', title: $t('page.channelQuote.common.createTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: 'channel-quote-ship'
 });
 

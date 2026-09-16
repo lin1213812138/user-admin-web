@@ -4,6 +4,8 @@ import { GLOBAL_SIDER_MENU_ID } from '@/constants/app';
 import { useAppStore } from '@/store/modules/app';
 import { useThemeStore } from '@/store/modules/theme';
 import GlobalLogo from '../global-logo/index.vue';
+// header 下线后用户区移至侧栏底部，组件暂留 global-header 目录（不删文件）
+import UserAvatar from '../global-header/components/user-avatar.vue';
 
 defineOptions({
   name: 'GlobalSider'
@@ -30,6 +32,13 @@ const menuWrapperClass = computed(() => (showLogo.value ? 'flex-1-hidden' : 'h-f
       :style="{ height: themeStore.header.height + 'px' }"
     />
     <div :id="GLOBAL_SIDER_MENU_ID" :class="menuWrapperClass"></div>
+    <!-- 底部用户区：收起时仅显示图标（见 user-avatar.vue） -->
+    <div
+      class="flex-y-center justify-center border-t border-gray-200 dark:border-gray-700"
+      :style="{ height: themeStore.header.height + 'px' }"
+    >
+      <UserAvatar />
+    </div>
   </DarkModeContainer>
 </template>
 

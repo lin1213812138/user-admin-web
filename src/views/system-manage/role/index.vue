@@ -76,7 +76,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       },
       { key: 'createTime', title: $t('page.manage.role.createTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  defaultPageSize: 20,
   cacheKey: 'system-manage-role'
 });
 

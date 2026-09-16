@@ -169,6 +169,8 @@ const routeMap: RouteMap = {
   "channel-quote": "/channel-quote",
   "channel-quote_receive": "/channel-quote/receive",
   "channel-quote_ship": "/channel-quote/ship",
+  "customer-manage": "/customer-manage",
+  "customer-manage_customer": "/customer-manage/customer",
   "data-manage": "/data-manage",
   "data-manage_basic": "/data-manage/basic",
   "data-manage_business": "/data-manage/business",
@@ -178,15 +180,15 @@ const routeMap: RouteMap = {
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
   "permission-manage": "/permission-manage",
   "permission-manage_menu": "/permission-manage/menu",
-  "permission-manage_role": "/permission-manage/role",
-  "permission-manage_user": "/permission-manage/user",
   "system-manage": "/system-manage",
-  "system-manage_customer": "/system-manage/customer",
   "system-manage_group": "/system-manage/group",
   "system-manage_label-designer": "/system-manage/label-designer",
+  "system-manage_log": "/system-manage/log",
   "system-manage_print-design": "/system-manage/print-design",
+  "system-manage_role": "/system-manage/role",
   "system-manage_setting": "/system-manage/setting",
-  "system-manage_site": "/system-manage/site"
+  "system-manage_site": "/system-manage/site",
+  "system-manage_user": "/system-manage/user"
 };
 
 /**

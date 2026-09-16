@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import { fetchCreateSite, fetchUpdateSite } from '@/service/api/system-manage';
+import { fetchCreateSite, fetchGetSite, fetchUpdateSite } from '@/service/api/system-manage';
 import SiteDrawer from '@/components/common/drawer.vue';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 
@@ -42,53 +42,53 @@ const title = computed(() => {
 });
 
 const submitting = ref(false);
+const fetching = ref(false);
 
 const formRef = ref<InstanceType<typeof NFormWrap>>();
 
 const model = reactive<Api.SystemManage.SiteCreateParams>({
-  siteCode: '',
-  siteName: '',
-  contactName: '',
-  contactPhone: '',
+  code: '',
+  name: '',
+  concat: '',
+  phone: '',
   workTime: '',
-  defaultOrigin: '',
-  warehouseAddress: '',
-  remark: '',
-  status: 1
+  startPlace: '',
+  address: '',
+  note: '',
+  // 站点类型固定 0（分公司），表单不展示该字段；编辑时保留原值
+  siteType: 0
 });
 
 const formItems = computed<FormItemConfig[]>(() => [
   {
-    key: 'siteCode',
-    label: $t('page.manage.site.siteCode'),
+    key: 'code',
+    label: $t('page.manage.site.code'),
     type: 'input',
     required: true,
     span: 24,
-    placeholder: $t('page.manage.site.form.siteCodePlaceholder')
+    placeholder: $t('page.manage.site.form.codePlaceholder')
   },
   {
-    key: 'siteName',
-    label: $t('page.manage.site.siteName'),
+    key: 'name',
+    label: $t('page.manage.site.name'),
     type: 'input',
     required: true,
     span: 24,
-    placeholder: $t('page.manage.site.form.siteNamePlaceholder')
+    placeholder: $t('page.manage.site.form.namePlaceholder')
   },
   {
-    key: 'contactName',
-    label: $t('page.manage.site.contactName'),
+    key: 'concat',
+    label: $t('page.manage.site.concat'),
     type: 'input',
-    required: true,
     span: 24,
-    placeholder: $t('page.manage.site.form.contactNamePlaceholder')
+    placeholder: $t('page.manage.site.form.concatPlaceholder')
   },
   {
-    key: 'contactPhone',
-    label: $t('page.manage.site.contactPhone'),
+    key: 'phone',
+    label: $t('page.manage.site.phone'),
     type: 'input',
-    required: true,
     span: 24,
-    placeholder: $t('page.manage.site.form.contactPhonePlaceholder')
+    placeholder: $t('page.manage.site.form.phonePlaceholder')
   },
   {
     key: 'workTime',
@@ -98,61 +98,65 @@ const formItems = computed<FormItemConfig[]>(() => [
     placeholder: $t('page.manage.site.form.workTimePlaceholder')
   },
   {
-    key: 'defaultOrigin',
-    label: $t('page.manage.site.defaultOrigin'),
+    key: 'startPlace',
+    label: $t('page.manage.site.startPlace'),
     type: 'input',
     span: 24,
-    placeholder: $t('page.manage.site.form.defaultOriginPlaceholder')
+    placeholder: $t('page.manage.site.form.startPlacePlaceholder')
   },
   {
-    key: 'warehouseAddress',
-    label: $t('page.manage.site.warehouseAddress'),
+    key: 'address',
+    label: $t('page.manage.site.address'),
     type: 'textarea',
     span: 24,
-    placeholder: $t('page.manage.site.form.warehouseAddressPlaceholder')
+    placeholder: $t('page.manage.site.form.addressPlaceholder')
   },
   {
-    key: 'remark',
-    label: $t('page.manage.site.remark'),
+    key: 'note',
+    label: $t('page.manage.site.note'),
     type: 'textarea',
     span: 24,
-    placeholder: $t('page.manage.site.form.remarkPlaceholder')
-  },
-  {
-    key: 'status',
-    label: $t('page.manage.site.status'),
-    type: 'switch',
-    span: 24,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable'),
-    checkedValue: 1,
-    uncheckedValue: 0
+    placeholder: $t('page.manage.site.form.notePlaceholder')
   }
 ]);
 
-function fillFormByRow() {
-  if (!props.row) return;
-  model.siteCode = props.row.siteCode;
-  model.siteName = props.row.siteName;
-  model.contactName = props.row.contactName;
-  model.contactPhone = props.row.contactPhone;
-  model.workTime = props.row.workTime;
-  model.defaultOrigin = props.row.defaultOrigin;
-  model.warehouseAddress = props.row.warehouseAddress;
-  model.remark = props.row.remark;
-  model.status = props.row.status;
+function fillFormByRow(row: Api.SystemManage.Site) {
+  model.code = row.code;
+  model.name = row.name;
+  model.concat = row.concat ?? '';
+  model.phone = row.phone ?? '';
+  model.workTime = row.workTime ?? '';
+  model.startPlace = row.startPlace ?? '';
+  model.address = row.address ?? '';
+  model.note = row.note ?? '';
+  model.siteType = row.siteType;
 }
 
 function resetForm() {
-  model.siteCode = '';
-  model.siteName = '';
-  model.contactName = '';
-  model.contactPhone = '';
+  model.code = '';
+  model.name = '';
+  model.concat = '';
+  model.phone = '';
   model.workTime = '';
-  model.defaultOrigin = '';
-  model.warehouseAddress = '';
-  model.remark = '';
-  model.status = 1;
+  model.startPlace = '';
+  model.address = '';
+  model.note = '';
+  model.siteType = 0;
+}
+
+/** 编辑时先调 /site/get 取最新数据再回填，保证不展示过期行数据 */
+async function fillByLatest() {
+  if (!props.row) return;
+
+  fetching.value = true;
+  try {
+    const { data, error } = await fetchGetSite(props.row._id);
+    if (!error && data) {
+      fillFormByRow(data);
+    }
+  } finally {
+    fetching.value = false;
+  }
 }
 
 async function handleSubmit() {
@@ -164,18 +168,17 @@ async function handleSubmit() {
 
   try {
     if (isCreate.value) {
-      await fetchCreateSite({ ...model });
+      const { error } = await fetchCreateSite({ ...model });
+      if (error) return;
       window.$message?.success($t('common.addSuccess'));
     } else {
-      await fetchUpdateSite({ id: props.row!.id, ...model });
+      const { error } = await fetchUpdateSite({ _id: props.row!._id, ...model });
+      if (error) return;
       window.$message?.success($t('common.updateSuccess'));
     }
 
     drawerVisible.value = false;
     emit('submitted');
-  } catch (error) {
-    // 本地 mock 校验（如站点编号重复）会抛错需自行提示；真实接口错误已由 request 拦截器统一提示
-    window.$message?.error(error instanceof Error ? error.message : String(error));
   } finally {
     submitting.value = false;
   }
@@ -188,8 +191,10 @@ watch(
 
     if (isCreate.value) {
       resetForm();
-    } else {
-      fillFormByRow();
+    } else if (props.mode === 'edit') {
+      fillByLatest();
+    } else if (props.row) {
+      fillFormByRow(props.row);
     }
   }
 );
@@ -199,7 +204,7 @@ watch(
   <SiteDrawer
     v-model:show="drawerVisible"
     :title="title"
-    :loading="submitting"
+    :loading="fetching || submitting"
     :footer="!isDetail"
     width="520"
     @submit="handleSubmit"
