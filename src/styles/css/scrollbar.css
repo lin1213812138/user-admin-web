@@ -27,7 +27,22 @@
   position: absolute !important;
   left: 0 !important;
   bottom: 0 !important;
+  width: 100% !important; /* 浮动化后 absolute 无 width，宽度会塌成 0，补回容器宽作为百分比基准 */
   pointer-events: none !important;
+}
+
+/* 0.3) 宽度账目对齐（消除「不需要横向滚动也显示滑块」）：
+   纵向滚动条浮动后不再挤占布局，主区宽度与列宽总和都按容器满宽计算（scrollXWidth == 容器宽），
+   但 vxe JS 仍从横向轨道宽度里扣掉 osbWidth(8px)，且 handle 自身的 thin 滚动条还要占位，
+   两者叠加使 handle 可视内容区恒少于填充宽 8 + 8px → 浏览器必然画出滑块。
+   这里把 wrapper 宽度补回容器宽，并给 handle 补偿自身滚动条占位
+   （--x-scrollbar-size 由 plugins/vxe-table.ts 运行时实测写入，未写入时退回 8px）。 */
+.vxe-table .vxe-table--scroll-x-wrapper {
+  width: 100% !important; /* 覆盖 JS 内联的「容器宽 − osbWidth」 */
+}
+
+.vxe-table .vxe-table--scroll-x-handle {
+  width: calc(100% + var(--x-scrollbar-size, 8px)) !important; /* 仅补回滚动条自身占位，真溢出时滑块仍按比例出现 */
 }
 
 /* 0.1) 非 hover 时整个虚拟滚动条包装层直接隐藏，一个像素都不出现 */
@@ -48,6 +63,17 @@
 .vxe-table .vxe-table--scroll-x-handle {
   height: 8px !important;
   min-height: 8px !important;
+}
+
+/* 0.4) 滚动条只在真正需要时渲染：vxe 把两条 handle 写成 overflow: scroll（强制常驻滚动条），
+   没有滑块时轨道两端仍会被浏览器画出小色块（hover 表格即可见）。
+   改成 auto 后「无溢出 = 完全不渲染滚动条」，真溢出时滑块照常出现。 */
+.vxe-table .vxe-table--scroll-x-handle {
+  overflow-x: auto !important;
+}
+
+.vxe-table .vxe-table--scroll-y-handle {
+  overflow-y: auto !important;
 }
 
 /* 0.3) 隐藏装饰：handle-appearance 分隔线、四角元素（含 :before 画的 1px 边框） */

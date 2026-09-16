@@ -32,6 +32,14 @@
 - elegant-router 合并 meta 行为：**对已存在的 `meta` 字段采用「旧值优先」**（旧 `routes.ts` 的值被保留，改 `routeIcons`/`routeOrders` 不会覆盖已有条目），只有**新增路由缺失**的字段才按配置补上。实证：把 `routeOrders.data-manage` 改成 2，重生成后它仍保留旧 `order: 1`。故要改**已有**路由的 icon/order，不能只改配置 —— 必须先把 `routes.ts` 对应条目删掉 + 清 `.vite-temp` + 重生成，否则旧值保留、配置不生效。
 - naive `NUpload` 在 `default-upload=false` 时**不给文件生成 url**（选择后是 `{status:'pending', url:null, thumbnailUrl:null}`，源码 `Upload.mjs:442-453`），而 image-card 缩略图与预览按钮要求 `status==='finished'` 且 `mergedThumbnailUrl` 非空（`UploadFile.mjs:117-129/282`）→ 本地选择要预览必须自行 `URL.createObjectURL(file.file)`。`FormWrap`（`components/Form/index.vue`）已在 `handleUploadChange` 处理（blob 记入 `uploadPreview`、换图 revoke、卸载兜底回收），所有 image/file 字段天然可用。
 
+## vxe 表格滚动条机制（2026-09-16）
+
+- 横向滚动条「不需要滚动也显示」的真因：handle 恒有 16px 伪溢出 —— vxe JS 内联轨道宽 `el.clientWidth − osbWidth` 扣掉 8px 纵向滚动条宽（本项目纵向滚动条已浮动不占布局、主区是容器满宽）+ handle 自身 `scrollbar-width: thin` 占位 8px，而填充 `--scroll-x-space` 宽 = `scrollXWidth` = 容器满宽 → 可视内容区恒少 16px（滑块长度≈98%）。
+- 修复：`plugins/vxe-table.ts` 的 `measureScrollbarSize()`（离屏探针实测 thin 占位 → `:root --x-scrollbar-size`）；`styles/css/scrollbar.css` 三条覆盖：`.vxe-table--scroll-x-virtual` / `--scroll-x-wrapper` 补 `width:100%!important`、`--scroll-x-handle` 用 `width: calc(100% + var(--x-scrollbar-size, 8px))!important`。
+- vxe `calcScrollbar()` 的 `x.visible` 只识别 `'visible'/'hidden'/false`，**布尔 `true` = 自动判定**（浮出与否仍由 `overflowX = scrollXWidth > 主区 clientWidth` 决定）；`scrollbarConfig.width: 0` 是 falsy，vxe 会回退实测 handle 厚度（≈8px）而非 0。
+- 浮动化后 `.vxe-table--scroll-x-virtual`（absolute 无 width、子元素又全是 absolute）宽度会塌成 0，任何依赖 `width: 100%` 的子级都必须先补这一层宽度。
+- vxe 给两条 handle 设的是 `overflow-x/y: scroll`（强制渲染滚动条），**没有滑块时浏览器仍会画出轨道端点**（hover 时表现为滚动条层两端的小色块）→ 已覆盖为 `overflow: auto`（溢出才渲染）。`--scroll-x-space` 的内联宽度 = `scrollXWidth`，可直接用它判断「表格是否真的横向溢出」（等于表格实际宽度即无溢出）。
+
 ## 系统设置（setting）模块结构
 
 - 页面壳 `views/system-manage/setting/index.vue`：顶层 segment tabs（录单格式/打印格式/导出格式/运单规则/轨迹抓取配置/初始化数据），各子模块放 `setting/modules/<kebab>/`，支持 `?tab=` query 切子页。
