@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.0.9](https://github.com/lin1213812138/user-admin-web/compare/v0.0.8...v0.0.9) (2026-09-16)
+
+### &nbsp;&nbsp;&nbsp;🐞 Bug Fixes
+
+- **vxe-table**: 修复横向滚动条误显与端点残留 &nbsp;-&nbsp; by **LINFLY** [<samp>(94231)</samp>](https://github.com/lin1213812138/user-admin-web/commit/9423166)
+- **搜索栏**: 用 grid 行高过渡替换淡入淡出动画 &nbsp;-&nbsp; by **LINFLY** [<samp>(a36e7)</samp>](https://github.com/lin1213812138/user-admin-web/commit/a36e7f9)
+- **权限抽屉**: 修复树表行高自适应被裁切问题 &nbsp;-&nbsp; by **LINFLY** [<samp>(ba659)</samp>](https://github.com/lin1213812138/user-admin-web/commit/ba6593f)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[LINFLY](mailto:2276928094@qq.com)
+
 ## [v0.0.8](https://github.com/lin1213812138/user-admin-web/compare/v0.0.7...v0.0.8) (2026-09-15)
 
 ### &nbsp;&nbsp;&nbsp;🚀 Features
