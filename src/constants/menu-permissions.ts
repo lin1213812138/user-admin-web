@@ -95,15 +95,15 @@ const sub = (module: string, items: [string, string][]): SubMenuPermission[] =>
 
 const user = op('user');
 const role = op('role');
-const menu = op('menu');
 const site = op('site');
 const group = op('group');
 const customer = op('customer');
-const dataBasic = op('dataBasic');
+const dataGeneral = op('dataGeneral');
 const dataBusiness = op('dataBusiness');
 const dataFinance = op('dataFinance');
 const dataNoRule = op('dataNoRule');
 const dataShip = op('dataShip');
+const dataBl = op('dataBl');
 const setting = op('setting');
 
 /** 各菜单的权限配置（一级菜单 → 二级菜单 → 按钮权限 / 子模块权限），顺序与侧栏菜单一致 */
@@ -145,28 +145,47 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
     icon: 'ic:baseline-folder',
     children: [
       {
-        name: '基础资料',
-        icon: 'ic:baseline-inventory',
-        routePath: '/data-manage/basic',
+        name: '发货资料',
+        icon: 'ic:baseline-local-shipping',
+        routePath: '/data-manage/ship',
         buttons: [
-          dataBasic.query,
-          dataBasic.reset,
-          dataBasic.add,
-          dataBasic.edit,
-          dataBasic.delete,
-          dataBasic.export,
-          dataBasic.import
+          dataShip.query,
+          dataShip.reset,
+          dataShip.add,
+          dataShip.edit,
+          dataShip.delete,
+          dataShip.export,
+          dataShip.import
         ],
-        subMenus: sub('dataBasic', [
-          ['countryRegion', '国家地区'],
-          ['postalRoute', '邮政路由码'],
-          ['fbaWarehouse', 'FBA仓库'],
-          ['customerLevel', '客户等级'],
-          ['customerSource', '客户来源']
+        subMenus: sub('dataShip', [
+          ['provider', '服务商'],
+          ['channelGroup', '渠道类别'],
+          ['weightRule', '计泡规则'],
+          ['carrier', '承运网络']
         ])
       },
       {
-        name: '业务资料',
+        name: '单号资料',
+        icon: 'ic:round-numbers',
+        routePath: '/data-manage/no-rule',
+        buttons: [
+          dataNoRule.query,
+          dataNoRule.reset,
+          dataNoRule.add,
+          dataNoRule.edit,
+          dataNoRule.delete,
+          dataNoRule.export,
+          dataNoRule.import
+        ],
+        subMenus: sub('dataNoRule', [
+          ['noRule', '单号规则'],
+          ['itemNoRule', '子单号规则'],
+          ['noPool', '运单号码池'],
+          ['longNoRule', '长单号截短']
+        ])
+      },
+      {
+        name: '运单资料',
         icon: 'ic:baseline-warehouse',
         routePath: '/data-manage/business',
         buttons: [
@@ -179,8 +198,8 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
           dataBusiness.import
         ],
         subMenus: sub('dataBusiness', [
-          ['address', '地址簿管理'],
           ['declaredGoods', '申报物品'],
+          ['address', '地址簿'],
           ['problemCategory', '问题类别'],
           ['goodsCategory', '物品类别'],
           ['customsType', '报关类型'],
@@ -206,42 +225,39 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
           ['expenseType', '费用类型'],
           ['settlement', '结算方式'],
           ['account', '银行账户'],
-          ['currency', '结算币种及汇率']
+          ['currency', '结算货币']
         ])
       },
       {
-        name: '单号资料',
-        icon: 'ic:round-numbers',
-        routePath: '/data-manage/no-rule',
-        buttons: [
-          dataNoRule.query,
-          dataNoRule.reset,
-          dataNoRule.add,
-          dataNoRule.edit,
-          dataNoRule.delete,
-          dataNoRule.export,
-          dataNoRule.import
-        ],
-        subMenus: sub('dataNoRule', [['noRule', '单号规则']])
+        name: '提单资料',
+        icon: 'ic:baseline-receipt-long',
+        routePath: '/data-manage/bl',
+        buttons: [dataBl.query, dataBl.reset, dataBl.add, dataBl.edit, dataBl.delete, dataBl.export, dataBl.import],
+        subMenus: sub('dataBl', [
+          ['blRoute', '航线'],
+          ['blPort', '港口'],
+          ['blTrip', '航名航次'],
+          ['blAddress', '地址簿'],
+          ['blUnit', '柜型'],
+          ['trackConfig', '轨迹配置']
+        ])
       },
       {
-        name: '发货资料',
-        icon: 'ic:baseline-local-shipping',
-        routePath: '/data-manage/ship',
+        name: '通用资料',
+        icon: 'ic:baseline-inventory',
+        routePath: '/data-manage/basic',
         buttons: [
-          dataShip.query,
-          dataShip.reset,
-          dataShip.add,
-          dataShip.edit,
-          dataShip.delete,
-          dataShip.export,
-          dataShip.import
+          dataGeneral.query,
+          dataGeneral.reset,
+          dataGeneral.add,
+          dataGeneral.edit,
+          dataGeneral.delete,
+          dataGeneral.export,
+          dataGeneral.import
         ],
-        subMenus: sub('dataShip', [
-          ['provider', '服务商'],
-          ['channelGroup', '渠道类别'],
-          ['weightRule', '计泡规则'],
-          ['carrier', '承运网络']
+        subMenus: sub('dataGeneral', [
+          ['countryRegion', '国家地区'],
+          ['fbaWarehouse', 'FBA仓库']
         ])
       }
     ]
@@ -316,19 +332,6 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
         icon: 'ic:round-article',
         routePath: '/system-manage/log',
         buttons: []
-      }
-    ]
-  },
-  {
-    name: '权限管理',
-    icon: 'ic:round-lock',
-    children: [
-      {
-        name: '菜单管理',
-        icon: 'ic:baseline-menu',
-        routePath: '/permission-manage/menu',
-        permission: 'system:menu:list',
-        buttons: [menu.add, menu.edit, menu.delete]
       }
     ]
   }

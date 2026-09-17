@@ -63,3 +63,4 @@
 - NUpload default-upload=false 不生成 url，预览用 URL.createObjectURL；image-card 缩略图要 status=finished 且 url 非空。
 - vxe 横向滚动条：plugins/vxe-table.ts measureScrollbarSize() + styles/css/scrollbar.css。
 - playwright-cli：dev 端口常被占（9111/9112，base `/tms/`），admin/admin@12345；eval 外层双引号+JS 内单引号，JS 内禁 `>`/`|`/`$`；NDropdown 项须真实 mousemove+mousedown+mouseup。
+- **改 `packages/@sa/*` 没生效先查软链**：`node_modules/@sa/xxx` 可能退化为旧的真实目录（Junction 丢失），应用跑的是旧拷贝（2026-09-18 页签 hover 事故根因）；判别=Get-Item 看 LinkType + 比对两份 package.json version；修复=杀 dev server → `pnpm i` → 重启；信号=DOM 里同名 CSS module 出现两个不同 hash。验证"下发内容"必须用应用实际解析的 node_modules 路径，别抓 packages 源码路径。

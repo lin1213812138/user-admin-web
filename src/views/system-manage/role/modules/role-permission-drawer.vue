@@ -61,7 +61,7 @@ const allSubMenuCodes = computed(() => collectPermissionCodes('subMenus'));
 const columns = computed<VxeColumnRenderColumn[]>(() => [
   {
     key: 'title',
-    title: $t('page.manage.menu.menuName'),
+    title: '菜单名称',
     treeNode: true,
     minWidth: 220,
     sortable: false,

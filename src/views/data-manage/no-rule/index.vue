@@ -11,6 +11,21 @@ const items: ArchiveTabItem[] = [
     key: 'no-rule',
     labelKey: 'page.dataManage.noRule.title',
     load: () => import('@/views/data-manage/no-rule/modules/no-rule/NoRule.vue')
+  },
+  {
+    key: 'item-no-rule',
+    labelKey: 'page.dataManage.noRule.itemNoRule.title',
+    load: () => import('@/views/data-manage/no-rule/modules/item-no-rule/ItemNoRule.vue')
+  },
+  {
+    key: 'no-pool',
+    labelKey: 'page.dataManage.noRule.noPool.title',
+    load: () => import('@/views/data-manage/no-rule/modules/no-pool/NoPool.vue')
+  },
+  {
+    key: 'long-no-rule',
+    labelKey: 'page.dataManage.noRule.longNoRule.title',
+    load: () => import('@/views/data-manage/no-rule/modules/long-no-rule/LongNoRule.vue')
   }
 ];
 

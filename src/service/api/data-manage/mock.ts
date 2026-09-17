@@ -12,15 +12,6 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-01 09:00:00`
   }),
-  postalRoute: i => ({
-    id: i,
-    code: `PR${String(i).padStart(4, '0')}`,
-    name: `路由码${i}`,
-    country: `国家${i % 5}`,
-    status: i % 4 === 0 ? 0 : 1,
-    remark: '',
-    createTime: `2026-0${(i % 9) + 1}-02 10:00:00`
-  }),
   fbaWarehouse: i => ({
     id: i,
     code: `FBA${String(i).padStart(4, '0')}`,
@@ -30,23 +21,6 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     status: i % 5 === 0 ? 0 : 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-03 11:00:00`
-  }),
-  customerLevel: i => ({
-    id: i,
-    code: `CL${String(i).padStart(4, '0')}`,
-    name: `客户等级${i}`,
-    discount: Number((1 - i * 0.01).toFixed(2)),
-    status: i % 4 === 0 ? 0 : 1,
-    remark: '',
-    createTime: `2026-0${(i % 9) + 1}-04 12:00:00`
-  }),
-  customerSource: i => ({
-    id: i,
-    code: `CS${String(i).padStart(4, '0')}`,
-    name: `客户来源${i}`,
-    status: 1,
-    remark: '',
-    createTime: `2026-0${(i % 9) + 1}-05 13:00:00`
   }),
   account: i => ({
     id: i,

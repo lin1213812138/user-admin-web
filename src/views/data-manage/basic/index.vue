@@ -13,24 +13,9 @@ const items: ArchiveTabItem[] = [
     load: () => import('@/views/data-manage/basic/modules/country-region/CountryRegion.vue')
   },
   {
-    key: 'postalRoute',
-    labelKey: 'page.dataManage.basic.postalRoute.title',
-    load: () => import('@/views/data-manage/basic/modules/postal-route/PostalRoute.vue')
-  },
-  {
     key: 'fbaWarehouse',
     labelKey: 'page.dataManage.basic.fbaWarehouse.title',
     load: () => import('@/views/data-manage/basic/modules/fba-warehouse/FbaWarehouse.vue')
-  },
-  {
-    key: 'customerLevel',
-    labelKey: 'page.dataManage.basic.customerLevel.title',
-    load: () => import('@/views/data-manage/basic/modules/customer-level/CustomerLevel.vue')
-  },
-  {
-    key: 'customerSource',
-    labelKey: 'page.dataManage.basic.customerSource.title',
-    load: () => import('@/views/data-manage/basic/modules/customer-source/CustomerSource.vue')
   }
 ];
 

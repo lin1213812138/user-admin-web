@@ -45,8 +45,6 @@ export function setupElegantRouter() {
         'system-manage_user': 'ic:round-person',
         'system-manage_role': 'ic:round-supervisor-account',
         'system-manage_log': 'ic:round-article',
-        'permission-manage': 'ic:round-lock',
-        'permission-manage_menu': 'ic:baseline-menu',
         'customer-manage': 'ic:round-business',
         'customer-manage_customer': 'ic:round-contacts',
         'system-manage_group': 'ic:round-groups',
@@ -57,6 +55,7 @@ export function setupElegantRouter() {
         'data-manage_business': 'ic:baseline-warehouse',
         'data-manage_no-rule': 'ic:round-numbers',
         'data-manage_ship': 'ic:baseline-local-shipping',
+        'data-manage_bl': 'ic:baseline-receipt-long',
         'channel-quote': 'ic:baseline-sell',
         'channel-quote_receive': 'ic:baseline-move-to-inbox',
         'channel-quote_ship': 'ic:baseline-local-shipping',
@@ -66,15 +65,12 @@ export function setupElegantRouter() {
 
       /** menu order of the route, the smaller the value, the higher the order */
       const routeOrders: Partial<Record<RouteKey, number>> = {
-        // 一级菜单（系统管理/权限管理与生成文件历史生效值对齐，客户管理追加在最后）
+        // 一级菜单（系统管理与生成文件历史生效值对齐，客户管理追加在最后）
         home: 0,
         'customer-manage': 1,
         'channel-quote': 2,
         'data-manage': 3,
         'system-manage': 4,
-        'permission-manage': 5,
-        // 权限管理模块
-        'permission-manage_menu': 1,
         // 系统管理模块
         'system-manage_user': 1,
         'system-manage_role': 2,
@@ -84,12 +80,13 @@ export function setupElegantRouter() {
         'system-manage_log': 6,
         // 客户管理模块
         'customer-manage_customer': 1,
-        // 资料管理模块（显式排序：单号资料稳定排在第四位）
-        'data-manage_basic': 1,
-        'data-manage_business': 2,
-        'data-manage_finance': 3,
-        'data-manage_no-rule': 4,
-        'data-manage_ship': 5,
+        // 资料管理模块（显式排序：发货 → 单号 → 运单 → 财务 → 提单 → 通用）
+        'data-manage_ship': 1,
+        'data-manage_no-rule': 2,
+        'data-manage_business': 3,
+        'data-manage_finance': 4,
+        'data-manage_bl': 5,
+        'data-manage_basic': 6,
         // 同图标：hideInMenu 后排序无展示效果，保留以便日后重新开放菜单入口
         'system-manage_label-designer': 5
       };

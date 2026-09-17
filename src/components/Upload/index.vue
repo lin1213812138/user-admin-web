@@ -28,6 +28,10 @@ interface Props {
   directoryDnd?: boolean;
   /** 禁用 */
   disabled?: boolean;
+  /** 关联业务 id（传入走 /upload/file 上传并写入 File 附件库，如客户附件 refId=客户 _id；不传仅上传不入库） */
+  refId?: string;
+  /** 是否显示文件列表（仅 file / dragger 形态生效，透传 naive show-file-list） */
+  showFileList?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -37,7 +41,9 @@ const props = withDefaults(defineProps<Props>(), {
   accept: undefined,
   maxSize: undefined,
   directoryDnd: undefined,
-  disabled: false
+  disabled: false,
+  refId: undefined,
+  showFileList: false
 });
 
 const emit = defineEmits<{
@@ -136,16 +142,17 @@ async function handleCustomRequest({ file, onProgress, onFinish, onError }: Uplo
     return;
   }
 
-  const { data, error } = await fetchUpload(file.file, props.dest, percent => onProgress({ percent }));
+  const { data, error } = await fetchUpload(file.file, props.dest, percent => onProgress({ percent }), props.refId);
 
-  if (error || !data?.url) {
+  // refId 模式走 /upload/file：后端只入库不返回地址，列表回显以业务方自行查询为准，文件名占位
+  if (error || (!data?.url && !props.refId)) {
     onError();
 
     return;
   }
 
   // naive 的 onFinish 为无参（url 由文件项自身携带），故把地址写在 file 上再结束
-  file.url = data.url;
+  file.url = data?.url ?? file.name;
   onFinish();
   emit('success', data);
 }
@@ -169,21 +176,23 @@ const uploadProps = computed(() => ({
 <template>
   <!-- image-card：不传默认插槽，保留 naive 原生「+」上传块 -->
   <NUpload v-if="isImageCard" v-bind="uploadProps" class="upload w-full" />
-  <!-- file / dragger：naive 无内置触发内容，默认插槽提供触发区 -->
-  <NUpload v-else v-bind="uploadProps" class="upload w-full">
+  <!-- file / dragger：naive 无内置触发内容，默认插槽提供触发区（外部传入插槽内容可自定义触发按钮文案/样式） -->
+  <NUpload v-else v-bind="uploadProps" class="upload w-full" :show-file-list="showFileList">
     <template #default>
-      <NUploadDragger v-if="isDragger">
-        <div class="flex flex-col items-center">
-          <icon-mdi-cloud-upload-outline class="mb-8px text-48px text-gray-400" />
-          <span class="text-14px">{{ $t('common.upload.draggerText') }}</span>
-        </div>
-      </NUploadDragger>
-      <NButton v-else size="small">
-        <template #icon>
-          <icon-mdi-upload class="text-icon" />
-        </template>
-        {{ $t('common.chooseFile') }}
-      </NButton>
+      <slot>
+        <NUploadDragger v-if="isDragger">
+          <div class="flex flex-col items-center">
+            <icon-mdi-cloud-upload-outline class="mb-8px text-48px text-gray-400" />
+            <span class="text-14px">{{ $t('common.upload.draggerText') }}</span>
+          </div>
+        </NUploadDragger>
+        <NButton v-else size="small">
+          <template #icon>
+            <icon-mdi-upload class="text-icon" />
+          </template>
+          {{ $t('common.chooseFile') }}
+        </NButton>
+      </slot>
     </template>
   </NUpload>
 </template>

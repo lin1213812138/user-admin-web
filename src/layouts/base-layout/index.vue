@@ -35,7 +35,8 @@ const contentShowPadding = computed(
       'data-manage_business',
       'data-manage_finance',
       'data-manage_no-rule',
-      'data-manage_ship'
+      'data-manage_ship',
+      'data-manage_bl'
     ].includes(route.name as string)
 );
 

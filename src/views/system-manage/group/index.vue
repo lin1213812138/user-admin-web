@@ -2,11 +2,17 @@
 import dayjs from 'dayjs';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteGroup, fetchGetGroupList } from '@/service/api/group';
+import {
+  fetchDeleteGroup,
+  fetchGetGroupCustomerList,
+  fetchGetGroupList,
+  fetchGetGroupUserList
+} from '@/service/api/group';
 import { fetchGetSiteList } from '@/service/api/site';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
+import RelationModal from '@/components/common/relation-modal.vue';
 import GroupOperateDrawer from './modules/group-operate-drawer.vue';
 
 const searchParams = reactive<{ groupName: string; siteId: string | null }>({
@@ -75,14 +81,30 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         sortable: false
       },
       { key: 'site', title: $t('page.manage.group.siteName'), visible: true, width: 120, sortable: false },
+      {
+        key: 'relationUser',
+        title: $t('page.manage.group.relationUser'),
+        visible: true,
+        width: 90,
+        sortable: false,
+        align: 'center'
+      },
+      {
+        key: 'relationCustomer',
+        title: $t('page.manage.group.relationCustomer'),
+        visible: true,
+        width: 90,
+        sortable: false,
+        align: 'center'
+      },
       { key: 'desc', title: $t('page.manage.group.remark'), visible: true, minWidth: 160, sortable: false },
       { key: 'creator', title: $t('page.manage.group.creator'), visible: true, width: 100, sortable: false },
       { key: 'createDate', title: $t('page.manage.group.createTime'), visible: true, width: 180, sortable: false },
       { key: 'updateBy', title: $t('page.manage.group.updateBy'), visible: true, width: 100, sortable: false },
       { key: 'updateDate', title: $t('page.manage.group.updateTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  // 字段结构对齐后端（name/desc/_id），换新缓存 key 避免旧列配置（groupName/status 等）残留
-  cacheKey: 'system-manage-group-v2'
+  // 新增关联用户/客户列，换新缓存 key 避免旧列配置残留
+  cacheKey: 'system-manage-group-v3'
 });
 
 /** 毫秒时间戳格式化展示 */
@@ -132,10 +154,6 @@ function openDrawer(mode: 'create' | 'edit' | 'detail', row?: Api.SystemManage.G
   operateVisible.value = true;
 }
 
-function handleDetail(row: Api.SystemManage.Group) {
-  openDrawer('detail', row);
-}
-
 function handleEdit(row: Api.SystemManage.Group) {
   openDrawer('edit', row);
 }
@@ -143,6 +161,81 @@ function handleEdit(row: Api.SystemManage.Group) {
 function handleSubmitted() {
   getData();
 }
+
+/** 关联弹窗当前行（用户 / 客户弹窗共用，取数时闭包读取） */
+const relationRow = ref<Api.SystemManage.Group | null>(null);
+const relationUserVisible = ref(false);
+const relationCustomerVisible = ref(false);
+
+async function openRelationModal(type: 'user' | 'customer', row: Api.SystemManage.Group) {
+  relationRow.value = row;
+
+  // 先探查是否有关联数据（只取第一条判断 total），为空时仅提示、不弹窗
+  const fetcher = type === 'user' ? fetchRelationUsers : fetchRelationCustomers;
+  const { list, total } = await fetcher({ page: 1, size: 1 });
+  if (!total && list.length === 0) {
+    window.$notification?.info({ title: $t('common.noData'), duration: 3000 });
+    return;
+  }
+
+  if (type === 'user') {
+    relationUserVisible.value = true;
+  } else {
+    relationCustomerVisible.value = true;
+  }
+}
+
+/** 弹窗取数：组别关联用户（/user/query where.groupIds 数组成员匹配；错误提示由 request 拦截器统一弹出，失败返回空列表） */
+async function fetchRelationUsers({ page, size }: { page: number; size: number }) {
+  if (!relationRow.value) return { list: [], total: 0 };
+
+  const { data: res, error } = await fetchGetGroupUserList({ page, size, groupId: relationRow.value._id });
+  if (error || !res) return { list: [], total: 0 };
+
+  return res;
+}
+
+/** 弹窗取数：组别关联客户（/customer/query where.groupId 精确过滤） */
+async function fetchRelationCustomers({ page, size }: { page: number; size: number }) {
+  if (!relationRow.value) return { list: [], total: 0 };
+
+  const { data: res, error } = await fetchGetGroupCustomerList({ page, size, groupId: relationRow.value._id });
+  if (error || !res) return { list: [], total: 0 };
+
+  return res;
+}
+
+/** 关联用户弹窗列（姓名 / 账号 / 所属站点 / 状态） */
+const relationUserColumns = [
+  { key: 'name', title: $t('page.manage.user.nickName'), visible: true, width: 140, sortable: false },
+  { key: 'account', title: $t('page.manage.user.userName'), visible: true, width: 140, sortable: false },
+  { key: 'site', title: $t('page.manage.site.siteName'), visible: true, minWidth: 140, sortable: false },
+  {
+    key: 'status',
+    title: $t('page.manage.user.status'),
+    type: 'status',
+    visible: true,
+    width: 90,
+    sortable: false,
+    align: 'center'
+  }
+] as VxeColumnConfig[];
+
+/** 关联客户弹窗列（编码 / 名称 / 所属站点 / 状态） */
+const relationCustomerColumns = [
+  { key: 'code', title: $t('page.manage.site.customerCode'), visible: true, width: 140, sortable: false },
+  { key: 'name', title: $t('page.manage.site.customerName'), visible: true, minWidth: 160, sortable: false },
+  { key: 'site', title: $t('page.manage.site.siteName'), visible: true, minWidth: 140, sortable: false },
+  {
+    key: 'status',
+    title: $t('page.manage.user.status'),
+    type: 'status',
+    visible: true,
+    width: 90,
+    sortable: false,
+    align: 'center'
+  }
+] as VxeColumnConfig[];
 </script>
 
 <template>
@@ -164,10 +257,21 @@ function handleSubmitted() {
         @refresh="getData"
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"
-        @detail="handleDetail"
       >
         <template #createDate="{ row }">
           <span>{{ formatDate(row.createDate) }}</span>
+        </template>
+
+        <template #relationUser="{ row }">
+          <NButton size="small" type="primary" text @click="openRelationModal('user', row)">
+            {{ $t('page.manage.site.view') }}
+          </NButton>
+        </template>
+
+        <template #relationCustomer="{ row }">
+          <NButton size="small" type="primary" text @click="openRelationModal('customer', row)">
+            {{ $t('page.manage.site.view') }}
+          </NButton>
         </template>
 
         <template #updateDate="{ row }">
@@ -239,6 +343,20 @@ function handleSubmitted() {
       :mode="operateMode"
       :row="operateRow"
       @submitted="handleSubmitted"
+    />
+
+    <RelationModal
+      v-model:show="relationUserVisible"
+      :title="$t('page.manage.group.relationUser')"
+      :fetcher="fetchRelationUsers"
+      :columns="relationUserColumns"
+    />
+
+    <RelationModal
+      v-model:show="relationCustomerVisible"
+      :title="$t('page.manage.group.relationCustomer')"
+      :fetcher="fetchRelationCustomers"
+      :columns="relationCustomerColumns"
     />
   </div>
 </template>

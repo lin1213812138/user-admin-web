@@ -89,9 +89,11 @@ declare namespace Api {
       size: number;
       keyword?: string;
       keywordFields?: string[];
-      /** 其他查询条件（站点 / 状态精确过滤） */
+      /** 其他查询条件（站点 / 角色 / 组别 / 状态精确过滤；roleIds、groupIds 走 MongoDB 数组成员匹配） */
       where?: {
         siteId?: string;
+        roleIds?: string;
+        groupIds?: string;
         status?: Api.Common.EnableStatus;
       };
     };
@@ -168,6 +170,8 @@ declare namespace Api {
       name: string;
       /** 角色类型 */
       roleType?: Api.SystemManage.RoleType;
+      /** 系统内置 0-否 1-是（内置角色不允许修改和删除） */
+      buildIn?: Api.SystemManage.RoleCtrl;
       /** 角色描述 */
       desc?: string;
       /** 操作权限码 */
@@ -241,75 +245,6 @@ declare namespace Api {
 
     /** 角色查询列表（与 RoleList 同构） */
     type RoleQueryList = RoleList;
-
-    /** menu type */
-    type MenuType = 'catalog' | 'menu';
-
-    /** menu record */
-    interface Menu {
-      id: number;
-      /** parent menu id, 0 means top level */
-      parentId: number;
-      /** menu name */
-      menuName: string;
-      /** menu type: catalog or menu */
-      menuType: MenuType;
-      /** menu icon */
-      icon: string;
-      /** route path */
-      routePath: string;
-      /** component path */
-      componentPath: string;
-      /** permission code */
-      permission: string;
-      /** sort order */
-      sort: number;
-      /** menu status */
-      status: Api.Common.EnableStatus;
-      /** whether visible */
-      visible: 1 | 2;
-      /** whether keep alive */
-      keepAlive: 1 | 2;
-      /** whether external link */
-      isExternal: 1 | 2;
-      /** redirect path */
-      redirect: string;
-      createTime: string;
-      /** children menus (built at frontend) */
-      children?: Menu[];
-    }
-
-    /** menu list (flat array, built to tree at frontend) */
-    type MenuList = Menu[];
-
-    /** menu search params */
-    type MenuSearchParams = {
-      menuName?: string;
-      status?: Api.Common.EnableStatus | null;
-    };
-
-    /** menu create params */
-    type MenuCreateParams = Pick<
-      Menu,
-      | 'parentId'
-      | 'menuName'
-      | 'menuType'
-      | 'icon'
-      | 'routePath'
-      | 'componentPath'
-      | 'permission'
-      | 'sort'
-      | 'status'
-      | 'visible'
-      | 'keepAlive'
-      | 'isExternal'
-      | 'redirect'
-    >;
-
-    /** menu update params */
-    type MenuUpdateParams = MenuCreateParams & {
-      id: number;
-    };
 
     /** 站点类型：0-分公司 1-总公司 */
     type SiteType = 0 | 1;
@@ -541,73 +476,382 @@ declare namespace Api {
       _id: string;
     };
 
-    /** 客户等级：普通 / 重要 / VIP */
-    type CustomerLevel = 'normal' | 'important' | 'vip';
+    /** 客户扣货方式 0-不扣货 1-信用额度 2-结算周期 3-信用额度+结算周期 */
+    type CustomerWithhold = 0 | 1 | 2 | 3;
 
-    /** 客户来源：官网 / 转介绍 / 广告 */
-    type CustomerSource = 'website' | 'referral' | 'ad';
+    /** 账单生成方式 0-手工生成 1-按账单结算周期 */
+    type CustomerBillGenMode = 0 | 1;
 
-    /** 客户 */
+    /** 客户（tms-user Customer 实体，/customer/* 接口；hashedPassword/salt/appToken 等后端域字段前端不使用） */
     interface Customer {
-      id: number;
-      /** 客户编号，唯一 */
-      customerCode: string;
-      /** 客户名称 */
-      customerName: string;
-      /** 客户等级：普通 / 重要 / VIP */
-      customerLevel: Api.SystemManage.CustomerLevel;
-      /** 客户来源：官网 / 转介绍 / 广告 */
-      customerSource: Api.SystemManage.CustomerSource;
+      /** 主键（MongoId 字符串） */
+      _id: string;
+      /** 客户编码，唯一，不传由后端按单号规则生成 */
+      code: string;
+      /** 客户名称，必填，唯一 */
+      name: string;
+      /** 网站账号，必填，唯一 */
+      account: string;
       /** 联系人 */
-      contactName: string;
-      /** 联系电话 */
-      contactPhone: string;
+      contact?: string;
+      /** 电话 */
+      mobile?: string;
       /** 邮箱 */
-      email: string;
+      email?: string;
       /** 地址 */
-      address: string;
-      /** 客户状态 */
-      status: Api.Common.EnableStatus;
+      address?: string;
+      /** 微信 */
+      wx?: string;
+      /** QQ */
+      qq?: string;
+      /** 标签 */
+      tag?: string;
+      /** 开票信息 */
+      taxInfo?: string;
       /** 备注 */
-      remark: string;
-      /** 创建人 */
-      createByName: string;
-      /** 创建时间（YYYY-MM-DD） */
-      createTime: string;
-      /** 最后更新人 */
-      updateByName: string;
-      /** 最后更新时间（YYYY-MM-DD） */
-      updateTime: string;
+      note?: string;
+      /** 状态 0-停用 1-启用 */
+      status: Api.Common.EnableStatus;
+      /** 网站状态（网站下单开通状态） 0-停用 1-启用 */
+      webStatus?: Api.Common.EnableStatus;
+      /** API状态（API下单开通状态） 0-停用 1-启用 */
+      apiStatus?: Api.Common.EnableStatus;
+      /** API下单授权 id（详情页 API配置 tab 展示/复制） */
+      appToken?: string;
+      /** API下单授权秘钥 */
+      appKey?: string;
+      /** 扣货方式 */
+      withhold?: Api.SystemManage.CustomerWithhold;
+      /** 信用额度（最大发货额度） */
+      creditLimit?: number;
+      /** 结算对接人 */
+      billPerson?: string;
+      /** 合同开始日期（毫秒时间戳） */
+      contractStartDate?: number;
+      /** 合同结束日期（毫秒时间戳） */
+      contractEndDate?: number;
+      /** 结算方式 id */
+      billModeId?: string;
+      /** 结算方式名称（后端 fillName 回填） */
+      billMode?: string;
+      /** 账单生成方式 */
+      billGenMode?: Api.SystemManage.CustomerBillGenMode;
+      /** 客户来源 id */
+      sourceId?: string;
+      /** 客户来源名称（后端 fillName 回填） */
+      source?: string;
+      /** 客户等级 id */
+      levelId?: string;
+      /** 客户等级名称（后端 fillName 回填） */
+      level?: string;
+      /** 专属销售 id */
+      salesmanId?: string;
+      /** 专属销售名称 */
+      salesman?: string;
+      /** 专属客服 id */
+      serviceId?: string;
+      /** 专属客服名称 */
+      service?: string;
+      /** 专属财务 id */
+      cashierId?: string;
+      /** 专属财务名称 */
+      cashier?: string;
+      /** 专属取件 id */
+      pickerId?: string;
+      /** 专属取件名称 */
+      picker?: string;
+      /** 所属站点 id */
+      siteId?: string;
+      /** 所属站点名称 */
+      site?: string;
+      /** 所属组别 id */
+      groupId?: string;
+      /** 所属组别名称 */
+      group?: string;
+      /** 余额 */
+      balance?: number;
+      /** 欠款金额 */
+      oweAmount?: number;
+      creatorId?: string;
+      creator?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate: number;
     }
 
-    /** 客户列表 */
-    type CustomerList = Api.Common.PaginatingQueryRecord<Customer>;
-
-    /** 客户查询参数 */
-    type CustomerSearchParams = Api.Common.CommonSearchParams & {
-      customerCode?: string;
-      customerName?: string;
-      customerLevel?: Api.SystemManage.CustomerLevel | null;
-      status?: Api.Common.EnableStatus | null;
+    /** 客户列表（/customer/query 返回 ret：{ list, total }） */
+    type CustomerList = {
+      list: Customer[];
+      total: number;
     };
 
-    /** 客户新增参数 */
+    /** 客户查询参数（/customer/query，scene=1 管理列表含停用；keyword 匹配 code/name/account） */
+    type CustomerSearchParams = {
+      page: number;
+      size: number;
+      /** 1-管理列表（不强制 status=1） */
+      scene?: number;
+      /** 关键字，按 code/name/account 模糊查询 */
+      keyword?: string;
+      /** 其他查询条件（精确过滤） */
+      where?: {
+        levelId?: string;
+        sourceId?: string;
+        siteId?: string;
+        status?: Api.Common.EnableStatus;
+      };
+      sort?: Record<string, 1 | -1>;
+    };
+
+    /** 客户新增参数（/customer/create，code 不传后端自动生成；name/account 唯一） */
     type CustomerCreateParams = {
-      customerCode: string;
-      customerName: string;
-      customerLevel: Api.SystemManage.CustomerLevel;
-      customerSource: Api.SystemManage.CustomerSource;
-      contactName: string;
-      contactPhone: string;
-      email: string;
-      address: string;
-      remark: string;
-      status: Api.Common.EnableStatus;
+      code?: string;
+      name: string;
+      account: string;
+      contact?: string;
+      mobile?: string;
+      email?: string;
+      address?: string;
+      wx?: string;
+      qq?: string;
+      tag?: string;
+      taxInfo?: string;
+      note?: string;
+      status?: Api.Common.EnableStatus;
+      /** 网站状态（网站下单开通状态，详情页 API配置 tab 可改） */
+      webStatus?: Api.Common.EnableStatus;
+      /** API状态（API下单开通状态，详情页 API配置 tab 可改） */
+      apiStatus?: Api.Common.EnableStatus;
+      withhold?: Api.SystemManage.CustomerWithhold;
+      creditLimit?: number;
+      billPerson?: string;
+      contractStartDate?: number;
+      contractEndDate?: number;
+      billModeId?: string;
+      billGenMode?: Api.SystemManage.CustomerBillGenMode;
+      sourceId?: string;
+      levelId?: string;
+      siteId?: string;
+      groupId?: string;
+      salesmanId?: string;
+      serviceId?: string;
+      cashierId?: string;
+      pickerId?: string;
     };
 
-    /** 客户更新参数 */
+    /** 客户更新参数（/customer/update） */
     type CustomerUpdateParams = CustomerCreateParams & {
-      id: number;
+      _id: string;
+    };
+
+    /** 客户等级字典（/customer-level/query） */
+    interface CustomerLevelItem {
+      _id: string;
+      /** 等级名称 */
+      name: string;
+      /** 等级序号 */
+      num?: number;
+      /** 状态 0-未启用 1-已启用 */
+      status?: Api.Common.EnableStatus;
+      createDate?: number;
+      updateDate?: number;
+    }
+
+    /** 客户等级字典列表 */
+    type CustomerLevelList = {
+      list: CustomerLevelItem[];
+      total: number;
+    };
+
+    /** 客户来源字典（/customer-source/query） */
+    interface CustomerSourceItem {
+      _id: string;
+      /** 来源名称 */
+      name: string;
+      /** 排序 */
+      order?: number;
+      /** 状态 0-禁用 1-启用 */
+      status?: Api.Common.EnableStatus;
+      createDate?: number;
+      updateDate?: number;
+    }
+
+    /** 客户来源字典列表 */
+    type CustomerSourceList = {
+      list: CustomerSourceItem[];
+      total: number;
+    };
+
+    /** 结算方式字典（/bill-mode/query） */
+    interface BillModeItem {
+      _id: string;
+      /** 结算名称 */
+      name: string;
+      /** 系统类型 1-天结 2-周结 3-月结 4-签收结 5-现结 6-到付 */
+      sysType?: number;
+      /** 结算周期 0-每天 1-每周 2-每月 */
+      billPeriod?: number;
+      /** 结算日期 每天-0-23 每周-1-7 每月-1-28（-1 为最后一天） */
+      billDay?: number;
+      /** 关联运单状态 0-已预报 1-已收货 2-已出库 3-转运中 4-已送达 */
+      billGenStatus?: number[];
+      /** 是否内置 0-否 1-是 */
+      buildIn?: number;
+      /** 状态 0-未启用 1-使用中 */
+      status?: Api.Common.EnableStatus;
+      createDate?: number;
+      updateDate?: number;
+    }
+
+    /** 结算方式字典列表 */
+    type BillModeList = {
+      list: BillModeItem[];
+      total: number;
+    };
+
+    /** 客户地址（tms-user ShipTo/Shipper 共有结构，/ship-to/*、/shipper/*；发件侧仅字段注释不同） */
+    interface CustomerAddress {
+      /** 主键（MongoId 字符串） */
+      _id: string;
+      /** 所属客户 id */
+      customerId: string;
+      /** 客户名称（后端 fillName 回填） */
+      customer?: string;
+      /** 目的地 id */
+      countryId?: string;
+      /** 目的地名称（后端 fillCountry 回填） */
+      country?: string;
+      /** 收(发)件人 */
+      name?: string;
+      /** 收(发)件公司 */
+      company?: string;
+      /** 收(发)件电话 */
+      phone?: string;
+      /** 收(发)件手机 */
+      mobile?: string;
+      /** 收(发)件邮箱 */
+      email?: string;
+      /** 地址 */
+      address?: string;
+      /** 地址2 */
+      address2?: string;
+      /** 地址3 */
+      address3?: string;
+      /** 省州 */
+      state?: string;
+      /** 城市 */
+      city?: string;
+      /** 邮编 */
+      zip?: string;
+      /** 税号 */
+      taxNo?: string;
+      /** FBA仓库代码（收件地址特有） */
+      fbaCode?: string;
+      /** 证照1（证件照正面） */
+      imgUrl1?: string;
+      /** 证照2（证件照反面） */
+      imgUrl2?: string;
+      /** 地址标签 */
+      tag?: string;
+      /** 是否默认 0-否 1-是 */
+      isDefault?: Api.Common.EnableStatus;
+      createDate?: number;
+      updateDate?: number;
+    }
+
+    /** 客户地址列表（/ship-to/query、/shipper/query 返回 ret：{ list, total }） */
+    type CustomerAddressList = {
+      list: CustomerAddress[];
+      total: number;
+    };
+
+    /** 客户地址查询参数（queryCommon；keyword 必须由前端显式传 keywordFields 才生效） */
+    type CustomerAddressSearchParams = {
+      page: number;
+      size: number;
+      /** 关键字（配合 keywordFields 匹配 name/phone/zip） */
+      keyword?: string;
+      /** keyword 匹配字段 */
+      keywordFields?: string[];
+      where?: {
+        customerId?: string;
+      };
+      sort?: Record<string, 1 | -1>;
+    };
+
+    /** 客户地址新增/编辑参数（/ship-to/create|update、/shipper/create|update；customerId 必填） */
+    type CustomerAddressSaveParams = {
+      _id?: string;
+      customerId: string;
+      countryId?: string;
+      /** 国家名称（老系统「收/发件国家」可手输，选目的地自动带出） */
+      country?: string;
+      name?: string;
+      company?: string;
+      phone?: string;
+      mobile?: string;
+      email?: string;
+      address?: string;
+      address2?: string;
+      address3?: string;
+      state?: string;
+      city?: string;
+      zip?: string;
+      taxNo?: string;
+      fbaCode?: string;
+      tag?: string;
+      isDefault?: Api.Common.EnableStatus;
+      /** 证照1（证件照正面） */
+      imgUrl1?: string;
+      /** 证照2（证件照反面） */
+      imgUrl2?: string;
+    };
+
+    /** 客户附件（tms-user File 模型，refId 关联客户 _id，/file/*） */
+    interface CustomerFileItem {
+      /** 主键 */
+      _id: string;
+      /** 文件名称 */
+      name?: string;
+      /** 关联 id（客户 _id） */
+      refId?: string;
+      /** 文件访问地址 */
+      url?: string;
+      /** 大小（字节） */
+      size?: number;
+      /** 上传人 */
+      creator?: string;
+      /** 上传时间（毫秒时间戳） */
+      createDate?: number;
+    }
+
+    /** 客户附件列表（/file/query 走 queryAllCommon，仅返回 { list } 无 total） */
+    type CustomerFileList = {
+      list: CustomerFileItem[];
+    };
+
+    /** 国家地区（/country/query，客户地址目的地下拉用） */
+    interface CountryItem {
+      _id: string;
+      /** 国家编码 */
+      code?: string;
+      /** 中文名称 */
+      nameCn?: string;
+      /** 英文名称 */
+      nameEn?: string;
+      /** 常用名称 */
+      name?: string;
+      /** 二字码 */
+      code2?: string;
+      /** 三字码 */
+      code3?: string;
+    }
+
+    /** 国家地区列表 */
+    type CountryList = {
+      list: CountryItem[];
+      total: number;
     };
 
     /** 轨迹抓取 - 前 4 个同构子 tab 分类 */

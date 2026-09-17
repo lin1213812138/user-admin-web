@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import dayjs from 'dayjs';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteCustomer, fetchGetCustomerList } from '@/service/api/customer';
+import { fetchGetCustomerLevelList, fetchGetCustomerList, fetchGetCustomerSourceList } from '@/service/api/customer';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
 import CustomerOperateDrawer from './modules/customer-operate-drawer.vue';
+import CustomerDetailDrawer from './modules/customer-detail-drawer.vue';
 
-const searchParams = reactive<Omit<Api.SystemManage.CustomerSearchParams, 'current' | 'size'>>({
-  customerCode: '',
-  customerName: '',
-  customerLevel: null,
+const searchParams = reactive<{
+  keyword: string;
+  levelId: string | null;
+  sourceId: string | null;
+  status: Api.Common.EnableStatus | null;
+}>({
+  keyword: '',
+  levelId: null,
+  sourceId: null,
   status: null
 });
 
@@ -19,41 +26,43 @@ const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() 
   { label: $t('common.disable'), value: 0 }
 ]);
 
-/** 客户等级 / 来源下拉选项（与抽屉共用口径） */
-const customerLevelOptions = computed<CommonType.Option<Api.SystemManage.CustomerLevel>[]>(() => [
-  { label: $t('page.manage.customer.levelNormal'), value: 'normal' },
-  { label: $t('page.manage.customer.levelImportant'), value: 'important' },
-  { label: $t('page.manage.customer.levelVip'), value: 'vip' }
-]);
+/** 客户等级 / 来源下拉（/customer-level/query、/customer-source/query 字典） */
+const levelOptions = ref<CommonType.Option<string>[]>([]);
+const sourceOptions = ref<CommonType.Option<string>[]>([]);
 
-const customerSourceOptions = computed<CommonType.Option<Api.SystemManage.CustomerSource>[]>(() => [
-  { label: $t('page.manage.customer.sourceWebsite'), value: 'website' },
-  { label: $t('page.manage.customer.sourceReferral'), value: 'referral' },
-  { label: $t('page.manage.customer.sourceAd'), value: 'ad' }
-]);
+function toOptions(list: { _id: string; name: string }[]): CommonType.Option<string>[] {
+  return list.map(item => ({ label: item.name, value: item._id }));
+}
+
+async function loadDictOptions() {
+  const [levelRes, sourceRes] = await Promise.all([fetchGetCustomerLevelList(), fetchGetCustomerSourceList()]);
+  levelOptions.value = toOptions(levelRes.data?.list ?? []);
+  sourceOptions.value = toOptions(sourceRes.data?.list ?? []);
+}
 
 const searchItems = computed<FormItemConfig[]>(() => [
   {
-    key: 'customerCode',
-    label: $t('page.manage.customer.customerCode'),
+    key: 'keyword',
+    label: $t('page.manage.customer.keyword'),
     type: 'input',
     span: 6,
-    placeholder: $t('page.manage.customer.form.customerCodePlaceholder')
+    placeholder: $t('page.manage.customer.form.keywordPlaceholder')
   },
   {
-    key: 'customerName',
-    label: $t('page.manage.customer.customerName'),
-    type: 'input',
-    span: 6,
-    placeholder: $t('page.manage.customer.form.customerNamePlaceholder')
-  },
-  {
-    key: 'customerLevel',
+    key: 'levelId',
     label: $t('page.manage.customer.customerLevel'),
     type: 'select',
     span: 6,
-    options: customerLevelOptions.value,
-    placeholder: $t('page.manage.customer.form.customerLevelPlaceholder')
+    options: levelOptions.value,
+    placeholder: $t('page.manage.customer.form.levelPlaceholder')
+  },
+  {
+    key: 'sourceId',
+    label: $t('page.manage.customer.customerSource'),
+    type: 'select',
+    span: 6,
+    options: sourceOptions.value,
+    placeholder: $t('page.manage.customer.form.sourcePlaceholder')
   },
   {
     key: 'status',
@@ -69,78 +78,77 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
   Api.SystemManage.CustomerList,
   Api.SystemManage.Customer
 >({
-  api: ({ current, size }) =>
-    fetchGetCustomerList({
-      current,
+  // 真实接口走 flat request，这里解包 { data, error }，失败时返回空列表（错误提示由 request 拦截器统一弹出）
+  api: async ({ current, size }) => {
+    const { data: res, error } = await fetchGetCustomerList({
+      page: current,
       size,
-      customerCode: searchParams.customerCode?.trim() || undefined,
-      customerName: searchParams.customerName?.trim() || undefined,
-      // 等级 / 状态 0 都是有效值，须用 ?? 兜底而不是 ||
-      customerLevel: searchParams.customerLevel ?? undefined,
-      status: searchParams.status ?? undefined
-    }) as Promise<Api.SystemManage.CustomerList>,
-  transform: r => ({ records: r.records, total: r.total }),
+      // scene=1 管理列表：不强制 status=1，状态筛选交给 where
+      scene: 1,
+      keyword: searchParams.keyword?.trim() || undefined,
+      where: {
+        levelId: searchParams.levelId ?? undefined,
+        sourceId: searchParams.sourceId ?? undefined,
+        // 状态 0（停用）是有效值，须用 ?? 兜底而不是 ||
+        status: searchParams.status ?? undefined
+      },
+      sort: { createDate: -1 }
+    });
+
+    if (error || !res) return { list: [], total: 0 };
+
+    return res;
+  },
+  // tms-user 返回 ret:{ list, total }，映射为表格需要的 records/total
+  transform: r => ({ records: r.list, total: r.total }),
   columns: () =>
     [
       {
-        key: 'customerCode',
+        key: 'code',
         title: $t('page.manage.customer.customerCode'),
         type: 'detail',
         visible: true,
-        width: 120,
-        sortable: false
-      },
-      {
-        key: 'customerName',
-        title: $t('page.manage.customer.customerName'),
-        visible: true,
-        width: 140,
-        sortable: false
-      },
-      {
-        key: 'customerLevel',
-        title: $t('page.manage.customer.customerLevel'),
-        visible: true,
         width: 100,
         sortable: false
       },
-      {
-        key: 'customerSource',
-        title: $t('page.manage.customer.customerSource'),
-        visible: true,
-        width: 100,
-        sortable: false
-      },
-      { key: 'contactName', title: $t('page.manage.customer.contactName'), visible: true, width: 100, sortable: false },
-      {
-        key: 'contactPhone',
-        title: $t('page.manage.customer.contactPhone'),
-        visible: true,
-        width: 140,
-        sortable: false
-      },
-      { key: 'email', title: $t('page.manage.customer.email'), visible: false, minWidth: 180, sortable: false },
-      { key: 'address', title: $t('page.manage.customer.address'), visible: false, minWidth: 200, sortable: false },
+      { key: 'name', title: $t('page.manage.customer.customerName'), visible: true, width: 160, sortable: false },
+      { key: 'account', title: $t('page.manage.customer.account'), visible: true, width: 110, sortable: false },
+      { key: 'contact', title: $t('page.manage.customer.contactName'), visible: true, width: 90, sortable: false },
+      { key: 'mobile', title: $t('page.manage.customer.contactPhone'), visible: true, width: 120, sortable: false },
+      { key: 'email', title: $t('page.manage.customer.email'), visible: true, width: 150, sortable: false },
+      { key: 'address', title: $t('page.manage.customer.address'), visible: true, minWidth: 160, sortable: false },
+      { key: 'salesman', title: $t('page.manage.customer.salesman'), visible: true, width: 90, sortable: false },
+      { key: 'service', title: $t('page.manage.customer.service'), visible: true, width: 90, sortable: false },
+      { key: 'group', title: $t('page.manage.customer.group'), visible: true, width: 100, sortable: false },
+      { key: 'source', title: $t('page.manage.customer.customerSource'), visible: true, width: 100, sortable: false },
+      { key: 'creditLimit', title: $t('page.manage.customer.creditLimit'), visible: true, width: 100, sortable: false },
       {
         key: 'status',
         title: $t('page.manage.customer.status'),
         type: 'status',
         visible: true,
-        width: 100,
-        fixed: 'right',
+        width: 80,
         sortable: false,
         align: 'center'
       },
-      { key: 'updateTime', title: $t('page.manage.customer.updateTime'), visible: true, width: 180, sortable: true }
+      {
+        key: 'webStatus',
+        title: $t('page.manage.customer.webStatus'),
+        type: 'status',
+        visible: true,
+        width: 90,
+        sortable: false,
+        align: 'center'
+      },
+      { key: 'createDate', title: $t('page.manage.customer.createDate'), visible: true, width: 160, sortable: true }
     ] as VxeColumnConfig[],
-  cacheKey: 'system-manage-customer'
+  // 列结构按老系统对齐调整，换新缓存 key 避免旧列配置残留
+  cacheKey: 'customer-manage-customer-v3'
 });
 
-const configVisible = ref(false);
-const checkedRows = ref<Api.SystemManage.Customer[]>([]);
-
-function handleSelectionChange(records: Api.SystemManage.Customer[]) {
-  checkedRows.value = records;
+/** 毫秒时间戳格式化展示 */
+function formatDate(ts?: number) {
+  return ts ? dayjs(ts).format('YYYY-MM-DD HH:mm') : '--';
 }
 
 function handlePageChange({ current, size }: { current: number; size: number }) {
@@ -155,21 +163,23 @@ function handleSearch() {
 }
 
 function handleReset() {
-  searchParams.customerCode = '';
-  searchParams.customerName = '';
-  searchParams.customerLevel = null;
+  searchParams.keyword = '';
+  searchParams.levelId = null;
+  searchParams.sourceId = null;
   searchParams.status = null;
   handleSearch();
 }
 
-async function handleDelete(ids: number[]) {
-  await fetchDeleteCustomer(ids);
-  window.$message?.success($t('common.deleteSuccess'));
-  checkedRows.value = [];
-  getData();
-}
-
 const operateVisible = ref(false);
+const detailVisible = ref(false);
+const detailId = ref('');
+const configVisible = ref(false);
+/** 勾选行暂仅作状态保留（删除接口就绪后启用批量删除） */
+const checkedRows = ref<Api.SystemManage.Customer[]>([]);
+
+function handleSelectionChange(records: Api.SystemManage.Customer[]) {
+  checkedRows.value = records;
+}
 const operateMode = ref<'create' | 'edit' | 'detail'>('create');
 const operateRow = ref<Api.SystemManage.Customer | null>(null);
 
@@ -179,8 +189,10 @@ function openDrawer(mode: 'create' | 'edit' | 'detail', row?: Api.SystemManage.C
   operateVisible.value = true;
 }
 
+/** 客户编码点击 → 打开客户详情弹窗 */
 function handleDetail(row: Api.SystemManage.Customer) {
-  openDrawer('detail', row);
+  detailId.value = row._id;
+  detailVisible.value = true;
 }
 
 function handleEdit(row: Api.SystemManage.Customer) {
@@ -191,14 +203,9 @@ function handleSubmitted() {
   getData();
 }
 
-/** 等级 / 来源反查中文 label（表格插槽用） */
-function levelLabel(level: Api.SystemManage.CustomerLevel): string {
-  return customerLevelOptions.value.find(item => item.value === level)?.label ?? '';
-}
-
-function sourceLabel(source: Api.SystemManage.CustomerSource): string {
-  return customerSourceOptions.value.find(item => item.value === source)?.label ?? '';
-}
+onMounted(() => {
+  loadDictOptions();
+});
 </script>
 
 <template>
@@ -214,7 +221,7 @@ function sourceLabel(source: Api.SystemManage.CustomerSource): string {
         :show-seq="true"
         :show-checkbox="true"
         :show-action="true"
-        :action-width="120"
+        :action-width="140"
         @search="handleSearch"
         @reset="handleReset"
         @refresh="getData"
@@ -222,16 +229,8 @@ function sourceLabel(source: Api.SystemManage.CustomerSource): string {
         @selection-change="handleSelectionChange"
         @detail="handleDetail"
       >
-        <template #customerLevel="{ row }">
-          <span>{{ levelLabel(row.customerLevel) }}</span>
-        </template>
-
-        <template #customerSource="{ row }">
-          <span>{{ sourceLabel(row.customerSource) }}</span>
-        </template>
-
-        <template #updateTime="{ row }">
-          <span>{{ row.updateByName }} - {{ row.updateTime }}</span>
+        <template #createDate="{ row }">
+          <span>{{ formatDate(row.createDate) }}</span>
         </template>
 
         <template #operation-left>
@@ -242,20 +241,20 @@ function sourceLabel(source: Api.SystemManage.CustomerSource): string {
               </template>
               {{ $t('common.add') }}
             </NButton>
-            <NPopconfirm
-              :disabled="checkedRows.length === 0"
-              @positive-click="handleDelete(checkedRows.map(i => i.id))"
-            >
+            <!-- 后端暂无 /customer/delete 接口，按钮先保留并禁用 -->
+            <NTooltip :disabled="false">
               <template #trigger>
-                <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
-                  <template #icon>
-                    <icon-mdi-delete class="text-icon" />
-                  </template>
-                  {{ $t('common.batchDelete') }}
-                </NButton>
+                <span>
+                  <NButton size="small" type="error" ghost disabled>
+                    <template #icon>
+                      <icon-mdi-delete class="text-icon" />
+                    </template>
+                    {{ $t('common.batchDelete') }}
+                  </NButton>
+                </span>
               </template>
-              {{ $t('common.confirmDelete') }}
-            </NPopconfirm>
+              {{ $t('page.manage.customer.deleteDisabledTip') }}
+            </NTooltip>
           </NSpace>
         </template>
 
@@ -277,12 +276,15 @@ function sourceLabel(source: Api.SystemManage.CustomerSource): string {
 
         <template #action="{ row }">
           <NButton size="small" type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</NButton>
-          <NPopconfirm @positive-click="handleDelete([row.id])">
+          <!-- 后端暂无 /customer/delete 接口，按钮先保留并禁用 -->
+          <NTooltip>
             <template #trigger>
-              <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
+              <span>
+                <NButton size="small" type="error" text disabled>{{ $t('common.delete') }}</NButton>
+              </span>
             </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+            {{ $t('page.manage.customer.deleteDisabledTip') }}
+          </NTooltip>
         </template>
       </Table>
     </div>
@@ -300,6 +302,8 @@ function sourceLabel(source: Api.SystemManage.CustomerSource): string {
       :row="operateRow"
       @submitted="handleSubmitted"
     />
+
+    <CustomerDetailDrawer v-model:show="detailVisible" :customer-id="detailId" />
   </div>
 </template>
 

@@ -124,7 +124,18 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_basic',
           i18nKey: 'route.data-manage_basic',
           icon: 'ic:baseline-inventory',
-          order: 1
+          order: 6
+        }
+      },
+      {
+        name: 'data-manage_bl',
+        path: '/data-manage/bl',
+        component: 'view.data-manage_bl',
+        meta: {
+          title: 'data-manage_bl',
+          i18nKey: 'route.data-manage_bl',
+          order: 5,
+          icon: 'ic:baseline-receipt-long'
         }
       },
       {
@@ -135,7 +146,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_business',
           i18nKey: 'route.data-manage_business',
           icon: 'ic:baseline-warehouse',
-          order: 2
+          order: 3
         }
       },
       {
@@ -146,7 +157,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_finance',
           i18nKey: 'route.data-manage_finance',
           icon: 'ic:baseline-account-balance-wallet',
-          order: 3
+          order: 4
         }
       },
       {
@@ -157,7 +168,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_no-rule',
           i18nKey: 'route.data-manage_no-rule',
           icon: 'ic:round-numbers',
-          order: 4
+          order: 2
         }
       },
       {
@@ -168,7 +179,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_ship',
           i18nKey: 'route.data-manage_ship',
           icon: 'ic:baseline-local-shipping',
-          order: 5
+          order: 1
         }
       }
     ]
@@ -208,30 +219,6 @@ export const generatedRoutes: GeneratedRoute[] = [
       constant: true,
       hideInMenu: true
     }
-  },
-  {
-    name: 'permission-manage',
-    path: '/permission-manage',
-    component: 'layout.base',
-    meta: {
-      title: 'permission-manage',
-      i18nKey: 'route.permission-manage',
-      icon: 'ic:round-lock',
-      order: 5
-    },
-    children: [
-      {
-        name: 'permission-manage_menu',
-        path: '/permission-manage/menu',
-        component: 'view.permission-manage_menu',
-        meta: {
-          title: 'permission-manage_menu',
-          i18nKey: 'route.permission-manage_menu',
-          icon: 'ic:baseline-menu',
-          order: 1
-        }
-      }
-    ]
   },
   {
     name: 'personal-center',

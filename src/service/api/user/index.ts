@@ -55,3 +55,16 @@ export function fetchDeleteUser(id: string) {
     data: { _id: id }
   });
 }
+
+/**
+ * get user relation customers（真实接口 /customer/user/query，flat 请求需调用方解包 { data, error }）
+ * 与 /customer/query 共用 ctrl.query：请求体带 userId 时后端按 salesmanId/serviceId/cashierId 的 $or 过滤
+ * （有 GROUP 数据权限的角色还会追加 groupIds 条件）；scene=1 管理列表，包含停用客户
+ */
+export function fetchGetUserCustomerList(params: { page: number; size: number; userId: string }) {
+  return request<Api.SystemManage.SiteCustomerList>({
+    url: '/customer/user/query',
+    method: 'post',
+    data: { page: params.page, size: params.size, scene: 1, userId: params.userId }
+  });
+}

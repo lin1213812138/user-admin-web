@@ -56,6 +56,15 @@ export function fetchDeleteRole(id: string) {
   });
 }
 
+/** get role relation users（真实接口 /user/query，where.roleIds 数组成员匹配，flat 请求需调用方解包 { data, error }） */
+export function fetchGetRoleUserList(params: { page: number; size: number; roleId: string }) {
+  return request<Api.SystemManage.UserList>({
+    url: '/user/query',
+    method: 'post',
+    data: { page: params.page, size: params.size, where: { roleIds: params.roleId } }
+  });
+}
+
 /** assign permissions to role（真实接口 /role/auths/update，body { _id, auths }） */
 export function fetchUpdateRoleAuths(params: { _id: string; auths: string[] }) {
   return request<boolean>({

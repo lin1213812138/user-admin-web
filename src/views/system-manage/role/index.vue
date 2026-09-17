@@ -2,7 +2,9 @@
 import dayjs from 'dayjs';
 import { computed, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteRole, fetchGetRoleList } from '@/service/api/role';
+import { fetchDeleteRole, fetchGetRoleList, fetchGetRoleUserList } from '@/service/api/role';
+import Link from '@/components/common/link.vue';
+import RelationModal from '@/components/common/relation-modal.vue';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
@@ -67,7 +69,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       {
         key: 'name',
         title: $t('page.manage.role.roleName'),
-        type: 'detail',
         visible: true,
         width: 140,
         sortable: false
@@ -80,6 +81,14 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         align: 'center',
         sortable: false
       },
+      {
+        key: 'relationUser',
+        title: $t('page.manage.role.relationUser'),
+        visible: true,
+        width: 90,
+        sortable: false,
+        align: 'center'
+      },
       { key: 'desc', title: $t('page.manage.role.desc'), visible: true, minWidth: 160, sortable: false },
       { key: 'order', title: $t('page.manage.role.order'), visible: true, width: 80, align: 'center', sortable: true },
       { key: 'dataAuths', title: $t('page.manage.role.dataAuths'), visible: true, minWidth: 180, sortable: false },
@@ -88,8 +97,8 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       { key: 'updateBy', title: $t('page.manage.role.updateBy'), visible: true, width: 100, sortable: false },
       { key: 'updateDate', title: $t('page.manage.role.updateTime'), visible: true, width: 180, sortable: true }
     ] as VxeColumnConfig[],
-  // 字段结构对齐后端（name/desc/_id），换新缓存 key 避免旧列配置（roleName/status 等）残留
-  cacheKey: 'system-manage-role-v2'
+  // 新增关联用户列，换新缓存 key 避免旧列配置残留
+  cacheKey: 'system-manage-role-v3'
 });
 
 /** 毫秒时间戳格式化展示 */
@@ -144,9 +153,14 @@ function handleReset() {
   handleSearch();
 }
 
-async function handleDelete(ids: string[]) {
-  // 后端 /role/delete 为单条删除，批量时逐条调用
-  await Promise.all(ids.map(id => fetchDeleteRole(id)));
+async function handleDelete(rows: Api.SystemManage.Role[]) {
+  // 后端 /role/delete 为单条删除，批量时逐条调用；内置角色（buildIn=1）不可删除，自动跳过
+  const deletable = rows.filter(row => row.buildIn !== 1);
+  if (deletable.length < rows.length) {
+    window.$message?.warning($t('page.manage.role.builtInBatchDeleteTip'));
+  }
+  if (!deletable.length) return;
+  await Promise.all(deletable.map(row => fetchDeleteRole(row._id)));
   window.$message?.success($t('common.deleteSuccess'));
   checkedRows.value = [];
   getData();
@@ -162,10 +176,6 @@ function openDrawer(mode: 'create' | 'edit' | 'detail', row?: Api.SystemManage.R
   operateVisible.value = true;
 }
 
-function handleDetail(row: Api.SystemManage.Role) {
-  openDrawer('detail', row);
-}
-
 function handleEdit(row: Api.SystemManage.Role) {
   openDrawer('edit', row);
 }
@@ -177,6 +187,49 @@ function openPermissionDrawer(row: Api.SystemManage.Role) {
   permissionRow.value = row;
   permissionVisible.value = true;
 }
+
+/** 关联用户弹窗当前行（取数时闭包读取） */
+const relationRow = ref<Api.SystemManage.Role | null>(null);
+const relationUserVisible = ref(false);
+
+async function openRelationModal(row: Api.SystemManage.Role) {
+  relationRow.value = row;
+
+  // 先探查是否有关联数据（只取第一条判断 total），为空时仅提示、不弹窗
+  const { list, total } = await fetchRelationUsers({ page: 1, size: 1 });
+  if (!total && list.length === 0) {
+    window.$notification?.info({ title: $t('common.noData'), duration: 3000 });
+    return;
+  }
+
+  relationUserVisible.value = true;
+}
+
+/** 弹窗取数：角色关联用户（/user/query where.roleIds 数组成员匹配；错误提示由 request 拦截器统一弹出，失败返回空列表） */
+async function fetchRelationUsers({ page, size }: { page: number; size: number }) {
+  if (!relationRow.value) return { list: [], total: 0 };
+
+  const { data: res, error } = await fetchGetRoleUserList({ page, size, roleId: relationRow.value._id });
+  if (error || !res) return { list: [], total: 0 };
+
+  return res;
+}
+
+/** 关联用户弹窗列（姓名 / 账号 / 所属站点 / 状态） */
+const relationUserColumns = [
+  { key: 'name', title: $t('page.manage.user.nickName'), visible: true, width: 140, sortable: false },
+  { key: 'account', title: $t('page.manage.user.userName'), visible: true, width: 140, sortable: false },
+  { key: 'site', title: $t('page.manage.site.siteName'), visible: true, minWidth: 140, sortable: false },
+  {
+    key: 'status',
+    title: $t('page.manage.user.status'),
+    type: 'status',
+    visible: true,
+    width: 90,
+    sortable: false,
+    align: 'center'
+  }
+] as VxeColumnConfig[];
 
 function handleSubmitted() {
   getData();
@@ -202,10 +255,24 @@ function handleSubmitted() {
         @refresh="getData"
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"
-        @detail="handleDetail"
       >
+        <template #name="{ row }">
+          <div class="flex-y-center gap-4px">
+            <Link type="primary">{{ row.name }}</Link>
+            <NTag v-if="row.buildIn === 1" size="small" type="info" :bordered="false">
+              {{ $t('page.manage.role.builtIn') }}
+            </NTag>
+          </div>
+        </template>
+
         <template #roleType="{ row }">
           <NTag size="small" :bordered="false">{{ roleTypeLabel(row.roleType) }}</NTag>
+        </template>
+
+        <template #relationUser="{ row }">
+          <NButton size="small" type="primary" text @click="openRelationModal(row)">
+            {{ $t('page.manage.site.view') }}
+          </NButton>
         </template>
 
         <template #dataAuths="{ row }">
@@ -228,10 +295,7 @@ function handleSubmitted() {
               </template>
               {{ $t('common.add') }}
             </NButton>
-            <NPopconfirm
-              :disabled="checkedRows.length === 0"
-              @positive-click="handleDelete(checkedRows.map(i => i._id))"
-            >
+            <NPopconfirm :disabled="checkedRows.length === 0" @positive-click="handleDelete(checkedRows)">
               <template #trigger>
                 <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
                   <template #icon>
@@ -262,7 +326,16 @@ function handleSubmitted() {
         </template>
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</NButton>
+          <NTooltip :disabled="row.buildIn !== 1">
+            <template #trigger>
+              <span>
+                <NButton size="small" type="primary" text :disabled="row.buildIn === 1" @click="handleEdit(row)">
+                  {{ $t('common.edit') }}
+                </NButton>
+              </span>
+            </template>
+            {{ $t('page.manage.role.builtInEditTip') }}
+          </NTooltip>
           <NTooltip :disabled="row.roleType !== 5">
             <template #trigger>
               <span>
@@ -279,12 +352,21 @@ function handleSubmitted() {
             </template>
             {{ $t('page.manage.role.permissionDisabledTip') }}
           </NTooltip>
-          <NPopconfirm @positive-click="handleDelete([row._id])">
+          <NTooltip :disabled="row.buildIn !== 1">
             <template #trigger>
-              <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
+              <span>
+                <NPopconfirm @positive-click="handleDelete([row])">
+                  <template #trigger>
+                    <NButton size="small" type="error" text :disabled="row.buildIn === 1">
+                      {{ $t('common.delete') }}
+                    </NButton>
+                  </template>
+                  {{ $t('common.confirmDelete') }}
+                </NPopconfirm>
+              </span>
             </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+            {{ $t('page.manage.role.builtInDeleteTip') }}
+          </NTooltip>
         </template>
       </Table>
     </div>
@@ -304,6 +386,13 @@ function handleSubmitted() {
     />
 
     <RolePermissionDrawer v-model:show="permissionVisible" :row="permissionRow" @submitted="handleSubmitted" />
+
+    <RelationModal
+      v-model:show="relationUserVisible"
+      :title="$t('page.manage.role.relationUser')"
+      :fetcher="fetchRelationUsers"
+      :columns="relationUserColumns"
+    />
   </div>
 </template>
 

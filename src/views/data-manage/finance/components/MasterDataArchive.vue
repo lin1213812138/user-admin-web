@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends MasterDataRow">
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, useSlots } from 'vue';
 import { $t } from '@/locales';
 import {
   fetchCreateDataManage,
@@ -15,6 +15,13 @@ import type { ArchiveConfig, MasterDataRow } from '@/views/data-manage/component
 
 const props = defineProps<{ config: ArchiveConfig<T> }>();
 
+const slots = useSlots();
+
+/** 组件内部已固定渲染的插槽，不参与透传（否则会覆盖 Table 内置的操作区/操作列） */
+const reservedSlots = ['operation-left', 'operation-right', 'action'];
+
+/** 透传给 Table 的业务插槽（如单元格自定义 #scope），使子档案可自定义列渲染而不必改写本组件 */
+const forwardedSlots = computed(() => Object.keys(slots).filter(name => !reservedSlots.includes(name)));
 const searchParams = reactive<Record<string, unknown>>({});
 for (const it of props.config.searchItems) {
   searchParams[it.key] = it.type === 'select' ? null : '';
@@ -204,6 +211,10 @@ async function handleSubmit() {
             </template>
             {{ $t('common.confirmDelete') }}
           </NPopconfirm>
+        </template>
+
+        <template v-for="name in forwardedSlots" :key="name" #[name]="scope">
+          <slot :name="name" v-bind="scope" />
         </template>
       </Table>
     </div>

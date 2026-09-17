@@ -298,15 +298,14 @@ defineExpose({
     :disabled="disabled"
   >
     <template v-if="fieldItems.length">
-      <NGrid :cols="24" :x-gap="gridXGap" :y-gap="isView ? 10 : 0" item-responsive :responsive="gridResponsive">
+      <NGrid :cols="24" :x-gap="gridXGap" item-responsive :responsive="gridResponsive">
         <NGi v-for="item in visibleFieldItems" :key="item.key" :span="getSpan(item)">
           <!-- 区块标题：占整行、不包 NFormItem（无 label 行、不参与校验） -->
           <div v-if="item.type === 'section'" class="w-full flex items-center gap-8px py-4px">
             <span class="h-16px w-3px rounded-2px bg-primary" />
             <span class="text-15px font-600">{{ item.label }}</span>
           </div>
-          <!-- view 态不校验、反馈区恒为空白占位（min-height: --n-feedback-height），故关闭；编辑态保留错误提示位置 -->
-          <NFormItem v-else :label="item.label" :path="item.key" :show-label="item.showLabel" :show-feedback="!isView">
+          <NFormItem v-else :label="item.label" :path="item.key" :show-label="item.showLabel">
             <!-- 只读展示态：值区域渲染纯文本，不渲染控件 -->
             <template v-if="isView">
               <NImage
@@ -340,6 +339,7 @@ defineExpose({
                 v-else-if="item.type === 'textarea'"
                 v-model:value="model[item.key] as string"
                 type="textarea"
+                :rows="1"
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
               />

@@ -1,0 +1,92 @@
+- generic [active] [ref=f13e1]:
+    - generic [ref=f13e94]:
+        - generic [ref=f13e96]:
+            - generic [ref=f13e97]: 首页
+            - button [ref=f13e106] [cursor=pointer]
+            - button [ref=f13e111] [cursor=pointer]
+            - button [ref=f13e116] [cursor=pointer]
+            - button [ref=f13e123] [cursor=pointer]
+        - complementary [ref=f13e129]:
+            - generic [ref=f13e130]:
+                - link [ref=f13e131] [cursor=pointer]:
+                    - /url: /tms/
+                    - heading "牛迈物流专线系统" [level=2] [ref=f13e142]
+                - region "scrollable content" [ref=f13e149]:
+                    - menu [ref=f13e151]:
+                        - menuitem "首页" [ref=f13e152]:
+                            - img [aria-hidden] [ref=f13e153] [cursor=pointer]
+                            - text: 首页
+                        - menu [ref=f13e155] [cursor=pointer]:
+                            - menuitem "客户管理" [ref=f13e156]
+                        - menu [ref=f13e162] [cursor=pointer]:
+                            - menuitem "渠道报价" [ref=f13e163]
+                        - menu [ref=f13e169] [cursor=pointer]:
+                            - menuitem "资料管理" [ref=f13e170]
+                        - menu [ref=f13e176] [cursor=pointer]:
+                            - menuitem "系统管理" [ref=f13e177]
+                - button "超级管理员" [ref=f13e185] [cursor=pointer]
+        - main [ref=f13e193]:
+            - generic [ref=f13e195]:
+                - generic [ref=f13e200]:
+                    - heading "早安，超级管理员, 今天又是充满活力的一天!" [level=3] [ref=f13e201]
+                    - paragraph [ref=f13e202]: 今日多云转晴，20℃ - 25℃!
+                - generic [ref=f13e203]:
+                    - generic [ref=f13e204]:
+                        - generic [ref=f13e205]: 项目数
+                        - generic [ref=f13e206]: '25'
+                    - generic [ref=f13e207]:
+                        - generic [ref=f13e208]: 待办
+                        - generic [ref=f13e209]: 4/16
+                    - generic [ref=f13e210]:
+                        - generic [ref=f13e211]: 消息
+                        - generic [ref=f13e212]: '12'
+            - generic [ref=f13e214]:
+                - generic [ref=f13e216]:
+                    - heading "访问量" [level=3] [ref=f13e217]
+                    - generic [ref=f13e218]: 9,725
+                - generic [ref=f13e223]:
+                    - heading "成交额" [level=3] [ref=f13e224]
+                    - generic [ref=f13e225]: $1,026
+                - generic [ref=f13e230]:
+                    - heading "下载量" [level=3] [ref=f13e231]
+                    - generic [ref=f13e232]: 970,925
+                - generic [ref=f13e238]:
+                    - heading "成交量" [level=3] [ref=f13e239]
+                    - generic [ref=f13e240]: 9,527
+            - generic [ref=f13e257]:
+                - generic [ref=f13e259]:
+                    - heading [ref=f13e260]:
+                        - heading "项目动态" [ref=f13e261]
+                        - link "更多动态" [ref=f13e263] [cursor=pointer]:
+                            - /url: javascript:;
+                    - list [ref=f13e264]:
+                        - listitem [ref=f13e265]:
+                            - generic [ref=f13e273]:
+                                - generic [ref=f13e274]: Soybean 在2021年5月28日创建了开源项目 soybean-admin!
+                                - generic [ref=f13e276]: 2021-05-28 22:22:22
+                        - listitem [ref=f13e277]:
+                            - generic [ref=f13e285]:
+                                - generic [ref=f13e286]: Yanbowe 向 soybean-admin 提交了一个bug，多标签栏不会自适应。
+                                - generic [ref=f13e288]: 2021-10-27 10:24:54
+                        - listitem [ref=f13e289]:
+                            - generic [ref=f13e297]:
+                                - generic [ref=f13e298]: Soybean 准备为 soybean-admin 的发布做充分的准备工作!
+                                - generic [ref=f13e300]: 2021-10-31 22:43:12
+                        - listitem [ref=f13e301]:
+                            - generic [ref=f13e309]:
+                                - generic [ref=f13e310]: Soybean 正在忙于为soybean-admin写项目说明文档！
+                                - generic [ref=f13e312]: 2021-11-03 20:33:31
+                        - listitem [ref=f13e313]:
+                            - generic [ref=f13e321]:
+                                - generic [ref=f13e322]: Soybean 刚才把工作台页面随便写了一些，凑合能看了！
+                                - generic [ref=f13e324]: 2021-11-07 22:45:32
+                - heading [ref=f13e327]:
+                    - heading "创意" [ref=f13e328]
+    - generic [ref=f13e3]:
+        - generic "Toggle devtools panel" [ref=f13e4] [cursor=pointer]
+        - generic "Toggle Component Inspector" [ref=f13e88] [cursor=pointer]
+    - generic [ref=f13e460]:
+        - button "close" [ref=f13e467] [cursor=pointer]
+        - generic [ref=f13e473]:
+            - generic [ref=f13e474]: 登录成功
+            - generic [ref=f13e475]: 欢迎回来，超级管理员 ！

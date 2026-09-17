@@ -2,12 +2,13 @@
 import dayjs from 'dayjs';
 import { computed, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteUser, fetchGetUserList } from '@/service/api/user';
+import { fetchDeleteUser, fetchGetUserCustomerList, fetchGetUserList } from '@/service/api/user';
 import { fetchGetSiteList } from '@/service/api/site';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
 import { TableExportAction } from '@/components/Export';
+import RelationModal from '@/components/common/relation-modal.vue';
 import UserOperateDrawer from './modules/user-operate-drawer.vue';
 import UserEditDrawer from './modules/user-edit-drawer.vue';
 
@@ -107,10 +108,18 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         sortable: false,
         align: 'center'
       },
-      { key: 'createDate', title: $t('page.manage.user.createTime'), visible: true, width: 180, sortable: false }
+      { key: 'createDate', title: $t('page.manage.user.createTime'), visible: true, width: 180, sortable: false },
+      {
+        key: 'relationCustomer',
+        title: $t('page.manage.user.relationCustomer'),
+        visible: true,
+        width: 90,
+        sortable: false,
+        align: 'center'
+      }
     ] as VxeColumnConfig[],
-  // 字段结构对齐后端（account/name/_id），换新缓存 key 避免旧列配置（userName/status 等）残留
-  cacheKey: 'system-manage-user-v2'
+  // 新增关联客户列，换新缓存 key 避免旧列配置残留
+  cacheKey: 'system-manage-user-v3'
 });
 
 /** 毫秒时间戳格式化展示 */
@@ -184,6 +193,49 @@ async function fetchAllUsers(): Promise<Api.SystemManage.User[]> {
   const { data: res } = await fetchGetUserList({ page: 1, size: 9999 });
   return res?.list ?? [];
 }
+
+/** 关联客户弹窗当前行（取数时闭包读取） */
+const relationRow = ref<Api.SystemManage.User | null>(null);
+const relationCustomerVisible = ref(false);
+
+async function openRelationModal(row: Api.SystemManage.User) {
+  relationRow.value = row;
+
+  // 先探查是否有关联数据（只取第一条判断 total），为空时仅提示、不弹窗
+  const { list, total } = await fetchRelationCustomers({ page: 1, size: 1 });
+  if (!total && list.length === 0) {
+    window.$notification?.info({ title: $t('common.noData'), duration: 3000 });
+    return;
+  }
+
+  relationCustomerVisible.value = true;
+}
+
+/** 弹窗取数：用户关联客户（/customer/user/query，带 userId 后端按销售/客服/财务 $or 过滤） */
+async function fetchRelationCustomers({ page, size }: { page: number; size: number }) {
+  if (!relationRow.value) return { list: [], total: 0 };
+
+  const { data: res, error } = await fetchGetUserCustomerList({ page, size, userId: relationRow.value._id });
+  if (error || !res) return { list: [], total: 0 };
+
+  return res;
+}
+
+/** 关联客户弹窗列（编码 / 名称 / 所属站点 / 状态） */
+const relationCustomerColumns = [
+  { key: 'code', title: $t('page.manage.site.customerCode'), visible: true, width: 140, sortable: false },
+  { key: 'name', title: $t('page.manage.site.customerName'), visible: true, minWidth: 160, sortable: false },
+  { key: 'site', title: $t('page.manage.site.siteName'), visible: true, minWidth: 140, sortable: false },
+  {
+    key: 'status',
+    title: $t('page.manage.user.status'),
+    type: 'status',
+    visible: true,
+    width: 90,
+    sortable: false,
+    align: 'center'
+  }
+] as VxeColumnConfig[];
 </script>
 
 <template>
@@ -211,6 +263,12 @@ async function fetchAllUsers(): Promise<Api.SystemManage.User[]> {
       >
         <template #createDate="{ row }">
           <span>{{ formatDate(row.createDate) }}</span>
+        </template>
+
+        <template #relationCustomer="{ row }">
+          <NButton size="small" type="primary" text @click="openRelationModal(row)">
+            {{ $t('page.manage.site.view') }}
+          </NButton>
         </template>
 
         <template #operation-left>
@@ -288,6 +346,13 @@ async function fetchAllUsers(): Promise<Api.SystemManage.User[]> {
     />
 
     <UserEditDrawer v-model:show="editVisible" :row="editRow" @submitted="handleSubmitted" />
+
+    <RelationModal
+      v-model:show="relationCustomerVisible"
+      :title="$t('page.manage.user.relationCustomer')"
+      :fetcher="fetchRelationCustomers"
+      :columns="relationCustomerColumns"
+    />
   </div>
 </template>
 

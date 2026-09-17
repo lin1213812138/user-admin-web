@@ -165,8 +165,17 @@ const relationRow = ref<Api.SystemManage.Site | null>(null);
 const relationUserVisible = ref(false);
 const relationCustomerVisible = ref(false);
 
-function openRelationModal(type: 'user' | 'customer', row: Api.SystemManage.Site) {
+async function openRelationModal(type: 'user' | 'customer', row: Api.SystemManage.Site) {
   relationRow.value = row;
+
+  // 先探查是否有关联数据（只取第一条判断 total），为空时仅提示、不弹窗
+  const fetcher = type === 'user' ? fetchRelationUsers : fetchRelationCustomers;
+  const { list, total } = await fetcher({ page: 1, size: 1 });
+  if (!total && list.length === 0) {
+    window.$notification?.info({ title: $t('common.noData'), duration: 3000 });
+    return;
+  }
+
   if (type === 'user') {
     relationUserVisible.value = true;
   } else {

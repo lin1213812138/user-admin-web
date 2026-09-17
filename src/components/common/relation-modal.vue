@@ -25,7 +25,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   show: false,
   title: '',
-  width: 720,
+  width: 900,
   bodyHeight: 480
 });
 
