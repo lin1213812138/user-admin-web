@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
 import { fetchCreateUser, fetchGetUser, fetchUpdateUser } from '@/service/api/user';
+import { md5 } from '@/utils/crypto';
 import { fetchGetRoleQueryList } from '@/service/api/role';
 import { fetchGetSiteList } from '@/service/api/site';
 import { fetchGetGroupList } from '@/service/api/group';
@@ -356,12 +357,16 @@ async function handleSubmit() {
 
   try {
     const { error } = isCreate.value
-      ? await fetchCreateUser({ ...buildSubmitParams(), password: model.password })
+      ? await fetchCreateUser({
+          ...buildSubmitParams(),
+          // 与登录同格式：MD5(MD5(明文) + 明文)
+          password: md5(md5(model.password) + model.password)
+        })
       : await fetchUpdateUser({
           _id: props.row!._id,
           ...buildSubmitParams(),
-          // 编辑时密码留空表示不修改
-          ...(model.password ? { password: model.password } : {})
+          // 编辑时密码留空表示不修改；填写则按登录同格式加密后提交
+          ...(model.password ? { password: md5(md5(model.password) + model.password) } : {})
         });
 
     // 真实接口错误已由 request 拦截器统一提示，这里只负责不再继续走成功流程

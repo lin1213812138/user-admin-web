@@ -123,7 +123,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'data-manage_basic',
           i18nKey: 'route.data-manage_basic',
-          icon: 'ic:baseline-inventory'
+          icon: 'ic:baseline-inventory',
+          order: 1
         }
       },
       {
@@ -133,7 +134,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'data-manage_business',
           i18nKey: 'route.data-manage_business',
-          icon: 'ic:baseline-warehouse'
+          icon: 'ic:baseline-warehouse',
+          order: 2
         }
       },
       {
@@ -143,7 +145,30 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'data-manage_finance',
           i18nKey: 'route.data-manage_finance',
-          icon: 'ic:baseline-account-balance-wallet'
+          icon: 'ic:baseline-account-balance-wallet',
+          order: 3
+        }
+      },
+      {
+        name: 'data-manage_no-rule',
+        path: '/data-manage/no-rule',
+        component: 'view.data-manage_no-rule',
+        meta: {
+          title: 'data-manage_no-rule',
+          i18nKey: 'route.data-manage_no-rule',
+          icon: 'ic:round-numbers',
+          order: 4
+        }
+      },
+      {
+        name: 'data-manage_ship',
+        path: '/data-manage/ship',
+        component: 'view.data-manage_ship',
+        meta: {
+          title: 'data-manage_ship',
+          i18nKey: 'route.data-manage_ship',
+          icon: 'ic:baseline-local-shipping',
+          order: 5
         }
       }
     ]
@@ -207,6 +232,16 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       }
     ]
+  },
+  {
+    name: 'personal-center',
+    path: '/personal-center',
+    component: 'layout.base$view.personal-center',
+    meta: {
+      title: 'personal-center',
+      i18nKey: 'route.personal-center',
+      hideInMenu: true
+    }
   },
   {
     name: 'system-manage',

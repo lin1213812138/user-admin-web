@@ -1,7 +1,6 @@
 import { request } from '../../request';
-import { mockAssignRoleMenu, mockGetRoleMenuTree } from '../mock';
 
-// 除权限树两个函数暂走 mock 外，其余均为真实接口（tms-user /api/v1/web/role/*），flat 请求需调用方解包 { data, error }
+// 全部为真实接口（tms-user /api/v1/web/role/*），flat 请求需调用方解包 { data, error }
 
 /** get role list（真实接口 /role/query，queryAllCommon 全量查询无分页，后端按 order 升序返回） */
 export function fetchGetRoleList(params: Api.SystemManage.RoleSearchParams = {}) {
@@ -57,27 +56,10 @@ export function fetchDeleteRole(id: string) {
   });
 }
 
-/** get role permission menu tree（权限对接另起设计，暂走 mock） */
-export function fetchGetRoleMenuTree(roleId: string) {
-  if (import.meta.env.DEV) {
-    return mockGetRoleMenuTree(roleId) as unknown as Promise<Api.SystemManage.RoleMenuTree>;
-  }
-
-  return request<Api.SystemManage.RoleMenuTree>({
-    url: '/system/role/menuTree',
-    method: 'get',
-    params: { roleId }
-  });
-}
-
-/** assign menu permissions to role（权限对接另起设计，暂走 mock） */
-export function fetchAssignRoleMenu(params: Api.SystemManage.RoleAssignMenuParams) {
-  if (import.meta.env.DEV) {
-    return mockAssignRoleMenu(params) as unknown as Promise<boolean>;
-  }
-
+/** assign permissions to role（真实接口 /role/auths/update，body { _id, auths }） */
+export function fetchUpdateRoleAuths(params: { _id: string; auths: string[] }) {
   return request<boolean>({
-    url: '/system/role/assignMenu',
+    url: '/role/auths/update',
     method: 'post',
     data: params
   });

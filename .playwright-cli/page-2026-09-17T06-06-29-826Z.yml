@@ -1,0 +1,146 @@
+- generic [active] [ref=f1e1]:
+    - generic [ref=f1e11]:
+        - generic [ref=f1e13]:
+            - generic [ref=f1e17]:
+                - generic [ref=f1e18] [cursor=pointer]: 首页
+                - generic [ref=f1e22] [cursor=pointer]: 系统设置
+            - button [ref=f1e30] [cursor=pointer]
+            - button [ref=f1e35] [cursor=pointer]
+            - button [ref=f1e40] [cursor=pointer]
+            - button [ref=f1e47] [cursor=pointer]
+        - complementary [ref=f1e53]:
+            - generic [ref=f1e54]:
+                - link [ref=f1e55] [cursor=pointer]:
+                    - /url: /tms/
+                    - heading "牛迈物流专线系统" [level=2] [ref=f1e66]
+                - region "scrollable content" [ref=f1e73]:
+                    - menu [ref=f1e75]:
+                        - menuitem "首页" [ref=f1e76]:
+                            - img [aria-hidden] [ref=f1e77] [cursor=pointer]
+                            - text: 首页
+                        - menu [ref=f1e79] [cursor=pointer]:
+                            - menuitem "客户管理" [ref=f1e80]
+                        - menu [ref=f1e86] [cursor=pointer]:
+                            - menuitem "渠道报价" [ref=f1e87]
+                        - menu [ref=f1e93] [cursor=pointer]:
+                            - menuitem "资料管理" [ref=f1e94]
+                        - menu [ref=f1e100] [cursor=pointer]:
+                            - menuitem "系统管理" [ref=f1e101]
+                            - menu [ref=f1e107]:
+                                - menuitem "用户管理" [ref=f1e108]
+                                - menuitem "角色管理" [ref=f1e111]
+                                - menuitem "组别管理" [ref=f1e114]
+                                - menuitem "站点管理" [ref=f1e117]
+                                - menuitem "系统设置" [ref=f1e120]
+                                - menuitem "系统日志" [ref=f1e123]
+                        - menu [ref=f1e126] [cursor=pointer]:
+                            - menuitem "权限管理" [ref=f1e127]
+                - button "超级管理员" [ref=f1e135] [cursor=pointer]
+        - main [ref=f1e143]:
+            - generic [ref=f1e144]:
+                - generic [ref=f1e145]:
+                    - generic [ref=f1e146]: 系统设置
+                    - generic [ref=f1e155]:
+                        - generic [ref=f1e156]: 基础配置
+                        - generic [ref=f1e159]: 录单格式
+                        - generic [ref=f1e163]: 打印格式
+                        - generic [ref=f1e167]: 导出格式
+                        - generic [ref=f1e171]: 运单号规则
+                        - generic [ref=f1e175]: 轨迹抓取配置
+                        - generic [ref=f1e179]: 操作轨迹配置
+                - generic [ref=f1e185]:
+                    - generic [ref=f1e186]:
+                        - generic [ref=f1e187]:
+                            - heading [ref=f1e188]:
+                                - heading "基本信息" [ref=f1e189]
+                            - generic [ref=f1e194]:
+                                - generic [ref=f1e196]:
+                                    - generic [ref=f1e197]:
+                                        - generic [ref=f1e198]: 公司名称
+                                        - generic [ref=f1e199]: '*'
+                                    - textbox "公司名称" [ref=f1e204]: 牛迈物流
+                                - generic [ref=f1e209]:
+                                    - generic [ref=f1e210]:
+                                        - generic [ref=f1e211]: 公司地址
+                                        - generic [ref=f1e212]: '*'
+                                    - textbox "公司地址" [ref=f1e216]: 深圳市宝安区福永街道福海工业区A1栋三层
+                                - generic [ref=f1e219]:
+                                    - generic [ref=f1e220]:
+                                        - generic [ref=f1e221]: 公司网址
+                                        - generic [ref=f1e222]: '*'
+                                    - textbox "公司网址" [ref=f1e227]: https://www.niumai.com
+                                - generic [ref=f1e232]:
+                                    - generic [ref=f1e233]:
+                                        - generic [ref=f1e234]: 系统名称
+                                        - generic [ref=f1e235]: '*'
+                                    - textbox "系统名称" [ref=f1e240]: 牛迈物流专线系统
+                                - generic [ref=f1e245]:
+                                    - generic [ref=f1e246]: 联系电话
+                                    - textbox "联系电话" [ref=f1e252]: 400-888-0000
+                                - generic [ref=f1e257]:
+                                    - generic [ref=f1e258]: 默认出发地
+                                    - textbox "默认出发地" [ref=f1e264]: 深圳宝安
+                                - generic [ref=f1e269]:
+                                    - generic [ref=f1e270]: 员工登录
+                                    - textbox "员工登录" [ref=f1e276]: http://user.niumai.com
+                                - generic [ref=f1e281]:
+                                    - generic [ref=f1e282]: 客户登录
+                                    - textbox "客户登录" [ref=f1e288]: http://customer.niumai.com
+                                - generic [ref=f1e293]:
+                                    - generic [ref=f1e294]:
+                                        - generic [ref=f1e295]: 公司LOGO
+                                        - generic [ref=f1e296]: '*'
+                                    - generic [ref=f1e320] [cursor=pointer]
+                        - generic [ref=f1e325]:
+                            - heading [ref=f1e326]:
+                                - heading "系统控制" [ref=f1e327]
+                            - generic [ref=f1e332]:
+                                - generic [ref=f1e334]:
+                                    - generic [ref=f1e335]: 应收总费用取整规则
+                                    - generic [ref=f1e340] [cursor=pointer]:
+                                        - generic "取整(四舍五入)" [ref=f1e341]
+                                        - img "loading" [ref=f1e343]
+                                - generic [ref=f1e352]:
+                                    - generic [ref=f1e353]: 运费允许为负数
+                                    - generic [ref=f1e358] [cursor=pointer]:
+                                        - generic "不允许" [ref=f1e359]
+                                        - img "loading" [ref=f1e361]
+                                - generic [ref=f1e370]:
+                                    - generic [ref=f1e371]: 重量允许为零
+                                    - generic [ref=f1e376] [cursor=pointer]:
+                                        - generic "允许" [ref=f1e377]
+                                        - img "loading" [ref=f1e379]
+                                - generic [ref=f1e388]:
+                                    - generic [ref=f1e389]: 内单号允许重复
+                                    - generic [ref=f1e394] [cursor=pointer]:
+                                        - generic "不允许" [ref=f1e395]
+                                        - img "loading" [ref=f1e397]
+                                - generic [ref=f1e406]:
+                                    - generic [ref=f1e407]: 转单号允许重复
+                                    - generic [ref=f1e412] [cursor=pointer]:
+                                        - generic "允许" [ref=f1e413]
+                                        - img "loading" [ref=f1e415]
+                                - generic [ref=f1e424]:
+                                    - generic [ref=f1e425]: 出库重小于入库重量不提示
+                                    - generic [ref=f1e430] [cursor=pointer]:
+                                        - generic "提示" [ref=f1e431]
+                                        - img "loading" [ref=f1e433]
+                                - generic [ref=f1e442]:
+                                    - generic [ref=f1e443]: 出库重量差提示阈值(KG)
+                                    - generic [ref=f1e448]:
+                                        - textbox "请输入" [ref=f1e450]: '0.5'
+                                        - generic [ref=f1e451]:
+                                            - button [ref=f1e453] [cursor=pointer]
+                                            - button [ref=f1e457] [cursor=pointer]
+                                - generic [ref=f1e464]:
+                                    - generic [ref=f1e465]: 退件重量差提示阈值(KG)
+                                    - generic [ref=f1e470]:
+                                        - textbox "请输入" [ref=f1e472]: '1'
+                                        - generic [ref=f1e473]:
+                                            - button [ref=f1e475] [cursor=pointer]
+                                            - button [ref=f1e479] [cursor=pointer]
+                    - generic [ref=f1e485] [cursor=pointer]
+                    - button "提交修改" [ref=f1e487] [cursor=pointer]
+    - generic [ref=f1e3]:
+        - generic "Toggle devtools panel" [ref=f1e4] [cursor=pointer]
+        - generic "Toggle Component Inspector" [ref=f1e490] [cursor=pointer]

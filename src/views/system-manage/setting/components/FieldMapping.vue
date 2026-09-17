@@ -90,12 +90,13 @@ function groupButtonType(group: FieldMappingGroup) {
   return isGroupIndeterminate(group) ? 'tertiary' : 'default';
 }
 
-/** 一键全选 / 取消全选：已全选则清空显示，未全选（含半选）则全选该组字段并默认设为必填（与字段级勾选行为一致） */
+/** 一键全选 / 取消全选：已全选则清空显示，未全选（含半选）则全选该组字段并默认设为必填（与字段级勾选行为一致）；锁定字段（disabled）永远保持勾选 */
 function toggleGroup(group: FieldMappingGroup) {
   const current = groupValueOf(group.key);
   const allChecked = isGroupAllChecked(group);
   const keys = group.fields.map(f => f.key);
-  const show = allChecked ? [] : keys;
+  const lockedKeys = group.fields.filter(f => f.disabled).map(f => f.key);
+  const show = allChecked ? lockedKeys : keys;
   // 取消全选不清除已设必填
   const required = allChecked
     ? current.required
@@ -134,7 +135,7 @@ function toggleGroup(group: FieldMappingGroup) {
                     <template #trigger>
                       <NCheckbox
                         :checked="isShown(g.key, f.key)"
-                        :disabled="disabled"
+                        :disabled="disabled || f.disabled"
                         @update:checked="checked => toggleField(g.key, f.key, checked)"
                       >
                         {{ f.label }}
@@ -177,7 +178,7 @@ function toggleGroup(group: FieldMappingGroup) {
                   <template #trigger>
                     <NCheckbox
                       :checked="isShown(g.key, f.key)"
-                      :disabled="disabled"
+                      :disabled="disabled || f.disabled"
                       @update:checked="checked => toggleField(g.key, f.key, checked)"
                     >
                       {{ f.label }}
@@ -208,3 +209,16 @@ function toggleGroup(group: FieldMappingGroup) {
     </div>
   </NCard>
 </template>
+
+<style scoped>
+/* naive 卡片头部靠 `__main: flex 1`（basis 0）撑满剩余宽度，把 `__header-extra` 按钮组顶到卡片最右；
+   设置页右侧变窄后标题（flex: 1 1 0 + min-width: 0）会被按钮组挤成 0 宽竖排，故：
+   - 保留撑满能力但 basis 改 auto（标题按内容宽参与分配，宽容器仍能把按钮组推到最右 = 左右布局）
+   - min-width 改 max-content（窄容器下标题最多压到自身内容宽，不竖排；按钮组靠 NSpace wrap 换行）
+   naive 原生规则 `.n-card > .n-card-header .n-card-header__main`（特异性 0,3,0）
+   高于 :deep 编译出的 `[data-v] .n-card-header__main`（0,2,0），故用 !important 覆盖 */
+:deep(.n-card-header__main) {
+  flex: 1 1 auto !important;
+  min-width: max-content !important;
+}
+</style>

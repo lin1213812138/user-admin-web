@@ -1,3 +1,4 @@
+import { sizeTypeToDimensions } from '@/service/api/print-format/size-map';
 import type { ElementType } from './types';
 
 /** 纸张逻辑单位 mm；屏幕 96dpi 下 1mm ≈ 3.7795px */
@@ -49,6 +50,15 @@ export function parsePaper(paper: string): PaperSize {
   const a4 = paper.match(/a4/i);
   if (a4) return { w: 210, h: 297 };
   return { w: 100, h: 150 };
+}
+
+/** 后端标签尺寸（sizeType + 自定义宽高，mm）→ 设计器纸张字符串（优先命中 PAPER_SIZES 预设项） */
+export function paperOfSizeType(sizeType: number, width?: number, height?: number): string {
+  const { w, h } = sizeTypeToDimensions(sizeType, width, height);
+  const preset = PAPER_SIZES.find(item => item === `${w}×${h}mm`);
+  if (preset) return preset;
+  if (w === 210 && h === 297) return 'A4(210×297mm)';
+  return `${w}×${h}mm`;
 }
 
 /** 业务字段定义（左侧字段面板与属性面板共用） */

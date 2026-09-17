@@ -1,5 +1,5 @@
 import { request } from '../../request';
-import type { MasterDataRow } from '@/components/MasterData/types';
+import type { MasterDataRow } from '@/views/data-manage/components/types';
 import { mockArchiveCreate, mockArchiveDelete, mockArchiveList, mockArchiveUpdate } from './mock';
 
 /** get archive list (DEV: mock; PROD: /data-manage/:archive/list) */

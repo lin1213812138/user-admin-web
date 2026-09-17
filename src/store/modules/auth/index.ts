@@ -194,6 +194,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     loginLoading,
     resetStore,
     login,
+    getUserInfo,
     initUserInfo
   };
 });

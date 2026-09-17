@@ -9,6 +9,7 @@ import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
 import { TableExportAction } from '@/components/Export';
 import UserOperateDrawer from './modules/user-operate-drawer.vue';
+import UserEditDrawer from './modules/user-edit-drawer.vue';
 
 const searchParams = reactive<{ keyword: string; siteId: string | null; status: Api.Common.EnableStatus | null }>({
   keyword: '',
@@ -154,6 +155,10 @@ const operateVisible = ref(false);
 const operateMode = ref<'create' | 'edit' | 'detail'>('create');
 const operateRow = ref<Api.SystemManage.User | null>(null);
 
+/** 编辑抽屉（基本信息 + 多 tab），与新增/详情抽屉分离 */
+const editVisible = ref(false);
+const editRow = ref<Api.SystemManage.User | null>(null);
+
 function openDrawer(mode: 'create' | 'edit' | 'detail', row?: Api.SystemManage.User) {
   operateMode.value = mode;
   operateRow.value = row ?? null;
@@ -164,8 +169,10 @@ function handleDetail(row: Api.SystemManage.User) {
   openDrawer('detail', row);
 }
 
+/** 编辑打开侧滑抽屉（基本信息 + 多 tab），新增 / 详情仍走 UserOperateDrawer */
 function handleEdit(row: Api.SystemManage.User) {
-  openDrawer('edit', row);
+  editRow.value = row;
+  editVisible.value = true;
 }
 
 function handleSubmitted() {
@@ -279,6 +286,8 @@ async function fetchAllUsers(): Promise<Api.SystemManage.User[]> {
       :row="operateRow"
       @submitted="handleSubmitted"
     />
+
+    <UserEditDrawer v-model:show="editVisible" :row="editRow" @submitted="handleSubmitted" />
   </div>
 </template>
 

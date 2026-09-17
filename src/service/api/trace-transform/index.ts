@@ -1,56 +1,31 @@
 import { request } from '../../request';
-import {
-  mockCreateTraceTransform,
-  mockDeleteTraceTransform,
-  mockGetTraceTransformList,
-  mockUpdateTraceTransform
-} from '../mock';
 
-/** get trace transform list（轨迹改造 - 异常状态定义） */
-export function fetchGetTraceTransformList(params: Api.SystemManage.TraceTransformSearchParams) {
-  if (import.meta.env.DEV) {
-    return mockGetTraceTransformList(params) as unknown as Promise<Api.SystemManage.TraceTransformList>;
-  }
+/**
+ * 异常轨迹接口（track-err-config 异常状态配置），tms-user 真实接口（无 DEV mock）。
+ * flat request，调用方需解包 { data, error }。
+ * query 为全量返回 { list }（后端忽略分页）；delete 仅单条 _id。
+ */
+
+/** 异常轨迹列表（全量返回，无 total） */
+export function fetchGetTraceTransformList(params: { current: number; size: number }) {
   return request<Api.SystemManage.TraceTransformList>({
-    url: '/system/trace-transform/list',
+    url: '/track-err-config/query',
     method: 'post',
     data: params
   });
 }
 
-/** create trace transform */
+/** 新建异常轨迹（name 后端唯一校验） */
 export function fetchCreateTraceTransform(params: Api.SystemManage.TraceTransformCreateParams) {
-  if (import.meta.env.DEV) {
-    return mockCreateTraceTransform(params) as unknown as Promise<Api.SystemManage.TraceTransformItem>;
-  }
-  return request<Api.SystemManage.TraceTransformItem>({
-    url: '/system/trace-transform/create',
-    method: 'post',
-    data: params
-  });
+  return request<Record<string, never>>({ url: '/track-err-config/create', method: 'post', data: params });
 }
 
-/** update trace transform */
+/** 更新异常轨迹（必填 _id） */
 export function fetchUpdateTraceTransform(params: Api.SystemManage.TraceTransformUpdateParams) {
-  if (import.meta.env.DEV) {
-    return mockUpdateTraceTransform(params) as unknown as Promise<Api.SystemManage.TraceTransformItem>;
-  }
-  return request<Api.SystemManage.TraceTransformItem>({
-    url: '/system/trace-transform/update',
-    method: 'post',
-    data: params
-  });
+  return request<Record<string, never>>({ url: '/track-err-config/update', method: 'post', data: params });
 }
 
-/** delete trace transform by ids */
-export function fetchDeleteTraceTransform(ids: number[]) {
-  if (import.meta.env.DEV) {
-    return mockDeleteTraceTransform(ids) as unknown as Promise<boolean>;
-  }
-
-  return request<boolean>({
-    url: '/system/trace-transform/delete',
-    method: 'post',
-    data: { ids }
-  });
+/** 删除异常轨迹（仅单条 _id） */
+export function fetchDeleteTraceTransform(id: string) {
+  return request<Record<string, never>>({ url: '/track-err-config/delete', method: 'post', data: { _id: id } });
 }

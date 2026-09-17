@@ -13,6 +13,7 @@ const local: App.I18n.Schema = {
     add: '新增',
     addSuccess: '添加成功',
     saveSuccess: '保存成功',
+    submitModify: '提交修改',
     backToHome: '返回首页',
     batchDelete: '批量删除',
     cancel: '取消',
@@ -49,6 +50,10 @@ const local: App.I18n.Schema = {
     confirmDelete: '确认删除吗？',
     copy: '复制',
     chooseFile: '选择文件',
+    upload: {
+      exceedSize: '文件大小不能超过 {size}MB',
+      draggerText: '点击或者拖动文件到该区域来上传'
+    },
     copySuccess: '复制成功',
     copyFailed: '复制失败',
     createSuccess: '新增成功',
@@ -301,12 +306,15 @@ const local: App.I18n.Schema = {
     'data-manage_basic': '基础资料',
     'data-manage_finance': '财务资料',
     'data-manage_business': '业务资料',
+    'data-manage_no-rule': '单号资料',
+    'data-manage_ship': '发货资料',
     'system-manage_setting': '系统设置',
     'system-manage_print-design': '设计标签',
     'system-manage_label-designer': '标签设计',
     'channel-quote': '渠道报价',
     'channel-quote_receive': '收货渠道',
-    'channel-quote_ship': '发货渠道'
+    'channel-quote_ship': '发货渠道',
+    'personal-center': '个人中心'
   },
   page: {
     login: {
@@ -386,6 +394,12 @@ const local: App.I18n.Schema = {
         remark: '备注',
         wechatQrcode: '微信二维码',
         createTime: '创建时间',
+        editPage: {
+          creator: '创建',
+          update: '最后更新',
+          tabPerm: '配置权限',
+          tabAccount: '账号配置'
+        },
         form: {
           userNamePlaceholder: '请输入账号',
           nickNamePlaceholder: '请输入用户名称',
@@ -441,6 +455,7 @@ const local: App.I18n.Schema = {
         },
         permission: '分配权限',
         permissionTip: '勾选该角色可访问的菜单',
+        permissionDisabledTip: '超级管理员不允许分配权限',
         searchMenuPlaceholder: '搜索菜单名称 / 路由地址 / 权限标识',
         loadMenuFailed: '菜单权限加载失败',
         form: {
@@ -495,6 +510,12 @@ const local: App.I18n.Schema = {
         siteTypeHeadquarters: '总公司',
         updateDate: '最后更新',
         keyword: '关键字',
+        relationUser: '关联用户',
+        relationCustomer: '关联客户',
+        view: '查看',
+        customerCode: '客户编码',
+        customerName: '客户名称',
+        siteName: '所属站点',
         form: {
           codePlaceholder: '请输入站点编号',
           namePlaceholder: '请输入站点名称',
@@ -530,7 +551,8 @@ const local: App.I18n.Schema = {
           login: '登录',
           update: '修改',
           del: '删除',
-          logout: '退出'
+          logout: '退出',
+          trace: '追踪'
         },
         form: {
           dateRange: '操作时间',
@@ -596,11 +618,27 @@ const local: App.I18n.Schema = {
         }
       },
       setting: {
-        inputFormat: '录单格式',
+        inputFormat: {
+          title: '录单格式',
+          name: '格式名称',
+          customerEnable: '客户可用',
+          isDefault: '是否默认',
+          order: '排序',
+          yes: '是',
+          no: '否',
+          newTitle: '新增录单格式',
+          editTitle: '编辑录单格式',
+          namePlaceholder: '请输入格式名称',
+          orderPlaceholder: '请输入排序',
+          lastOperation: '最后操作',
+          lastUpdateTime: '最后更新时间',
+          remarkPlaceholder: '请输入备注'
+        },
         printFormat: {
           title: '打印格式',
           listTitle: '打印格式类型',
           name: '模板名称',
+          category: '分类',
           labelSize: '标签尺寸',
           isDefault: '是否默认',
           yes: '是',
@@ -621,42 +659,44 @@ const local: App.I18n.Schema = {
         },
         exportFormat: {
           title: '导出格式',
-          listTitle: '导出格式类型',
           name: '模板名称',
-          scope: '使用范围',
-          scopeInternal: '内部系统',
-          scopeCustomer: '客户',
-          scopeAll: '全部',
-          fileName: '上传模板',
-          remark: '备注',
-          lastEditor: '最后编辑',
-          editTime: '编辑时间',
-          create: '新建',
-          delete: '删除',
-          edit: '编辑',
-          download: '下载模板',
-          downloadFields: '字段模板下载',
-          newTitle: '新建导出模板',
+          templateType: '模板类别',
+          type: {
+            sysList: '系统列表',
+            sendList: '发货清单',
+            billRec: '应收账单',
+            billPay: '应付账单',
+            blLoadList: '提单装箱单',
+            blInvoice: '提单发票',
+            blFile: '提单文件',
+            blCustoms: '清关资料',
+            shipOrder: '运单详情'
+          },
+          excelTemplate: 'Excel模板',
+          excelTemplateRequired: '请上传 Excel 模板',
+          thPos: '表头起始单元格',
+          tdPos: '数据起始单元格',
+          note: '备注',
+          lastOperation: '最后操作',
+          lastUpdateTime: '最后更新时间',
+          download: '下载',
+          downloadMissing: '模板文件不存在，无法下载',
+          newTitle: '新增导出模板',
           editTitle: '编辑导出模板',
-          detailTitle: '导出模板详情',
-          hint: '该模板在 [业务操作-业务管理-导出] 时调用！',
-          downloadToast: '模板下载功能待后端接入',
-          downloadFieldsToast: '字段模板下载功能待后端接入'
+          uploadParseSuccess: '解析成功：信息字段 {info} 项 / 列表字段 {list} 项'
         },
-        waybillRule: '运单号规则',
         traceCapture: {
           title: '轨迹抓取配置',
           subTab: {
             trackNetwork: '追踪网络',
-            trackTransform: '轨迹改造',
+            trackTransform: '异常轨迹',
             trackKeyword: '轨迹关键词',
-            captureTime: '抓取时间',
-            operationTrace: '操作轨迹'
+            captureTime: '抓取时间'
           },
           col: {
             name: '名称',
-            serverAddress: '服务器地址',
-            systemType: '系统类型',
+            trackType: '系统类型',
+            url: '服务器地址',
             lastEditor: '最后编辑',
             editTime: '编辑时间',
             node: '操作节点',
@@ -667,18 +707,20 @@ const local: App.I18n.Schema = {
             statusName: '状态名称',
             keywordDefinition: '抓取轨迹关键词判断定义',
             ruleName: '规则名称',
-            scope: '使用范围',
+            common: '全局通用',
+            trackNetworks: '关联追踪网络',
             keywordGroup: '关键词组',
-            waybillStatus: '运单状态',
-            enabled: '启用状态'
+            waybillStatus: '运单状态'
           },
           form: {
-            name: '名称',
+            name: '网络名称',
             namePlaceholder: '请输入名称',
-            serverAddress: '服务器地址',
-            serverAddressPlaceholder: '请输入服务器地址',
-            systemType: '系统类型',
-            systemTypePlaceholder: '请输入系统类型',
+            trackType: '系统类型',
+            url: '服务器地址',
+            urlPlaceholder: '请输入服务器地址',
+            fieldPlaceholder: '请输入',
+            web: '官网查询地址',
+            webPlaceholder: '请输入官网查询地址',
             node: '操作节点',
             nodePlaceholder: '请输入操作节点',
             timeFormat: '时间格式',
@@ -694,18 +736,14 @@ const local: App.I18n.Schema = {
             keywordDefinitionPlaceholder: '请输入关键词，多个关键词用中文逗号分隔',
             ruleName: '规则名称',
             ruleNamePlaceholder: '请输入规则名称',
-            scope: '使用范围',
+            common: '全局通用',
+            configIds: '关联追踪网络',
+            configIdsPlaceholder: '请选择关联追踪网络',
             keywordGroup: '关键词组',
             keywordGroupPlaceholder: '请输入关键词，多个关键词用中文逗号分隔',
-            waybillStatus: '运单状态',
-            enabled: '启用状态'
+            waybillStatus: '运单状态'
           },
           addRow: '新增',
-          scopeOption: {
-            global: '全局通用',
-            site: '指定站点',
-            customer: '指定客户'
-          },
           waybillStatusOption: {
             inTransit: '转运中',
             delivered: '已送达',
@@ -718,24 +756,59 @@ const local: App.I18n.Schema = {
             ymdHms: '年-月-日 时分:秒'
           },
           createTitle: '新增',
-          editTitle: '编辑'
+          editTitle: '编辑',
+          captureTime: {
+            entry: '抓取时间设置',
+            title: '抓取时间设置',
+            desc: '系统每天将在以下时间自动抓取轨迹',
+            addTime: '添加时间',
+            saveConfig: '保存配置',
+            timePlaceholder: '请选择时间',
+            duplicateTime: '存在重复的抓取时间',
+            emptyTime: '请先选择抓取时间',
+            col: {
+              log: '操作日志',
+              system: '操作系统',
+              opType: '操作类型',
+              operator: '操作人',
+              opTime: '操作时间'
+            }
+          }
         },
-        initData: {
-          title: '初始化数据',
-          basicInfoTitle: '基本信息',
-          basicInit: '基本信息初始化',
-          businessInit: '业务数据初始化',
-          channel: '渠道类别',
-          network: '承运网络',
-          bubble: '计泡规则',
-          operation: '操作配置',
-          cnName: '中文名称',
-          enName: '英文名称',
-          remark: '备注',
-          cnNamePlaceholder: '请输入中文名称',
-          enNamePlaceholder: '请输入英文名称',
-          remarkPlaceholder: '请输入备注',
-          addRow: '新增',
+        operationTrace: {
+          title: '操作轨迹配置',
+          col: {
+            opType: '操作节点',
+            timeType: '时间格式',
+            place: '服务地点',
+            desc: '详细描述',
+            status: '是否发布'
+          },
+          placeOption: {
+            waybillOrigin: '[运单出发地]',
+            destination: '[目的地]'
+          },
+          addRow: '新增一行',
+          opTypeOption: {
+            forecast: '运单预报',
+            pickup: '运单揽收',
+            inbound: '运单入库',
+            outbound: '运单发货出库',
+            delivery: '运单派送出库'
+          },
+          timeTypeOption: {
+            ymd: '年月日',
+            ymdHm: '年月日 时分',
+            ymdHms: '年月日 时分:秒'
+          },
+          batchSave: '批量保存',
+          saveSuccess: '保存成功',
+          saveFailed: '保存失败'
+        },
+        basicConfig: {
+          title: '基础配置',
+          infoCard: '基本信息',
+          ruleCard: '系统控制',
           info: {
             companyName: '公司名称',
             companyAddress: '公司地址',
@@ -746,6 +819,25 @@ const local: App.I18n.Schema = {
             companyLogo: '公司LOGO',
             defaultOrigin: '默认出发地',
             customerLogin: '客户登录'
+          },
+          rule: {
+            feeTotalStrategy: '应收总费用取整规则',
+            feeTotalCtrl: '运费允许为负数',
+            weightCtrl: '重量允许为零',
+            noCtrl: '内单号允许重复',
+            channelNoCtrl: '转单号允许重复',
+            outInWeightDiffNotify: '出库重小于入库重量不提示',
+            outWeightDiffNotify: '出库重量差提示阈值(KG)',
+            returnWeightDiffNotify: '退件重量差提示阈值(KG)'
+          },
+          option: {
+            notRound: '不取整(2位小数)',
+            roundDown: '取整(抹零)',
+            roundHalfUp: '取整(四舍五入)',
+            allow: '允许',
+            deny: '不允许',
+            notify: '提示',
+            notNotify: '不提示'
           }
         },
         fieldMapping: '字段映射',
@@ -875,6 +967,29 @@ const local: App.I18n.Schema = {
         selectTemplate: '选择模板'
       }
     },
+    order: {
+      packTypeOption: {
+        package: '包裹',
+        bag: '袋子',
+        file: '文件'
+      },
+      packTypePlaceholder: '请选择包裹类型'
+    },
+    personalCenter: {
+      profileInfo: '基本信息',
+      changePassword: '修改密码',
+      accountInfo: '账号信息',
+      profileForm: '个人信息',
+      newPassword: '新密码',
+      confirmPassword: '确认新密码',
+      form: {
+        newPasswordPlaceholder: '请输入新密码',
+        confirmPasswordPlaceholder: '请再次输入新密码'
+      },
+      passwordNotMatch: '两次输入的密码不一致',
+      backendNotOpen: '修改密码功能暂未开放：后端当前不允许用户修改自己的密码，待后端支持后启用。',
+      editInfoDisabled: '当前角色未开放个人信息修改权限，如需修改请联系管理员。'
+    },
     dataManage: {
       common: {
         createTime: '创建时间',
@@ -955,7 +1070,6 @@ const local: App.I18n.Schema = {
         code: '编码',
         name: '名称',
         form: { codePlaceholder: '请输入编码', namePlaceholder: '请输入名称' },
-        waybill: { title: '单号资料管理' },
         address: { title: '地址簿管理' },
         declaredGoods: { title: '申报物品' },
         problemCategory: { title: '问题类别' },
@@ -964,6 +1078,103 @@ const local: App.I18n.Schema = {
         exportReason: { title: '出口原因' },
         clearanceMethod: { title: '清关方式' },
         salesTerms: { title: '销售条款' }
+      },
+      noRule: {
+        title: '单号规则',
+        name: '名称',
+        prefix: '前缀',
+        suffix: '后缀',
+        start: '起始值',
+        end: '结束值',
+        current: '当前值',
+        len: '数字位数',
+        checkType: '验证位',
+        sysType: '系统类型',
+        sysTypeAll: '全部类型',
+        lastOperation: '最后操作',
+        lastUpdateTime: '最后更新时间',
+        newTitle: '新增单号规则',
+        editTitle: '编辑单号规则',
+        sysTypeForbidDelete: '系统类型规则不可删除',
+        checkTypeOption: {
+          none: '无验证位',
+          weighted: '加权验证',
+          mod7: '模7验证'
+        },
+        sysTypeOption: {
+          custom: '自定义',
+          waybill: '运单号',
+          customer: '客户编号'
+        },
+        form: {
+          namePlaceholder: '请输入规则名称',
+          prefixPlaceholder: '请输入前缀（提交后自动转为大写）',
+          suffixPlaceholder: '请输入后缀（提交后自动转为大写）',
+          startPlaceholder: '请输入起始值',
+          endPlaceholder: '请输入结束值',
+          currentPlaceholder: '请输入当前值',
+          lenPlaceholder: '请输入数字位数',
+          notePlaceholder: '请输入备注',
+          positiveInt: '请输入正整数'
+        }
+      },
+      ship: {
+        provider: {
+          title: '服务商',
+          code: '服务商代码',
+          name: '服务商名称',
+          billMode: '结算方式',
+          contact: '联系人',
+          phone: '电话',
+          email: '邮箱',
+          web: '网址',
+          address: '地址',
+          balance: '余额',
+          providerType: '服务商类型',
+          typeOption: { out: '发货服务商', send: '派送服务商', bl: '提单服务商', other: '杂支服务商' }
+        },
+        channelGroup: {
+          title: '渠道类别',
+          name: '类别名称',
+          nameEn: '英文名称',
+          order: '排序'
+        },
+        weightRule: {
+          title: '计泡规则',
+          calcMode: '计算方式',
+          mode: '计泡类型',
+          weightOff: '计泡比率',
+          cubicNum: '材积除',
+          order: '排序',
+          calcModeOption: { byKg: '按公斤', byCubic: '按方' },
+          modeOption: { m0: '件实重之和', m1: '件体积重之和', m2: '票总重和票总体积重取大值', m3: '件计费重之和' },
+          carry: '进位规则',
+          carryOption: {
+            c0: '件实重和件体积重进位',
+            c1: '件计费重进位',
+            c2: '票总重和票总体积重进位',
+            c3: '票计费重进位'
+          },
+          carryGroup: '进位规则组',
+          addCarryGroup: '加进位规则组',
+          addRule: '加区间',
+          removeCarryGroup: '删除该组',
+          removeRule: '删行',
+          start: '开始重量',
+          end: '结束重量',
+          unit: '计重单位'
+        },
+        carrier: {
+          title: '承运网络',
+          name: '网络名称',
+          weightRule: '关联计泡规则',
+          trackConfig: '追踪配置',
+          oilRate: '燃油费率',
+          feeCustom: '报关费',
+          cubicNum: '材积除',
+          weightOff: '计泡比率',
+          order: '排序'
+        }
       }
     },
     channelQuote: {

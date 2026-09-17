@@ -48,8 +48,13 @@ const menuWrapperClass = computed(() => (showLogo.value ? 'flex-1-hidden' : 'h-f
   color: rgba(255, 255, 255, 0.82);
 }
 
-/* NButton 通过内联 CSS 变量设置文字颜色（浅色主题为深色），深色侧栏下需强制覆盖为浅色 */
+/* NButton 通过内联 CSS 变量设置三态颜色（浅色主题为深色），深色侧栏下需强制覆盖为浅色；
+   同时覆盖 hover/pressed 变量，让悬浮反馈在深蓝底上明显可见（内联变量必须 !important） */
 .sider-footer--inverted :deep(.n-button) {
-  color: rgba(255, 255, 255, 0.82) !important;
+  --n-text-color: rgba(255, 255, 255, 0.82) !important;
+  --n-text-color-hover: #fff !important;
+  --n-text-color-pressed: #fff !important;
+  --n-color-hover: rgba(255, 255, 255, 0.16) !important;
+  --n-color-pressed: rgba(255, 255, 255, 0.24) !important;
 }
 </style>

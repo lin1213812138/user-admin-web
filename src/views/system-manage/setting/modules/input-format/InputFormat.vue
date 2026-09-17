@@ -1,435 +1,206 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
+import dayjs from 'dayjs';
 import { $t } from '@/locales';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import MasterDetail from '../../components/MasterDetail.vue';
-import FieldMapping, { type FieldMappingGroup, type FieldMappingValue } from '../../components/FieldMapping.vue';
+import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
+import type { VxeColumnConfig } from '@/components/Table';
+import { fetchDeleteInputFormat, fetchGetInputFormatList } from '@/service/api/input-format';
+import InputFormatDrawer from './input-format-drawer.vue';
 
-interface InputFormatItem {
-  id: number;
-  name: string;
-  status: Api.Common.EnableStatus;
-  scope: ('internal' | 'customer' | 'wechat')[];
-  remark: string;
-  fields: Record<string, FieldMappingValue>;
+const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
+  Api.InputFormat.List,
+  Api.InputFormat.OrderTemplate
+>({
+  // 真实接口走 flat request，这里解包 { data, error }，失败时返回空列表（错误提示由 request 拦截器统一弹出）
+  api: async ({ current, size }) => {
+    // scene 必传：不传时后端会强制 status=1 并按角色可见格式过滤，管理端要看到全部（含停用）
+    const { data: res, error } = await fetchGetInputFormatList({ scene: 1, page: current, size });
+
+    if (error || !res) return { list: [], total: 0 };
+
+    return res;
+  },
+  // wms-user 返回 ret:{ list, total }，映射为表格需要的 records/total
+  transform: r => ({ records: r.list, total: r.total }),
+  columns: () =>
+    [
+      {
+        key: 'name',
+        title: $t('page.manage.setting.inputFormat.name'),
+        type: 'detail',
+        visible: true,
+        minWidth: 180,
+        sortable: false
+      },
+      {
+        key: 'customerEnable',
+        title: $t('page.manage.setting.inputFormat.customerEnable'),
+        visible: true,
+        width: 100,
+        align: 'center',
+        sortable: false
+      },
+      {
+        key: 'isDefault',
+        title: $t('page.manage.setting.inputFormat.isDefault'),
+        visible: true,
+        width: 100,
+        align: 'center',
+        sortable: false
+      },
+      {
+        key: 'order',
+        title: $t('page.manage.setting.inputFormat.order'),
+        visible: true,
+        width: 80,
+        align: 'center',
+        sortable: false
+      },
+      { key: 'note', title: $t('common.remark'), visible: true, minWidth: 220, sortable: false },
+      {
+        key: 'status',
+        title: $t('common.status'),
+        type: 'status',
+        visible: true,
+        width: 100,
+        fixed: 'right',
+        align: 'center',
+        sortable: false
+      },
+      {
+        key: 'updateBy',
+        title: $t('page.manage.setting.inputFormat.lastOperation'),
+        visible: true,
+        width: 100,
+        fixed: 'right',
+        align: 'center',
+        sortable: false
+      },
+      {
+        key: 'updateDate',
+        title: $t('page.manage.setting.inputFormat.lastUpdateTime'),
+        visible: true,
+        width: 170,
+        fixed: 'right',
+        align: 'center',
+        sortable: false
+      }
+    ] as VxeColumnConfig[],
+  // 新增两列：列配置缓存以缓存数组为准（useVxeTable 按缓存 map），升版本避免老缓存把新列挡住
+  cacheKey: 'setting-input-format-v3'
+});
+
+const configVisible = ref(false);
+
+/** 毫秒时间戳格式化展示（最后更新时间） */
+function formatDateTime(ts?: number) {
+  return ts ? dayjs(ts).format('YYYY-MM-DD HH:mm:ss') : '--';
 }
 
-const navGroups: FieldMappingGroup[] = [
-  {
-    key: 'waybill',
-    title: '运单信息',
-    fields: [
-      { key: 'bizRemark', label: '业务备注' },
-      { key: 'innerRemark', label: '内部备注' },
-      { key: 'subtotal', label: '小计金额' },
-      { key: 'netWeight', label: '净重' },
-      { key: 'goodsCount', label: '货物件数' },
-      { key: 'length', label: '长' },
-      { key: 'width', label: '宽' }
-    ]
-  },
-  {
-    key: 'receiver',
-    title: '收件人信息',
-    fields: [
-      { key: 'receiverName', label: '收件人姓名' },
-      { key: 'receiverPhone', label: '电话' },
-      { key: 'receiverAddress', label: '地址' },
-      { key: 'receiverCompany', label: '公司' }
-    ]
-  },
-  {
-    key: 'sender',
-    title: '发件人信息',
-    fields: [
-      { key: 'senderName', label: '发件人姓名' },
-      { key: 'senderPhone', label: '电话' },
-      { key: 'senderAddress', label: '地址', span: 12 }
-    ]
-  },
-  {
-    key: 'goods',
-    title: '物品信息',
-    fields: [
-      { key: 'goodsName', label: '品名' },
-      { key: 'quantity', label: '数量' },
-      { key: 'weight', label: '重量' },
-      { key: 'volume', label: '体积' }
-    ]
-  },
-  {
-    key: 'subItem',
-    title: '子件信息',
-    fields: [
-      { key: 'singleVolume', label: '单件材积' },
-      { key: 'chargeWeight', label: '计费重' },
-      { key: 'singleWeight', label: '单件重量' }
-    ]
-  }
-];
-
-const extraFormatNames = [
-  '顺丰录单',
-  '京东录单',
-  '菜鸟录单',
-  '美团录单',
-  '拼多多录单',
-  '抖音录单',
-  '小红书录单',
-  '淘宝录单',
-  '天猫录单',
-  '唯品会录单',
-  '苏宁录单',
-  '国美录单',
-  '网易考拉录单',
-  '亚马逊录单',
-  'eBay录单',
-  '速卖通录单',
-  'Wish录单',
-  'Lazada录单',
-  'Shopee录单',
-  'Coupang录单',
-  '俄向专线录单',
-  '欧向专线录单',
-  '美向专线录单',
-  '东南亚专线录单',
-  '中东专线录单',
-  '非洲专线录单',
-  '南美专线录单',
-  '澳洲专线录单',
-  '日韩专线录单',
-  '港澳台录单'
-];
-const extraScopes: Array<Array<'internal' | 'customer' | 'wechat'>> = [
-  ['internal'],
-  ['internal', 'customer'],
-  ['internal', 'customer', 'wechat'],
-  ['customer', 'wechat'],
-  ['wechat']
-];
-
-const formats = ref<InputFormatItem[]>([
-  {
-    id: 1,
-    name: '代发录单',
-    status: 1,
-    scope: ['internal', 'customer', 'wechat'],
-    remark: '',
-    fields: {
-      waybill: { show: ['bizRemark', 'innerRemark'], required: ['bizRemark'] },
-      receiver: { show: [], required: [] },
-      sender: { show: [], required: [] },
-      goods: { show: ['subtotal', 'netWeight', 'goodsCount', 'length', 'width'], required: ['goodsCount'] },
-      subItem: { show: ['singleVolume', 'chargeWeight'], required: ['chargeWeight'] }
-    }
-  },
-  {
-    id: 2,
-    name: '专线录单',
-    status: 1,
-    scope: ['internal', 'customer'],
-    remark: '',
-    fields: {
-      waybill: { show: ['bizRemark'], required: ['bizRemark'] },
-      receiver: { show: ['receiverName'], required: ['receiverName'] },
-      sender: { show: [], required: [] },
-      goods: { show: ['netWeight', 'goodsCount'], required: ['netWeight', 'goodsCount'] },
-      subItem: { show: [], required: [] }
-    }
-  },
-  {
-    id: 3,
-    name: '国际快递录单',
-    status: 1,
-    scope: ['internal'],
-    remark: '跨境电商专用，字段最全',
-    fields: {
-      waybill: {
-        show: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
-        required: ['bizRemark']
-      },
-      receiver: {
-        show: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
-        required: ['receiverName', 'receiverPhone', 'receiverAddress']
-      },
-      sender: { show: ['senderName', 'senderPhone', 'senderAddress'], required: ['senderName'] },
-      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: ['goodsName', 'quantity'] },
-      subItem: { show: ['singleVolume', 'chargeWeight', 'singleWeight'], required: [] }
-    }
-  },
-  {
-    id: 4,
-    name: '同城速递录单',
-    status: 1,
-    scope: ['wechat'],
-    remark: '微信小程序同城下单',
-    fields: {
-      waybill: { show: ['bizRemark'], required: [] },
-      receiver: {
-        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
-        required: ['receiverName', 'receiverPhone', 'receiverAddress']
-      },
-      sender: { show: ['senderName', 'senderPhone'], required: [] },
-      goods: { show: ['goodsName', 'quantity'], required: ['goodsName'] },
-      subItem: { show: [], required: [] }
-    }
-  },
-  {
-    id: 5,
-    name: '冷链专线录单',
-    status: 1,
-    scope: ['internal', 'customer'],
-    remark: '冷链运输，需记录体积与重量',
-    fields: {
-      waybill: { show: ['bizRemark', 'innerRemark', 'netWeight', 'goodsCount'], required: ['netWeight'] },
-      receiver: {
-        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
-        required: ['receiverName', 'receiverPhone']
-      },
-      sender: { show: ['senderName', 'senderPhone'], required: [] },
-      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: ['goodsName', 'weight', 'volume'] },
-      subItem: { show: ['singleVolume', 'singleWeight'], required: [] }
-    }
-  },
-  {
-    id: 6,
-    name: '到付录单',
-    status: 0,
-    scope: ['customer', 'wechat'],
-    remark: '收件人付运费（暂时停用）',
-    fields: {
-      waybill: { show: ['bizRemark', 'subtotal'], required: ['subtotal'] },
-      receiver: {
-        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
-        required: ['receiverName', 'receiverPhone']
-      },
-      sender: { show: ['senderName'], required: [] },
-      goods: { show: ['goodsName', 'quantity', 'weight'], required: ['goodsName', 'quantity'] },
-      subItem: { show: [], required: [] }
-    }
-  },
-  {
-    id: 7,
-    name: '临时录单',
-    status: 0,
-    scope: ['internal'],
-    remark: '内部临时使用，已废弃',
-    fields: {
-      waybill: { show: ['bizRemark'], required: ['bizRemark'] },
-      receiver: { show: ['receiverName'], required: [] },
-      sender: { show: [], required: [] },
-      goods: { show: ['goodsName'], required: [] },
-      subItem: { show: [], required: [] }
-    }
-  },
-  {
-    id: 8,
-    name: '大件物流录单',
-    status: 1,
-    scope: ['internal', 'customer', 'wechat'],
-    remark: '大件/重货，需长宽与体积',
-    fields: {
-      waybill: {
-        show: ['bizRemark', 'innerRemark', 'subtotal', 'netWeight', 'goodsCount', 'length', 'width'],
-        required: ['netWeight', 'goodsCount', 'length', 'width']
-      },
-      receiver: {
-        show: ['receiverName', 'receiverPhone', 'receiverAddress'],
-        required: ['receiverName', 'receiverPhone']
-      },
-      sender: { show: ['senderName', 'senderPhone', 'senderAddress'], required: [] },
-      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: ['goodsName', 'quantity', 'volume'] },
-      subItem: { show: ['singleVolume', 'chargeWeight'], required: ['chargeWeight'] }
-    }
-  },
-  {
-    id: 9,
-    name: '电商专用录单',
-    status: 1,
-    scope: ['customer', 'wechat'],
-    remark: '电商平台客户下单',
-    fields: {
-      waybill: { show: ['bizRemark'], required: [] },
-      receiver: {
-        show: ['receiverName', 'receiverPhone', 'receiverAddress', 'receiverCompany'],
-        required: ['receiverName', 'receiverPhone', 'receiverAddress']
-      },
-      sender: { show: [], required: [] },
-      goods: { show: ['goodsName', 'quantity', 'weight'], required: ['goodsName', 'quantity'] },
-      subItem: { show: [], required: [] }
-    }
-  },
-  {
-    id: 10,
-    name: '测试模板',
-    status: 1,
-    scope: ['internal'],
-    remark: '字段映射测试用',
-    fields: {
-      waybill: { show: ['bizRemark', 'innerRemark', 'subtotal'], required: ['bizRemark'] },
-      receiver: { show: [], required: [] },
-      sender: { show: [], required: [] },
-      goods: { show: [], required: [] },
-      subItem: { show: [], required: [] }
-    }
-  },
-  ...Array.from({ length: 30 }, (_, i) => ({
-    id: i + 11,
-    name: extraFormatNames[i],
-    status: (i % 4 === 0 ? 0 : 1) as Api.Common.EnableStatus,
-    scope: extraScopes[i % extraScopes.length],
-    remark: '',
-    fields: {
-      waybill: { show: ['bizRemark', 'innerRemark'], required: ['bizRemark'] },
-      receiver: {
-        show: i % 2 === 0 ? ['receiverName', 'receiverPhone', 'receiverAddress'] : [],
-        required: i % 2 === 0 ? ['receiverName', 'receiverPhone'] : []
-      },
-      sender: { show: i % 2 === 0 ? ['senderName', 'senderPhone', 'senderAddress'] : [], required: [] },
-      goods: { show: ['goodsName', 'quantity', 'weight', 'volume'], required: i % 3 === 0 ? ['goodsName'] : [] },
-      subItem: { show: i % 3 === 0 ? ['singleVolume', 'chargeWeight'] : [], required: [] }
-    }
-  }))
-]);
-
-const selectedId = ref<number | null>(formats.value[0]?.id ?? null);
-const isEditing = ref(false);
-const prevSelectedId = ref<number | null>(null);
-
-const current = computed(() => formats.value.find(f => f.id === selectedId.value) ?? null);
-
-const formModel = ref<{
-  name: string;
-  status: Api.Common.EnableStatus;
-  scope: ('internal' | 'customer' | 'wechat')[];
-  remark: string;
-}>({ name: '', status: 1, scope: [], remark: '' });
-
-const fieldModel = ref<Record<string, FieldMappingValue>>({});
-
-function loadCurrent() {
-  const c = current.value;
-  if (!c) return;
-  formModel.value = { name: c.name, status: c.status, scope: [...c.scope], remark: c.remark };
-  fieldModel.value = JSON.parse(JSON.stringify(c.fields));
+/** 是 / 否标签：是-绿色、否-灰色 */
+function flagTagType(value: Api.Common.EnableStatus) {
+  return value === 1 ? 'success' : 'default';
 }
-loadCurrent();
 
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'name',
-    label: $t('page.manage.setting.inputFormat') + '名称',
-    type: 'input',
-    required: true,
-    span: 6,
-    placeholder: '请输入格式名称'
-  },
-  {
-    key: 'status',
-    label: $t('common.status'),
-    type: 'switch',
-    span: 6,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable'),
-    checkedValue: 1,
-    uncheckedValue: 0
-  },
-  {
-    key: 'scope',
-    label: '适用范围',
-    type: 'checkbox',
-    span: 6,
-    options: [
-      { label: '内部系统', value: 'internal' },
-      { label: '客户下单', value: 'customer' }
-    ]
-  },
-  { key: 'remark', label: $t('common.remark'), type: 'input', span: 6, placeholder: '请输入备注' }
-]);
+function confirmDelete(row: Api.InputFormat.OrderTemplate) {
+  window.$dialog?.warning({
+    title: $t('common.delete'),
+    content: $t('common.confirmDelete'),
+    positiveText: $t('common.confirm'),
+    negativeText: $t('common.cancel'),
+    onPositiveClick: async () => {
+      const { error } = await fetchDeleteInputFormat(row._id);
 
-function handleCreate() {
-  prevSelectedId.value = selectedId.value;
-  selectedId.value = null;
-  isEditing.value = true;
-  formModel.value = { name: '', status: 1, scope: [], remark: '' };
-  fieldModel.value = {};
+      // 失败提示由 request 拦截器统一弹出
+      if (error) return;
+
+      getData();
+      window.$message?.success($t('common.deleteSuccess'));
+    }
+  });
 }
-function handleEdit() {
-  if (!current.value) return;
-  isEditing.value = true;
+
+function handlePageChange({ current, size }: { current: number; size: number }) {
+  pagination.current = current;
+  pagination.size = size;
+  getData();
 }
-function handleDelete() {
-  if (selectedId.value === null) return;
-  formats.value = formats.value.filter(f => f.id !== selectedId.value);
-  selectedId.value = formats.value[0]?.id ?? null;
-  loadCurrent();
+
+// ---- 新增/编辑交给独立组件 InputFormatDrawer（列表与表单解耦） ----
+const drawerVisible = ref(false);
+const editRow = ref<Api.InputFormat.OrderTemplate | null>(null);
+
+function openCreate() {
+  editRow.value = null;
+  drawerVisible.value = true;
 }
-function handleSave() {
-  if (selectedId.value === null) {
-    const id = Math.max(0, ...formats.value.map(f => f.id)) + 1;
-    formats.value.push({
-      id,
-      name: formModel.value.name,
-      status: formModel.value.status,
-      scope: formModel.value.scope,
-      remark: formModel.value.remark,
-      fields: fieldModel.value
-    });
-    selectedId.value = id;
-  } else {
-    const idx = formats.value.findIndex(f => f.id === selectedId.value);
-    if (idx >= 0) formats.value[idx] = { ...formats.value[idx], ...formModel.value, fields: fieldModel.value };
-  }
-  isEditing.value = false;
-}
-function handleCancel() {
-  isEditing.value = false;
-  if (selectedId.value === null) {
-    selectedId.value = prevSelectedId.value ?? formats.value[0]?.id ?? null;
-  }
-  loadCurrent();
+function openEdit(row: Api.InputFormat.OrderTemplate) {
+  editRow.value = row;
+  drawerVisible.value = true;
 }
 </script>
 
 <template>
-  <MasterDetail
-    list-title="录单格式列表"
-    search-placeholder="搜索列表"
-    :items="formats"
-    :show-status="true"
-    :show-actions="true"
-    :selected-id="selectedId"
-    :editable="!isEditing"
-    @update:selected-id="
-      id => {
-        selectedId = id;
-        loadCurrent();
-      }
-    "
-    @create="handleCreate"
-    @edit="handleEdit"
-    @delete="handleDelete"
-  >
-    <template #operation-extra>
-      <NSpace v-if="isEditing">
-        <NButton type="primary" size="small" @click="handleSave">保存</NButton>
-        <NButton size="small" @click="handleCancel">取消</NButton>
-      </NSpace>
-    </template>
-    <NFormWrap
-      v-if="current || isEditing"
-      class="shrink-0"
-      :model="formModel"
-      :items="formItems"
-      :disabled="!isEditing"
-    />
-    <FieldMapping
-      v-if="current || isEditing"
-      fill
-      :nav-groups="navGroups"
-      :model-value="fieldModel"
-      :disabled="!isEditing"
-      @update:model-value="fieldModel = $event"
-    />
-  </MasterDetail>
+  <div class="h-full w-full">
+    <Table
+      :columns="columns"
+      :data="data"
+      :loading="loading"
+      :pagination="pagination"
+      :show-seq="true"
+      :show-checkbox="true"
+      :show-action="true"
+      :action-width="130"
+      @refresh="getData"
+      @page-change="handlePageChange"
+    >
+      <template #customerEnable="{ row }">
+        <NTag size="small" :bordered="false" :type="flagTagType(row.customerEnable)">
+          {{
+            row.customerEnable === 1
+              ? $t('page.manage.setting.inputFormat.yes')
+              : $t('page.manage.setting.inputFormat.no')
+          }}
+        </NTag>
+      </template>
+      <template #isDefault="{ row }">
+        <NTag size="small" :bordered="false" :type="flagTagType(row.isDefault)">
+          {{
+            row.isDefault === 1 ? $t('page.manage.setting.inputFormat.yes') : $t('page.manage.setting.inputFormat.no')
+          }}
+        </NTag>
+      </template>
+      <template #updateBy="{ row }">{{ row.updateBy || '--' }}</template>
+      <template #updateDate="{ row }">{{ formatDateTime(row.updateDate) }}</template>
+      <template #operation-left>
+        <NButton size="small" type="primary" ghost @click="openCreate">
+          <template #icon><icon-ic-round-plus class="text-icon" /></template>
+          {{ $t('common.add') }}
+        </NButton>
+      </template>
+      <template #operation-right="{ refresh }">
+        <NButton size="small" @click="refresh">
+          <template #icon><icon-ic-round-refresh class="text-icon" /></template>
+        </NButton>
+        <TableColumnConfig
+          v-model:visible="configVisible"
+          v-model:columns="columnConfigs"
+          @confirm="persistColumns"
+          @reset="resetColumns"
+        />
+      </template>
+      <template #action="{ row }">
+        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
+        <!-- 内置格式（buildIn=1）由客户端依赖，不提供删除入口 -->
+        <NPopconfirm v-if="row.buildIn !== 1" @positive-click="confirmDelete(row)">
+          <template #trigger>
+            <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
+          </template>
+          {{ $t('common.confirmDelete') }}
+        </NPopconfirm>
+      </template>
+    </Table>
+
+    <InputFormatDrawer v-model:show="drawerVisible" :row="editRow" @submitted="getData" />
+  </div>
 </template>

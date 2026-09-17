@@ -1,56 +1,31 @@
 import { request } from '../../request';
-import {
-  mockCreateTraceKeyword,
-  mockDeleteTraceKeyword,
-  mockGetTraceKeywordList,
-  mockUpdateTraceKeyword
-} from '../mock';
 
-/** get trace keyword list（轨迹关键词 - 匹配规则） */
+/**
+ * 轨迹关键词接口（track-status-config），tms-user 真实接口（无 DEV mock）。
+ * flat request，调用方需解包 { data, error }。
+ * 分页契约：{ page, size, keyword, where } → { list, total }；delete 仅单条 _id。
+ */
+
+/** 轨迹关键词列表（keyword 只搜名称） */
 export function fetchGetTraceKeywordList(params: Api.SystemManage.TraceKeywordSearchParams) {
-  if (import.meta.env.DEV) {
-    return mockGetTraceKeywordList(params) as unknown as Promise<Api.SystemManage.TraceKeywordList>;
-  }
   return request<Api.SystemManage.TraceKeywordList>({
-    url: '/system/trace-keyword/list',
+    url: '/track-status-config/query',
     method: 'post',
     data: params
   });
 }
 
-/** create trace keyword */
+/** 新建轨迹关键词（name 后端唯一校验） */
 export function fetchCreateTraceKeyword(params: Api.SystemManage.TraceKeywordCreateParams) {
-  if (import.meta.env.DEV) {
-    return mockCreateTraceKeyword(params) as unknown as Promise<Api.SystemManage.TraceKeywordItem>;
-  }
-  return request<Api.SystemManage.TraceKeywordItem>({
-    url: '/system/trace-keyword/create',
-    method: 'post',
-    data: params
-  });
+  return request<Record<string, never>>({ url: '/track-status-config/create', method: 'post', data: params });
 }
 
-/** update trace keyword */
+/** 更新轨迹关键词（必填 _id） */
 export function fetchUpdateTraceKeyword(params: Api.SystemManage.TraceKeywordUpdateParams) {
-  if (import.meta.env.DEV) {
-    return mockUpdateTraceKeyword(params) as unknown as Promise<Api.SystemManage.TraceKeywordItem>;
-  }
-  return request<Api.SystemManage.TraceKeywordItem>({
-    url: '/system/trace-keyword/update',
-    method: 'post',
-    data: params
-  });
+  return request<Record<string, never>>({ url: '/track-status-config/update', method: 'post', data: params });
 }
 
-/** delete trace keyword by ids */
-export function fetchDeleteTraceKeyword(ids: number[]) {
-  if (import.meta.env.DEV) {
-    return mockDeleteTraceKeyword(ids) as unknown as Promise<boolean>;
-  }
-
-  return request<boolean>({
-    url: '/system/trace-keyword/delete',
-    method: 'post',
-    data: { ids }
-  });
+/** 删除轨迹关键词（仅单条 _id） */
+export function fetchDeleteTraceKeyword(id: string) {
+  return request<Record<string, never>>({ url: '/track-status-config/delete', method: 'post', data: { _id: id } });
 }

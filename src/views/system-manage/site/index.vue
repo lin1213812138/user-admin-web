@@ -2,10 +2,11 @@
 import dayjs from 'dayjs';
 import { computed, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteSite, fetchGetSiteList } from '@/service/api/site';
+import { fetchDeleteSite, fetchGetSiteCustomerList, fetchGetSiteList, fetchGetSiteUserList } from '@/service/api/site';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
+import RelationModal from '@/components/common/relation-modal.vue';
 import SiteOperateDrawer from './modules/site-operate-drawer.vue';
 
 const searchParams = reactive<{ keyword: string }>({
@@ -72,10 +73,26 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         sortable: false,
         align: 'center'
       },
-      { key: 'updateDate', title: $t('page.manage.site.updateDate'), visible: true, width: 200, sortable: true }
+      { key: 'updateDate', title: $t('page.manage.site.updateDate'), visible: true, width: 200, sortable: true },
+      {
+        key: 'relationUser',
+        title: $t('page.manage.site.relationUser'),
+        visible: true,
+        width: 90,
+        sortable: false,
+        align: 'center'
+      },
+      {
+        key: 'relationCustomer',
+        title: $t('page.manage.site.relationCustomer'),
+        visible: true,
+        width: 90,
+        sortable: false,
+        align: 'center'
+      }
     ] as VxeColumnConfig[],
-  // 字段结构较旧版变化大，换新缓存 key 避免旧列配置（siteCode/status 等）残留
-  cacheKey: 'system-manage-site-v2'
+  // 新增关联用户/客户列，换新缓存 key 避免旧列配置残留
+  cacheKey: 'system-manage-site-v3'
 });
 
 /** 毫秒时间戳格式化展示 */
@@ -142,6 +159,72 @@ function handleEdit(row: Api.SystemManage.Site) {
 function handleSubmitted() {
   getData();
 }
+
+/** 关联弹窗当前行（用户 / 客户弹窗共用，取数时闭包读取） */
+const relationRow = ref<Api.SystemManage.Site | null>(null);
+const relationUserVisible = ref(false);
+const relationCustomerVisible = ref(false);
+
+function openRelationModal(type: 'user' | 'customer', row: Api.SystemManage.Site) {
+  relationRow.value = row;
+  if (type === 'user') {
+    relationUserVisible.value = true;
+  } else {
+    relationCustomerVisible.value = true;
+  }
+}
+
+/** 弹窗取数：站点关联用户（错误提示由 request 拦截器统一弹出，失败返回空列表） */
+async function fetchRelationUsers({ page, size }: { page: number; size: number }) {
+  if (!relationRow.value) return { list: [], total: 0 };
+
+  const { data: res, error } = await fetchGetSiteUserList({ page, size, siteId: relationRow.value._id });
+  if (error || !res) return { list: [], total: 0 };
+
+  return res;
+}
+
+/** 弹窗取数：站点关联客户 */
+async function fetchRelationCustomers({ page, size }: { page: number; size: number }) {
+  if (!relationRow.value) return { list: [], total: 0 };
+
+  const { data: res, error } = await fetchGetSiteCustomerList({ page, size, siteId: relationRow.value._id });
+  if (error || !res) return { list: [], total: 0 };
+
+  return res;
+}
+
+/** 关联用户弹窗列（姓名 / 账号 / 所属站点 / 状态） */
+const relationUserColumns = [
+  { key: 'name', title: $t('page.manage.user.nickName'), visible: true, width: 140, sortable: false },
+  { key: 'account', title: $t('page.manage.user.userName'), visible: true, width: 140, sortable: false },
+  { key: 'site', title: $t('page.manage.site.siteName'), visible: true, minWidth: 140, sortable: false },
+  {
+    key: 'status',
+    title: $t('page.manage.user.status'),
+    type: 'status',
+    visible: true,
+    width: 90,
+    sortable: false,
+    align: 'center'
+  }
+] as VxeColumnConfig[];
+
+/** 关联客户弹窗列（编码 / 名称 / 所属站点 / 状态） */
+const relationCustomerColumns = [
+  { key: 'code', title: $t('page.manage.site.customerCode'), visible: true, width: 140, sortable: false },
+  { key: 'name', title: $t('page.manage.site.customerName'), visible: true, minWidth: 160, sortable: false },
+  { key: 'site', title: $t('page.manage.site.siteName'), visible: true, minWidth: 140, sortable: false },
+  {
+    key: 'status',
+    title: $t('page.manage.user.status'),
+    type: 'status',
+    visible: true,
+    width: 90,
+    sortable: false,
+    align: 'center'
+  }
+] as VxeColumnConfig[];
 </script>
 
 <template>
@@ -177,6 +260,18 @@ function handleSubmitted() {
               row.siteType === 1 ? $t('page.manage.site.siteTypeHeadquarters') : $t('page.manage.site.siteTypeBranch')
             }}
           </NTag>
+        </template>
+
+        <template #relationUser="{ row }">
+          <NButton size="small" type="primary" text @click="openRelationModal('user', row)">
+            {{ $t('page.manage.site.view') }}
+          </NButton>
+        </template>
+
+        <template #relationCustomer="{ row }">
+          <NButton size="small" type="primary" text @click="openRelationModal('customer', row)">
+            {{ $t('page.manage.site.view') }}
+          </NButton>
         </template>
 
         <template #updateDate="{ row }">
@@ -238,6 +333,20 @@ function handleSubmitted() {
       :mode="operateMode"
       :row="operateRow"
       @submitted="handleSubmitted"
+    />
+
+    <RelationModal
+      v-model:show="relationUserVisible"
+      :title="$t('page.manage.site.relationUser')"
+      :fetcher="fetchRelationUsers"
+      :columns="relationUserColumns"
+    />
+
+    <RelationModal
+      v-model:show="relationCustomerVisible"
+      :title="$t('page.manage.site.relationCustomer')"
+      :fetcher="fetchRelationCustomers"
+      :columns="relationCustomerColumns"
     />
   </div>
 </template>

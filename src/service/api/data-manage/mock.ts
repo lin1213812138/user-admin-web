@@ -1,4 +1,4 @@
-import type { MasterDataRow } from '@/components/MasterData/types';
+import type { MasterDataRow } from '@/views/data-manage/components/types';
 
 type RowFactory = (i: number) => MasterDataRow;
 
@@ -84,14 +84,6 @@ const factories: Record<Api.DataManage.DataManageArchiveKey, RowFactory> = {
     status: 1,
     remark: '',
     createTime: `2026-0${(i % 9) + 1}-08 16:00:00`
-  }),
-  waybill: i => ({
-    id: i,
-    code: `WB${String(i).padStart(4, '0')}`,
-    name: `单号资料${i}`,
-    status: i % 5 === 0 ? 0 : 1,
-    remark: '',
-    createTime: `2026-0${(i % 9) + 1}-09 17:00:00`
   }),
   address: i => ({
     id: i,

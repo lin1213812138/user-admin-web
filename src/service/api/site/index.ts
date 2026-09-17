@@ -44,3 +44,21 @@ export function fetchDeleteSite(ids: string[]) {
     data: { ids }
   });
 }
+
+/** get site relation users（真实接口 /user/query，where.siteId 精确过滤，flat 请求需调用方解包 { data, error }） */
+export function fetchGetSiteUserList(params: { page: number; size: number; siteId: string }) {
+  return request<Api.SystemManage.UserList>({
+    url: '/user/query',
+    method: 'post',
+    data: { page: params.page, size: params.size, where: { siteId: params.siteId } }
+  });
+}
+
+/** get site relation customers（真实接口 /customer/query，tms-user queryCommon 分页，where.siteId 精确过滤） */
+export function fetchGetSiteCustomerList(params: { page: number; size: number; siteId: string }) {
+  return request<Api.SystemManage.SiteCustomerList>({
+    url: '/customer/query',
+    method: 'post',
+    data: { page: params.page, size: params.size, where: { siteId: params.siteId } }
+  });
+}

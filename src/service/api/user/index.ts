@@ -38,6 +38,15 @@ export function fetchUpdateUser(params: Api.SystemManage.UserUpdateParams) {
   });
 }
 
+/** update self profile（个人中心，真实接口同为 /user/update；仅提交可编辑字段，account/siteId/status/roleIds/groupIds 不可改） */
+export function fetchUpdateSelfProfile(params: Api.SystemManage.UserSelfUpdateParams) {
+  return request<null>({
+    url: '/user/update',
+    method: 'post',
+    data: params
+  });
+}
+
 /** delete user by id（真实接口 /user/delete，单条删除；管理员账号/本人/绑定客户的业务员会被后端拒绝） */
 export function fetchDeleteUser(id: string) {
   return request<null>({

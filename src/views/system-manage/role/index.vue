@@ -263,9 +263,22 @@ function handleSubmitted() {
 
         <template #action="{ row }">
           <NButton size="small" type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</NButton>
-          <NButton size="small" type="info" text @click="openPermissionDrawer(row)">
-            {{ $t('page.manage.role.permission') }}
-          </NButton>
+          <NTooltip :disabled="row.roleType !== 5">
+            <template #trigger>
+              <span>
+                <NButton
+                  size="small"
+                  type="info"
+                  text
+                  :disabled="row.roleType === 5"
+                  @click="openPermissionDrawer(row)"
+                >
+                  {{ $t('page.manage.role.permission') }}
+                </NButton>
+              </span>
+            </template>
+            {{ $t('page.manage.role.permissionDisabledTip') }}
+          </NTooltip>
           <NPopconfirm @positive-click="handleDelete([row._id])">
             <template #trigger>
               <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>

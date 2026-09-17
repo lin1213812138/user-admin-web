@@ -29,11 +29,14 @@ declare module "@elegant-router/types" {
     "data-manage_basic": "/data-manage/basic";
     "data-manage_business": "/data-manage/business";
     "data-manage_finance": "/data-manage/finance";
+    "data-manage_no-rule": "/data-manage/no-rule";
+    "data-manage_ship": "/data-manage/ship";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "permission-manage": "/permission-manage";
     "permission-manage_menu": "/permission-manage/menu";
+    "personal-center": "/personal-center";
     "system-manage": "/system-manage";
     "system-manage_group": "/system-manage/group";
     "system-manage_label-designer": "/system-manage/label-designer";
@@ -84,6 +87,7 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "permission-manage"
+    | "personal-center"
     | "system-manage"
   >;
 
@@ -112,8 +116,11 @@ declare module "@elegant-router/types" {
     | "data-manage_basic"
     | "data-manage_business"
     | "data-manage_finance"
+    | "data-manage_no-rule"
+    | "data-manage_ship"
     | "home"
     | "permission-manage_menu"
+    | "personal-center"
     | "system-manage_group"
     | "system-manage_label-designer"
     | "system-manage_log"

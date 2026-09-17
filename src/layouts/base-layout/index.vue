@@ -23,9 +23,21 @@ const appStore = useAppStore();
 const themeStore = useThemeStore();
 const { secondLevelMenus, childLevelMenus, isActiveFirstLevelMenuHasChildren } = provideMixMenuContext();
 
-// 打印设计页是整屏设计器，去掉 content 区域默认的 16px 外边距让其占满可视区
+// 打印设计页是整屏设计器，系统设置页、个人中心页与资料管理五个页面左侧为贴边侧栏，去掉 content 区域默认的 16px 外边距让其占满可视区
 const route = useRoute();
-const contentShowPadding = computed(() => route.name !== 'system-manage_print-design');
+const contentShowPadding = computed(
+  () =>
+    ![
+      'system-manage_print-design',
+      'system-manage_setting',
+      'personal-center',
+      'data-manage_basic',
+      'data-manage_business',
+      'data-manage_finance',
+      'data-manage_no-rule',
+      'data-manage_ship'
+    ].includes(route.name as string)
+);
 
 const GlobalMenu = defineAsyncComponent(() => import('../modules/global-menu/index.vue'));
 

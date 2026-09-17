@@ -1,35 +1,58 @@
 <script setup lang="ts">
-import ArchiveSwitch, { type ArchiveSwitchItem } from '@/components/MasterData/archive-switch.vue';
+import { computed, defineAsyncComponent, h, ref, type Component } from 'vue';
+import { NSpin } from 'naive-ui';
+import { $t } from '@/locales';
+import VerticalTabLayout from '@/components/VerticalTabLayout/index.vue';
+import type { ArchiveTabItem } from '@/views/data-manage/components/types';
 
-const items: ArchiveSwitchItem[] = [
+/** 本组资料项（懒加载子档案）：左侧竖向 tab 与右侧内容均由它驱动 */
+const items: ArchiveTabItem[] = [
   {
     key: 'countryRegion',
     labelKey: 'page.dataManage.basic.countryRegion.title',
-    load: () => import('@/components/MasterData/archives/basic/country-region/index.vue')
+    load: () => import('@/views/data-manage/basic/modules/country-region/CountryRegion.vue')
   },
   {
     key: 'postalRoute',
     labelKey: 'page.dataManage.basic.postalRoute.title',
-    load: () => import('@/components/MasterData/archives/basic/postal-route/index.vue')
+    load: () => import('@/views/data-manage/basic/modules/postal-route/PostalRoute.vue')
   },
   {
     key: 'fbaWarehouse',
     labelKey: 'page.dataManage.basic.fbaWarehouse.title',
-    load: () => import('@/components/MasterData/archives/basic/fba-warehouse/index.vue')
+    load: () => import('@/views/data-manage/basic/modules/fba-warehouse/FbaWarehouse.vue')
   },
   {
     key: 'customerLevel',
     labelKey: 'page.dataManage.basic.customerLevel.title',
-    load: () => import('@/components/MasterData/archives/basic/customer-level/index.vue')
+    load: () => import('@/views/data-manage/basic/modules/customer-level/CustomerLevel.vue')
   },
   {
     key: 'customerSource',
     labelKey: 'page.dataManage.basic.customerSource.title',
-    load: () => import('@/components/MasterData/archives/basic/customer-source/index.vue')
+    load: () => import('@/views/data-manage/basic/modules/customer-source/CustomerSource.vue')
   }
 ];
+
+/** 左侧竖向 tab（labelKey → 当前语言文案） */
+const tabs = items.map(item => ({ value: item.key, label: $t(item.labelKey) }));
+
+/** 分包加载中的占位 */
+const loadingComponent: Component = () =>
+  h('div', { class: 'flex h-full w-full items-center justify-center' }, [h(NSpin)]);
+
+/** 每个资料项一个异步组件：key 不同即组件不同，切 tab 时自动重建并重新取数 */
+const asyncComps: Record<string, Component> = {};
+for (const item of items) {
+  asyncComps[item.key] = defineAsyncComponent({ loader: item.load, loadingComponent });
+}
+
+const activeKey = ref(items[0]?.key ?? '');
+const activeComponent = computed(() => asyncComps[activeKey.value]);
 </script>
 
 <template>
-  <ArchiveSwitch :items="items" />
+  <VerticalTabLayout v-model:value="activeKey" :tabs="tabs" :title="$t('route.data-manage_basic')">
+    <component :is="activeComponent" :key="activeKey" class="h-full w-full" />
+  </VerticalTabLayout>
 </template>

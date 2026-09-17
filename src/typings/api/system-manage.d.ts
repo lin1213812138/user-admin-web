@@ -128,6 +128,29 @@ declare namespace Api {
       password?: string;
     };
 
+    /** user self update params（个人中心 /user/update：仅提交可编辑字段，account/siteId/status/roleIds/groupIds 不可改） */
+    type UserSelfUpdateParams = Pick<
+      UserCreateParams,
+      | 'name'
+      | 'fullName'
+      | 'sex'
+      | 'birthday'
+      | 'idCard'
+      | 'address'
+      | 'phone'
+      | 'email'
+      | 'wx'
+      | 'contact'
+      | 'job'
+      | 'entryDate'
+      | 'qrCodeUrl'
+      | 'file'
+      | 'fileUrl'
+      | 'note'
+    > & {
+      _id: string;
+    };
+
     /** 角色类型 0-客服 1-销售 2-操作 3-财务 4-经理 5-管理员 */
     type RoleType = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -288,29 +311,6 @@ declare namespace Api {
       id: number;
     };
 
-    /** menu node of role permission tree */
-    interface RoleMenuNode {
-      id: number;
-      /** menu title */
-      title: string;
-      children?: RoleMenuNode[];
-    }
-
-    /** role permission tree, contains all menus and the checked menus of the role */
-    type RoleMenuTree = {
-      menus: RoleMenuNode[];
-      checkedMenuIds: number[];
-    };
-
-    /** role assign menu params */
-    type RoleAssignMenuParams = {
-      /** 角色 MongoId */
-      roleId: string;
-      menuIds: number[];
-      /** 角色分配的按钮权限码（前端按菜单勾选，需后端支持接收） */
-      buttonCodes?: string[];
-    };
-
     /** 站点类型：0-分公司 1-总公司 */
     type SiteType = 0 | 1;
 
@@ -386,11 +386,39 @@ declare namespace Api {
       _id: string;
     };
 
+    /** 站点关联客户（tms-user Customer 实体，/customer/query 返回；仅声明本功能使用字段） */
+    interface SiteCustomer {
+      /** 主键（MongoId 字符串） */
+      _id: string;
+      /** 客户编码，唯一 */
+      code: string;
+      /** 客户名称 */
+      name: string;
+      /** 网站账号 */
+      account?: string;
+      /** 所属站点 id */
+      siteId?: string;
+      /** 所属站点名称（后端冗余字段） */
+      site?: string;
+      /** 是否启用 0-否 1-是 */
+      status: Api.Common.EnableStatus;
+      /** 创建时间（毫秒时间戳） */
+      createDate: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate: number;
+    }
+
+    /** 站点关联客户列表（/customer/query 返回 ret：{ list, total }） */
+    type SiteCustomerList = {
+      list: SiteCustomer[];
+      total: number;
+    };
+
     /** 操作端（tms-user OpLog.client） */
     type OpLogClient = 0 | 1 | 2 | 3; // 0-TMS 1-PC 2-PDA 3-OMS
 
     /** 操作类型（tms-user OpLog.opType） */
-    type OpLogOpType = 0 | 1 | 2 | 3; // 0-登录 1-修改 2-删除 3-退出
+    type OpLogOpType = 0 | 1 | 2 | 3 | 4; // 0-登录 1-修改 2-删除 3-退出 4-追踪
 
     /** 操作日志变更明细（OpLog.logs 项） */
     interface OpLogDetail {
@@ -582,145 +610,146 @@ declare namespace Api {
       id: number;
     };
 
-    /** 初始化数据分类：渠道类别 / 承运网络 / 计泡规则 / 操作配置 */
-    type InitDataCategory = 'channel' | 'network' | 'bubble' | 'operation';
-
-    /** 初始化数据项 */
-    interface InitDataItem {
-      id: number;
-      /** 所属分类 */
-      category: Api.SystemManage.InitDataCategory;
-      /** 中文名称 */
-      cnName: string;
-      /** 英文名称 */
-      enName: string;
-      /** 备注 */
-      remark: string;
-      /** 创建人 */
-      createByName: string;
-      /** 创建时间（YYYY-MM-DD） */
-      createTime: string;
-      /** 最后更新人 */
-      updateByName: string;
-      /** 最后更新时间（YYYY-MM-DD） */
-      updateTime: string;
-    }
-
-    /** 初始化数据列表 */
-    type InitDataList = Api.Common.PaginatingQueryRecord<InitDataItem>;
-
-    /** 初始化数据查询参数 */
-    type InitDataSearchParams = Api.Common.CommonSearchParams & {
-      category: Api.SystemManage.InitDataCategory;
-      cnName?: string;
-    };
-
-    /** 初始化数据新增参数 */
-    type InitDataCreateParams = {
-      category: Api.SystemManage.InitDataCategory;
-      cnName: string;
-      enName: string;
-      remark: string;
-    };
-
-    /** 初始化数据更新参数 */
-    type InitDataUpdateParams = InitDataCreateParams & {
-      id: number;
-    };
-
     /** 轨迹抓取 - 前 4 个同构子 tab 分类 */
     type TraceCaptureCategory = 'track-network' | 'track-transform' | 'track-keyword' | 'capture-time';
 
+    /** 追踪网络（系统设置 → 轨迹抓取 → 追踪网络，对应 tms-user /track-config/*，模型：轨迹抓取配置） */
     interface TraceConfigItem {
-      id: number;
-      category: Api.SystemManage.TraceCaptureCategory;
+      _id: string;
+      /** 网络名称（后端唯一） */
       name: string;
-      serverAddress: string;
-      systemType: string;
-      lastEditor: string;
-      editTime: string;
+      /** 系统类型：ups-UPS fedex-FedEx kdzs-快递助手 sd-速递 hl-华磊 k5-K5 kjv5-跨境v5 nm-钮门 ry-睿云 ydd-易抵达 xzh-新智慧 t6-T6 zgyz-中国邮政 track17-17track */
+      trackType?: string;
+      /** 地址 */
+      url?: string;
+      /** 账号 */
+      account?: string;
+      /** 密码 */
+      password?: string;
+      /** 秘钥 */
+      key?: string;
+      /** 网址 */
+      web?: string;
+      /** 渠道名称 */
+      channel?: string;
+      /** 账户号码 */
+      accountNo?: string;
+      /** 创建人名称 */
+      creator?: string;
+      /** 修改人名称 */
+      updateBy?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate?: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate?: number;
     }
 
-    type TraceConfigList = Api.Common.PaginatingQueryRecord<TraceConfigItem>;
-
-    type TraceConfigSearchParams = Api.Common.CommonSearchParams & {
-      category: Api.SystemManage.TraceCaptureCategory;
+    /** 追踪网络查询参数（tms-user queryCommon 契约，keyword 按 name 模糊匹配） */
+    type TraceConfigSearchParams = {
+      page?: number;
+      size?: number;
+      keyword?: string;
     };
 
-    type TraceConfigCreateParams = {
-      category: Api.SystemManage.TraceCaptureCategory;
+    /** 追踪网络查询返回 */
+    type TraceConfigList = {
+      list: TraceConfigItem[];
+      total: number;
+    };
+
+    type TraceConfigCreateParams = Partial<Omit<TraceConfigItem, '_id' | 'creator' | 'createDate'>> & {
       name: string;
-      serverAddress: string;
-      systemType: string;
     };
 
-    type TraceConfigUpdateParams = TraceConfigCreateParams & { id: number };
+    type TraceConfigUpdateParams = TraceConfigCreateParams & { _id: string };
 
-    /** 轨迹改造 - 时间格式预设：年月日 / 年-月-日 时分 / 年-月-日 时分:秒 */
-    type TraceTransformTimeFormat = 'ymd' | 'ymd-hm' | 'ymd-hms';
+    /** 异常轨迹（track-err-config）- 时间格式 0-年月日 1-年月日时分 2-年月日时分秒 */
+    type TraceTransformTimeType = 0 | 1 | 2;
 
-    /** 轨迹改造 - 异常状态定义（按关键词判断映射的标准化轨迹状态） */
+    /** 异常轨迹 - 异常状态定义（按关键词判断映射的标准化轨迹状态） */
     interface TraceTransformItem {
-      id: number;
+      /** 主键 */
+      _id: string;
       /** 状态名称 */
-      statusName: string;
+      name: string;
       /** 时间格式 */
-      timeFormat: Api.SystemManage.TraceTransformTimeFormat;
+      timeType: Api.SystemManage.TraceTransformTimeType;
       /** 服务地点 */
-      location: string;
+      place?: string;
       /** 详细描述 */
-      description: string;
-      /** 抓取轨迹关键词判断定义（多个关键词用中文逗号分隔） */
-      keywordDefinition: string;
-    }
-
-    type TraceTransformList = Api.Common.PaginatingQueryRecord<TraceTransformItem>;
-
-    type TraceTransformSearchParams = Api.Common.CommonSearchParams;
-
-    type TraceTransformCreateParams = Omit<Api.SystemManage.TraceTransformItem, 'id'>;
-
-    type TraceTransformUpdateParams = Api.SystemManage.TraceTransformItem;
-
-    /** 轨迹关键词 - 使用范围 */
-    type TraceKeywordScope = 'global' | 'site' | 'customer';
-
-    /** 轨迹关键词 - 运单状态 */
-    type TraceKeywordWaybillStatus = 'in-transit' | 'delivered' | 'exception' | 'returned';
-
-    /** 轨迹关键词 - 匹配规则（命中关键词组时把运单状态置为指定值） */
-    interface TraceKeywordItem {
-      id: number;
-      /** 规则名称 */
-      ruleName: string;
-      /** 使用范围 */
-      scope: Api.SystemManage.TraceKeywordScope;
-      /** 关键词组（多个关键词用中文逗号分隔） */
-      keywordGroup: string;
-      /** 运单状态 */
-      waybillStatus: Api.SystemManage.TraceKeywordWaybillStatus;
-      /** 启用状态：1 启用 / 0 禁用 */
-      enabled: Api.Common.EnableStatus;
+      desc?: string;
+      /** 抓取轨迹关键词判断定义 */
+      detectDesc?: string;
+      /** 创建人 */
+      creator?: string;
       /** 最后编辑 */
-      lastEditor: string;
-      /** 编辑时间 */
-      editTime: string;
+      updateBy?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate?: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate?: number;
     }
 
-    type TraceKeywordList = Api.Common.PaginatingQueryRecord<TraceKeywordItem>;
+    /** 异常轨迹列表（/track-err-config/query 全量返回，无 total） */
+    interface TraceTransformList {
+      list: Api.SystemManage.TraceTransformItem[];
+    }
 
-    type TraceKeywordSearchParams = Api.Common.CommonSearchParams;
+    /** 异常轨迹新增参数 */
+    type TraceTransformCreateParams = Pick<
+      Api.SystemManage.TraceTransformItem,
+      'name' | 'timeType' | 'place' | 'desc' | 'detectDesc'
+    >;
 
-    /** 轨迹关键词新增参数（审计字段由数据层生成） */
-    type TraceKeywordCreateParams = {
-      ruleName: string;
-      scope: Api.SystemManage.TraceKeywordScope;
-      keywordGroup: string;
-      waybillStatus: Api.SystemManage.TraceKeywordWaybillStatus;
-      enabled: Api.Common.EnableStatus;
+    type TraceTransformUpdateParams = Api.SystemManage.TraceTransformCreateParams & { _id: string };
+
+    /** 轨迹关键词 - 运单状态 50-转运中 60-已送达 70-异常件 80-已退件 */
+    type TraceKeywordOrderStatus = 50 | 60 | 70 | 80;
+
+    /** 轨迹关键词 - 匹配规则（命中关键词时把运单状态置为指定值） */
+    interface TraceKeywordItem {
+      /** 主键 */
+      _id: string;
+      /** 规则名称 */
+      name: string;
+      /** 全局通用 0-否 1-是 */
+      common: Api.Common.EnableStatus;
+      /** 关联追踪网络（track-config 的 _id 集合） */
+      configIds: string[];
+      /** 关键词 */
+      detectEvents: string[];
+      /** 运单状态 */
+      orderStatus: Api.SystemManage.TraceKeywordOrderStatus;
+      /** 创建人 */
+      creator?: string;
+      /** 最后编辑 */
+      updateBy?: string;
+      /** 创建时间（毫秒时间戳） */
+      createDate?: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate?: number;
+    }
+
+    /** 轨迹关键词列表（/track-status-config/query 返回） */
+    interface TraceKeywordList {
+      list: Api.SystemManage.TraceKeywordItem[];
+      total: number;
+    }
+
+    type TraceKeywordSearchParams = {
+      page: number;
+      size: number;
+      keyword?: string;
+      where?: Record<string, any>;
     };
 
-    type TraceKeywordUpdateParams = Api.SystemManage.TraceKeywordCreateParams & { id: number };
+    /** 轨迹关键词新增参数（审计字段由后端生成） */
+    type TraceKeywordCreateParams = Pick<
+      Api.SystemManage.TraceKeywordItem,
+      'name' | 'common' | 'configIds' | 'detectEvents' | 'orderStatus'
+    >;
+
+    type TraceKeywordUpdateParams = Api.SystemManage.TraceKeywordCreateParams & { _id: string };
 
     interface OperationTraceItem {
       id: number;
@@ -738,5 +767,44 @@ declare namespace Api {
     type OperationTraceCreateParams = Omit<Api.SystemManage.OperationTraceItem, 'id'>;
 
     type OperationTraceUpdateParams = Api.SystemManage.OperationTraceItem;
+
+    /** 操作轨迹配置项（track-op）：运单各操作节点的轨迹文案配置，节点固定 5 种，仅可整表批量编辑 */
+    interface TrackOpItem {
+      /** 主键 */
+      _id: string;
+      /** 操作节点 0-运单预报 1-运单揽收 2-运单入库 3-运单发货出库 4-运单派送出库 */
+      opType: number;
+      /** 时间格式 0-年月日 1-年月日时分 2-年月日时分秒 */
+      timeType: number;
+      /** 服务地点 */
+      place: string;
+      /** 详细描述 */
+      desc: string;
+      /** 是否发布 0-否 1-是 */
+      status: number;
+      /** 创建时间（毫秒时间戳） */
+      createDate: number;
+      /** 更新时间（毫秒时间戳） */
+      updateDate: number;
+    }
+
+    /** 操作轨迹配置列表（/track-op/query 返回） */
+    interface TrackOpList {
+      list: Api.SystemManage.TrackOpItem[];
+    }
+
+    /** 抓取时间 - 每日自动抓取配置（/track-schedule/get 返回单文档或 null） */
+    interface CaptureTimeConfig {
+      /** 执行时间（0-23 小时数组） */
+      exeTimes: number[];
+      /** 最后编辑 */
+      updateBy?: string;
+      /** 更新时间（毫秒时间戳） */
+      updateDate?: number;
+    }
+
+    type CaptureTimeConfigSaveParams = {
+      exeTimes: number[];
+    };
   }
 }

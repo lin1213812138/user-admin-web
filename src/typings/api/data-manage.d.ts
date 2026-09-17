@@ -18,7 +18,6 @@ declare namespace Api {
       | 'currency'
       | 'expense-type'
       | 'settlement'
-      | 'waybill'
       | 'address'
       | 'declaredGoods'
       | 'problemCategory'
@@ -85,10 +84,6 @@ declare namespace Api {
     interface FinanceSettlement extends MasterDataRow {
       name: string;
       period: string;
-    }
-    interface BusinessWaybill extends MasterDataRow {
-      code: string;
-      name: string;
     }
     interface BusinessAddress extends MasterDataRow {
       code: string;

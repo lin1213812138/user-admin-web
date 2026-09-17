@@ -13,6 +13,7 @@ const local: App.I18n.Schema = {
     add: 'Add',
     addSuccess: 'Add Success',
     saveSuccess: 'Save Success',
+    submitModify: 'Submit Changes',
     backToHome: 'Back to home',
     batchDelete: 'Batch Delete',
     cancel: 'Cancel',
@@ -49,6 +50,10 @@ const local: App.I18n.Schema = {
     confirmDelete: 'Are you sure you want to delete?',
     copy: 'Copy',
     chooseFile: 'Choose File',
+    upload: {
+      exceedSize: 'File size cannot exceed {size}MB',
+      draggerText: 'Click or drag files to this area to upload'
+    },
     copySuccess: 'Copied successfully',
     copyFailed: 'Copy failed',
     createSuccess: 'Created successfully',
@@ -305,12 +310,15 @@ const local: App.I18n.Schema = {
     'data-manage_basic': 'Basic',
     'data-manage_finance': 'Finance',
     'data-manage_business': 'Business',
+    'data-manage_no-rule': 'Number Data',
+    'data-manage_ship': 'Shipping Data',
     'system-manage_setting': 'System Settings',
     'system-manage_print-design': 'Design Label',
     'system-manage_label-designer': 'Label Designer',
     'channel-quote': 'Channel Quote',
     'channel-quote_receive': 'Receive Channel',
-    'channel-quote_ship': 'Ship Channel'
+    'channel-quote_ship': 'Ship Channel',
+    'personal-center': 'Personal Center'
   },
   page: {
     login: {
@@ -390,6 +398,12 @@ const local: App.I18n.Schema = {
         remark: 'Remark',
         wechatQrcode: 'WeChat QR Code',
         createTime: 'Create Time',
+        editPage: {
+          creator: 'Created',
+          update: 'Last Updated',
+          tabPerm: 'Permissions',
+          tabAccount: 'Account Config'
+        },
         form: {
           userNamePlaceholder: 'Please enter account',
           nickNamePlaceholder: 'Please enter user name',
@@ -445,6 +459,7 @@ const local: App.I18n.Schema = {
         },
         permission: 'Assign Permission',
         permissionTip: 'Check the menus that the role can access',
+        permissionDisabledTip: 'Super admin roles cannot be assigned permissions',
         searchMenuPlaceholder: 'Search menu name / route / permission',
         loadMenuFailed: 'Failed to load menu permissions',
         form: {
@@ -499,6 +514,12 @@ const local: App.I18n.Schema = {
         siteTypeHeadquarters: 'Headquarters',
         updateDate: 'Last Updated',
         keyword: 'Keyword',
+        relationUser: 'Related Users',
+        relationCustomer: 'Related Customers',
+        view: 'View',
+        customerCode: 'Customer Code',
+        customerName: 'Customer Name',
+        siteName: 'Site',
         form: {
           codePlaceholder: 'Please enter site code',
           namePlaceholder: 'Please enter site name',
@@ -534,7 +555,8 @@ const local: App.I18n.Schema = {
           login: 'Login',
           update: 'Update',
           del: 'Delete',
-          logout: 'Logout'
+          logout: 'Logout',
+          trace: 'Trace'
         },
         form: {
           dateRange: 'Operation Time',
@@ -600,11 +622,27 @@ const local: App.I18n.Schema = {
         }
       },
       setting: {
-        inputFormat: 'Input Format',
+        inputFormat: {
+          title: 'Input Format',
+          name: 'Format Name',
+          customerEnable: 'Customer Enabled',
+          isDefault: 'Default',
+          order: 'Sort',
+          yes: 'Yes',
+          no: 'No',
+          newTitle: 'New Input Format',
+          editTitle: 'Edit Input Format',
+          namePlaceholder: 'Please enter format name',
+          orderPlaceholder: 'Please enter sort',
+          lastOperation: 'Last Operator',
+          lastUpdateTime: 'Last Update Time',
+          remarkPlaceholder: 'Please enter remark'
+        },
         printFormat: {
           title: 'Print Format',
           listTitle: 'Print Format Type',
           name: 'Template Name',
+          category: 'Category',
           labelSize: 'Label Size',
           isDefault: 'Default',
           yes: 'Yes',
@@ -625,42 +663,44 @@ const local: App.I18n.Schema = {
         },
         exportFormat: {
           title: 'Export Format',
-          listTitle: 'Export Format Type',
           name: 'Template Name',
-          scope: 'Scope',
-          scopeInternal: 'Internal System',
-          scopeCustomer: 'Customer',
-          scopeAll: 'All',
-          fileName: 'Template File',
-          remark: 'Remark',
-          lastEditor: 'Last Editor',
-          editTime: 'Edit Time',
-          create: 'Create',
-          delete: 'Delete',
-          edit: 'Edit',
-          download: 'Download Template',
-          downloadFields: 'Download Field Template',
+          templateType: 'Template Type',
+          type: {
+            sysList: 'System List',
+            sendList: 'Shipping List',
+            billRec: 'Receivable Bill',
+            billPay: 'Payable Bill',
+            blLoadList: 'B/L Packing List',
+            blInvoice: 'B/L Invoice',
+            blFile: 'B/L Document',
+            blCustoms: 'Customs Documents',
+            shipOrder: 'Waybill Detail'
+          },
+          excelTemplate: 'Excel Template',
+          excelTemplateRequired: 'Please upload the Excel template',
+          thPos: 'Header Start Cell',
+          tdPos: 'Data Start Cell',
+          note: 'Remark',
+          lastOperation: 'Last Operation',
+          lastUpdateTime: 'Last Update Time',
+          download: 'Download',
+          downloadMissing: 'Template file does not exist, cannot download',
           newTitle: 'New Export Template',
           editTitle: 'Edit Export Template',
-          detailTitle: 'Export Template Detail',
-          hint: 'This template is called at [Business Operation - Business Management - Export]!',
-          downloadToast: 'Template download pending backend integration',
-          downloadFieldsToast: 'Field template download pending backend integration'
+          uploadParseSuccess: 'Parsed: {info} info fields / {list} list fields'
         },
-        waybillRule: 'Waybill Rule',
         traceCapture: {
           title: 'Trace Capture Config',
           subTab: {
             trackNetwork: 'Track Network',
             trackTransform: 'Track Transform',
             trackKeyword: 'Track Keyword',
-            captureTime: 'Capture Time',
-            operationTrace: 'Operation Trace'
+            captureTime: 'Capture Time'
           },
           col: {
             name: 'Name',
-            serverAddress: 'Server Address',
-            systemType: 'System Type',
+            trackType: 'System Type',
+            url: 'Server URL',
             lastEditor: 'Last Editor',
             editTime: 'Edit Time',
             node: 'Node',
@@ -671,18 +711,20 @@ const local: App.I18n.Schema = {
             statusName: 'Status Name',
             keywordDefinition: 'Trace Keyword Judgment Definition',
             ruleName: 'Rule Name',
-            scope: 'Scope',
+            common: 'Global Common',
+            trackNetworks: 'Track Networks',
             keywordGroup: 'Keyword Group',
-            waybillStatus: 'Waybill Status',
-            enabled: 'Enabled'
+            waybillStatus: 'Waybill Status'
           },
           form: {
-            name: 'Name',
+            name: 'Network Name',
             namePlaceholder: 'Please enter name',
-            serverAddress: 'Server Address',
-            serverAddressPlaceholder: 'Please enter server address',
-            systemType: 'System Type',
-            systemTypePlaceholder: 'Please enter system type',
+            trackType: 'System Type',
+            url: 'Server URL',
+            urlPlaceholder: 'Please enter server url',
+            fieldPlaceholder: 'Please enter',
+            web: 'Tracking URL',
+            webPlaceholder: 'Please enter tracking url',
             node: 'Node',
             nodePlaceholder: 'Please enter node',
             timeFormat: 'Time Format',
@@ -698,18 +740,14 @@ const local: App.I18n.Schema = {
             keywordDefinitionPlaceholder: 'Enter keywords, separate multiple keywords with commas',
             ruleName: 'Rule Name',
             ruleNamePlaceholder: 'Please enter rule name',
-            scope: 'Scope',
+            common: 'Global Common',
+            configIds: 'Track Networks',
+            configIdsPlaceholder: 'Please select track networks',
             keywordGroup: 'Keyword Group',
             keywordGroupPlaceholder: 'Enter keywords, separate multiple keywords with commas',
-            waybillStatus: 'Waybill Status',
-            enabled: 'Enabled'
+            waybillStatus: 'Waybill Status'
           },
           addRow: 'Add',
-          scopeOption: {
-            global: 'Global',
-            site: 'Specified Site',
-            customer: 'Specified Customer'
-          },
           waybillStatusOption: {
             inTransit: 'In Transit',
             delivered: 'Delivered',
@@ -722,24 +760,59 @@ const local: App.I18n.Schema = {
             ymdHms: 'Year-Month-Day Hour:Minute:Second'
           },
           createTitle: 'Create',
-          editTitle: 'Edit'
+          editTitle: 'Edit',
+          captureTime: {
+            entry: 'Capture Time Settings',
+            title: 'Capture Time Settings',
+            desc: 'The system will automatically capture tracks at the following times every day',
+            addTime: 'Add Time',
+            saveConfig: 'Save Config',
+            timePlaceholder: 'Please select time',
+            duplicateTime: 'Duplicate capture time exists',
+            emptyTime: 'Please select capture time',
+            col: {
+              log: 'Operation Log',
+              system: 'Operating System',
+              opType: 'Operation Type',
+              operator: 'Operator',
+              opTime: 'Operation Time'
+            }
+          }
         },
-        initData: {
-          title: 'Init Data',
-          basicInfoTitle: 'Basic Info',
-          basicInit: 'Basic Info Init',
-          businessInit: 'Business Data Init',
-          channel: 'Channel',
-          network: 'Carrier Network',
-          bubble: 'Volumetric Rule',
-          operation: 'Operation Config',
-          cnName: 'Chinese Name',
-          enName: 'English Name',
-          remark: 'Remark',
-          cnNamePlaceholder: 'Please enter Chinese name',
-          enNamePlaceholder: 'Please enter English name',
-          remarkPlaceholder: 'Please enter remark',
-          addRow: 'Add',
+        operationTrace: {
+          title: 'Operation Trace Config',
+          col: {
+            opType: 'Operation Node',
+            timeType: 'Time Format',
+            place: 'Service Location',
+            desc: 'Description',
+            status: 'Published'
+          },
+          placeOption: {
+            waybillOrigin: '[运单出发地]',
+            destination: '[目的地]'
+          },
+          addRow: 'Add Row',
+          opTypeOption: {
+            forecast: 'Waybill Forecast',
+            pickup: 'Waybill Pickup',
+            inbound: 'Waybill Inbound',
+            outbound: 'Waybill Outbound',
+            delivery: 'Waybill Delivery'
+          },
+          timeTypeOption: {
+            ymd: 'YYYY-MM-DD',
+            ymdHm: 'YYYY-MM-DD HH:mm',
+            ymdHms: 'YYYY-MM-DD HH:mm:ss'
+          },
+          batchSave: 'Batch Save',
+          saveSuccess: 'Saved',
+          saveFailed: 'Save failed'
+        },
+        basicConfig: {
+          title: 'Basic Config',
+          infoCard: 'Basic Information',
+          ruleCard: 'System Control',
           info: {
             companyName: 'Company Name',
             companyAddress: 'Company Address',
@@ -750,6 +823,25 @@ const local: App.I18n.Schema = {
             companyLogo: 'Company Logo',
             defaultOrigin: 'Default Origin',
             customerLogin: 'Customer Login'
+          },
+          rule: {
+            feeTotalStrategy: 'Total Fee Rounding Rule',
+            feeTotalCtrl: 'Negative Freight Allowed',
+            weightCtrl: 'Zero Weight Allowed',
+            noCtrl: 'Duplicate Internal No.',
+            channelNoCtrl: 'Duplicate Channel No.',
+            outInWeightDiffNotify: 'Notify Outbound < Inbound Weight',
+            outWeightDiffNotify: 'Outbound Weight Diff Threshold (KG)',
+            returnWeightDiffNotify: 'Return Weight Diff Threshold (KG)'
+          },
+          option: {
+            notRound: 'No Rounding (2 decimals)',
+            roundDown: 'Round Down',
+            roundHalfUp: 'Round Half Up',
+            allow: 'Allow',
+            deny: 'Not Allow',
+            notify: 'Notify',
+            notNotify: 'No Notify'
           }
         },
         fieldMapping: 'Field Mapping',
@@ -879,6 +971,30 @@ const local: App.I18n.Schema = {
         selectTemplate: 'Select Template'
       }
     },
+    order: {
+      packTypeOption: {
+        package: 'Package',
+        bag: 'Bag',
+        file: 'File'
+      },
+      packTypePlaceholder: 'Please select package type'
+    },
+    personalCenter: {
+      profileInfo: 'Basic Info',
+      changePassword: 'Change Password',
+      accountInfo: 'Account Info',
+      profileForm: 'Profile',
+      newPassword: 'New Password',
+      confirmPassword: 'Confirm Password',
+      form: {
+        newPasswordPlaceholder: 'Please enter the new password',
+        confirmPasswordPlaceholder: 'Please enter the new password again'
+      },
+      passwordNotMatch: 'The two passwords entered do not match',
+      backendNotOpen:
+        'Changing password is not available yet: the backend currently does not allow users to change their own password.',
+      editInfoDisabled: 'Your role is not allowed to edit personal information. Please contact the administrator.'
+    },
     dataManage: {
       common: {
         createTime: 'Created Time',
@@ -959,7 +1075,6 @@ const local: App.I18n.Schema = {
         code: 'Code',
         name: 'Name',
         form: { codePlaceholder: 'Enter code', namePlaceholder: 'Enter name' },
-        waybill: { title: 'Waybill Data' },
         address: { title: 'Address Book' },
         declaredGoods: { title: 'Declared Goods' },
         problemCategory: { title: 'Problem Category' },
@@ -968,6 +1083,108 @@ const local: App.I18n.Schema = {
         exportReason: { title: 'Export Reason' },
         clearanceMethod: { title: 'Clearance Method' },
         salesTerms: { title: 'Sales Terms' }
+      },
+      noRule: {
+        title: 'Number Rule',
+        name: 'Name',
+        prefix: 'Prefix',
+        suffix: 'Suffix',
+        start: 'Start Value',
+        end: 'End Value',
+        current: 'Current Value',
+        len: 'Digit Length',
+        checkType: 'Check Digit',
+        sysType: 'System Type',
+        sysTypeAll: 'All Types',
+        lastOperation: 'Last Operation',
+        lastUpdateTime: 'Last Update Time',
+        newTitle: 'New Number Rule',
+        editTitle: 'Edit Number Rule',
+        sysTypeForbidDelete: 'System-type rules cannot be deleted',
+        checkTypeOption: {
+          none: 'No Check Digit',
+          weighted: 'Weighted Check',
+          mod7: 'Mod 7 Check'
+        },
+        sysTypeOption: {
+          custom: 'Custom',
+          waybill: 'Waybill No.',
+          customer: 'Customer No.'
+        },
+        form: {
+          namePlaceholder: 'Enter rule name',
+          prefixPlaceholder: 'Enter prefix (auto uppercase on save)',
+          suffixPlaceholder: 'Enter suffix (auto uppercase on save)',
+          startPlaceholder: 'Enter start value',
+          endPlaceholder: 'Enter end value',
+          currentPlaceholder: 'Enter current value',
+          lenPlaceholder: 'Enter digit length',
+          notePlaceholder: 'Enter remark',
+          positiveInt: 'Please enter a positive integer'
+        }
+      },
+      ship: {
+        provider: {
+          title: 'Provider',
+          code: 'Provider Code',
+          name: 'Provider Name',
+          billMode: 'Settlement',
+          contact: 'Contact',
+          phone: 'Phone',
+          email: 'Email',
+          web: 'Website',
+          address: 'Address',
+          balance: 'Balance',
+          providerType: 'Provider Type',
+          typeOption: { out: 'Shipping Provider', send: 'Delivery Provider', bl: 'BL Provider', other: 'Misc Provider' }
+        },
+        channelGroup: {
+          title: 'Channel Category',
+          name: 'Category Name',
+          nameEn: 'English Name',
+          order: 'Order'
+        },
+        weightRule: {
+          title: 'Weight Rule',
+          calcMode: 'Calc Mode',
+          mode: 'Calc Type',
+          weightOff: 'Volumetric Ratio',
+          cubicNum: 'Cubic Divisor',
+          order: 'Order',
+          calcModeOption: { byKg: 'By Weight', byCubic: 'By Volume' },
+          modeOption: {
+            m0: 'Sum of Real Weight',
+            m1: 'Sum of Volumetric Weight',
+            m2: 'Max of Totals',
+            m3: 'Sum of Chargeable Weight'
+          },
+          carry: 'Carry Rule',
+          carryOption: {
+            c0: 'Round Per-piece Real & Volumetric',
+            c1: 'Round Per-piece Chargeable',
+            c2: 'Round Shipment Totals',
+            c3: 'Round Shipment Chargeable'
+          },
+          carryGroup: 'Carry Group',
+          addCarryGroup: 'Add Carry Group',
+          addRule: 'Add Range',
+          removeCarryGroup: 'Remove Group',
+          removeRule: 'Remove',
+          start: 'Start Weight',
+          end: 'End Weight',
+          unit: 'Weight Unit'
+        },
+        carrier: {
+          title: 'Carrier Network',
+          name: 'Network Name',
+          weightRule: 'Weight Rule',
+          trackConfig: 'Track Config',
+          oilRate: 'Fuel Rate',
+          feeCustom: 'Customs Fee',
+          cubicNum: 'Cubic Divisor',
+          weightOff: 'Volumetric Ratio',
+          order: 'Order'
+        }
       }
     },
     channelQuote: {

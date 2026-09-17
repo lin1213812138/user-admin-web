@@ -3,10 +3,11 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { $t } from '@/locales';
 import { useLabelDesignStore } from '@/store/modules/label-design';
-import { mmToPt, parsePaper } from './modules/core/constant';
+import { dimensionsToSizeType } from '@/service/api/print-format/size-map';
+import { mmToPt, paperOfSizeType, parsePaper } from './modules/core/constant';
 import {
-  fetchGetPrintTemplateList,
   fetchGetPrintTemplateDetail,
+  fetchGetPrintTemplateList,
   fetchSavePrintTemplateDesign
 } from '@/service/api/print-format';
 import ToolBar from './modules/panels/tool-bar.vue';
@@ -19,35 +20,36 @@ const store = useLabelDesignStore();
 const route = useRoute();
 const previewVisible = ref(false);
 
-/** 打印格式列表「设计」带 query.id 进来时直接打开该模板；无 id（手输地址/调试）回退到分类下首个模板 */
-const queryId = Number(route.query.id ?? 0);
+/** 打印格式列表「设计」带 query.id 进来时直接打开该模板；无 id（手输地址/调试）回退到首个模板 */
+const queryId = String(route.query.id ?? '');
 const currentName = ref(String(route.query.name ?? ''));
-const templates = ref<{ label: string; value: number }[]>([]);
-const currentId = ref<number | null>(queryId || null);
+const templates = ref<{ label: string; value: string }[]>([]);
+const currentId = ref<string | null>(queryId || null);
+/** 当前模板（保存设计时需回带 templateType/templateMode，后端 update 必填） */
+const currentTemplate = ref<Api.PrintFormat.Template | null>(null);
 const loading = ref(false);
 
 async function loadTemplates() {
-  // DEV 下 print-format service 直接返回裸数据（与 prod 的 request 包裹形态不同），此处按裸数据消费
-  const list = (await fetchGetPrintTemplateList({
-    categoryId: 1,
-    current: 1,
-    size: 100
-  })) as unknown as Api.PrintFormat.List;
-  templates.value = list.records.map(r => ({ label: r.name, value: r.id }));
+  const { data: res } = await fetchGetPrintTemplateList({ page: 1, size: 100 });
+  templates.value = (res?.list ?? []).map(r => ({ label: r.name, value: r._id }));
   if (templates.value.length > 0 && currentId.value === null) {
     currentId.value = templates.value[0].value;
     await loadTemplate(currentId.value);
   }
 }
 
-async function loadTemplate(id: number) {
+async function loadTemplate(id: string) {
   loading.value = true;
   try {
-    const detail = (await fetchGetPrintTemplateDetail(id)) as unknown as Api.PrintFormat.Template;
+    const { data: detail, error } = await fetchGetPrintTemplateDetail(id);
+    if (error || !detail) throw new Error('template not found');
+    currentTemplate.value = detail;
     // 标题以详情为准回填，详情缺名称时保留 query 带入的名字
     currentName.value = detail.name || currentName.value;
-    store.loadFromJson(detail.designJson || '');
-    if (detail.paperSize) store.setPaper(detail.paperSize);
+    // design 为对象（旧数据可能是 JSON 字符串），统一转为设计器可解析的 JSON 字符串
+    const { design } = detail;
+    store.loadFromJson(typeof design === 'string' ? design : design ? JSON.stringify(design) : '');
+    store.setPaper(paperOfSizeType(detail.sizeType, detail.width, detail.height));
   } catch {
     window.$message?.error($t('page.manage.labelDesign.loadFailed'));
   } finally {
@@ -56,16 +58,26 @@ async function loadTemplate(id: number) {
 }
 
 async function handleSave() {
-  if (!currentId.value) return;
+  const tpl = currentTemplate.value;
+  if (!currentId.value || !tpl) return;
   loading.value = true;
   try {
-    const ok = (await fetchSavePrintTemplateDesign({
-      id: currentId.value,
-      designJson: store.toJson(),
-      paperSize: store.template.paperSize
-    })) as unknown as boolean;
-    if (ok) {
-      previewTemplateJson();
+    const design = JSON.parse(store.toJson()) as Record<string, unknown>;
+    const { w, h } = parsePaper(store.template.paperSize);
+    // design 顶层补 mm 宽高：后端 setGenerate 会用 design.width/height 覆盖模板宽高，保持一致
+    design.width = w;
+    design.height = h;
+    const { sizeType } = dimensionsToSizeType(w, h);
+    const { error } = await fetchSavePrintTemplateDesign({
+      _id: currentId.value,
+      templateType: tpl.templateType,
+      templateMode: tpl.templateMode,
+      sizeType,
+      width: w,
+      height: h,
+      design
+    });
+    if (!error) {
       window.$message?.success($t('page.manage.labelDesign.saveSuccess'));
     } else {
       window.$message?.error($t('page.manage.labelDesign.saveFailed'));
@@ -75,15 +87,6 @@ async function handleSave() {
   } finally {
     loading.value = false;
   }
-}
-
-/** 保存成功后在新标签页预览模板 JSON（Blob URL，浏览器原生 JSON 查看器渲染） */
-function previewTemplateJson() {
-  const blob = new Blob([store.toJson()], { type: 'application/json;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
-  // 延迟释放：新标签页加载完成前立即 revoke 会导致空白页
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 function toggleBodyScroll(disable: boolean) {

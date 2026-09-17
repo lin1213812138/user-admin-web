@@ -5,11 +5,12 @@ import type { PrintTemplate } from 'vue-plugin-hiprint';
 import { $t } from '@/locales';
 import { useRouterPush } from '@/hooks/common/router';
 import { fetchGetPrintTemplateDetail, fetchSavePrintTemplateDesign } from '@/service/api/print-format';
+import { dimensionsToSizeType } from '@/service/api/print-format/size-map';
 import FieldPanel from './modules/field-panel.vue';
 import PreviewModal from './modules/preview-modal.vue';
 import ToolBar from './modules/tool-bar.vue';
 import { basicElements } from './modules/basic-elements';
-import { parseLabelSize } from './modules/paper-sizes';
+import { parseLabelSize, paperOfSizeType } from './modules/paper-sizes';
 import { buildSampleData, printFieldGroups } from './modules/print-fields';
 import printLockCss from 'vue-plugin-hiprint/dist/print-lock.css?url';
 import {
@@ -23,7 +24,7 @@ import {
 const route = useRoute();
 const { routerPushByKey } = useRouterPush();
 
-const templateId = Number(route.query.id ?? 0);
+const templateId = String(route.query.id ?? '');
 const templateName = String(route.query.name ?? '');
 
 const MIN_SCALE = 0.2;
@@ -41,6 +42,8 @@ const saving = ref(false);
 const previewVisible = ref(false);
 const currentJson = ref('');
 const previewHtml = ref('');
+/** 当前模板（保存设计时需回带 templateType/templateMode，后端 update 必填） */
+const currentTemplate = ref<Api.PrintFormat.Template | null>(null);
 
 /** getHtml 的返回值在部分版本是 DTO / 数组，这里统一取字符串 */
 function toHtmlString(result: unknown): string {
@@ -215,13 +218,33 @@ function handleClear() {
 
 async function handleSave() {
   const instance = templateRef.value;
-  if (!instance || !templateId) return;
+  const tpl = currentTemplate.value;
+  if (!instance || !templateId || !tpl) return;
 
   saving.value = true;
   try {
-    currentJson.value = JSON.stringify(instance.getJson());
-    await fetchSavePrintTemplateDesign({ id: templateId, designJson: currentJson.value, paperSize: paperSize.value });
-    window.$message?.success($t('page.manage.printDesign.saveSuccess'));
+    const paper = parseLabelSize(paperSize.value);
+    const json = instance.getJson() as unknown;
+    // hiprint getJson 可能是数组（printPanels）或对象，统一包成对象；顶层补 mm 宽高与后端 setGenerate 对齐
+    const design: Record<string, unknown> = Array.isArray(json)
+      ? { panels: json }
+      : json && typeof json === 'object'
+        ? (json as Record<string, unknown>)
+        : {};
+    design.width = paper.width;
+    design.height = paper.height;
+    currentJson.value = JSON.stringify(design);
+    const { sizeType } = dimensionsToSizeType(paper.width, paper.height);
+    const { error } = await fetchSavePrintTemplateDesign({
+      _id: templateId,
+      templateType: tpl.templateType,
+      templateMode: tpl.templateMode,
+      sizeType,
+      width: paper.width,
+      height: paper.height,
+      design
+    });
+    if (!error) window.$message?.success($t('page.manage.printDesign.saveSuccess'));
   } finally {
     saving.value = false;
   }
@@ -270,17 +293,19 @@ onMounted(async () => {
   }
 
   try {
-    // 该模块 DEV 下返回裸数据（无 { data, error } 包裹），故此处直接断言为模板实体
-    const detail = (await fetchGetPrintTemplateDetail(templateId)) as Api.PrintFormat.Template;
-    paperSize.value = detail.paperSize || detail.labelSize;
+    const { data: detail, error } = await fetchGetPrintTemplateDetail(templateId);
+    if (error || !detail) throw new Error('template not found');
+    currentTemplate.value = detail;
+    paperSize.value = paperOfSizeType(detail.sizeType, detail.width, detail.height);
 
     const api = await initHiprint();
     apiRef.value = api;
 
+    // design 为对象（旧数据可能是 JSON 字符串），解析失败回退空模板
     let template: unknown = {};
-    if (detail.designJson) {
+    if (detail.design) {
       try {
-        template = JSON.parse(detail.designJson) as unknown;
+        template = typeof detail.design === 'string' ? JSON.parse(detail.design) : detail.design;
       } catch {
         template = {};
       }

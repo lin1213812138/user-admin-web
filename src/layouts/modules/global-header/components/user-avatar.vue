@@ -20,7 +20,7 @@ function loginOrRegister() {
   toLogin();
 }
 
-type DropdownKey = 'logout';
+type DropdownKey = 'logout' | 'personal-center';
 
 type DropdownOption =
   | {
@@ -35,6 +35,12 @@ type DropdownOption =
 
 const options = computed(() => {
   const opts: DropdownOption[] = [
+    {
+      label: $t('route.personal-center'),
+      key: 'personal-center',
+      icon: SvgIconVNode({ icon: 'mdi:account-circle-outline', fontSize: 18 })
+    },
+    { type: 'divider', key: 'divider' },
     {
       label: $t('common.logout'),
       key: 'logout',
@@ -78,6 +84,8 @@ function handleDropdown(key: DropdownKey) {
         <span v-if="!appStore.siderCollapse" class="text-16px font-medium whitespace-nowrap">
           {{ authStore.userInfo.userName }}
         </span>
+        <!-- 展开指示箭头：提示点击后向上弹出菜单（同 NDropdown placement="top"）；折叠态无文字不显示 -->
+        <SvgIcon v-if="!appStore.siderCollapse" icon="mdi:chevron-up" class="text-14px" />
       </ButtonIcon>
     </div>
   </NDropdown>

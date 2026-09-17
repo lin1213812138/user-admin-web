@@ -26,8 +26,12 @@ export function setupElegantRouter() {
 
       const constantRoutes: RouteKey[] = ['login', '403', '404', '500'];
 
-      /** 只在业务页面内跳转进入、不出现在菜单里的路由（标签设计器由「系统设置 → 打印格式 → 设计」进入） */
-      const hideInMenuRoutes: RouteKey[] = ['system-manage_print-design', 'system-manage_label-designer'];
+      /** 只在业务页面内跳转进入、不出现在菜单里的路由（标签设计器由「系统设置 → 打印格式 → 设计」进入；个人中心由侧栏底部下拉菜单进入） */
+      const hideInMenuRoutes: RouteKey[] = [
+        'system-manage_print-design',
+        'system-manage_label-designer',
+        'personal-center'
+      ];
 
       /** 不在菜单里、但需要点亮其它菜单项的路由（菜单选中 = hideInMenu ? activeMenu : name） */
       const menuActiveKeys: Partial<Record<RouteKey, RouteKey>> = {
@@ -51,6 +55,8 @@ export function setupElegantRouter() {
         'data-manage_basic': 'ic:baseline-inventory',
         'data-manage_finance': 'ic:baseline-account-balance-wallet',
         'data-manage_business': 'ic:baseline-warehouse',
+        'data-manage_no-rule': 'ic:round-numbers',
+        'data-manage_ship': 'ic:baseline-local-shipping',
         'channel-quote': 'ic:baseline-sell',
         'channel-quote_receive': 'ic:baseline-move-to-inbox',
         'channel-quote_ship': 'ic:baseline-local-shipping',
@@ -78,6 +84,12 @@ export function setupElegantRouter() {
         'system-manage_log': 6,
         // 客户管理模块
         'customer-manage_customer': 1,
+        // 资料管理模块（显式排序：单号资料稳定排在第四位）
+        'data-manage_basic': 1,
+        'data-manage_business': 2,
+        'data-manage_finance': 3,
+        'data-manage_no-rule': 4,
+        'data-manage_ship': 5,
         // 同图标：hideInMenu 后排序无展示效果，保留以便日后重新开放菜单入口
         'system-manage_label-designer': 5
       };

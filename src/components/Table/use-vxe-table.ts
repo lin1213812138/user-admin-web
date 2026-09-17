@@ -16,6 +16,8 @@ export interface VxeColumnConfig {
   sortable: boolean;
   /** mark as vxe-table tree-node column (renders indent + ▷ arrow) */
   treeNode?: boolean;
+  /** 自定义表头插槽名（如列全选复选框），插槽由业务页面提供 */
+  headerSlot?: string;
 }
 
 export type VxeColumnRenderColumn = {
@@ -33,6 +35,8 @@ export type VxeColumnRenderColumn = {
   sortable?: boolean;
   /** mark as vxe-table tree-node column (renders indent + ▷ arrow) */
   treeNode?: boolean;
+  /** 自定义表头插槽名（如列全选复选框），插槽由业务页面提供 */
+  headerSlot?: string;
 };
 
 export interface VxePagination {
@@ -113,7 +117,8 @@ export function useVxeTable<ResponseData, ApiData>(options: UseVxeTableOptions<R
         fixed: col.fixed || undefined,
         align: col.align,
         sortable: col.sortable,
-        treeNode: col.treeNode
+        treeNode: col.treeNode,
+        headerSlot: col.headerSlot
       }))
   );
 

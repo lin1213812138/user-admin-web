@@ -327,6 +327,7 @@ declare namespace App {
         add: string;
         addSuccess: string;
         saveSuccess: string;
+        submitModify: string;
         backToHome: string;
         batchDelete: string;
         cancel: string;
@@ -363,6 +364,10 @@ declare namespace App {
         confirmDelete: string;
         copy: string;
         chooseFile: string;
+        upload: {
+          exceedSize: string;
+          draggerText: string;
+        };
         copySuccess: string;
         copyFailed: string;
         createSuccess: string;
@@ -649,6 +654,12 @@ declare namespace App {
             remark: string;
             wechatQrcode: string;
             createTime: string;
+            editPage: {
+              creator: string;
+              update: string;
+              tabPerm: string;
+              tabAccount: string;
+            };
             form: {
               userNamePlaceholder: string;
               nickNamePlaceholder: string;
@@ -704,6 +715,7 @@ declare namespace App {
             };
             permission: string;
             permissionTip: string;
+            permissionDisabledTip: string;
             searchMenuPlaceholder: string;
             loadMenuFailed: string;
             form: {
@@ -758,6 +770,12 @@ declare namespace App {
             siteTypeHeadquarters: string;
             updateDate: string;
             keyword: string;
+            relationUser: string;
+            relationCustomer: string;
+            view: string;
+            customerCode: string;
+            customerName: string;
+            siteName: string;
             form: {
               codePlaceholder: string;
               namePlaceholder: string;
@@ -794,6 +812,7 @@ declare namespace App {
               update: string;
               del: string;
               logout: string;
+              trace: string;
             };
             form: {
               dateRange: string;
@@ -859,11 +878,27 @@ declare namespace App {
             };
           };
           setting: {
-            inputFormat: string;
+            inputFormat: {
+              title: string;
+              name: string;
+              customerEnable: string;
+              isDefault: string;
+              order: string;
+              yes: string;
+              no: string;
+              newTitle: string;
+              editTitle: string;
+              namePlaceholder: string;
+              orderPlaceholder: string;
+              lastOperation: string;
+              lastUpdateTime: string;
+              remarkPlaceholder: string;
+            };
             printFormat: {
               title: string;
               listTitle: string;
               name: string;
+              category: string;
               labelSize: string;
               isDefault: string;
               yes: string;
@@ -884,29 +919,32 @@ declare namespace App {
             };
             exportFormat: {
               title: string;
-              listTitle: string;
               name: string;
-              scope: string;
-              scopeInternal: string;
-              scopeCustomer: string;
-              scopeAll: string;
-              fileName: string;
-              remark: string;
-              lastEditor: string;
-              editTime: string;
-              create: string;
-              delete: string;
-              edit: string;
+              templateType: string;
+              type: {
+                sysList: string;
+                sendList: string;
+                billRec: string;
+                billPay: string;
+                blLoadList: string;
+                blInvoice: string;
+                blFile: string;
+                blCustoms: string;
+                shipOrder: string;
+              };
+              excelTemplate: string;
+              excelTemplateRequired: string;
+              thPos: string;
+              tdPos: string;
+              note: string;
+              lastOperation: string;
+              lastUpdateTime: string;
               download: string;
-              downloadFields: string;
+              downloadMissing: string;
               newTitle: string;
               editTitle: string;
-              detailTitle: string;
-              hint: string;
-              downloadToast: string;
-              downloadFieldsToast: string;
+              uploadParseSuccess: string;
             };
-            waybillRule: string;
             traceCapture: {
               title: string;
               subTab: {
@@ -914,12 +952,11 @@ declare namespace App {
                 trackTransform: string;
                 trackKeyword: string;
                 captureTime: string;
-                operationTrace: string;
               };
               col: {
                 name: string;
-                serverAddress: string;
-                systemType: string;
+                trackType: string;
+                url: string;
                 lastEditor: string;
                 editTime: string;
                 node: string;
@@ -930,18 +967,20 @@ declare namespace App {
                 statusName: string;
                 keywordDefinition: string;
                 ruleName: string;
-                scope: string;
+                common: string;
+                trackNetworks: string;
                 keywordGroup: string;
                 waybillStatus: string;
-                enabled: string;
               };
               form: {
                 name: string;
                 namePlaceholder: string;
-                serverAddress: string;
-                serverAddressPlaceholder: string;
-                systemType: string;
-                systemTypePlaceholder: string;
+                trackType: string;
+                url: string;
+                urlPlaceholder: string;
+                fieldPlaceholder: string;
+                web: string;
+                webPlaceholder: string;
                 node: string;
                 nodePlaceholder: string;
                 timeFormat: string;
@@ -957,18 +996,14 @@ declare namespace App {
                 keywordDefinitionPlaceholder: string;
                 ruleName: string;
                 ruleNamePlaceholder: string;
-                scope: string;
+                common: string;
+                configIds: string;
+                configIdsPlaceholder: string;
                 keywordGroup: string;
                 keywordGroupPlaceholder: string;
                 waybillStatus: string;
-                enabled: string;
               };
               addRow: string;
-              scopeOption: {
-                global: string;
-                site: string;
-                customer: string;
-              };
               waybillStatusOption: {
                 inTransit: string;
                 delivered: string;
@@ -982,23 +1017,58 @@ declare namespace App {
               };
               createTitle: string;
               editTitle: string;
+              captureTime: {
+                entry: string;
+                title: string;
+                desc: string;
+                addTime: string;
+                saveConfig: string;
+                timePlaceholder: string;
+                duplicateTime: string;
+                emptyTime: string;
+                col: {
+                  log: string;
+                  system: string;
+                  opType: string;
+                  operator: string;
+                  opTime: string;
+                };
+              };
             };
-            initData: {
+            operationTrace: {
               title: string;
-              basicInfoTitle: string;
-              basicInit: string;
-              businessInit: string;
-              channel: string;
-              network: string;
-              bubble: string;
-              operation: string;
-              cnName: string;
-              enName: string;
-              remark: string;
-              cnNamePlaceholder: string;
-              enNamePlaceholder: string;
-              remarkPlaceholder: string;
+              col: {
+                opType: string;
+                timeType: string;
+                place: string;
+                desc: string;
+                status: string;
+              };
+              placeOption: {
+                waybillOrigin: string;
+                destination: string;
+              };
               addRow: string;
+              opTypeOption: {
+                forecast: string;
+                pickup: string;
+                inbound: string;
+                outbound: string;
+                delivery: string;
+              };
+              timeTypeOption: {
+                ymd: string;
+                ymdHm: string;
+                ymdHms: string;
+              };
+              batchSave: string;
+              saveSuccess: string;
+              saveFailed: string;
+            };
+            basicConfig: {
+              title: string;
+              infoCard: string;
+              ruleCard: string;
               info: {
                 companyName: string;
                 companyAddress: string;
@@ -1009,6 +1079,25 @@ declare namespace App {
                 companyLogo: string;
                 defaultOrigin: string;
                 customerLogin: string;
+              };
+              rule: {
+                feeTotalStrategy: string;
+                feeTotalCtrl: string;
+                weightCtrl: string;
+                noCtrl: string;
+                channelNoCtrl: string;
+                outInWeightDiffNotify: string;
+                outWeightDiffNotify: string;
+                returnWeightDiffNotify: string;
+              };
+              option: {
+                notRound: string;
+                roundDown: string;
+                roundHalfUp: string;
+                allow: string;
+                deny: string;
+                notify: string;
+                notNotify: string;
               };
             };
             fieldMapping: string;
@@ -1138,6 +1227,29 @@ declare namespace App {
             selectTemplate: string;
           };
         };
+        order: {
+          packTypeOption: {
+            package: string;
+            bag: string;
+            file: string;
+          };
+          packTypePlaceholder: string;
+        };
+        personalCenter: {
+          profileInfo: string;
+          changePassword: string;
+          accountInfo: string;
+          profileForm: string;
+          newPassword: string;
+          confirmPassword: string;
+          form: {
+            newPasswordPlaceholder: string;
+            confirmPasswordPlaceholder: string;
+          };
+          passwordNotMatch: string;
+          backendNotOpen: string;
+          editInfoDisabled: string;
+        };
         dataManage: {
           common: {
             createTime: string;
@@ -1218,7 +1330,6 @@ declare namespace App {
             code: string;
             name: string;
             form: { codePlaceholder: string; namePlaceholder: string };
-            waybill: { title: string };
             address: { title: string };
             declaredGoods: { title: string };
             problemCategory: { title: string };
@@ -1227,6 +1338,98 @@ declare namespace App {
             exportReason: { title: string };
             clearanceMethod: { title: string };
             salesTerms: { title: string };
+          };
+          noRule: {
+            title: string;
+            name: string;
+            prefix: string;
+            suffix: string;
+            start: string;
+            end: string;
+            current: string;
+            len: string;
+            checkType: string;
+            sysType: string;
+            sysTypeAll: string;
+            lastOperation: string;
+            lastUpdateTime: string;
+            newTitle: string;
+            editTitle: string;
+            sysTypeForbidDelete: string;
+            checkTypeOption: {
+              none: string;
+              weighted: string;
+              mod7: string;
+            };
+            sysTypeOption: {
+              custom: string;
+              waybill: string;
+              customer: string;
+            };
+            form: {
+              namePlaceholder: string;
+              prefixPlaceholder: string;
+              suffixPlaceholder: string;
+              startPlaceholder: string;
+              endPlaceholder: string;
+              currentPlaceholder: string;
+              lenPlaceholder: string;
+              notePlaceholder: string;
+              positiveInt: string;
+            };
+          };
+          ship: {
+            provider: {
+              title: string;
+              code: string;
+              name: string;
+              billMode: string;
+              contact: string;
+              phone: string;
+              email: string;
+              web: string;
+              address: string;
+              balance: string;
+              providerType: string;
+              typeOption: { out: string; send: string; bl: string; other: string };
+            };
+            channelGroup: {
+              title: string;
+              name: string;
+              nameEn: string;
+              order: string;
+            };
+            weightRule: {
+              title: string;
+              calcMode: string;
+              mode: string;
+              weightOff: string;
+              cubicNum: string;
+              order: string;
+              calcModeOption: { byKg: string; byCubic: string };
+              modeOption: { m0: string; m1: string; m2: string; m3: string };
+              carry: string;
+              carryOption: { c0: string; c1: string; c2: string; c3: string };
+              carryGroup: string;
+              addCarryGroup: string;
+              addRule: string;
+              removeCarryGroup: string;
+              removeRule: string;
+              start: string;
+              end: string;
+              unit: string;
+            };
+            carrier: {
+              title: string;
+              name: string;
+              weightRule: string;
+              trackConfig: string;
+              oilRate: string;
+              feeCustom: string;
+              cubicNum: string;
+              weightOff: string;
+              order: string;
+            };
           };
         };
         channelQuote: {

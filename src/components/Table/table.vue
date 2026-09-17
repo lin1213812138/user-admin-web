@@ -46,11 +46,13 @@ interface Props {
   treeConfig?: VxeTablePropTypes.TreeConfig;
   /** vxe-table checkbox-config, e.g. { checkStrictly: false, checkField: 'checked' } for cascaded tree checkbox */
   checkboxConfig?: VxeTablePropTypes.CheckboxConfig;
-  /** vxe-table row-config, default { isHover: true, height: 40 } */
-  // rowConfig?: VxeTablePropTypes.RowConfig;
+  /** vxe-table row-config，如 { keyField: 'id' }；树表展开、勾选保留等按 rowid 索引的状态必须配置 keyField，否则行对象重建后状态会整体丢失 */
+  rowConfig?: VxeTablePropTypes.RowConfig;
   cellConfig?: VxeTablePropTypes.CellConfig;
   /** vxe-table header-cell-config, e.g. { height: 35 } to align fixed columns' header */
   headerCellConfig?: VxeTablePropTypes.HeaderCellConfig;
+  /** search-action 快速搜索栏贴边：卡片向上/左/右各外扩 16px，抵消父容器（GlobalContent / VerticalTabLayout）默认 p-16px，使卡片通栏贴边 */
+  searchActionFlush?: boolean;
   /** 搜索栏配置项，传入即启用内嵌可折叠搜索栏（由所有使用本表格的页面各自配置） */
   searchItems?: FormItemConfig[];
   /** 搜索表单数据对象（按引用传递，由父页面持有并在取数时读取） */
@@ -84,6 +86,7 @@ const props = withDefaults(defineProps<Props>(), {
   rowConfig: undefined,
   cellConfig: undefined,
   headerCellConfig: undefined,
+  searchActionFlush: true,
   searchItems: undefined,
   searchModel: undefined,
   searchDefaultCollapsed: true,
@@ -244,9 +247,10 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
          与 searchItems/SearchBar 完整搜索栏互不依赖，二者可并存（插槽在上、完整搜索栏在下）；
          想用自己的搜索栏时不传 searchItems 即不会出现默认搜索/重置按钮。
          卡片阴影用 shadow-sm；圆角不写死（不用 card-wrapper，其 rd-8px 会覆盖主题圆角），
-         跟随 NCard 主题圆角（themeRadius），暗黑模式自动适配
+         跟随 NCard 主题圆角（themeRadius），暗黑模式自动适配；
+        searchActionFlush 开启时卡片向上/左/右各外扩 16px，抵消父容器默认 p-16px 实现通栏贴边
 -->
-    <div v-if="$slots['search-action']" class="mb-12px">
+    <div v-if="$slots['search-action']" class="mb-12px" :class="searchActionFlush ? '-mx-16px -mt-16px' : ''">
       <NCard :bordered="false" class="shadow-sm" :content-style="{ padding: '12px 16px' }">
         <slot name="search-action" :refresh="refresh" />
       </NCard>
@@ -302,6 +306,7 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         :border="border"
         :stripe="stripe"
         :cell-config="finalCellConfig"
+        :row-config="rowConfig"
         :column-config="{ resizable: true }"
         :sort-config="{ trigger: 'cell' }"
         :seq-config="{ startIndex: seqStartIndex }"
@@ -336,6 +341,9 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
           :sortable="col.sortable"
           :tree-node="col.treeNode"
         >
+          <template v-if="col.headerSlot && $slots[col.headerSlot]" #header>
+            <slot :name="col.headerSlot" />
+          </template>
           <template v-if="$slots[col.key]" #default="scope">
             <slot :name="col.key" v-bind="scope" />
           </template>

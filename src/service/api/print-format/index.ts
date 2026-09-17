@@ -1,175 +1,72 @@
 import { request } from '../../request';
 
-/** 内存 mock 库（DEV 持久化增删改） */
-let mockSeq = 200;
-const mockDb: Api.PrintFormat.Template[] = [
-  {
-    id: 1,
-    categoryId: 1,
-    name: '标准内单标签',
-    labelSize: '100×150mm',
-    isDefault: 1,
-    generatedCount: 1280,
-    remark: '默认内单',
-    lastEditor: 'admin',
-    editTime: '2026-08-01 10:20',
-    designJson: '',
-    paperSize: '100×150mm'
-  },
-  {
-    id: 2,
-    categoryId: 1,
-    name: '热敏内单',
-    labelSize: '80×60mm',
-    isDefault: 0,
-    generatedCount: 320,
-    remark: '',
-    lastEditor: 'admin',
-    editTime: '2026-08-12 14:05',
-    designJson: '',
-    paperSize: '80×60mm'
-  },
-  {
-    id: 3,
-    categoryId: 2,
-    name: '标准转单标签',
-    labelSize: '100×150mm',
-    isDefault: 1,
-    generatedCount: 640,
-    remark: '转单专用',
-    lastEditor: 'admin',
-    editTime: '2026-08-03 09:30',
-    designJson: '',
-    paperSize: '100×150mm'
-  },
-  {
-    id: 4,
-    categoryId: 3,
-    name: '商业发票',
-    labelSize: 'A4',
-    isDefault: 1,
-    generatedCount: 88,
-    remark: '形式发票',
-    lastEditor: 'admin',
-    editTime: '2026-07-20 16:40',
-    designJson: '',
-    paperSize: 'A4'
-  },
-  {
-    id: 5,
-    categoryId: 4,
-    name: '总单主标',
-    labelSize: '100×100mm',
-    isDefault: 1,
-    generatedCount: 1500,
-    remark: '汇总总单',
-    lastEditor: 'admin',
-    editTime: '2026-08-15 11:00',
-    designJson: '',
-    paperSize: '100×100mm'
-  },
-  {
-    id: 6,
-    categoryId: 4,
-    name: '总单副标',
-    labelSize: '100×100mm',
-    isDefault: 0,
-    generatedCount: 210,
-    remark: '',
-    lastEditor: 'admin',
-    editTime: '2026-08-18 13:25',
-    designJson: '',
-    paperSize: '100×100mm'
-  }
-];
+/**
+ * 打印格式（打印模板）接口，全部为 wms-user 真实接口（路由前缀 /tms/api/v1/web）。
+ * 均为 flat request，调用方需解包 { data, error }。
+ */
 
-function now(): string {
-  const d = new Date();
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+/** 获取打印模板列表（/print-template/query，返回 ret:{ list, total }，列表项不含 design 等大字段） */
+export function fetchGetPrintTemplateList(params: Api.PrintFormat.SearchParams) {
+  return request<Api.PrintFormat.List>({
+    url: '/print-template/query',
+    method: 'post',
+    data: params
+  });
 }
 
-function mockList(params: { categoryId: number; current: number; size: number }) {
-  const list = mockDb.filter(t => t.categoryId === params.categoryId);
-  const start = (params.current - 1) * params.size;
-  return Promise.resolve({ records: list.slice(start, start + params.size), total: list.length });
+/** 获取模板详情（/print-template/get，含 design 等完整字段） */
+export function fetchGetPrintTemplateDetail(id: string) {
+  return request<Api.PrintFormat.Template>({
+    url: '/print-template/get',
+    method: 'post',
+    data: { _id: id }
+  });
 }
 
-/** 获取打印模板列表（按分类过滤 + 分页） */
-export function fetchGetPrintTemplateList(params: { categoryId: number; current: number; size: number }) {
-  if (import.meta.env.DEV) {
-    return mockList(params) as unknown as Promise<Api.PrintFormat.List>;
-  }
-  return request<Api.PrintFormat.List>({ url: '/print/template/list', method: 'post', data: params });
+/** 新建模板（/print-template/create；名称全局唯一，isDefault=1 时同类型互斥） */
+export function fetchCreatePrintTemplate(params: Api.PrintFormat.SaveParams) {
+  return request<Api.PrintFormat.Template>({
+    url: '/print-template/create',
+    method: 'post',
+    data: params
+  });
 }
 
-/** 新建模板 */
-export function fetchCreatePrintTemplate(params: Api.PrintFormat.CreateParams) {
-  if (import.meta.env.DEV) {
-    const id = ++mockSeq;
-    const row: Api.PrintFormat.Template = { ...params, id, generatedCount: 0, lastEditor: 'admin', editTime: now() };
-    mockDb.push(row);
-    return Promise.resolve(row) as unknown as Promise<Api.PrintFormat.Template>;
-  }
-  return request<Api.PrintFormat.Template>({ url: '/print/template/create', method: 'post', data: params });
+/** 更新模板（/print-template/update；templateType/templateMode/sizeType 为后端必填） */
+export function fetchUpdatePrintTemplate(params: Api.PrintFormat.UpdateParams) {
+  return request<Api.PrintFormat.Template>({
+    url: '/print-template/update',
+    method: 'post',
+    data: params
+  });
 }
 
-/** 批量删除模板 */
-export function fetchDeletePrintTemplate(ids: number[]) {
-  if (import.meta.env.DEV) {
-    for (const id of ids) {
-      const idx = mockDb.findIndex(t => t.id === id);
-      if (idx >= 0) mockDb.splice(idx, 1);
-    }
-    return Promise.resolve(true) as unknown as Promise<boolean>;
-  }
-  return request<boolean>({ url: '/print/template/delete', method: 'post', data: { ids } });
+/** 复制模板（/print-template/copy/create；design 由服务端从原模板复制） */
+export function fetchCopyPrintTemplate(params: Api.PrintFormat.CopyParams) {
+  return request<Api.PrintFormat.Template>({
+    url: '/print-template/copy/create',
+    method: 'post',
+    data: params
+  });
 }
 
-/** 复制为模板（调用方已去掉 id） */
-export function fetchCopyPrintTemplate(params: Api.PrintFormat.CreateParams) {
-  if (import.meta.env.DEV) {
-    const id = ++mockSeq;
-    const row: Api.PrintFormat.Template = { ...params, id, generatedCount: 0, lastEditor: 'admin', editTime: now() };
-    mockDb.push(row);
-    return Promise.resolve(row) as unknown as Promise<Api.PrintFormat.Template>;
-  }
-  return request<Api.PrintFormat.Template>({ url: '/print/template/copy', method: 'post', data: params });
+/** 删除模板（/print-template/delete；后端仅支持单条 _id） */
+export function fetchDeletePrintTemplate(id: string) {
+  return request<boolean>({
+    url: '/print-template/delete',
+    method: 'post',
+    data: { _id: id }
+  });
 }
 
-/** 获取模板详情（含设计 JSON），返回裸数据，没有 { data, error } 包裹 */
-export function fetchGetPrintTemplateDetail(id: number) {
-  if (import.meta.env.DEV) {
-    const row = mockDb.find(t => t.id === id);
-    return row
-      ? (Promise.resolve(row) as unknown as Promise<Api.PrintFormat.Template>)
-      : (Promise.reject(new Error('template not found')) as unknown as Promise<Api.PrintFormat.Template>);
-  }
-  return request<Api.PrintFormat.Template>({ url: '/print/template/detail', method: 'post', data: { id } });
-}
-
-/** 保存设计器产物（模板 JSON + 纸张），返回裸数据 */
-export function fetchSavePrintTemplateDesign(params: { id: number; designJson: string; paperSize: string }) {
-  if (import.meta.env.DEV) {
-    const row = mockDb.find(t => t.id === params.id);
-    if (row) {
-      row.designJson = params.designJson;
-      row.paperSize = params.paperSize;
-      row.lastEditor = 'admin';
-      row.editTime = now();
-    }
-    return Promise.resolve(Boolean(row)) as unknown as Promise<boolean>;
-  }
-  return request<boolean>({ url: '/print/template/saveDesign', method: 'post', data: params });
-}
-
-/** 设为默认（同分类互斥） */
-export function fetchSetDefaultPrintTemplate(params: { id: number; categoryId: number }) {
-  if (import.meta.env.DEV) {
-    mockDb.forEach(t => {
-      if (t.categoryId === params.categoryId) t.isDefault = t.id === params.id ? 1 : 0;
-    });
-    return Promise.resolve(true) as unknown as Promise<boolean>;
-  }
-  return request<boolean>({ url: '/print/template/setDefault', method: 'post', data: params });
+/**
+ * 保存设计器产物（即 /print-template/update：design + 顶层 mm 宽高）。
+ * 后端 setGenerate 在 design 非空时会用 design.width/height 覆盖宽高，故 design 顶层需带实际 mm 尺寸。
+ */
+export function fetchSavePrintTemplateDesign(params: Api.PrintFormat.SaveDesignParams) {
+  return request<boolean>({
+    url: '/print-template/update',
+    method: 'post',
+    data: params
+  });
 }

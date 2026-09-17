@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   confirmText: '',
   cancelText: '',
-  closeOnMask: true
+  closeOnMask: false
 });
 
 const emit = defineEmits<{

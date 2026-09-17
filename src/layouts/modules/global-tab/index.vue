@@ -3,8 +3,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useElementBounding } from '@vueuse/core';
 import { PageTab } from '@sa/materials';
-// 刷新/全屏按钮下线期间 appStore 无引用，恢复按钮时一并取消注释
-// import { useAppStore } from '@/store/modules/app';
+import { useAppStore } from '@/store/modules/app';
 import { useThemeStore } from '@/store/modules/theme';
 import { useTabStore } from '@/store/modules/tab';
 import { isPC } from '@/utils/agent';
@@ -17,7 +16,7 @@ defineOptions({
 });
 
 const route = useRoute();
-// const appStore = useAppStore();
+const appStore = useAppStore();
 const themeStore = useThemeStore();
 const tabStore = useTabStore();
 
@@ -108,9 +107,9 @@ function switchTab(e: MouseEvent, tab: App.Global.Tab) {
   tabStore.switchRouteByTab(tab);
 }
 
-// async function refresh() {
-//   appStore.reloadPage(500);
-// }
+async function refresh() {
+  appStore.reloadPage(500);
+}
 
 interface DropdownConfig {
   visible: boolean;
@@ -220,12 +219,13 @@ init();
       </BetterScroll>
     </div>
     <!--
-      刷新/全屏按钮先注释下线，恢复时取消注释
-      <ReloadButton :loading="!appStore.reloadFlag" @click="refresh" />
+      全屏按钮继续下线，恢复时取消注释
       <FullScreen :full="appStore.fullContent" @click="appStore.toggleFullContent" />
     -->
+    <LangSwitch :lang="appStore.locale" :lang-options="appStore.localeOptions" @change-lang="appStore.changeLocale" />
     <ThemeSchemaSwitch :theme-schema="themeStore.themeScheme" @switch="themeStore.toggleThemeScheme" />
     <ThemeButton />
+    <ReloadButton :loading="!appStore.reloadFlag" @click="refresh" />
   </DarkModeContainer>
   <ContextMenu
     :visible="dropdown.visible"

@@ -112,9 +112,9 @@ function opTypeText(value?: Api.SystemManage.OpLogOpType) {
   return value === undefined ? '--' : (opTypeOptions[value]?.label ?? '--');
 }
 
-/** 操作类型标签色（0-登录 1-修改 2-删除 3-退出） */
+/** 操作类型标签色（0-登录 1-修改 2-删除 3-退出；4-追踪为 OpLogOpType 扩展值，越界时兜底 default） */
 function opTypeTagType(value?: Api.SystemManage.OpLogOpType) {
-  const map = ['primary', 'info', 'error', 'default'] as const;
+  const map = ['primary', 'info', 'error', 'default', 'warning'] as const;
   return value === undefined ? 'default' : (map[value] ?? 'default');
 }
 

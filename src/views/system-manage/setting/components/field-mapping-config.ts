@@ -6,6 +6,8 @@ export interface FieldMappingField {
   label: string;
   /** 24 栅格宽度（1..24），同 FormItemConfig.span；缺省 6（一行 4 个） */
   span?: number;
+  /** 锁定字段：显示态不可取消（用于客户端固定字段），必填仍可切换 */
+  disabled?: boolean;
 }
 
 /** 字段映射分组 */
