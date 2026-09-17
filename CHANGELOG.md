@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.0.10](https://github.com/lin1213812138/user-admin-web/compare/v0.0.9...v0.0.10) (2026-09-18)
+
+### &nbsp;&nbsp;&nbsp;🚀 Features
+
+- 接入站点真实接口并重构布局与菜单 &nbsp;-&nbsp; by **LINFLY** [<samp>(7d667)</samp>](https://github.com/lin1213812138/user-admin-web/commit/7d66741)
+- **资料管理**: 按脑图重构资料分组并新增提单资料 &nbsp;-&nbsp; by **林翔** [<samp>(61eb4)</samp>](https://github.com/lin1213812138/user-admin-web/commit/61eb47c)
+
+### &nbsp;&nbsp;&nbsp;💅 Refactors
+
+- **service**: 按模块拆分 api 目录并同步 i18n 文案 &nbsp;-&nbsp; by **林翔** [<samp>(063c0)</samp>](https://github.com/lin1213812138/user-admin-web/commit/063c0b9)
+
+### &nbsp;&nbsp;&nbsp;📖 Documentation
+
+- **memory**: 精简记忆文档并新增 2026-09-17 日报 &nbsp;-&nbsp; by **LINFLY** [<samp>(1133e)</samp>](https://github.com/lin1213812138/user-admin-web/commit/1133e4c)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[林翔](mailto:2276928094@qq.com)
+
 ## [v0.0.9](https://github.com/lin1213812138/user-admin-web/compare/v0.0.8...v0.0.9) (2026-09-16)
 
 ### &nbsp;&nbsp;&nbsp;🐞 Bug Fixes
