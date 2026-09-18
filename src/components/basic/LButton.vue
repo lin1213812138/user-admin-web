@@ -25,6 +25,7 @@
  * - 其余属性、插槽（#default / #icon）、事件全部透传给 NButton
  */
 import { computed, useAttrs } from 'vue';
+import { useAuth } from '@/hooks/business/auth';
 import type { CSSProperties } from 'vue';
 import { createReusableTemplate } from '@vueuse/core';
 import type { ButtonProps, PopoverPlacement } from 'naive-ui';
@@ -34,9 +35,13 @@ defineOptions({
   inheritAttrs: false
 });
 
-// ButtonProps 是派生类型，SFC 编译器无法解析其成员，用 @vue-ignore 跳过：
+// ButtonProps 是派生类型，SFC 编译器无法解析其成员，只能在 extends 处加行内忽略标记跳过（见下一行）。
+// 注意：该忽略标记的关键字不要出现在注释里——编译器会把"声明上方注释含该关键字"识别为"整块忽略"，
+// 从而丢弃本 interface 声明的全部 props（曾导致 auth/size/circle/tooltip 全部失效）。
 // 未显式声明的 NButton 属性运行期走 $attrs 透传，编译期仍由 ButtonProps 提供类型提示
 interface Props extends /* @vue-ignore */ ButtonProps {
+  /** 权限码（单码或数组）；传入后当前用户无该权限时按钮整体不渲染。等价于 v-auth，但适用于 LButton 这种多根组件 */
+  auth?: string | string[];
   /** 按钮尺寸：不传时为默认档（高度固定 32px），传值时沿用组件库高度 */
   size?: 'tiny' | 'small' | 'medium' | 'large';
   /** 文字按钮：naive 对 text 按钮刻意不设高度，不做干预 */
@@ -55,6 +60,7 @@ interface Props extends /* @vue-ignore */ ButtonProps {
 
 const props = withDefaults(defineProps<Props>(), {
   // 不设默认尺寸：不传时由 NButton 走默认档，再由 fixedHeightStyle 固定为 32px
+  auth: undefined,
   size: undefined,
   tooltip: '',
   tooltipPlacement: 'bottom',
@@ -62,6 +68,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const [DefineButton, ReuseButton] = createReusableTemplate();
+
+const { hasAuth } = useAuth();
+
+/** 权限控制：传入 auth 且无权限时整段不渲染（多根组件无法用 v-auth 指令） */
+const visible = computed(() => (props.auth ? hasAuth(props.auth) : true));
 
 /** 未声明为 props 的属性（class / style / onClick 等） */
 const attrs = useAttrs();
@@ -91,30 +102,38 @@ const fixedHeightStyle = computed<CSSProperties | undefined>(() => {
 
 /** 透传给 NButton 的属性（剔除 LButton 自有属性） */
 const buttonProps = computed(() => {
-  const { tooltip: _tooltip, tooltipPlacement: _tooltipPlacement, tooltipZIndex: _tooltipZIndex, ...rest } = props;
+  const {
+    auth: _auth,
+    tooltip: _tooltip,
+    tooltipPlacement: _tooltipPlacement,
+    tooltipZIndex: _tooltipZIndex,
+    ...rest
+  } = props;
 
   return rest;
 });
 </script>
 
 <template>
-  <DefineButton>
-    <NButton v-bind="{ ...attrs, ...buttonProps }" :style="fixedHeightStyle">
-      <template v-for="name in Object.keys($slots)" #[name]="slotProps">
-        <slot :name="name" v-bind="slotProps || {}" />
-      </template>
-    </NButton>
-  </DefineButton>
+  <template v-if="visible">
+    <DefineButton>
+      <NButton v-bind="{ ...attrs, ...buttonProps }" :style="fixedHeightStyle">
+        <template v-for="name in Object.keys($slots)" #[name]="slotProps">
+          <slot :name="name" v-bind="slotProps || {}" />
+        </template>
+      </NButton>
+    </DefineButton>
 
-  <NTooltip v-if="props.tooltip" :placement="props.tooltipPlacement" :z-index="props.tooltipZIndex">
-    <template #trigger>
-      <!-- disabled 按钮不响应鼠标事件，垫一层 span 让 tooltip 仍能触发 -->
-      <span v-if="props.disabled" class="inline-flex"><ReuseButton /></span>
-      <ReuseButton v-else />
-    </template>
-    {{ props.tooltip }}
-  </NTooltip>
-  <ReuseButton v-else />
+    <NTooltip v-if="props.tooltip" :placement="props.tooltipPlacement" :z-index="props.tooltipZIndex">
+      <template #trigger>
+        <!-- disabled 按钮不响应鼠标事件，垫一层 span 让 tooltip 仍能触发 -->
+        <span v-if="props.disabled" class="inline-flex"><ReuseButton /></span>
+        <ReuseButton v-else />
+      </template>
+      {{ props.tooltip }}
+    </NTooltip>
+    <ReuseButton v-else />
+  </template>
 </template>
 
 <style scoped></style>

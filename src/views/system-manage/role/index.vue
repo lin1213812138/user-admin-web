@@ -351,9 +351,9 @@ function handleSubmitted() {
           <NTooltip :disabled="row.buildIn !== 1">
             <template #trigger>
               <span>
-                <NPopconfirm v-auth="'system:role:delete'" @positive-click="handleDelete([row])">
+                <NPopconfirm @positive-click="handleDelete([row])">
                   <template #trigger>
-                    <NButton size="small" type="error" text :disabled="row.buildIn === 1">
+                    <NButton v-auth="'system:role:delete'" size="small" type="error" text :disabled="row.buildIn === 1">
                       {{ $t('common.delete') }}
                     </NButton>
                   </template>

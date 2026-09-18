@@ -119,19 +119,12 @@ async function handleExport(payload: ExportConfirmPayload) {
 </script>
 
 <template>
-  <NButton
-    v-if="exportFields.length > 0"
-    type="success"
-    size="small"
-    ghost
-    :loading="exporting"
-    @click="visible = true"
-  >
+  <LButton v-if="exportFields.length > 0" type="success" :loading="exporting" @click="visible = true">
     <template #icon>
       <icon-mdi-download class="text-icon" />
     </template>
     {{ $t('common.export') }}
-  </NButton>
+  </LButton>
 
   <FieldSelectDialog
     v-model:visible="visible"

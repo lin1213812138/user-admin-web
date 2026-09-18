@@ -148,6 +148,13 @@ export const vAuth: Directive<HTMLElement, string | string[]> = {
 
 新增 `src/plugins/directive.ts` 负责 `app.directive('auth', vAuth)` 注册，挂在 `src/plugins/index.ts`（现有 6 个 export 后追加）。
 
+> **使用约束（防回归，2026-09-18 补充）**：`v-auth` 是自定义指令，只作用到组件的**单根元素**；挂在多根（Fragment）组件（`LButton` / `NPopconfirm` / `NTooltip` / 任意多根自定义组件）上时 Vue 会直接丢弃指令（dev 告警 `Runtime directive used on component with non-element root node. The directives will not function as intended`），导致权限完全不生效。
+>
+> - 多根组件需控制按钮权限时，优先用 `LButton` 的 `auth` prop（内部 `useAuth().hasAuth()`，无权限时整段不渲染）；
+> - 或把 `v-auth` 挂到多根组件内部的**单根触发元素**上（如 `NPopconfirm` / `NTooltip` 的 `#trigger` 插槽内 `NButton`、`#reference` 内元素）—— naive 会用 `cloneVNode` 保留该元素的 `dirs`，指令生效；
+> - 原生元素（`span` / `div`）与单根组件（`NButton` 根即 `<button>`）可直接用 `v-auth`。
+> - 详见修复设计 [`2026-09-18-v-auth-multroot-fix-design.md`](./2026-09-18-v-auth-multroot-fix-design.md)。
+
 ### 6.2 函数形式
 
 保留并改造 `src/hooks/business/auth.ts`：

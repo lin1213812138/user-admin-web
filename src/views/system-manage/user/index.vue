@@ -247,7 +247,7 @@ const relationCustomerColumns = [
         :show-checkbox="true"
         :show-action="true"
         :action-width="120"
-        action-export
+        :action-export="false"
         :export-filename="$t('route.system-manage_user')"
         @search="handleSearch"
         @reset="handleReset"
@@ -277,29 +277,23 @@ const relationCustomerColumns = [
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton v-auth="'system:user:add'" size="small" type="primary" ghost @click="openDrawer('create')">
+            <LButton auth="system:user:add" type="primary" @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
               {{ $t('common.add') }}
-            </NButton>
+            </LButton>
             <NPopconfirm
               :disabled="checkedRows.length === 0"
               @positive-click="handleDelete(checkedRows.map(i => i._id))"
             >
               <template #trigger>
-                <NButton
-                  v-auth="'system:user:delete'"
-                  size="small"
-                  type="error"
-                  ghost
-                  :disabled="checkedRows.length === 0"
-                >
+                <LButton v-auth="'system:user:delete'" type="error" :disabled="checkedRows.length === 0">
                   <template #icon>
                     <icon-mdi-delete class="text-icon" />
                   </template>
                   {{ $t('common.batchDelete') }}
-                </NButton>
+                </LButton>
               </template>
               {{ $t('common.confirmDelete') }}
             </NPopconfirm>
@@ -317,17 +311,16 @@ const relationCustomerColumns = [
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
+            <LButton circle @click="configVisible = true">
               <template #icon>
                 <icon-mdi-cog class="text-icon" />
               </template>
-              {{ $t('common.columnSetting') }}
-            </NButton>
-            <NButton size="small" @click="getData">
+            </LButton>
+            <LButton circle @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
@@ -335,17 +328,17 @@ const relationCustomerColumns = [
           <NButton v-auth="'system:user:edit'" size="small" type="primary" text @click="handleEdit(row)">
             {{ $t('common.edit') }}
           </NButton>
-          <NPopconfirm v-auth="'system:user:enableOrDisable'" @positive-click="handleToggleStatus(row)">
+          <NPopconfirm @positive-click="handleToggleStatus(row)">
             <template #trigger>
-              <NButton size="small" :type="row.status === 1 ? 'warning' : 'success'" text>
+              <NButton v-auth="'system:user:status'" size="small" :type="row.status === 1 ? 'warning' : 'success'" text>
                 {{ row.status === 1 ? $t('common.disable') : $t('common.enable') }}
               </NButton>
             </template>
             {{ row.status === 1 ? $t('common.confirmDisable') : $t('common.confirmEnable') }}
           </NPopconfirm>
-          <NPopconfirm v-auth="'system:user:delete'" @positive-click="handleDelete([row._id])">
+          <NPopconfirm @positive-click="handleDelete([row._id])">
             <template #trigger>
-              <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
+              <NButton v-auth="'system:user:delete'" size="small" type="error" text>{{ $t('common.delete') }}</NButton>
             </template>
             {{ $t('common.confirmDelete') }}
           </NPopconfirm>
