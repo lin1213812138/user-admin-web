@@ -907,6 +907,29 @@ declare namespace Api {
 
     type TraceConfigUpdateParams = TraceConfigCreateParams & { _id: string };
 
+    /** 轨迹信息改造规则（track-replace 模型，按 configId 归属某个追踪网络；oriStr/replaceStr 均可空，保存时过滤空行） */
+    interface TraceReplaceItem {
+      /** 已有规则有；新增空行无 */
+      _id?: string;
+      /** 原始字符串 */
+      oriStr?: string;
+      /** 替换字符串（可空=删除原串） */
+      replaceStr?: string;
+      /** 创建人（来自后端，只读展示） */
+      creator?: string;
+    }
+
+    /** 改造规则查询返回（/track-replace/query 全量返回，size 拉满） */
+    type TraceReplaceList = { list: Api.SystemManage.TraceReplaceItem[] };
+
+    /** 批量保存入参（与后端 /track-replace/batch/save 对齐） */
+    type TraceReplaceBatchSaveParams = {
+      /** 所属追踪网络 _id */
+      configId: string;
+      /** 规则列表（无 _id=新增，带 _id=更新；本地删除即从数组移除，后端按 _id 差集删除） */
+      list: Api.SystemManage.TraceReplaceItem[];
+    };
+
     /** 异常轨迹（track-err-config）- 时间格式 0-年月日 1-年月日时分 2-年月日时分秒 */
     type TraceTransformTimeType = 0 | 1 | 2;
 

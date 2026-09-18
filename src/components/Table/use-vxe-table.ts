@@ -1,4 +1,4 @@
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import type { Ref } from 'vue';
 import { useBoolean, useLoading } from '@sa/hooks';
 import { jsonClone } from '@sa/utils';
@@ -53,6 +53,10 @@ interface UseVxeTableOptions<ResponseData, ApiData> {
   defaultPageSize?: number;
   /** 列配置缓存 key，按组件/页面名缓存到 localStorage，不传则不缓存 */
   cacheKey?: string;
+  /** 延迟取数（默认开启）：挂载后推迟到下一帧（或 lazyDelay 毫秒）再首次取数，避免与 tab 切换 / 页面进入的过渡动画抢帧；keep-alive 切回不会重复取数。设为 false 则走即时取数（immediate） */
+  lazy?: boolean;
+  /** lazy 为 true 时，首次取数前的等待毫秒数；传 0（默认）则推迟到下一帧 requestAnimationFrame */
+  lazyDelay?: number;
 }
 
 const COLUMN_CACHE_PREFIX = 'vxe-table-column:';
@@ -149,7 +153,21 @@ export function useVxeTable<ResponseData, ApiData>(options: UseVxeTableOptions<R
     }
   }
 
-  if (options.immediate ?? true) {
+  // lazy 默认开启：挂载后推迟到下一帧（或 lazyDelay 毫秒）再首次取数，避免抢帧卡顿。
+  // 仅首次挂载取一次，keep-alive 切回不重复取；非 keep-alive 表格也会正常取数（onMounted 总会触发）。
+  if (options.lazy ?? true) {
+    let fetched = false;
+    onMounted(() => {
+      if (fetched) return;
+      fetched = true;
+      const delay = options.lazyDelay ?? 0;
+      if (delay > 0) {
+        setTimeout(() => getData(), delay);
+      } else {
+        requestAnimationFrame(() => getData());
+      }
+    });
+  } else if (options.immediate ?? true) {
     getData();
   }
 

@@ -1042,6 +1042,9 @@ declare namespace App {
             };
             traceCapture: {
               title: string;
+              traceInfoTransform: string;
+              transformRules: string;
+              addRuleRow: string;
               subTab: {
                 trackNetwork: string;
                 trackTransform: string;
@@ -1066,6 +1069,8 @@ declare namespace App {
                 trackNetworks: string;
                 keywordGroup: string;
                 waybillStatus: string;
+                oriStr: string;
+                replaceStr: string;
               };
               form: {
                 name: string;

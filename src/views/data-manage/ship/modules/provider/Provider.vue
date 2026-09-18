@@ -4,22 +4,9 @@ import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import Drawer from '@/components/common/drawer.vue';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import {
-  fetchCreateProvider,
-  fetchDeleteProvider,
-  fetchGetProviderList,
-  fetchUpdateProvider
-} from '@/service/api/data-manage-ship';
-
-/** 服务商类型（后端固定枚举 0-发货 1-派送 2-提单 3-杂支） */
-const providerTypeOptions = computed(() => [
-  { label: $t('page.dataManage.ship.provider.typeOption.out'), value: 0 },
-  { label: $t('page.dataManage.ship.provider.typeOption.send'), value: 1 },
-  { label: $t('page.dataManage.ship.provider.typeOption.bl'), value: 2 },
-  { label: $t('page.dataManage.ship.provider.typeOption.other'), value: 3 }
-]);
+import { fetchDeleteProvider, fetchGetProviderList } from '@/service/api/data-manage-ship';
+import ProviderSearchForm from './ProviderSearchForm.vue';
+import ProviderOperateDrawer from './ProviderOperateDrawer.vue';
 
 /** 当前服务商类型（NRadioGroup 切换后重查） */
 const providerType = ref<0 | 1 | 2 | 3>(0);
@@ -31,6 +18,13 @@ const statusFilter = ref<0 | 1 | null>(null);
 const statusOptions = computed(() => [
   { label: $t('common.enable'), value: 1 },
   { label: $t('common.disable'), value: 0 }
+]);
+
+const providerTypeOptions = computed(() => [
+  { label: $t('page.dataManage.ship.provider.typeOption.out'), value: 0 },
+  { label: $t('page.dataManage.ship.provider.typeOption.send'), value: 1 },
+  { label: $t('page.dataManage.ship.provider.typeOption.bl'), value: 2 },
+  { label: $t('page.dataManage.ship.provider.typeOption.other'), value: 3 }
 ]);
 
 /** 毫秒时间戳格式化展示 */
@@ -118,12 +112,6 @@ function handleReset() {
   getData();
 }
 
-/** 切换服务商类型：重置到第一页重查 */
-function handleTypeChange() {
-  pagination.current = 1;
-  getData();
-}
-
 function handlePageChange({ current, size }: { current: number; size: number }) {
   pagination.current = current;
   pagination.size = size;
@@ -154,127 +142,7 @@ async function confirmBatchDelete() {
   window.$message?.success($t('common.deleteSuccess'));
 }
 
-// ---- 抽屉 ----
-const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit'>('create');
-const submitting = ref(false);
-const formModel = ref<Partial<Api.DataManageShip.Provider>>(emptyForm());
-const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
-
-function emptyForm(): Partial<Api.DataManageShip.Provider> {
-  return {
-    code: '',
-    name: '',
-    billMode: '',
-    contact: '',
-    phone: '',
-    email: '',
-    web: '',
-    address: '',
-    providerType: providerType.value,
-    status: 1,
-    note: ''
-  };
-}
-
-const drawerTitle = computed(() =>
-  drawerMode.value === 'create'
-    ? `${$t('common.add')}${$t('page.dataManage.ship.provider.title')}`
-    : `${$t('common.edit')}${$t('page.dataManage.ship.provider.title')}`
-);
-
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'providerType',
-    label: $t('page.dataManage.ship.provider.providerType'),
-    type: 'select',
-    required: true,
-    span: 12,
-    options: providerTypeOptions.value,
-    filterable: false
-  },
-  {
-    key: 'code',
-    label: $t('page.dataManage.ship.provider.code'),
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: '请输入服务商代码'
-  },
-  {
-    key: 'name',
-    label: $t('page.dataManage.ship.provider.name'),
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: '请输入服务商名称'
-  },
-  { key: 'billMode', label: $t('page.dataManage.ship.provider.billMode'), type: 'input', span: 12 },
-  { key: 'contact', label: $t('page.dataManage.ship.provider.contact'), type: 'input', span: 12 },
-  { key: 'phone', label: $t('page.dataManage.ship.provider.phone'), type: 'input', span: 12 },
-  { key: 'email', label: $t('page.dataManage.ship.provider.email'), type: 'input', span: 12 },
-  { key: 'web', label: $t('page.dataManage.ship.provider.web'), type: 'input', span: 12 },
-  { key: 'address', label: $t('page.dataManage.ship.provider.address'), type: 'input', span: 12 },
-  {
-    key: 'status',
-    label: $t('common.status'),
-    type: 'switch',
-    span: 24,
-    checkedValue: 1,
-    uncheckedValue: 0,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
-  },
-  { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
-]);
-
-function openCreate() {
-  drawerMode.value = 'create';
-  formModel.value = emptyForm();
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-
-function openEdit(row: Api.DataManageShip.Provider) {
-  drawerMode.value = 'edit';
-  formModel.value = {
-    _id: row._id,
-    code: row.code,
-    name: row.name,
-    billMode: row.billMode ?? '',
-    contact: row.contact ?? '',
-    phone: row.phone ?? '',
-    email: row.email ?? '',
-    web: row.web ?? '',
-    address: row.address ?? '',
-    providerType: row.providerType,
-    status: row.status,
-    note: row.note ?? ''
-  };
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-
-async function handleDrawerSubmit() {
-  const ok = await formRef.value?.validate();
-  if (!ok) return;
-
-  submitting.value = true;
-  try {
-    const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateProvider(formModel.value)
-        : await fetchUpdateProvider(formModel.value);
-
-    if (error) return;
-
-    drawerVisible.value = false;
-    getData();
-    window.$message?.success($t(drawerMode.value === 'create' ? 'common.createSuccess' : 'common.saveSuccess'));
-  } finally {
-    submitting.value = false;
-  }
-}
+const drawerRef = ref<InstanceType<typeof ProviderOperateDrawer> | null>(null);
 </script>
 
 <template>
@@ -293,35 +161,15 @@ async function handleDrawerSubmit() {
       @selection-change="handleSelectionChange"
     >
       <template #search-action>
-        <div class="flex flex-wrap items-center gap-12px">
-          <NRadioGroup v-model:value="providerType" @update:value="handleTypeChange">
-            <NRadioButton v-for="opt in providerTypeOptions" :key="opt.value" :value="opt.value">
-              {{ opt.label }}
-            </NRadioButton>
-          </NRadioGroup>
-          <NInput
-            v-model:value="keyword"
-            class="w-200px!"
-            clearable
-            placeholder="请输入服务商名称"
-            @keyup.enter="handleSearch"
-          />
-          <NSelect
-            v-model:value="statusFilter"
-            class="w-140px!"
-            clearable
-            :options="statusOptions"
-            placeholder="状态"
-          />
-          <NButton size="small" type="primary" @click="handleSearch">
-            <template #icon><icon-ic-round-search class="text-icon" /></template>
-            {{ $t('common.search') }}
-          </NButton>
-          <NButton size="small" @click="handleReset">
-            <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-            {{ $t('common.reset') }}
-          </NButton>
-        </div>
+        <ProviderSearchForm
+          v-model:provider-type="providerType"
+          v-model:keyword="keyword"
+          v-model:status-filter="statusFilter"
+          :provider-type-options="providerTypeOptions"
+          :status-options="statusOptions"
+          @search="handleSearch"
+          @reset="handleReset"
+        />
       </template>
       <template #status="{ row }">
         <NTag :type="row.status === 1 ? 'success' : 'error'" size="small">
@@ -332,7 +180,7 @@ async function handleDrawerSubmit() {
         <span>{{ formatDateTime(row.createDate) }}</span>
       </template>
       <template #operation-left>
-        <NButton type="primary" ghost size="small" @click="openCreate">
+        <NButton type="primary" ghost size="small" @click="drawerRef?.openCreate(providerType)">
           <template #icon><icon-ic-round-plus class="text-icon" /></template>
           {{ $t('common.add') }}
         </NButton>
@@ -357,7 +205,7 @@ async function handleDrawerSubmit() {
         />
       </template>
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
+        <NButton size="small" type="primary" text @click="drawerRef?.openEdit(row)">{{ $t('common.edit') }}</NButton>
         <NPopconfirm @positive-click="confirmDelete(row)">
           <template #trigger>
             <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
@@ -367,14 +215,6 @@ async function handleDrawerSubmit() {
       </template>
     </Table>
 
-    <Drawer
-      v-model:show="drawerVisible"
-      :title="drawerTitle"
-      :loading="submitting"
-      :confirm-text="$t('common.save')"
-      @submit="handleDrawerSubmit"
-    >
-      <NFormWrap ref="formRef" :model="formModel" :items="formItems" />
-    </Drawer>
+    <ProviderOperateDrawer ref="drawerRef" @submitted="getData" />
   </div>
 </template>

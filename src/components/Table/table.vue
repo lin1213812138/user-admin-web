@@ -57,8 +57,6 @@ interface Props {
   searchItems?: FormItemConfig[];
   /** 搜索表单数据对象（按引用传递，由父页面持有并在取数时读取） */
   searchModel?: Record<string, unknown>;
-  /** 搜索栏是否默认收起 */
-  searchDefaultCollapsed?: boolean;
   /** 是否在右侧操作栏内置「导出」按钮：点击打开 vxe-table 原生高级导出弹窗 */
   actionExport?: boolean;
   /** actionExport 导出文件名（不含扩展名），缺省「导出_时间戳」 */
@@ -89,7 +87,6 @@ const props = withDefaults(defineProps<Props>(), {
   searchActionFlush: true,
   searchItems: undefined,
   searchModel: undefined,
-  searchDefaultCollapsed: true,
   actionExport: false,
   exportFilename: undefined,
   virtualScrollRowThreshold: 200,
@@ -120,9 +117,6 @@ function handleNativeExport() {
     window.$message?.error($t('common.exportFailed'));
   }
 }
-
-/** 搜索栏是否收起（默认收起，让表格更清爽） */
-const searchCollapsed = ref(props.searchDefaultCollapsed);
 
 const actionJustify = computed(() => {
   if (props.actionAlign === 'center') return 'justify-center';
@@ -158,6 +152,20 @@ const emit = defineEmits<{
   (e: 'reset'): void;
   (e: 'toggleTreeExpand', payload: { row: any; expanded: boolean }): void;
 }>();
+
+/** 搜索抽屉可见性：替代原内联折叠，点击搜索图标打开右侧抽屉 */
+const searchDrawerVisible = ref(false);
+
+/** 抽屉内点「搜索」：触发父级筛选并关闭抽屉 */
+function handleSearch() {
+  emit('search');
+  searchDrawerVisible.value = false;
+}
+
+/** 抽屉内点「重置」：触发父级重置，抽屉保持打开 */
+function handleReset() {
+  emit('reset');
+}
 
 function refresh() {
   emit('refresh');
@@ -256,16 +264,6 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
       </NCard>
     </div>
 
-    <div v-if="searchItems?.length">
-      <SearchBar
-        :items="searchItems"
-        :model="searchModel ?? {}"
-        :collapsed="searchCollapsed"
-        @search="emit('search')"
-        @reset="emit('reset')"
-      />
-    </div>
-
     <div
       v-if="$slots['operation-left'] || $slots['operation-right']"
       class="mb-12px flex-y-center justify-between gap-12px"
@@ -284,9 +282,9 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         <NButton
           v-if="searchItems?.length"
           size="small"
-          :type="searchCollapsed ? 'default' : 'primary'"
+          type="default"
           :title="$t('common.search')"
-          @click="searchCollapsed = !searchCollapsed"
+          @click="searchDrawerVisible = true"
         >
           <template #icon><icon-ic-round-search class="text-icon" /></template>
         </NButton>
@@ -406,6 +404,15 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         </template>
       </NPagination>
     </div>
+
+    <SearchBar
+      v-if="searchItems?.length"
+      v-model:show="searchDrawerVisible"
+      :items="searchItems"
+      :model="searchModel ?? {}"
+      @search="handleSearch"
+      @reset="handleReset"
+    />
   </div>
 </template>
 

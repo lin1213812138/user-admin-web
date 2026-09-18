@@ -1,17 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import Drawer from '@/components/common/drawer.vue';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import {
-  fetchCreateChannelGroup,
-  fetchDeleteChannelGroup,
-  fetchGetChannelGroupList,
-  fetchUpdateChannelGroup
-} from '@/service/api/data-manage-ship';
+import { fetchDeleteChannelGroup, fetchGetChannelGroupList } from '@/service/api/data-manage-ship';
+import ChannelGroupSearchForm from './ChannelGroupSearchForm.vue';
+import ChannelGroupOperateDrawer from './ChannelGroupOperateDrawer.vue';
 
 /** 名称搜索关键字 */
 const keyword = ref('');
@@ -116,83 +111,7 @@ async function confirmBatchDelete() {
   window.$message?.success($t('common.deleteSuccess'));
 }
 
-// ---- 抽屉 ----
-const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit'>('create');
-const submitting = ref(false);
-const formModel = ref<Partial<Api.DataManageShip.ChannelGroup>>(emptyForm());
-const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
-
-function emptyForm(): Partial<Api.DataManageShip.ChannelGroup> {
-  return { name: '', nameEn: '', order: 0, note: '' };
-}
-
-const drawerTitle = computed(() =>
-  drawerMode.value === 'create'
-    ? `${$t('common.add')}${$t('page.dataManage.ship.channelGroup.title')}`
-    : `${$t('common.edit')}${$t('page.dataManage.ship.channelGroup.title')}`
-);
-
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'name',
-    label: $t('page.dataManage.ship.channelGroup.name'),
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: '请输入类别名称'
-  },
-  {
-    key: 'nameEn',
-    label: $t('page.dataManage.ship.channelGroup.nameEn'),
-    type: 'input',
-    span: 12,
-    placeholder: '请输入英文名称'
-  },
-  { key: 'order', label: $t('page.dataManage.ship.channelGroup.order'), type: 'number', span: 12 },
-  { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
-]);
-
-function openCreate() {
-  drawerMode.value = 'create';
-  formModel.value = emptyForm();
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-
-function openEdit(row: Api.DataManageShip.ChannelGroup) {
-  drawerMode.value = 'edit';
-  formModel.value = {
-    _id: row._id,
-    name: row.name,
-    nameEn: row.nameEn ?? '',
-    order: row.order ?? 0,
-    note: row.note ?? ''
-  };
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-
-async function handleDrawerSubmit() {
-  const ok = await formRef.value?.validate();
-  if (!ok) return;
-
-  submitting.value = true;
-  try {
-    const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateChannelGroup(formModel.value)
-        : await fetchUpdateChannelGroup(formModel.value);
-
-    if (error) return;
-
-    drawerVisible.value = false;
-    getData();
-    window.$message?.success($t(drawerMode.value === 'create' ? 'common.createSuccess' : 'common.saveSuccess'));
-  } finally {
-    submitting.value = false;
-  }
-}
+const drawerRef = ref<InstanceType<typeof ChannelGroupOperateDrawer> | null>(null);
 </script>
 
 <template>
@@ -211,29 +130,13 @@ async function handleDrawerSubmit() {
       @selection-change="handleSelectionChange"
     >
       <template #search-action>
-        <div class="flex flex-wrap items-center gap-12px">
-          <NInput
-            v-model:value="keyword"
-            class="w-200px!"
-            clearable
-            placeholder="请输入类别名称"
-            @keyup.enter="handleSearch"
-          />
-          <NButton size="small" type="primary" @click="handleSearch">
-            <template #icon><icon-ic-round-search class="text-icon" /></template>
-            {{ $t('common.search') }}
-          </NButton>
-          <NButton size="small" @click="handleReset">
-            <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-            {{ $t('common.reset') }}
-          </NButton>
-        </div>
+        <ChannelGroupSearchForm v-model:keyword="keyword" @search="handleSearch" @reset="handleReset" />
       </template>
       <template #createDate="{ row }">
         <span>{{ formatDateTime(row.createDate) }}</span>
       </template>
       <template #operation-left>
-        <NButton type="primary" ghost size="small" @click="openCreate">
+        <NButton type="primary" ghost size="small" @click="drawerRef?.openCreate()">
           <template #icon><icon-ic-round-plus class="text-icon" /></template>
           {{ $t('common.add') }}
         </NButton>
@@ -258,7 +161,7 @@ async function handleDrawerSubmit() {
         />
       </template>
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
+        <NButton size="small" type="primary" text @click="drawerRef?.openEdit(row)">{{ $t('common.edit') }}</NButton>
         <NPopconfirm @positive-click="confirmDelete(row)">
           <template #trigger>
             <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
@@ -268,14 +171,6 @@ async function handleDrawerSubmit() {
       </template>
     </Table>
 
-    <Drawer
-      v-model:show="drawerVisible"
-      :title="drawerTitle"
-      :loading="submitting"
-      :confirm-text="$t('common.save')"
-      @submit="handleDrawerSubmit"
-    >
-      <NFormWrap ref="formRef" :model="formModel" :items="formItems" />
-    </Drawer>
+    <ChannelGroupOperateDrawer ref="drawerRef" @submitted="getData" />
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, type VNodeChild } from 'vue';
 import type { FormInst, FormItemRule, FormRules, SelectOption, UploadFileInfo } from 'naive-ui';
 import { NColorPicker, NDatePicker, NUpload } from 'naive-ui';
 import { $t } from '@/locales';
@@ -77,6 +77,15 @@ function optionLabel(options: SelectOption[] | undefined, value: unknown): strin
   const matched = (options ?? []).find(opt => opt.value === value);
 
   return matched ? String(matched.label ?? value) : String(value);
+}
+
+/** select 的 render-label 兜底：优先使用 option 自带的 renderLabel，否则回退纯文本 label */
+function fallbackOptionLabel(option: SelectOption): VNodeChild {
+  const custom = (option as SelectOption & { renderLabel?: (opt: SelectOption) => VNodeChild }).renderLabel;
+
+  if (typeof custom === 'function') return custom(option);
+
+  return String(option.label ?? option.value ?? '');
 }
 
 /** 只读文本：按控件类型把值映射为展示文案（空值统一占位符） */
@@ -377,6 +386,7 @@ defineExpose({
                 :disabled="item.disabled"
                 :clearable="item.clearable || true"
                 :filterable="item.filterable ?? true"
+                :render-label="item.renderLabel ?? fallbackOptionLabel"
               />
               <NDatePicker
                 v-else-if="item.type === 'date'"

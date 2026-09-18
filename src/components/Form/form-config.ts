@@ -1,3 +1,4 @@
+import type { VNodeChild } from 'vue';
 import type { SelectOption } from 'naive-ui';
 
 /** 表单支持的控件类型 */
@@ -35,6 +36,8 @@ export interface FormItemConfig {
   placeholder?: string;
   /** 下拉选项（type 为 select 时使用） */
   options?: SelectOption[];
+  /** 下拉自定义 label 渲染（type 为 select 时使用），作用于下拉项与选中态；未传时回退 option 自带 renderLabel 或纯文本 label */
+  renderLabel?: (option: SelectOption) => VNodeChild;
   /** 开关选中时文案 */
   checkedText?: string;
   /** 开关未选中时文案 */

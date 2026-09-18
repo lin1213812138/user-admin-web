@@ -781,6 +781,9 @@ const local: App.I18n.Schema = {
         },
         traceCapture: {
           title: '轨迹抓取配置',
+          traceInfoTransform: '轨迹信息改造',
+          transformRules: '改造规则',
+          addRuleRow: '添加一行',
           subTab: {
             trackNetwork: '追踪网络',
             trackTransform: '异常轨迹',
@@ -804,7 +807,9 @@ const local: App.I18n.Schema = {
             common: '全局通用',
             trackNetworks: '关联追踪网络',
             keywordGroup: '关键词组',
-            waybillStatus: '运单状态'
+            waybillStatus: '运单状态',
+            oriStr: '原始字符串',
+            replaceStr: '替换字符串'
           },
           form: {
             name: '网络名称',

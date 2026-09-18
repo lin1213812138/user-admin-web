@@ -4,15 +4,13 @@ import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import Drawer from '@/components/common/drawer.vue';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 import {
-  fetchCreateLongNoRule,
   fetchDeleteLongNoRule,
   fetchGetLongNoRuleList,
-  fetchUpdateLongNoRule,
   type LongNoRule as LongNoRuleItem
 } from '@/service/api/data-manage-no-rule';
+import LongNoRuleSearchForm from './LongNoRuleSearchForm.vue';
+import LongNoRuleOperateDrawer from './LongNoRuleOperateDrawer.vue';
 
 const keyword = ref('');
 const statusFilter = ref<0 | 1 | null>(null);
@@ -98,71 +96,7 @@ async function confirmBatchDelete() {
   window.$message?.success($t('common.deleteSuccess'));
 }
 
-const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit'>('create');
-const submitting = ref(false);
-const formModel = ref<Partial<LongNoRuleItem>>(emptyForm());
-const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
-function emptyForm(): Partial<LongNoRuleItem> {
-  return { name: '', oriLen: 0, start: 0, len: 0, rule: '', status: 1, note: '' };
-}
-const drawerTitle = computed(() => `${$t(drawerMode.value === 'create' ? 'common.add' : 'common.edit')}长单号截短`);
-const formItems = computed<FormItemConfig[]>(() => [
-  { key: 'name', label: '规则名称', type: 'input', required: true, span: 24 },
-  { key: 'oriLen', label: '原始长度', type: 'number', required: true, span: 12 },
-  { key: 'start', label: '截取开始位置', type: 'number', required: true, span: 12 },
-  { key: 'len', label: '截取长度', type: 'number', required: true, span: 12 },
-  { key: 'rule', label: '单号掩码', type: 'input', span: 24 },
-  {
-    key: 'status',
-    label: $t('common.status'),
-    type: 'switch',
-    span: 24,
-    checkedValue: 1,
-    uncheckedValue: 0,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
-  },
-  { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
-]);
-function openCreate() {
-  drawerMode.value = 'create';
-  formModel.value = emptyForm();
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-function openEdit(row: LongNoRuleItem) {
-  drawerMode.value = 'edit';
-  formModel.value = {
-    _id: row._id,
-    name: row.name,
-    oriLen: row.oriLen,
-    start: row.start,
-    len: row.len,
-    rule: row.rule ?? '',
-    status: row.status ?? 1,
-    note: row.note ?? ''
-  };
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-async function handleDrawerSubmit() {
-  const ok = await formRef.value?.validate();
-  if (!ok) return;
-  submitting.value = true;
-  try {
-    const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateLongNoRule(formModel.value)
-        : await fetchUpdateLongNoRule(formModel.value);
-    if (error) return;
-    drawerVisible.value = false;
-    getData();
-    window.$message?.success($t(drawerMode.value === 'create' ? 'common.createSuccess' : 'common.saveSuccess'));
-  } finally {
-    submitting.value = false;
-  }
-}
+const drawerRef = ref<InstanceType<typeof LongNoRuleOperateDrawer> | null>(null);
 </script>
 
 <template>
@@ -181,30 +115,13 @@ async function handleDrawerSubmit() {
       @selection-change="handleSelectionChange"
     >
       <template #search-action>
-        <div class="flex flex-wrap items-center gap-12px">
-          <NInput
-            v-model:value="keyword"
-            class="w-200px!"
-            clearable
-            placeholder="请输入规则名称"
-            @keyup.enter="handleSearch"
-          />
-          <NSelect
-            v-model:value="statusFilter"
-            class="w-140px!"
-            clearable
-            :options="statusOptions"
-            :placeholder="$t('common.status')"
-          />
-          <NButton size="small" type="primary" @click="handleSearch">
-            <template #icon><icon-ic-round-search class="text-icon" /></template>
-            {{ $t('common.search') }}
-          </NButton>
-          <NButton size="small" @click="handleReset">
-            <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-            {{ $t('common.reset') }}
-          </NButton>
-        </div>
+        <LongNoRuleSearchForm
+          v-model:keyword="keyword"
+          v-model:status-filter="statusFilter"
+          :status-options="statusOptions"
+          @search="handleSearch"
+          @reset="handleReset"
+        />
       </template>
       <template #status="{ row }">
         <NTag :type="row.status === 1 ? 'success' : 'error'" size="small">
@@ -215,7 +132,7 @@ async function handleDrawerSubmit() {
         <span>{{ formatDateTime(row.createDate) }}</span>
       </template>
       <template #operation-left>
-        <NButton type="primary" ghost size="small" @click="openCreate">
+        <NButton type="primary" ghost size="small" @click="drawerRef?.openCreate()">
           <template #icon><icon-ic-round-plus class="text-icon" /></template>
           {{ $t('common.add') }}
         </NButton>
@@ -240,7 +157,7 @@ async function handleDrawerSubmit() {
         />
       </template>
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
+        <NButton size="small" type="primary" text @click="drawerRef?.openEdit(row)">{{ $t('common.edit') }}</NButton>
         <NPopconfirm @positive-click="confirmDelete(row)">
           <template #trigger>
             <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
@@ -249,14 +166,7 @@ async function handleDrawerSubmit() {
         </NPopconfirm>
       </template>
     </Table>
-    <Drawer
-      v-model:show="drawerVisible"
-      :title="drawerTitle"
-      :loading="submitting"
-      :confirm-text="$t('common.save')"
-      @submit="handleDrawerSubmit"
-    >
-      <NFormWrap ref="formRef" :model="formModel" :items="formItems" />
-    </Drawer>
+
+    <LongNoRuleOperateDrawer ref="drawerRef" @submitted="getData" />
   </div>
 </template>

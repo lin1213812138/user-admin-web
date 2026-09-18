@@ -1,0 +1,12 @@
+- generic [active] [ref=f8e1]:
+    - generic "国家0 (C00)" [ref=f8e7] [cursor=pointer]:
+        - textbox [ref=f8e8]
+        - generic:
+            - generic:
+                - generic:
+                    - generic: 国家0
+                    - generic: C00
+        - img "loading" [ref=f8e9]
+    - generic [ref=f8e16]:
+        - generic "Toggle devtools panel" [ref=f8e17] [cursor=pointer]
+        - generic "Toggle Component Inspector" [ref=f8e23] [cursor=pointer]

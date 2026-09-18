@@ -785,6 +785,9 @@ const local: App.I18n.Schema = {
         },
         traceCapture: {
           title: 'Trace Capture Config',
+          traceInfoTransform: 'Trace Info Transform',
+          transformRules: 'Transform Rules',
+          addRuleRow: 'Add Row',
           subTab: {
             trackNetwork: 'Track Network',
             trackTransform: 'Track Transform',
@@ -808,7 +811,9 @@ const local: App.I18n.Schema = {
             common: 'Global Common',
             trackNetworks: 'Track Networks',
             keywordGroup: 'Keyword Group',
-            waybillStatus: 'Waybill Status'
+            waybillStatus: 'Waybill Status',
+            oriStr: 'Original String',
+            replaceStr: 'Replace String'
           },
           form: {
             name: 'Network Name',

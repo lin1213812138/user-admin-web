@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
+import { useCountrySelect } from '@/hooks/business/use-country-select';
 import {
   fetchCreateShipTo,
   fetchCreateShipper,
-  fetchGetCountryList,
   fetchUpdateShipTo,
   fetchUpdateShipper
 } from '@/service/api/ship-address';
@@ -52,20 +52,8 @@ const formRef = ref<InstanceType<typeof NFormWrap>>();
 /** 地址类型由所在列表 tab 决定（收件地址 tab 新增即收件表单，发件同理） */
 const isShipTo = computed(() => props.type === 'ship-to');
 
-/** 目的地国家下拉（/country/query） */
-const countryOptions = ref<CommonType.Option<string>[]>([]);
-
-async function loadCountryOptions() {
-  if (countryOptions.value.length) return;
-
-  const { data, error } = await fetchGetCountryList();
-  if (error || !data) return;
-
-  countryOptions.value = (data.list ?? []).map(item => ({
-    label: item.name || item.nameCn || item.nameEn || item.code || item._id,
-    value: item._id
-  }));
-}
+/** 目的地国家下拉（/country/query），由公共 Hook 提供并缓存 */
+const { options: countryOptions, load: loadCountryOptions, getName: getCountryName } = useCountrySelect();
 
 const model = reactive<Api.SystemManage.CustomerAddressSaveParams>({
   customerId: '',
@@ -95,9 +83,7 @@ watch(
   () => model.countryId,
   id => {
     if (!id) return;
-
-    const option = countryOptions.value.find(item => item.value === id);
-    if (option) model.country = option.label;
+    model.country = getCountryName(id);
   }
 );
 

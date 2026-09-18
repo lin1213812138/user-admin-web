@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { $t } from '@/locales';
+import type { SelectOption } from 'naive-ui';
+
+const filterSysType = defineModel<number | null>('filterSysType', { default: null });
+const props = defineProps<{ options: SelectOption[] }>();
+const emit = defineEmits<{
+  search: [];
+  reset: [];
+}>();
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-12px">
+    <NSelect
+      v-model:value="filterSysType"
+      class="w-180px!"
+      clearable
+      :options="props.options"
+      :placeholder="$t('page.dataManage.noRule.sysTypeAll')"
+    />
+    <NButton size="small" type="primary" @click="emit('search')">
+      <template #icon><icon-ic-round-search class="text-icon" /></template>
+      {{ $t('common.search') }}
+    </NButton>
+    <NButton size="small" @click="emit('reset')">
+      <template #icon><icon-ic-round-refresh class="text-icon" /></template>
+      {{ $t('common.reset') }}
+    </NButton>
+  </div>
+</template>

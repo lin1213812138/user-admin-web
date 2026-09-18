@@ -76,12 +76,3 @@ export function fetchDeleteShipper(ids: string[]) {
     data: { ids }
   });
 }
-
-/** get country options（真实接口 /country/query，地址目的地下拉用） */
-export function fetchGetCountryList() {
-  return request<Api.SystemManage.CountryList>({
-    url: '/country/query',
-    method: 'post',
-    data: { page: 1, size: 999 }
-  });
-}

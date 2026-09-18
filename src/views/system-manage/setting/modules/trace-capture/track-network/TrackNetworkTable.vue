@@ -8,6 +8,7 @@ import { NButton, NInput, NPopconfirm } from 'naive-ui';
 import { fetchDeleteTrackConfig, fetchGetTrackConfigList } from '@/service/api/track-config';
 import { trackTypeLabel } from '@/constants/track-config';
 import TrackNetworkDrawer from './TrackNetworkDrawer.vue';
+import TrackReplaceModal from './TrackReplaceModal.vue';
 
 const props = defineProps<{ category: Api.SystemManage.TraceCaptureCategory }>();
 
@@ -91,6 +92,14 @@ const drawerVisible = ref(false);
 const drawerMode = ref<'create' | 'edit'>('create');
 const drawerRow = ref<Api.SystemManage.TraceConfigItem | null>(null);
 
+const replaceVisible = ref(false);
+const replaceRow = ref<Api.SystemManage.TraceConfigItem | null>(null);
+
+function openReplace(row: Api.SystemManage.TraceConfigItem) {
+  replaceRow.value = row;
+  replaceVisible.value = true;
+}
+
 function handleSearch() {
   pagination.current = 1;
   getData();
@@ -137,7 +146,7 @@ async function handleDelete(row: Api.SystemManage.TraceConfigItem) {
         :pagination="pagination"
         :show-seq="true"
         :show-action="true"
-        :action-width="140"
+        :action-width="200"
         @refresh="getData"
         @page-change="handlePageChange"
       >
@@ -174,6 +183,9 @@ async function handleDelete(row: Api.SystemManage.TraceConfigItem) {
         </template>
         <template #action="{ row }">
           <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
+          <NButton size="small" type="primary" text @click="openReplace(row)">
+            {{ $t('page.manage.setting.traceCapture.traceInfoTransform') }}
+          </NButton>
           <NPopconfirm @positive-click="handleDelete(row)">
             <template #trigger>
               <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
@@ -196,5 +208,10 @@ async function handleDelete(row: Api.SystemManage.TraceConfigItem) {
       @reset="resetColumns"
     />
     <TrackNetworkDrawer v-model:show="drawerVisible" :mode="drawerMode" :row="drawerRow" @submitted="getData" />
+    <TrackReplaceModal
+      v-model:show="replaceVisible"
+      :config-id="replaceRow?._id ?? ''"
+      :network-name="replaceRow?.name ?? ''"
+    />
   </div>
 </template>

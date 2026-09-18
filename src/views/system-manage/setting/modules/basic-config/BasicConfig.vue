@@ -79,7 +79,7 @@ const infoItems = computed<FormItemConfig[]>(() => [
     label: $t('page.manage.setting.basicConfig.info.companyName'),
     type: 'input',
     required: true,
-    span: 24,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.companyName')
   },
   {
@@ -87,7 +87,7 @@ const infoItems = computed<FormItemConfig[]>(() => [
     label: $t('page.manage.setting.basicConfig.info.companyAddress'),
     type: 'textarea',
     required: true,
-    span: 24,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.companyAddress')
   },
   {
@@ -95,7 +95,7 @@ const infoItems = computed<FormItemConfig[]>(() => [
     label: $t('page.manage.setting.basicConfig.info.companyUrl'),
     type: 'input',
     required: true,
-    span: 24,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.companyUrl')
   },
   {
@@ -103,35 +103,35 @@ const infoItems = computed<FormItemConfig[]>(() => [
     label: $t('page.manage.setting.basicConfig.info.systemName'),
     type: 'input',
     required: true,
-    span: 24,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.systemName')
   },
   {
     key: 'phone',
     label: $t('page.manage.setting.basicConfig.info.contactPhone'),
     type: 'input',
-    span: 12,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.contactPhone')
   },
   {
     key: 'startPlace',
     label: $t('page.manage.setting.basicConfig.info.defaultOrigin'),
     type: 'input',
-    span: 12,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.defaultOrigin')
   },
   {
     key: 'userWeb',
     label: $t('page.manage.setting.basicConfig.info.staffLogin'),
     type: 'input',
-    span: 12,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.staffLogin')
   },
   {
     key: 'customerWeb',
     label: $t('page.manage.setting.basicConfig.info.customerLogin'),
     type: 'input',
-    span: 12,
+    span: 8,
     placeholder: $t('page.manage.setting.basicConfig.info.customerLogin')
   },
   {
@@ -139,7 +139,7 @@ const infoItems = computed<FormItemConfig[]>(() => [
     label: $t('page.manage.setting.basicConfig.info.companyLogo'),
     type: 'custom',
     required: true,
-    span: 24
+    span: 8
   }
 ]);
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
+
 defineOptions({
   name: 'VerticalTabLayout'
 });
@@ -10,7 +12,7 @@ interface TabItem {
   label: string;
 }
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     /** 当前激活的 tab（v-model:value） */
     value: string | number;
@@ -18,15 +20,48 @@ withDefaults(
     tabs: TabItem[];
     /** 左栏顶部页面名称（不传则不渲染标题区） */
     title?: string;
+    /** 切 tab 后，延迟多少毫秒再切换右侧内容区；用于等左侧指示条动画完成后再加载异步组件，避免抢帧 */
+    contentDelay?: number;
   }>(),
   {
-    title: ''
+    title: '',
+    contentDelay: 300
   }
 );
 
 const emit = defineEmits<{
   'update:value': [value: string | number];
 }>();
+
+/** 左侧 tab UI 高亮的值：点击后立即更新，保证指示条动画先跑 */
+const activeTab = ref(props.value);
+
+let delayTimer: ReturnType<typeof setTimeout> | null = null;
+
+watch(
+  () => props.value,
+  newValue => {
+    activeTab.value = newValue;
+  }
+);
+
+function handleTabChange(value: string | number) {
+  // 左侧指示条立即高亮、开始动画
+  activeTab.value = value;
+
+  if (delayTimer) {
+    clearTimeout(delayTimer);
+    delayTimer = null;
+  }
+
+  if (props.contentDelay > 0) {
+    delayTimer = setTimeout(() => {
+      emit('update:value', value);
+    }, props.contentDelay);
+  } else {
+    emit('update:value', value);
+  }
+}
 </script>
 
 <template>
@@ -43,7 +78,7 @@ const emit = defineEmits<{
         <span class="text-15px font-600">{{ title }}</span>
       </div>
       <div class="min-h-0 flex-1 overflow-y-auto">
-        <NTabs placement="left" type="line" :value="value" @update:value="v => emit('update:value', v)">
+        <NTabs placement="left" type="line" :value="activeTab" @update:value="handleTabChange">
           <NTab v-for="t in tabs" :key="t.value" :name="t.value">{{ t.label }}</NTab>
         </NTabs>
       </div>

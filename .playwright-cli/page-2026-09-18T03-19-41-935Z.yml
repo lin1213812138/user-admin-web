@@ -1,0 +1,8 @@
+- generic [active] [ref=f2e1]:
+    - generic [ref=f2e7] [cursor=pointer]:
+        - textbox [ref=f2e8]
+        - generic: Please Select
+        - img "loading" [ref=f2e9]
+    - generic [ref=f2e16]:
+        - generic "Toggle devtools panel" [ref=f2e17] [cursor=pointer]
+        - generic "Toggle Component Inspector" [ref=f2e23] [cursor=pointer]

@@ -14,3 +14,25 @@ html {
   overflow-x: hidden;
   color: rgb(var(--base-text-color));
 }
+
+/* naive 下拉选项内容容器默认不撑满整行（flex 子项无 flex:1），
+   撑满后自定义 render-label 的 justify-between 才有空间把右侧辅助信息（如国家二字码）推到行尾 */
+.n-base-select-option__content,
+.n-base-select-menu .n-base-select-option .n-base-select-option__content {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/* 国家选项（含 .country-option-row）：
+   1) 单选下拉会为选中行预留 20px 勾选图标位（padding-right: 12px+20px），
+      导致选中行与未选中行的二字码不在同一列；勾选标记与二字码语义重复，直接隐藏并把右内边距统一回 12px；
+   2) 隐藏 ✓ 后勾选图标元素也不再占位 */
+.n-base-select-option:has(.country-option-row) {
+  /* !important：naive 的 --show-checkmark 规则由运行时动态注入且顺序靠后，同级特异性会覆盖静态样式表 */
+  padding-right: 12px !important;
+}
+.n-base-select-option:has(.country-option-row) .n-base-select-option__check,
+.n-base-select-option:has(.country-option-row) .n-base-select-option__check-mark {
+  display: none;
+}

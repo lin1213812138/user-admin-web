@@ -1,19 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import Drawer from '@/components/common/drawer.vue';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import {
-  fetchCreateCarrier,
-  fetchDeleteCarrier,
-  fetchGetCarrierList,
-  fetchGetWeightRuleList,
-  fetchUpdateCarrier
-} from '@/service/api/data-manage-ship';
+import { fetchDeleteCarrier, fetchGetCarrierList, fetchGetWeightRuleList } from '@/service/api/data-manage-ship';
 import { fetchGetTrackConfigList } from '@/service/api/track-config';
+import CarrierSearchForm from './CarrierSearchForm.vue';
+import CarrierOperateDrawer from './CarrierOperateDrawer.vue';
 
 /** 名称搜索关键字 */
 const keyword = ref('');
@@ -190,116 +184,7 @@ async function confirmBatchDelete() {
   window.$message?.success($t('common.deleteSuccess'));
 }
 
-// ---- 抽屉 ----
-const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit'>('create');
-const submitting = ref(false);
-const formModel = ref<Partial<Api.DataManageShip.Carrier>>(emptyForm());
-const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
-
-function emptyForm(): Partial<Api.DataManageShip.Carrier> {
-  return {
-    name: '',
-    weightRuleId: undefined,
-    trackConfigId: undefined,
-    remoteGroupId: undefined,
-    oilRate: undefined,
-    feeCustom: undefined,
-    cubicNum: undefined,
-    weightOff: undefined,
-    order: 0,
-    note: ''
-  };
-}
-
-const drawerTitle = computed(() =>
-  drawerMode.value === 'create'
-    ? `${$t('common.add')}${$t('page.dataManage.ship.carrier.title')}`
-    : `${$t('common.edit')}${$t('page.dataManage.ship.carrier.title')}`
-);
-
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'name',
-    label: $t('page.dataManage.ship.carrier.name'),
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: '请输入网络名称'
-  },
-  {
-    key: 'weightRuleId',
-    label: $t('page.dataManage.ship.carrier.weightRule'),
-    type: 'select',
-    span: 12,
-    options: weightRuleOptions.value,
-    clearable: true,
-    filterable: false
-  },
-  {
-    key: 'trackConfigId',
-    label: $t('page.dataManage.ship.carrier.trackConfig'),
-    type: 'select',
-    span: 12,
-    options: trackConfigOptions.value,
-    clearable: true,
-    filterable: false
-  },
-  { key: 'order', label: $t('page.dataManage.ship.carrier.order'), type: 'number', span: 12 },
-  { key: 'oilRate', label: $t('page.dataManage.ship.carrier.oilRate'), type: 'number', span: 12 },
-  { key: 'feeCustom', label: $t('page.dataManage.ship.carrier.feeCustom'), type: 'number', span: 12 },
-  { key: 'cubicNum', label: $t('page.dataManage.ship.carrier.cubicNum'), type: 'number', span: 12 },
-  { key: 'weightOff', label: $t('page.dataManage.ship.carrier.weightOff'), type: 'number', span: 12 },
-  { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
-]);
-
-function openCreate() {
-  drawerMode.value = 'create';
-  formModel.value = emptyForm();
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-
-/** 编辑回填：remoteGroupId 数据源页面暂不存在，原样带回保证不丢（trackConfigId 已接追踪网络下拉） */
-function openEdit(row: Api.DataManageShip.Carrier) {
-  drawerMode.value = 'edit';
-  formModel.value = {
-    _id: row._id,
-    name: row.name,
-    weightRuleId: row.weightRuleId,
-    trackConfigId: row.trackConfigId,
-    remoteGroupId: row.remoteGroupId,
-    oilRate: row.oilRate,
-    feeCustom: row.feeCustom,
-    cubicNum: row.cubicNum,
-    weightOff: row.weightOff,
-    order: row.order ?? 0,
-    note: row.note ?? ''
-  };
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-
-async function handleDrawerSubmit() {
-  const ok = await formRef.value?.validate();
-  if (!ok) return;
-
-  submitting.value = true;
-  try {
-    const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateCarrier(formModel.value)
-        : await fetchUpdateCarrier(formModel.value);
-
-    if (error) return;
-
-    drawerVisible.value = false;
-    getData();
-    window.$message?.success($t(drawerMode.value === 'create' ? 'common.createSuccess' : 'common.saveSuccess'));
-  } finally {
-    submitting.value = false;
-  }
-}
+const drawerRef = ref<InstanceType<typeof CarrierOperateDrawer> | null>(null);
 </script>
 
 <template>
@@ -318,23 +203,7 @@ async function handleDrawerSubmit() {
       @selection-change="handleSelectionChange"
     >
       <template #search-action>
-        <div class="flex flex-wrap items-center gap-12px">
-          <NInput
-            v-model:value="keyword"
-            class="w-200px!"
-            clearable
-            placeholder="请输入网络名称"
-            @keyup.enter="handleSearch"
-          />
-          <NButton size="small" type="primary" @click="handleSearch">
-            <template #icon><icon-ic-round-search class="text-icon" /></template>
-            {{ $t('common.search') }}
-          </NButton>
-          <NButton size="small" @click="handleReset">
-            <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-            {{ $t('common.reset') }}
-          </NButton>
-        </div>
+        <CarrierSearchForm v-model:keyword="keyword" @search="handleSearch" @reset="handleReset" />
       </template>
       <template #weightRuleId="{ row }">
         <span>{{ weightRuleLabel(row.weightRuleId) }}</span>
@@ -346,7 +215,7 @@ async function handleDrawerSubmit() {
         <span>{{ formatDateTime(row.createDate) }}</span>
       </template>
       <template #operation-left>
-        <NButton type="primary" ghost size="small" @click="openCreate">
+        <NButton type="primary" ghost size="small" @click="drawerRef?.openCreate()">
           <template #icon><icon-ic-round-plus class="text-icon" /></template>
           {{ $t('common.add') }}
         </NButton>
@@ -371,7 +240,7 @@ async function handleDrawerSubmit() {
         />
       </template>
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
+        <NButton size="small" type="primary" text @click="drawerRef?.openEdit(row)">{{ $t('common.edit') }}</NButton>
         <NPopconfirm @positive-click="confirmDelete(row)">
           <template #trigger>
             <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
@@ -381,14 +250,11 @@ async function handleDrawerSubmit() {
       </template>
     </Table>
 
-    <Drawer
-      v-model:show="drawerVisible"
-      :title="drawerTitle"
-      :loading="submitting"
-      :confirm-text="$t('common.save')"
-      @submit="handleDrawerSubmit"
-    >
-      <NFormWrap ref="formRef" :model="formModel" :items="formItems" />
-    </Drawer>
+    <CarrierOperateDrawer
+      ref="drawerRef"
+      :weight-rule-options="weightRuleOptions"
+      :track-config-options="trackConfigOptions"
+      @submitted="getData"
+    />
   </div>
 </template>

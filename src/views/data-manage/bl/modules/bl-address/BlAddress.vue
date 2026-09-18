@@ -4,14 +4,9 @@ import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import Drawer from '@/components/common/drawer.vue';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import {
-  fetchCreateBlAddress,
-  fetchDeleteBlAddress,
-  fetchGetBlAddressList,
-  fetchUpdateBlAddress
-} from '@/service/api/data-manage-bl';
+import { fetchDeleteBlAddress, fetchGetBlAddressList } from '@/service/api/data-manage-bl';
+import BlAddressSearchForm from './BlAddressSearchForm.vue';
+import BlAddressOperateDrawer from './BlAddressOperateDrawer.vue';
 
 /** 9 类地址簿（label 固定文案，对齐 i18n typeOption） */
 const addressTypeOptions = computed(() => {
@@ -29,6 +24,7 @@ const addressTypeOptions = computed(() => {
   return Object.entries(typeOption).map(([value, label]) => ({ label, value }));
 });
 
+/** 当前地址类型（切换后重查） */
 const activeType = ref('BY');
 const keyword = ref('');
 
@@ -114,141 +110,7 @@ async function confirmBatchDelete() {
   window.$message?.success($t('common.deleteSuccess'));
 }
 
-const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit'>('create');
-const submitting = ref(false);
-const formModel = ref<Partial<Api.DataManageBl.BlAddress>>(emptyForm());
-const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
-function emptyForm(): Partial<Api.DataManageBl.BlAddress> {
-  return {
-    addressType: activeType.value,
-    name: '',
-    company: '',
-    phone: '',
-    city: '',
-    state: '',
-    zip: '',
-    address: '',
-    email: '',
-    eori: '',
-    vat: '',
-    countryId: '',
-    note: ''
-  };
-}
-const drawerTitle = computed(
-  () => `${$t(drawerMode.value === 'create' ? 'common.add' : 'common.edit')}${$t('page.dataManage.bl.blAddress.title')}`
-);
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'addressType',
-    label: '地址类型',
-    type: 'select',
-    required: true,
-    span: 12,
-    options: addressTypeOptions.value,
-    disabled: drawerMode.value === 'edit'
-  },
-  {
-    key: 'name',
-    label: '姓名',
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: $t('page.dataManage.bl.blAddress.form.namePlaceholder')
-  },
-  {
-    key: 'company',
-    label: '公司',
-    type: 'input',
-    span: 12,
-    placeholder: $t('page.dataManage.bl.blAddress.form.companyPlaceholder')
-  },
-  {
-    key: 'phone',
-    label: '电话',
-    type: 'input',
-    span: 12,
-    placeholder: $t('page.dataManage.bl.blAddress.form.phonePlaceholder')
-  },
-  { key: 'countryId', label: '国家', type: 'input', span: 12 },
-  {
-    key: 'city',
-    label: '城市',
-    type: 'input',
-    span: 12,
-    placeholder: $t('page.dataManage.bl.blAddress.form.cityPlaceholder')
-  },
-  {
-    key: 'state',
-    label: '省州',
-    type: 'input',
-    span: 12,
-    placeholder: $t('page.dataManage.bl.blAddress.form.statePlaceholder')
-  },
-  {
-    key: 'zip',
-    label: '邮编',
-    type: 'input',
-    span: 12,
-    placeholder: $t('page.dataManage.bl.blAddress.form.zipPlaceholder')
-  },
-  {
-    key: 'address',
-    label: '地址',
-    type: 'textarea',
-    span: 24,
-    placeholder: $t('page.dataManage.bl.blAddress.form.addressPlaceholder')
-  },
-  { key: 'email', label: '邮箱', type: 'input', span: 12 },
-  { key: 'eori', label: 'EORI', type: 'input', span: 12 },
-  { key: 'vat', label: 'VAT', type: 'input', span: 12 },
-  { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
-]);
-function openCreate() {
-  drawerMode.value = 'create';
-  formModel.value = emptyForm();
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-function openEdit(row: Api.DataManageBl.BlAddress) {
-  drawerMode.value = 'edit';
-  formModel.value = {
-    _id: row._id,
-    addressType: row.addressType,
-    name: row.name,
-    company: row.company ?? '',
-    phone: row.phone ?? '',
-    city: row.city ?? '',
-    state: row.state ?? '',
-    zip: row.zip ?? '',
-    address: row.address ?? '',
-    email: row.email ?? '',
-    eori: row.eori ?? '',
-    vat: row.vat ?? '',
-    countryId: row.countryId ?? '',
-    note: row.note ?? ''
-  };
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
-async function handleDrawerSubmit() {
-  const ok = await formRef.value?.validate();
-  if (!ok) return;
-  submitting.value = true;
-  try {
-    const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateBlAddress(formModel.value)
-        : await fetchUpdateBlAddress(formModel.value);
-    if (error) return;
-    drawerVisible.value = false;
-    getData();
-    window.$message?.success($t(drawerMode.value === 'create' ? 'common.createSuccess' : 'common.saveSuccess'));
-  } finally {
-    submitting.value = false;
-  }
-}
+const drawerRef = ref<InstanceType<typeof BlAddressOperateDrawer> | null>(null);
 </script>
 
 <template>
@@ -267,36 +129,19 @@ async function handleDrawerSubmit() {
       @selection-change="handleSelectionChange"
     >
       <template #search-action>
-        <div class="flex flex-col gap-12px">
-          <NRadioGroup v-model:value="activeType" type="button">
-            <NRadioButton v-for="opt in addressTypeOptions" :key="opt.value" :value="opt.value">
-              {{ opt.label }}
-            </NRadioButton>
-          </NRadioGroup>
-          <div class="flex flex-wrap items-center gap-12px">
-            <NInput
-              v-model:value="keyword"
-              class="w-200px!"
-              clearable
-              :placeholder="$t('page.dataManage.bl.blAddress.form.namePlaceholder')"
-              @keyup.enter="handleSearch"
-            />
-            <NButton size="small" type="primary" @click="handleSearch">
-              <template #icon><icon-ic-round-search class="text-icon" /></template>
-              {{ $t('common.search') }}
-            </NButton>
-            <NButton size="small" @click="handleReset">
-              <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-              {{ $t('common.reset') }}
-            </NButton>
-          </div>
-        </div>
+        <BlAddressSearchForm
+          v-model:active-type="activeType"
+          v-model:keyword="keyword"
+          :address-type-options="addressTypeOptions"
+          @search="handleSearch"
+          @reset="handleReset"
+        />
       </template>
       <template #createDate="{ row }">
         <span>{{ formatDateTime(row.createDate) }}</span>
       </template>
       <template #operation-left>
-        <NButton type="primary" ghost size="small" @click="openCreate">
+        <NButton type="primary" ghost size="small" @click="drawerRef?.openCreate(activeType)">
           <template #icon><icon-ic-round-plus class="text-icon" /></template>
           {{ $t('common.add') }}
         </NButton>
@@ -321,7 +166,7 @@ async function handleDrawerSubmit() {
         />
       </template>
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
+        <NButton size="small" type="primary" text @click="drawerRef?.openEdit(row)">{{ $t('common.edit') }}</NButton>
         <NPopconfirm @positive-click="confirmDelete(row)">
           <template #trigger>
             <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
@@ -330,14 +175,7 @@ async function handleDrawerSubmit() {
         </NPopconfirm>
       </template>
     </Table>
-    <Drawer
-      v-model:show="drawerVisible"
-      :title="drawerTitle"
-      :loading="submitting"
-      :confirm-text="$t('common.save')"
-      @submit="handleDrawerSubmit"
-    >
-      <NFormWrap ref="formRef" :model="formModel" :items="formItems" />
-    </Drawer>
+
+    <BlAddressOperateDrawer ref="drawerRef" @submitted="getData" />
   </div>
 </template>

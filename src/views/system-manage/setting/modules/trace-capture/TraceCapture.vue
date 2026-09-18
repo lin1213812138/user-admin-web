@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import type { Component } from 'vue';
 import { $t } from '@/locales';
 import { NCard, NTabPane, NTabs } from 'naive-ui';
 import TrackNetworkTable from './track-network/TrackNetworkTable.vue';
@@ -23,36 +24,30 @@ const active = ref<SubTabKey>('track-network');
 function handleTabChange(value: string | number) {
   active.value = value as SubTabKey;
 }
+
+/** 按需挂载：子 tab key → 对应表格组件，仅渲染当前激活的表格，切回时复用 keep-alive 缓存（不重新取数） */
+const tableMap: Record<SubTabKey, Component> = {
+  'track-network': TrackNetworkTable,
+  'track-transform': TraceTransformTable,
+  'track-keyword': TraceKeywordTable,
+  'capture-time': CaptureTimeTable
+};
 </script>
 
 <template>
   <NCard class="h-full" :content-style="{ padding: '0', display: 'flex', flexDirection: 'column', minHeight: '0' }">
     <div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-16px py-16px">
-      <NTabs :value="active" type="line" class="trace-capture-tabs" @update:value="handleTabChange">
-        <NTabPane v-for="t in configTabs" :key="t.key" :name="t.key" :tab="t.label">
-          <TraceTransformTable v-if="t.key === 'track-transform'" />
-          <TraceKeywordTable v-else-if="t.key === 'track-keyword'" />
-          <CaptureTimeTable v-else-if="t.key === 'capture-time'" />
-          <TrackNetworkTable v-else :category="t.key" />
-        </NTabPane>
+      <NTabs :value="active" type="line" class="mb-5px" @update:value="handleTabChange">
+        <NTabPane v-for="t in configTabs" :key="t.key" :name="t.key" :tab="t.label" />
       </NTabs>
+      <KeepAlive>
+        <component
+          :is="tableMap[active]"
+          :key="active"
+          v-bind="active === 'track-network' ? { category: active } : {}"
+          class="min-h-0 flex-1"
+        />
+      </KeepAlive>
     </div>
   </NCard>
 </template>
-
-<style scoped>
-.trace-capture-tabs {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.trace-capture-tabs :deep(.n-tabs-pane-wrapper) {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.trace-capture-tabs :deep(.n-tab-pane) {
-  height: 100%;
-}
-</style>
