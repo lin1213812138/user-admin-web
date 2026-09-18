@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.0.11](https://github.com/lin1213812138/user-admin-web/compare/v0.0.10...v0.0.11) (2026-09-18)
+
+### &nbsp;&nbsp;&nbsp;🚀 Features
+
+- **权限**: 注入静态路由权限码并补充相关计划文档 &nbsp;-&nbsp; by **LINFLY** [<samp>(b5a65)</samp>](https://github.com/lin1213812138/user-admin-web/commit/b5a6584)
+
+### &nbsp;&nbsp;&nbsp;📖 Documentation
+
+- 新增国家选择组件与资料管理拆表计划 &nbsp;-&nbsp; by **LINFLY** [<samp>(ef8f7)</samp>](https://github.com/lin1213812138/user-admin-web/commit/ef8f7f4)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[LINFLY](mailto:2276928094@qq.com)
+
 ## [v0.0.10](https://github.com/lin1213812138/user-admin-web/compare/v0.0.9...v0.0.10) (2026-09-18)
 
 ### &nbsp;&nbsp;&nbsp;🚀 Features
