@@ -8,3 +8,11 @@ export function useArchiveStatusOptions() {
     { label: $t('common.disable'), value: 0 }
   ]);
 }
+
+/** 是/否(0-否 1-是)选项，档案弹窗内布尔字段下拉共用 */
+export function useArchiveYesNoOptions() {
+  return computed<CommonType.Option<0 | 1>[]>(() => [
+    { label: $t('common.yesOrNo.yes'), value: 1 },
+    { label: $t('common.yesOrNo.no'), value: 0 }
+  ]);
+}

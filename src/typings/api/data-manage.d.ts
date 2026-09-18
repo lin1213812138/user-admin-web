@@ -95,28 +95,52 @@ declare namespace Api {
       name: string;
     }
     interface BusinessProblemCategory extends MasterDataRow {
-      code: string;
+      /** 类别名称（后端唯一字段，必填） */
       name: string;
+      /** 详细描述 */
+      desc?: string;
+      /** 处理办法 */
+      note?: string;
     }
     interface BusinessGoodsCategory extends MasterDataRow {
-      code: string;
+      /** 类别名称（后端唯一字段，必填） */
       name: string;
+      /** 是否敏感货 0-否 1-是 */
+      sensitive?: 0 | 1;
+      /** 是否带电 0-否 1-是 */
+      charged?: 0 | 1;
+      /** 是否危险品 0-否 1-是 */
+      danger?: 0 | 1;
+      /** 说明 */
+      note?: string;
+      /** 是否默认 0-否 1-是（设 1 时后端自动清其他默认） */
+      isDefault?: 0 | 1;
     }
     interface BusinessCustomsType extends MasterDataRow {
-      code: string;
+      /** 类型名称（后端唯一字段，必填） */
       name: string;
+      /** 仅内部可用 0-否 1-是 */
+      inner?: 0 | 1;
+      /** 备注 */
+      note?: string;
     }
     interface BusinessExportReason extends MasterDataRow {
-      code: string;
+      /** 名称（后端唯一字段，必填） */
       name: string;
+      /** 备注 */
+      note?: string;
     }
     interface BusinessClearanceMethod extends MasterDataRow {
-      code: string;
+      /** 类型名称（后端唯一字段，必填） */
       name: string;
+      /** 备注 */
+      note?: string;
     }
     interface BusinessSalesTerms extends MasterDataRow {
-      code: string;
+      /** 条款名称（后端唯一字段，必填） */
       name: string;
+      /** 备注 */
+      note?: string;
     }
   }
 }

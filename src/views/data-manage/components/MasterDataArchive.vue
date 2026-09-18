@@ -203,9 +203,6 @@ async function handleSubmit() {
           <NButton size="small" type="primary" text @click="openDrawer('edit', row as T)">
             {{ $t('common.edit') }}
           </NButton>
-          <NButton size="small" type="info" text @click="openDrawer('detail', row as T)">
-            {{ $t('common.detail') }}
-          </NButton>
           <NPopconfirm @positive-click="handleDelete([(row as T & { _id: string })._id])">
             <template #trigger>
               <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>

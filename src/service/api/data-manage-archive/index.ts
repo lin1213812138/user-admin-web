@@ -3,14 +3,16 @@ import { request } from '../../request';
 /**
  * 业务资料(business) + 财务资料(finance) 共 12 个档案的独立接口。
  *
- * - 后端 api-v1-web 已存在路由的 4 个（currency / sales-terms / export-reason / customs-type）走真实 request，
- *   调用方需解包 { data, error }（与 basic/bl/ship/no-rule 一致）。
- * - 后端暂未实现的 8 个（account / settlement / address / declared-goods / problem-category /
- *   goods-category / clearance-method / expense-type）暂走本地 mock 兜底，返回结构与真实接口一致
+ * - 后端 api-v1-web 已存在路由的 7 个（currency / sales-terms / export-reason / customs-type /
+ *   problem-category / goods-category / clearance-method(=customs-clear)）走真实 request，调用方需解包
+ *   { data, error }（与 basic/bl/ship/no-rule 一致）；list 均显式 current→page 映射且 status 拼 where。
+ * - 后端暂未实现的 5 个（account / settlement / address / declared-goods /
+ *   expense-type）暂走本地 mock 兜底，返回结构与真实接口一致
  *   （{ list, total } + _id），将来后端补好路由后只需把对应函数体从 mock 改为 request 即可，零成本切换。
  *
  * 通用分页契约：{ current, size, keyword, status } → { list, total }；
  * create 收 body（update 必带 _id）；delete 收 { ids: string[] }（_id 数组）。
+ * 注意：后端 queryCommon 读 `page`（无 current→page 转换），真实接口的 list 函数需显式把 current 映射为 page。
  */
 
 export interface ArchiveApiGroup {
@@ -56,12 +58,17 @@ export function fetchDeleteCurrency(ids: string[]) {
   }>;
 }
 
-/** 销售条款 /sales-terms */
+/** 销售条款 /sales-terms（后端 keywordFields 固定 ['name']，status 需放进 where） */
 export function fetchGetSalesTermsList(params: Api.DataManage.ArchiveSearchParams) {
   return request<Api.DataManage.ArchiveList<Api.DataManage.BusinessSalesTerms>>({
     url: '/sales-terms/query',
     method: 'post',
-    data: params
+    data: {
+      page: params.current,
+      size: params.size,
+      keyword: params.keyword,
+      where: params.status != null ? { status: params.status } : undefined
+    }
   }) as Promise<{
     data: Api.DataManage.ArchiveList<Api.DataManage.MasterDataRow> | null;
     error: unknown;
@@ -86,12 +93,17 @@ export function fetchDeleteSalesTerms(ids: string[]) {
   }>;
 }
 
-/** 出口原因 /export-reason */
+/** 出口原因 /export-reason（后端 keywordFields 固定 ['name']，status 需放进 where） */
 export function fetchGetExportReasonList(params: Api.DataManage.ArchiveSearchParams) {
   return request<Api.DataManage.ArchiveList<Api.DataManage.BusinessExportReason>>({
     url: '/export-reason/query',
     method: 'post',
-    data: params
+    data: {
+      page: params.current,
+      size: params.size,
+      keyword: params.keyword,
+      where: params.status != null ? { status: params.status } : undefined
+    }
   }) as Promise<{
     data: Api.DataManage.ArchiveList<Api.DataManage.MasterDataRow> | null;
     error: unknown;
@@ -116,12 +128,17 @@ export function fetchDeleteExportReason(ids: string[]) {
   }>;
 }
 
-/** 报关类型 /customs-type */
+/** 报关类型 /customs-type（后端 keywordFields 固定 ['name']，status 需放进 where） */
 export function fetchGetCustomsTypeList(params: Api.DataManage.ArchiveSearchParams) {
   return request<Api.DataManage.ArchiveList<Api.DataManage.BusinessCustomsType>>({
     url: '/customs-type/query',
     method: 'post',
-    data: params
+    data: {
+      page: params.current,
+      size: params.size,
+      keyword: params.keyword,
+      where: params.status != null ? { status: params.status } : undefined
+    }
   }) as Promise<{
     data: Api.DataManage.ArchiveList<Api.DataManage.MasterDataRow> | null;
     error: unknown;
@@ -146,8 +163,113 @@ export function fetchDeleteCustomsType(ids: string[]) {
   }>;
 }
 
+/** 问题类别 /problem-group（后端 keywordFields 固定 ['name']，status 需放进 where） */
+export function fetchGetProblemGroupList(params: Api.DataManage.ArchiveSearchParams) {
+  return request<Api.DataManage.ArchiveList<Api.DataManage.BusinessProblemCategory>>({
+    url: '/problem-group/query',
+    method: 'post',
+    data: {
+      page: params.current,
+      size: params.size,
+      keyword: params.keyword,
+      where: params.status != null ? { status: params.status } : undefined
+    }
+  }) as Promise<{
+    data: Api.DataManage.ArchiveList<Api.DataManage.BusinessProblemCategory> | null;
+    error: unknown;
+  }>;
+}
+export function fetchCreateProblemGroup(params: Partial<Api.DataManage.BusinessProblemCategory>) {
+  return request<unknown>({ url: '/problem-group/create', method: 'post', data: params }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+export function fetchUpdateProblemGroup(params: Partial<Api.DataManage.BusinessProblemCategory>) {
+  return request<unknown>({ url: '/problem-group/update', method: 'post', data: params }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+export function fetchDeleteProblemGroup(ids: string[]) {
+  return request<unknown>({ url: '/problem-group/delete', method: 'post', data: { ids } }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+
+/** 物品类别 /product-group（后端 keywordFields 固定 ['name']，status 需放进 where；isDefault 由后端自动清他项） */
+export function fetchGetProductGroupList(params: Api.DataManage.ArchiveSearchParams) {
+  return request<Api.DataManage.ArchiveList<Api.DataManage.BusinessGoodsCategory>>({
+    url: '/product-group/query',
+    method: 'post',
+    data: {
+      page: params.current,
+      size: params.size,
+      keyword: params.keyword,
+      where: params.status != null ? { status: params.status } : undefined
+    }
+  }) as Promise<{
+    data: Api.DataManage.ArchiveList<Api.DataManage.BusinessGoodsCategory> | null;
+    error: unknown;
+  }>;
+}
+export function fetchCreateProductGroup(params: Partial<Api.DataManage.BusinessGoodsCategory>) {
+  return request<unknown>({ url: '/product-group/create', method: 'post', data: params }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+export function fetchUpdateProductGroup(params: Partial<Api.DataManage.BusinessGoodsCategory>) {
+  return request<unknown>({ url: '/product-group/update', method: 'post', data: params }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+export function fetchDeleteProductGroup(ids: string[]) {
+  return request<unknown>({ url: '/product-group/delete', method: 'post', data: { ids } }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+
+/** 清关方式 /customs-clear（后端 keywordFields 固定 ['name']，status 需放进 where） */
+export function fetchGetCustomsClearList(params: Api.DataManage.ArchiveSearchParams) {
+  return request<Api.DataManage.ArchiveList<Api.DataManage.BusinessClearanceMethod>>({
+    url: '/customs-clear/query',
+    method: 'post',
+    data: {
+      page: params.current,
+      size: params.size,
+      keyword: params.keyword,
+      where: params.status != null ? { status: params.status } : undefined
+    }
+  }) as Promise<{
+    data: Api.DataManage.ArchiveList<Api.DataManage.BusinessClearanceMethod> | null;
+    error: unknown;
+  }>;
+}
+export function fetchCreateCustomsClear(params: Partial<Api.DataManage.BusinessClearanceMethod>) {
+  return request<unknown>({ url: '/customs-clear/create', method: 'post', data: params }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+export function fetchUpdateCustomsClear(params: Partial<Api.DataManage.BusinessClearanceMethod>) {
+  return request<unknown>({ url: '/customs-clear/update', method: 'post', data: params }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+export function fetchDeleteCustomsClear(ids: string[]) {
+  return request<unknown>({ url: '/customs-clear/delete', method: 'post', data: { ids } }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
+}
+
 // ---------------------------------------------------------------------------
-// 本地 mock 兜底（后端暂未实现路由的 8 个档案）
+// 本地 mock 兜底（后端暂未实现路由的 5 个档案）
 // ---------------------------------------------------------------------------
 
 type RowFactory = (i: number) => Api.DataManage.MasterDataRow;
@@ -182,33 +304,6 @@ const factories: Partial<Record<Api.DataManage.DataManageArchiveKey, RowFactory>
       status: i % 5 === 0 ? 0 : 1,
       remark: '',
       createTime: `2026-0${(i % 9) + 1}-11 19:00:00`
-    }) as unknown as Api.DataManage.MasterDataRow,
-  problemCategory: i =>
-    ({
-      _id: `PC${i}`,
-      code: `PC${String(i).padStart(4, '0')}`,
-      name: `问题类别${i}`,
-      status: i % 4 === 0 ? 0 : 1,
-      remark: '',
-      createTime: `2026-0${(i % 9) + 1}-12 20:00:00`
-    }) as unknown as Api.DataManage.MasterDataRow,
-  goodsCategory: i =>
-    ({
-      _id: `GC${i}`,
-      code: `GC${String(i).padStart(4, '0')}`,
-      name: `物品类别${i}`,
-      status: i % 5 === 0 ? 0 : 1,
-      remark: '',
-      createTime: `2026-0${(i % 9) + 1}-13 21:00:00`
-    }) as unknown as Api.DataManage.MasterDataRow,
-  clearanceMethod: i =>
-    ({
-      _id: `CM${i}`,
-      code: `CM${String(i).padStart(4, '0')}`,
-      name: `清关方式${i}`,
-      status: i % 4 === 0 ? 0 : 1,
-      remark: '',
-      createTime: `2026-0${(i % 9) + 1}-16 10:00:00`
     }) as unknown as Api.DataManage.MasterDataRow,
   'expense-type': i =>
     ({
@@ -303,22 +398,22 @@ export const archiveApiMap: Partial<Record<Api.DataManage.DataManageArchiveKey, 
     remove: fetchDeleteExportReason
   },
   problemCategory: {
-    list: (p: Api.DataManage.ArchiveSearchParams) => mockList('problemCategory', p),
-    create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('problemCategory', p),
-    update: (p: Api.DataManage.MasterDataRow) => mockUpdate('problemCategory', p),
-    remove: (ids: string[]) => mockDelete('problemCategory', ids)
+    list: fetchGetProblemGroupList,
+    create: fetchCreateProblemGroup,
+    update: fetchUpdateProblemGroup,
+    remove: fetchDeleteProblemGroup
   },
   goodsCategory: {
-    list: (p: Api.DataManage.ArchiveSearchParams) => mockList('goodsCategory', p),
-    create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('goodsCategory', p),
-    update: (p: Api.DataManage.MasterDataRow) => mockUpdate('goodsCategory', p),
-    remove: (ids: string[]) => mockDelete('goodsCategory', ids)
+    list: fetchGetProductGroupList,
+    create: fetchCreateProductGroup,
+    update: fetchUpdateProductGroup,
+    remove: fetchDeleteProductGroup
   },
   clearanceMethod: {
-    list: (p: Api.DataManage.ArchiveSearchParams) => mockList('clearanceMethod', p),
-    create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('clearanceMethod', p),
-    update: (p: Api.DataManage.MasterDataRow) => mockUpdate('clearanceMethod', p),
-    remove: (ids: string[]) => mockDelete('clearanceMethod', ids)
+    list: fetchGetCustomsClearList,
+    create: fetchCreateCustomsClear,
+    update: fetchUpdateCustomsClear,
+    remove: fetchDeleteCustomsClear
   },
   declaredGoods: {
     list: (p: Api.DataManage.ArchiveSearchParams) => mockList('declaredGoods', p),
