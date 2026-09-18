@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.0.12](https://github.com/lin1213812138/user-admin-web/compare/v0.0.11...v0.0.12) (2026-09-19)
+
+### &nbsp;&nbsp;&nbsp;🐞 Bug Fixes
+
+- **权限**: 修复 v-auth 在多根组件上失效 &nbsp;-&nbsp; by **LINFLY** [<samp>(59060)</samp>](https://github.com/lin1213812138/user-admin-web/commit/5906078)
+
+### &nbsp;&nbsp;&nbsp;💅 Refactors
+
+- **data-manage**:
+  - 拆分 business/finance 独立接口并调整契约 &nbsp;-&nbsp; by **林翔** [<samp>(a507c)</samp>](https://github.com/lin1213812138/user-admin-web/commit/a507ca2)
+  - 对齐档案接口并改造申报物品页面 &nbsp;-&nbsp; by **林翔** [<samp>(c95be)</samp>](https://github.com/lin1213812138/user-admin-web/commit/c95bec2)
+
+### &nbsp;&nbsp;&nbsp;❤️ Contributors
+
+[林翔](mailto:2276928094@qq.com)
+
 ## [v0.0.11](https://github.com/lin1213812138/user-admin-web/compare/v0.0.10...v0.0.11) (2026-09-18)
 
 ### &nbsp;&nbsp;&nbsp;🚀 Features
