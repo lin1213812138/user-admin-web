@@ -48,11 +48,14 @@ const local: App.I18n.Schema = {
     delete: '删除',
     deleteSuccess: '删除成功',
     confirmDelete: '确认删除吗？',
+    confirmEnable: '确认启用吗？',
+    confirmDisable: '确认停用吗？',
     copy: '复制',
     chooseFile: '选择文件',
     upload: {
       exceedSize: '文件大小不能超过 {size}MB',
-      draggerText: '点击或者拖动文件到该区域来上传'
+      draggerText: '点击或者拖动文件到该区域来上传',
+      invalidType: '文件格式不支持，仅支持 {accept}'
     },
     copySuccess: '复制成功',
     copyFailed: '复制失败',
@@ -411,17 +414,17 @@ const local: App.I18n.Schema = {
           statusPlaceholder: '请选择状态',
           keywordPlaceholder: '账号 / 用户名称 / 姓名模糊搜索',
           idCardPlaceholder: '请输入身份证号码',
-          realNamePlaceholder: '请输入',
-          contactPhonePlaceholder: '请输入',
-          positionPlaceholder: '请输入',
+          realNamePlaceholder: '请输入姓名',
+          contactPhonePlaceholder: '请输入联系电话',
+          positionPlaceholder: '请输入职位',
           genderPlaceholder: '请选择性别',
-          emailPlaceholder: '请输入',
+          emailPlaceholder: '请输入邮箱',
           hireDatePlaceholder: '请选择日期',
           birthdayPlaceholder: '请选择日期',
-          wechatPlaceholder: '请输入',
-          homeAddressPlaceholder: '请输入',
-          otherContactPlaceholder: '请输入',
-          remarkPlaceholder: '请输入'
+          wechatPlaceholder: '请输入微信',
+          homeAddressPlaceholder: '请输入家庭应住址',
+          otherContactPlaceholder: '请输入其他联系方式',
+          remarkPlaceholder: '请输入备注'
         }
       },
       role: {
@@ -430,6 +433,7 @@ const local: App.I18n.Schema = {
         desc: '角色描述',
         refId: '权限套用',
         dataAuths: '数据权限',
+        restrictSection: '限制性权限设置',
         order: '排序',
         creator: '创建人',
         createTime: '创建时间',
@@ -447,16 +451,23 @@ const local: App.I18n.Schema = {
           user: '仅查看专属客户业务',
           group: '仅查看所属组别客户业务'
         },
+        ctrlOptions: {
+          allow: '允许',
+          deny: '不允许',
+          enable: '启用',
+          disable: '不启用'
+        },
         ctrls: {
-          sendOrder: '出库后允许修改运单',
+          sendOrder: '出库后禁止修改',
           sendCtrl: '出库必须称重',
-          orderCol: '允许设置运单列表字段',
-          editInfo: '允许修改个人信息'
+          orderCol: '运单列表禁止设置列表字段',
+          editInfo: '用户修改个人信息',
+          editPwd: '用户修改密码'
         },
         permission: '分配权限',
         relationUser: '关联用户',
         permissionTip: '勾选该角色可访问的菜单',
-        permissionDisabledTip: '超级管理员不允许分配权限',
+        permissionDisabledTip: '管理员类型不允许分配权限',
         builtIn: '内置',
         builtInEditTip: '内置角色不允许修改',
         builtInDeleteTip: '内置角色不允许删除',

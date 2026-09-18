@@ -194,8 +194,8 @@ watch(
     </div>
     <template #footer>
       <div class="flex justify-end gap-12px">
-        <NButton @click="handleReset">{{ $t('common.reset') }}</NButton>
-        <NButton type="primary" @click="handleConfirm">{{ $t('common.confirm') }}</NButton>
+        <LButton @click="handleReset">{{ $t('common.reset') }}</LButton>
+        <LButton type="primary" @click="handleConfirm">{{ $t('common.confirm') }}</LButton>
       </div>
     </template>
   </NModal>

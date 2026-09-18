@@ -36,7 +36,7 @@ const tableMap: Record<SubTabKey, Component> = {
 
 <template>
   <NCard class="h-full" :content-style="{ padding: '0', display: 'flex', flexDirection: 'column', minHeight: '0' }">
-    <div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-16px py-16px">
+    <div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-10px py-10px">
       <NTabs :value="active" type="line" class="mb-5px" @update:value="handleTabChange">
         <NTabPane v-for="t in configTabs" :key="t.key" :name="t.key" :tab="t.label" />
       </NTabs>

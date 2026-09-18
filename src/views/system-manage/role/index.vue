@@ -16,14 +16,14 @@ const searchParams = reactive<{ name: string; roleType: Api.SystemManage.RoleTyp
   roleType: null
 });
 
-/** 角色类型下拉选项（后端 RoleType：0-客服 1-销售 2-操作 3-财务 4-经理 5-管理员） */
+/** 角色类型下拉选项（后端 RoleType：0-客服 1-销售 2-操作 3-财务 4-经理 100-管理员） */
 const roleTypeOptions = computed<CommonType.Option<Api.SystemManage.RoleType>[]>(() => [
   { label: $t('page.manage.role.roleTypes.service'), value: 0 },
   { label: $t('page.manage.role.roleTypes.sales'), value: 1 },
   { label: $t('page.manage.role.roleTypes.operation'), value: 2 },
   { label: $t('page.manage.role.roleTypes.finance'), value: 3 },
   { label: $t('page.manage.role.roleTypes.manager'), value: 4 },
-  { label: $t('page.manage.role.roleTypes.admin'), value: 5 }
+  { label: $t('page.manage.role.roleTypes.admin'), value: 100 }
 ]);
 
 const searchItems = computed<FormItemConfig[]>(() => [
@@ -91,7 +91,7 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
       },
       { key: 'desc', title: $t('page.manage.role.desc'), visible: true, minWidth: 160, sortable: false },
       { key: 'order', title: $t('page.manage.role.order'), visible: true, width: 80, align: 'center', sortable: true },
-      { key: 'dataAuths', title: $t('page.manage.role.dataAuths'), visible: true, minWidth: 180, sortable: false },
+      // { key: 'dataAuths', title: $t('page.manage.role.dataAuths'), visible: true, minWidth: 180, sortable: false },
       { key: 'creator', title: $t('page.manage.role.creator'), visible: true, width: 100, sortable: false },
       { key: 'createDate', title: $t('page.manage.role.createTime'), visible: true, width: 180, sortable: false },
       { key: 'updateBy', title: $t('page.manage.role.updateBy'), visible: true, width: 100, sortable: false },
@@ -114,7 +114,7 @@ function roleTypeLabel(roleType?: Api.SystemManage.RoleType) {
     2: $t('page.manage.role.roleTypes.operation'),
     3: $t('page.manage.role.roleTypes.finance'),
     4: $t('page.manage.role.roleTypes.manager'),
-    5: $t('page.manage.role.roleTypes.admin')
+    100: $t('page.manage.role.roleTypes.admin')
   };
   return roleType === undefined ? '--' : map[roleType];
 }
@@ -237,7 +237,7 @@ function handleSubmitted() {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col gap-12px p-16px">
+  <div class="h-full w-full flex flex-col gap-12px p-10px">
     <div class="flex-1 min-h-0">
       <Table
         :search-items="searchItems"
@@ -289,23 +289,12 @@ function handleSubmitted() {
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton size="small" type="primary" ghost @click="openDrawer('create')">
+            <NButton v-auth="'system:role:add'" size="small" type="primary" ghost @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
               {{ $t('common.add') }}
             </NButton>
-            <NPopconfirm :disabled="checkedRows.length === 0" @positive-click="handleDelete(checkedRows)">
-              <template #trigger>
-                <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
-                  <template #icon>
-                    <icon-mdi-delete class="text-icon" />
-                  </template>
-                  {{ $t('common.batchDelete') }}
-                </NButton>
-              </template>
-              {{ $t('common.confirmDelete') }}
-            </NPopconfirm>
           </NSpace>
         </template>
 
@@ -329,21 +318,28 @@ function handleSubmitted() {
           <NTooltip :disabled="row.buildIn !== 1">
             <template #trigger>
               <span>
-                <NButton size="small" type="primary" text :disabled="row.buildIn === 1" @click="handleEdit(row)">
+                <NButton
+                  v-auth="'system:role:edit'"
+                  size="small"
+                  type="primary"
+                  text
+                  :disabled="row.buildIn === 1"
+                  @click="handleEdit(row)"
+                >
                   {{ $t('common.edit') }}
                 </NButton>
               </span>
             </template>
             {{ $t('page.manage.role.builtInEditTip') }}
           </NTooltip>
-          <NTooltip :disabled="row.roleType !== 5">
+          <NTooltip :disabled="row.roleType !== 100">
             <template #trigger>
               <span>
                 <NButton
                   size="small"
                   type="info"
                   text
-                  :disabled="row.roleType === 5"
+                  :disabled="row.roleType === 100"
                   @click="openPermissionDrawer(row)"
                 >
                   {{ $t('page.manage.role.permission') }}
@@ -355,7 +351,7 @@ function handleSubmitted() {
           <NTooltip :disabled="row.buildIn !== 1">
             <template #trigger>
               <span>
-                <NPopconfirm @positive-click="handleDelete([row])">
+                <NPopconfirm v-auth="'system:role:delete'" @positive-click="handleDelete([row])">
                   <template #trigger>
                     <NButton size="small" type="error" text :disabled="row.buildIn === 1">
                       {{ $t('common.delete') }}

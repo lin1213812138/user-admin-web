@@ -22,6 +22,13 @@ declare module 'vue-router' {
      * It only works when the route mode is "static", if the route mode is "dynamic", it will be ignored
      */
     roles?: string[];
+    /**
+     * Menu permission code for static-route auth (`system:{module}:list`)
+     *
+     * Route is visible only if the current user's permissions include this code.
+     * It only works when the route mode is "static", if the route mode is "dynamic", it will be ignored.
+     */
+    permission?: string | null;
     /** Whether to cache the route */
     keepAlive?: boolean | null;
     /**

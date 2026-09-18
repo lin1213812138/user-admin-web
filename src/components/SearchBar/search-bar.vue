@@ -61,14 +61,14 @@ const drawerItems = computed<FormItemConfig[]>(() => props.items.map(item => ({ 
 
     <template #footer>
       <div class="flex items-center justify-end gap-8px">
-        <NButton @click="emit('reset')">
+        <LButton @click="emit('reset')">
           <template #icon><icon-ic-round-refresh class="text-icon" /></template>
           {{ $t('common.reset') }}
-        </NButton>
-        <NButton type="primary" @click="emit('search')">
+        </LButton>
+        <LButton type="primary" @click="emit('search')">
           <template #icon><icon-ic-round-search class="text-icon" /></template>
           {{ $t('common.search') }}
-        </NButton>
+        </LButton>
       </div>
     </template>
   </CommonDrawer>

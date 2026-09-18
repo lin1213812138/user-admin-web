@@ -33,7 +33,7 @@ import VerticalTabLayout from '@/components/VerticalTabLayout/index.vue';
 
 | 名称      | 说明                                                                 |
 | --------- | -------------------------------------------------------------------- |
-| `default` | 右侧内容区（自带 `p-16px` 内边距），可放 `Table`、动态组件等任意内容 |
+| `default` | 右侧内容区（自带 `p-10px` 内边距），可放 `Table`、动态组件等任意内容 |
 
 ## 用法示例
 
@@ -91,7 +91,7 @@ watch(activeKey, () => {
 1. **切 tab 不会自动刷新数据**：右侧是插槽，组件不知道内容语义。放表格时需自行 `watch(activeKey)` 重置分页 + `getData()`（参考 `export-format/ExportFormat.vue`）；放动态组件时用 `:key="activeKey"` 重建即可。
 2. **`tabs` 的 `value` 支持 `string | number`**：原数据为数值 id 时需自行 `String(id)` 映射，在 api 闭包内再 `Number(activeKey)` 还原。
 3. **左栏宽度自适应**（`w-fit`）：tab 文案越长左栏越宽；tab 项过多时左栏内部滚动，不会撑破页面。
-4. **右栏自带 `p-16px`**：组件暂未暴露 padding 配置，页面如需贴边自行处理。
+4. **右栏自带 `p-10px`**：组件暂未暴露 padding 配置，页面如需贴边自行处理。
 5. **左栏 tab 外层包裹 div 不可删**：naive `.n-tabs` 自带 `width:100%`，直接当 flex item 会占满整行、把右侧 `flex-1` 挤成 0 宽。
 6. 页面若位于 `base-layout` 内容区且需要整体贴边，请用 `base-layout` 的 `contentShowPadding` 路由名排除机制，不要在页面里用 `!important` 覆盖。
 7. **页面内不要再套 `<KeepAlive>` 包动态组件**：布局层 `<Transition mode="out-in">` 与页内 `<KeepAlive>` 组合会触发 Vue 上游缺陷（vuejs/core#11775），表现为离开本页后所有 SPA 跳转都空白；动态组件场景用 `:key` 重建即可。

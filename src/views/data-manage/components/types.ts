@@ -29,6 +29,13 @@ export interface ArchiveTabItem {
   key: string;
   /** tab 文案 i18n key */
   labelKey: App.I18n.I18nKey;
-  /** 懒加载组件 */
-  load: () => Promise<{ default: Component }>;
+  /** 懒加载组件（与 component 二选一） */
+  load?: () => Promise<{ default: Component }>;
+  /** 已就绪组件（与 load 二选一，静态导入场景用） */
+  component?: Component;
+  /**
+   * 子模块权限码（`system:{module}:{key}`，与 menu-permissions.ts 配置一致）。
+   * 配置后仅当角色勾选了该子模块权限（或超管）时才显示 tab；不配置 = 不做权限控制
+   */
+  permission?: string;
 }

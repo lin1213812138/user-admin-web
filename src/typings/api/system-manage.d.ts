@@ -153,8 +153,8 @@ declare namespace Api {
       _id: string;
     };
 
-    /** 角色类型 0-客服 1-销售 2-操作 3-财务 4-经理 5-管理员 */
-    type RoleType = 0 | 1 | 2 | 3 | 4 | 5;
+    /** 角色类型 0-客服 1-销售 2-操作 3-财务 4-经理 100-管理员 */
+    type RoleType = 0 | 1 | 2 | 3 | 4 | 100;
 
     /** 角色数据权限 0-仅查看专属客户业务 1-仅查看所属组别客户业务 */
     type RoleDataAuth = 0 | 1;
@@ -190,6 +190,8 @@ declare namespace Api {
       orderColCtrl?: Api.SystemManage.RoleCtrl;
       /** 允许修改个人信息 0-不允许 1-允许 */
       editInfoCtrl?: Api.SystemManage.RoleCtrl;
+      /** 用户修改密码 0-不允许 1-允许 */
+      editPwdCtrl?: Api.SystemManage.RoleCtrl;
       /** 排序 */
       order?: number;
       creatorId?: string;
@@ -232,6 +234,8 @@ declare namespace Api {
       sendCtrl?: Api.SystemManage.RoleCtrl;
       orderColCtrl?: Api.SystemManage.RoleCtrl;
       editInfoCtrl?: Api.SystemManage.RoleCtrl;
+      /** 用户修改密码 0-不允许 1-允许 */
+      editPwdCtrl?: Api.SystemManage.RoleCtrl;
       order?: number;
     };
 

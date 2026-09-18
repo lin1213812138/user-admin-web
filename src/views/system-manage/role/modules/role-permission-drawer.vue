@@ -4,6 +4,7 @@ import type { VxeTablePropTypes } from 'vxe-table';
 import { $t } from '@/locales';
 import { fetchUpdateRoleAuths } from '@/service/api/role';
 import { getMenuPermissionTree, type MenuPermissionRow } from '@/constants/menu-permissions';
+import { SUPER_ROLE_TYPE } from '@/constants/auth';
 import CommonDrawer from '@/components/common/drawer.vue';
 import { Table } from '@/components/Table';
 import type { VxeColumnRenderColumn } from '@/components/Table';
@@ -38,12 +39,13 @@ const title = computed(() =>
   props.row ? `${$t('page.manage.role.permission')} - ${props.row.name}` : $t('page.manage.role.permission')
 );
 
+/** 当前角色是否为超管（roleType === SUPER_ROLE_TYPE=100）：权限树强制全选且只读 */
+const isSuperRole = computed(() => props.row?.roleType === SUPER_ROLE_TYPE);
+
 const submitting = ref(false);
 const tableRef = ref<{ setTreeExpand?: (rows: any[], expanded: boolean) => void } | null>(null);
 /** 每个菜单 id 勾选的按钮权限码，独立于过滤/搜索，避免搜索后丢失 */
 const rowButtonChecks = ref<Record<number, string[]>>({});
-/** 每个菜单 id 勾选的子模块权限码（界面内子模块），与按钮权限同样独立于过滤/搜索 */
-const rowSubMenuChecks = ref<Record<number, string[]>>({});
 
 /** 完整权限树（权威数据源）：由 src/constants/menu-permissions.ts 配置自动生成 */
 const allRows = ref<MenuPermissionRow[]>([]);
@@ -54,20 +56,17 @@ const checkedIds = ref<number[]>([]);
 const keyword = ref('');
 
 /** 全表按钮权限码（表头全选 / 半选用） */
-const allButtonCodes = computed(() => collectPermissionCodes('buttons'));
-/** 全表子模块权限码（表头全选 / 半选用） */
-const allSubMenuCodes = computed(() => collectPermissionCodes('subMenus'));
+// const allButtonCodes = computed(() => collectButtonCodes());
 
 const columns = computed<VxeColumnRenderColumn[]>(() => [
   {
     key: 'title',
     title: '菜单名称',
     treeNode: true,
-    minWidth: 220,
+    width: 200,
     sortable: false,
     headerSlot: 'nav-header'
   },
-  { key: 'subMenus', title: '子模块权限', minWidth: 320, sortable: false, headerSlot: 'sub-menu-header' },
   { key: 'buttons', title: '按钮权限', minWidth: 320, sortable: false, headerSlot: 'button-header' }
 ]);
 
@@ -98,8 +97,8 @@ const treeConfig = computed<VxeTablePropTypes.TreeConfig>(() => ({
 const checkboxConfig = computed<VxeTablePropTypes.CheckboxConfig>(() => ({
   checkStrictly: false,
   checkField: 'checked',
-  // 首页等必选菜单禁用勾选（保持默认勾选，不可取消）
-  checkMethod: (params: any) => !params?.row?.home
+  // 首页等必选菜单禁用勾选（保持默认勾选，不可取消）；超管角色权限树强制只读
+  checkMethod: (params: any) => !params?.row?.home && !isSuperRole.value
 }));
 
 function collectIds(rows: MenuPermissionRow[]): number[] {
@@ -205,65 +204,63 @@ function withHome(ids: number[]): number[] {
   return [...set];
 }
 
-/** 收集全表某一列（按钮 / 二级菜单）的全部权限码 */
-function collectPermissionCodes(key: 'buttons' | 'subMenus'): string[] {
-  const codes: string[] = [];
+/** 收集全树所有菜单节点（含子模块）的按钮权限码，供表头全选 / 半选计算 */
+// function collectButtonCodes(): string[] {
+//   const codes: string[] = [];
 
-  function walk(rows: MenuPermissionRow[]) {
-    rows.forEach(row => {
-      row[key].forEach(item => codes.push(item.code));
-      if (row.children?.length) {
-        walk(row.children);
-      }
-    });
-  }
+//   function walk(rows: MenuPermissionRow[]) {
+//     rows.forEach(row => {
+//       row.buttons.forEach(item => codes.push(item.code));
+//       if (row.children?.length) {
+//         walk(row.children);
+//       }
+//     });
+//   }
 
-  walk(allRows.value);
+//   walk(allRows.value);
 
-  return [...new Set(codes)];
-}
+//   return [...new Set(codes)];
+// }
 
-interface HeaderCheckState {
-  checked: boolean;
-  indeterminate: boolean;
-  disabled: boolean;
-}
+// interface HeaderCheckState {
+//   checked: boolean;
+//   indeterminate: boolean;
+//   disabled: boolean;
+// }
 
 /** 表头复选框状态：按某一列权限码的勾选覆盖面计算全选 / 半选 */
-function headerCheckState(allCodes: string[], checks: Record<number, string[]>): HeaderCheckState {
-  const checkedCodes = new Set(Object.values(checks).flat());
-  const checkedCount = allCodes.filter(code => checkedCodes.has(code)).length;
+// function headerCheckState(allCodes: string[], checks: Record<number, string[]>): HeaderCheckState {
+//   const checkedCodes = new Set(Object.values(checks).flat());
+//   const checkedCount = allCodes.filter(code => checkedCodes.has(code)).length;
 
-  return {
-    checked: allCodes.length > 0 && checkedCount === allCodes.length,
-    indeterminate: checkedCount > 0 && checkedCount < allCodes.length,
-    disabled: allCodes.length === 0
-  };
-}
+//   return {
+//     checked: allCodes.length > 0 && checkedCount === allCodes.length,
+//     indeterminate: checkedCount > 0 && checkedCount < allCodes.length,
+//     disabled: allCodes.length === 0
+//   };
+// }
 
-const buttonHeaderState = computed(() => headerCheckState(allButtonCodes.value, rowButtonChecks.value));
-const subMenuHeaderState = computed(() => headerCheckState(allSubMenuCodes.value, rowSubMenuChecks.value));
+// const buttonHeaderState = computed(() => headerCheckState(allButtonCodes.value, rowButtonChecks.value));
 
-/** 表头全选：把某一列（按钮 / 二级菜单）的全部权限码写入所有菜单行，取消时整体清空 */
-function toggleAllPermission(key: 'buttons' | 'subMenus', checked: boolean) {
-  const target = key === 'buttons' ? rowButtonChecks : rowSubMenuChecks;
-  const next: Record<number, string[]> = {};
+// /** 表头全选：把全树所有菜单节点（含子模块）的按钮权限码写入，取消时整体清空 */
+// function toggleAllButtons(checked: boolean) {
+//   const next: Record<number, string[]> = {};
 
-  function walk(rows: MenuPermissionRow[]) {
-    rows.forEach(row => {
-      const codes = row[key].map(item => item.code);
-      if (checked && codes.length) {
-        next[row.id] = codes;
-      }
-      if (row.children?.length) {
-        walk(row.children);
-      }
-    });
-  }
+//   function walk(rows: MenuPermissionRow[]) {
+//     rows.forEach(row => {
+//       const codes = row.buttons.map(item => item.code);
+//       if (checked && codes.length) {
+//         next[row.id] = codes;
+//       }
+//       if (row.children?.length) {
+//         walk(row.children);
+//       }
+//     });
+//   }
 
-  walk(allRows.value);
-  target.value = next;
-}
+//   walk(allRows.value);
+//   rowButtonChecks.value = next;
+// }
 
 /** 按当前勾选集合递归生成行副本（不污染 allRows） */
 function withChecked(row: MenuPermissionRow, checked: Set<number>): MenuPermissionRow {
@@ -322,33 +319,30 @@ function applyView() {
 function loadData() {
   allRows.value = getMenuPermissionTree();
   HOME_IDS.value = collectHomeIds(allRows.value);
-  // 角色已存权限码（菜单 id 转字符串 + 按钮/子模块 code），用于回显预勾选
+  // 角色已存权限码（菜单 permission 码 + 按钮 code），用于回显预勾选
   const authSet = new Set((props.row?.auths ?? []).map(String));
 
   const checked: number[] = [];
   const btnChecks: Record<number, string[]> = {};
-  const subChecks: Record<number, string[]> = {};
 
   // 递归：菜单 id 在 authSet、或任一后代命中 → 该菜单勾选（父级随子级联动，提交/回显可往返）
   // 不能用 Array.some：回调首次返回 true 即短路，后续兄弟行（含整棵子树）不再遍历，回显会大面积丢失
   function walk(rows: MenuPermissionRow[]): boolean {
     let anyMatched = false;
     rows.forEach(row => {
-      let matched = authSet.has(String(row.id));
+      // 菜单勾选基于 permission 码（兼容老数据：仍认数字 id）
+      let matched = (row.permission && authSet.has(row.permission)) || authSet.has(String(row.id));
       if (row.children?.length && walk(row.children)) {
         matched = true;
       }
       if (matched) {
         checked.push(row.id);
         anyMatched = true;
-      }
-      if (row.buttons.length) {
-        const hit = row.buttons.filter(b => authSet.has(b.code)).map(b => b.code);
-        if (hit.length) btnChecks[row.id] = hit;
-      }
-      if (row.subMenus.length) {
-        const hit = row.subMenus.filter(s => authSet.has(s.code)).map(s => s.code);
-        if (hit.length) subChecks[row.id] = hit;
+        // 只有菜单/子模块本身被勾选，才回显其按钮权限；按钮权限依附于菜单访问权限
+        if (row.buttons.length) {
+          const hit = row.buttons.filter(b => authSet.has(b.code)).map(b => b.code);
+          if (hit.length) btnChecks[row.id] = hit;
+        }
       }
     });
     return anyMatched;
@@ -357,7 +351,23 @@ function loadData() {
 
   checkedIds.value = withHome(checked);
   rowButtonChecks.value = btnChecks;
-  rowSubMenuChecks.value = subChecks;
+
+  // 超管角色：权限树强制全选（所有菜单节点 + 按钮），保证 auths 完整、后端 authMap 校验通过
+  if (isSuperRole.value) {
+    const allIds: number[] = [];
+    const allBtn: Record<number, string[]> = {};
+    function walkAll(rows: MenuPermissionRow[]) {
+      rows.forEach(row => {
+        allIds.push(row.id);
+        if (row.buttons.length) allBtn[row.id] = row.buttons.map(b => b.code);
+        if (row.children?.length) walkAll(row.children);
+      });
+    }
+    walkAll(allRows.value);
+    checkedIds.value = withHome(allIds);
+    rowButtonChecks.value = allBtn;
+  }
+
   // 默认展开全部有子节点的菜单（受控展开，applyView 重建后不丢失）
   expandedKeys.value = collectExpandableIds(allRows.value);
   keyword.value = '';
@@ -374,8 +384,10 @@ function handleSelectionChange(records: Record<string, unknown>[], indeterminate
   const prevChecked = checkedIds.value;
   const prevSet = new Set(prevChecked);
   const visibleIds = new Set(collectIds(viewRows.value));
-  // 半选父节点（部分子节点勾选）也要纳入，否则提交 menuIds 会丢失父菜单
+  // 半选父节点（部分子节点勾选）也要纳入，否则提交会丢失父菜单的 permission
   const selectedIds = new Set([...records, ...indeterminates].map(record => Number(record.id)));
+  // 全选态节点（不含半选）：只有它们才触发「按钮默认全选」
+  const fullSelectedIds = new Set(records.map(record => Number(record.id)));
   const next = prevChecked.filter(id => !visibleIds.has(id));
 
   visibleIds.forEach(id => {
@@ -384,32 +396,25 @@ function handleSelectionChange(records: Record<string, unknown>[], indeterminate
     }
   });
 
-  // 新勾选的菜单：按钮 / 子模块权限默认全选
+  // 新勾选且处于全选态的菜单：按钮权限默认全选。
+  // 仅因子模块联动而半选的父菜单不触发，否则只勾一个子模块就会把整个父菜单的按钮全部勾上。
   next.forEach(id => {
-    if (!prevSet.has(id)) {
+    if (!prevSet.has(id) && fullSelectedIds.has(id)) {
       const row = getRowByMenuId(id);
       if (row?.buttons.length) {
         rowButtonChecks.value[id] = row.buttons.map(btn => btn.code);
       }
-      if (row?.subMenus.length) {
-        rowSubMenuChecks.value[id] = row.subMenus.map(item => item.code);
-      }
     }
   });
 
-  // 取消勾选的菜单：重建映射，剔除其按钮 / 子模块权限勾选（避免 delete 动态键）
+  // 取消勾选的菜单：重建映射，剔除其按钮勾选（避免 delete 动态键）
   const cleanedButtons: Record<number, string[]> = {};
-  const cleanedSubMenus: Record<number, string[]> = {};
   next.forEach(id => {
     if (rowButtonChecks.value[id]) {
       cleanedButtons[id] = rowButtonChecks.value[id];
     }
-    if (rowSubMenuChecks.value[id]) {
-      cleanedSubMenus[id] = rowSubMenuChecks.value[id];
-    }
   });
   rowButtonChecks.value = cleanedButtons;
-  rowSubMenuChecks.value = cleanedSubMenus;
 
   checkedIds.value = withHome(next);
 }
@@ -422,16 +427,13 @@ function handleButtonCheckChange(menuId: number, codes: (string | number)[]) {
   if (stringCodes.length && !checkedIds.value.includes(menuId)) {
     checkedIds.value = withHome([...checkedIds.value, menuId]);
     applyView();
+    return;
   }
-}
 
-function handleSubMenuCheckChange(menuId: number, codes: (string | number)[]) {
-  const stringCodes = codes.map(String);
-  rowSubMenuChecks.value[menuId] = stringCodes;
-
-  // 子模块权限同样依附于菜单访问权限：勾了子模块但菜单未勾选时自动勾选该菜单
-  if (stringCodes.length && !checkedIds.value.includes(menuId)) {
-    checkedIds.value = withHome([...checkedIds.value, menuId]);
+  // 如果该菜单所有按钮都被取消，且菜单当前处于勾选状态，则联动取消该菜单勾选；
+  // vxe 父子联动会自动处理父级（无其他子级勾选时父级同步取消）。
+  if (!stringCodes.length && checkedIds.value.includes(menuId)) {
+    checkedIds.value = withHome(checkedIds.value.filter(id => id !== menuId));
     applyView();
   }
 }
@@ -440,11 +442,17 @@ async function handleSubmit() {
   if (!props.row) return;
   submitting.value = true;
   try {
-    // 三套勾选状态合并为扁平 auths：菜单 id(转字符串) + 按钮码 + 子模块码，去重
+    // 只输出带 ':' 的权限码：勾选节点的 permission（菜单 + 子模块，子模块也是树上的普通节点）+ 按钮码；数字菜单 id 不落库
     const auths = new Set<string>();
-    checkedIds.value.forEach(id => auths.add(String(id)));
-    Object.values(rowButtonChecks.value).forEach(codes => codes.forEach(code => auths.add(code)));
-    Object.values(rowSubMenuChecks.value).forEach(codes => codes.forEach(code => auths.add(code)));
+    const addCodes = (codes: string[]) =>
+      codes.forEach(code => {
+        if (code.includes(':')) auths.add(code);
+      });
+    checkedIds.value.forEach(id => {
+      const row = getRowByMenuId(id);
+      if (row?.permission) addCodes([row.permission]);
+    });
+    Object.values(rowButtonChecks.value).forEach(addCodes);
 
     await fetchUpdateRoleAuths({ _id: props.row._id, auths: [...auths] });
     window.$message?.success($t('common.updateSuccess'));
@@ -483,7 +491,7 @@ watch(keyword, () => {
   <CommonDrawer
     v-model:show="drawerVisible"
     :title="title"
-    width="min(92vw, 1400px)"
+    width="min(92vw, 1000px)"
     :loading="submitting"
     @submit="handleSubmit"
   >
@@ -508,7 +516,7 @@ watch(keyword, () => {
               v-model:value="keyword"
               size="small"
               clearable
-              class="w-260px"
+              class="w-300px!"
               :placeholder="$t('page.manage.role.searchMenuPlaceholder')"
             >
               <template #prefix>
@@ -519,33 +527,25 @@ watch(keyword, () => {
           </NSpace>
         </template>
 
-        <template #nav-header>
+        <!--
+ <template #nav-header>
           <span>导航菜单</span>
         </template>
+-->
 
-        <template #button-header>
+        <!--
+ <template #button-header>
           <div class="flex-y-center gap-6px">
             <span>按钮权限</span>
             <NCheckbox
               :checked="buttonHeaderState.checked"
               :indeterminate="buttonHeaderState.indeterminate"
-              :disabled="buttonHeaderState.disabled"
-              @update:checked="checked => toggleAllPermission('buttons', checked)"
+              :disabled="isSuperRole || buttonHeaderState.disabled"
+              @update:checked="checked => toggleAllButtons(checked)"
             />
           </div>
         </template>
-
-        <template #sub-menu-header>
-          <div class="flex-y-center gap-6px">
-            <span>子模块权限</span>
-            <NCheckbox
-              :checked="subMenuHeaderState.checked"
-              :indeterminate="subMenuHeaderState.indeterminate"
-              :disabled="subMenuHeaderState.disabled"
-              @update:checked="checked => toggleAllPermission('subMenus', checked)"
-            />
-          </div>
-        </template>
+-->
 
         <template #title="{ row: menuRow }">
           <div class="flex-y-center gap-6px">
@@ -562,26 +562,12 @@ watch(keyword, () => {
           <NCheckboxGroup
             v-if="(menuRow as MenuPermissionRow).buttons.length"
             :value="rowButtonChecks[(menuRow as MenuPermissionRow).id] || []"
+            :disabled="isSuperRole"
             @update:value="val => handleButtonCheckChange((menuRow as MenuPermissionRow).id, val)"
           >
             <NSpace :size="8" wrap>
               <NCheckbox v-for="btn in (menuRow as MenuPermissionRow).buttons" :key="btn.code" :value="btn.code">
                 {{ btn.label }}
-              </NCheckbox>
-            </NSpace>
-          </NCheckboxGroup>
-          <span v-else>--</span>
-        </template>
-
-        <template #subMenus="{ row: menuRow }">
-          <NCheckboxGroup
-            v-if="(menuRow as MenuPermissionRow).subMenus.length"
-            :value="rowSubMenuChecks[(menuRow as MenuPermissionRow).id] || []"
-            @update:value="val => handleSubMenuCheckChange((menuRow as MenuPermissionRow).id, val)"
-          >
-            <NSpace :size="8" wrap>
-              <NCheckbox v-for="item in (menuRow as MenuPermissionRow).subMenus" :key="item.code" :value="item.code">
-                {{ item.label }}
               </NCheckbox>
             </NSpace>
           </NCheckboxGroup>

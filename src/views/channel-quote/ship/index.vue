@@ -194,7 +194,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col gap-12px py-8px pl-16px">
+  <div class="h-full w-full flex flex-col gap-12px py-8px pl-10px">
     <div class="flex-1 min-h-0">
       <Table
         :columns="columns"

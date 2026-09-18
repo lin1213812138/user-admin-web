@@ -8,6 +8,8 @@ import { fetchGetRoleQueryList } from '@/service/api/role';
 import { fetchGetSiteList } from '@/service/api/site';
 import { fetchGetGroupList } from '@/service/api/group';
 import UserDrawer from '@/components/common/drawer.vue';
+import InputUpload from '@/components/Upload/input-upload.vue';
+import { NCard } from 'naive-ui';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 
 type DrawerMode = 'create' | 'edit' | 'detail';
@@ -48,12 +50,14 @@ const title = computed(() => {
 
 const submitting = ref(false);
 
-const formRef = ref<InstanceType<typeof NFormWrap>>();
+const basicFormRef = ref<InstanceType<typeof NFormWrap>>();
+const profileFormRef = ref<InstanceType<typeof NFormWrap>>();
 
 /** 下拉选项：用户角色（真实 /role/query）/ 所属站点 / 所属组别，主键均为字符串 _id */
 const roleOptions = ref<CommonType.Option<string>[]>([]);
 const siteOptions = ref<CommonType.Option<string>[]>([]);
-const groupOptions = ref<CommonType.Option<string>[]>([]);
+/** 组别全量数据：组别选项按所选站点联动过滤（Group 自带 siteId，无需按站点重复请求） */
+const allGroups = ref<Api.SystemManage.Group[]>([]);
 
 async function loadOptions() {
   const [roleRes, siteRes, groupRes] = await Promise.all([
@@ -64,7 +68,7 @@ async function loadOptions() {
 
   roleOptions.value = (roleRes.data?.list ?? []).map(item => ({ label: item.name, value: item._id }));
   siteOptions.value = (siteRes.data?.list ?? []).map(item => ({ label: item.name, value: item._id }));
-  groupOptions.value = (groupRes.data?.list ?? []).map(item => ({ label: item.name, value: item._id }));
+  allGroups.value = groupRes.data?.list ?? [];
 }
 
 onMounted(() => {
@@ -77,17 +81,17 @@ const sexOptions = computed<CommonType.Option<Api.SystemManage.UserSex>[]>(() =>
   { label: $t('page.manage.user.female'), value: 2 }
 ]);
 
-const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() => [
-  { label: $t('common.enable'), value: 1 },
-  { label: $t('common.disable'), value: 0 }
-]);
+/** 状态不在表单中编辑（启停由列表「启用/停用」按钮控制），仅用于提交默认值/回填现值 */
+const DEFAULT_STATUS: Api.Common.EnableStatus = 1;
 
 /** 表单模型：日期/身份证按字符串编辑，提交时再转后端要求的毫秒时间戳 / Number */
 interface UserFormModel {
   account: string;
   name: string;
   password: string;
-  siteId: string;
+  /** 空值必须给 null 才能触发 NSelect placeholder；空字符串会被当成有效值导致下拉框留白 */
+  siteId: string | null;
+  /** 表单不编辑状态：新增默认启用，编辑回填现值；启停由列表「启用/停用」按钮控制 */
   status: Api.Common.EnableStatus;
   roleIds: string[];
   groupIds: string[];
@@ -106,7 +110,9 @@ interface UserFormModel {
   /** 'YYYY-MM-DD'，提交时转毫秒时间戳 */
   entryDate: string;
   qrCodeUrl: string;
+  /** 附件原始文件名（后端 User.file 语义），fileUrl 存地址 */
   file: string;
+  fileUrl: string;
   note: string;
 }
 
@@ -115,8 +121,8 @@ function createEmptyModel(): UserFormModel {
     account: '',
     name: '',
     password: '',
-    siteId: '',
-    status: 1,
+    siteId: null,
+    status: DEFAULT_STATUS,
     roleIds: [],
     groupIds: [],
     fullName: '',
@@ -132,14 +138,40 @@ function createEmptyModel(): UserFormModel {
     entryDate: '',
     qrCodeUrl: '',
     file: '',
+    fileUrl: '',
     note: ''
   };
 }
 
 const model = reactive<UserFormModel>(createEmptyModel());
 
-const formItems = computed<FormItemConfig[]>(() => [
-  { key: 'basicInfo', label: $t('page.manage.user.basicInfo'), type: 'section', span: 24 },
+/** 组别选项：未选站点时展示全部；已选站点时仅展示该站点的组别（并保留已选中项以便回显） */
+const groupOptions = computed<CommonType.Option<string>[]>(() => {
+  const selected = new Set(model.groupIds);
+
+  return allGroups.value
+    .filter(group => !model.siteId || group.siteId === model.siteId || selected.has(group._id))
+    .map(group => ({ label: group.name, value: group._id }));
+});
+
+/** 回填标志：编辑/详情回填时跳过站点联动清理，避免误删历史数据中不属于当前站点的组别 */
+let restoring = false;
+
+/** 站点 → 组别联动：切换站点后，清掉不属于新站点的已选组别（sync 立即执行，配合 restoring 区分回填） */
+watch(
+  () => model.siteId,
+  () => {
+    if (restoring || !model.siteId) return;
+
+    const validIds = new Set(allGroups.value.filter(group => group.siteId === model.siteId).map(group => group._id));
+
+    model.groupIds = model.groupIds.filter(id => validIds.has(id));
+  },
+  { flush: 'sync' }
+);
+
+/** 基本信息卡片字段：账号 / 名称 / 密码 / 站点 / 角色 / 组别（组别随站点联动过滤） */
+const basicItems = computed<FormItemConfig[]>(() => [
   {
     key: 'account',
     label: $t('page.manage.user.userName'),
@@ -155,6 +187,15 @@ const formItems = computed<FormItemConfig[]>(() => [
     required: true,
     span: 8,
     placeholder: $t('page.manage.user.form.nickNamePlaceholder')
+  },
+  {
+    key: 'roleIds',
+    label: $t('page.manage.user.roleName'),
+    type: 'select',
+    multiple: true,
+    span: 8,
+    options: roleOptions.value,
+    placeholder: $t('page.manage.user.form.roleNamePlaceholder')
   },
   {
     key: 'password',
@@ -177,17 +218,18 @@ const formItems = computed<FormItemConfig[]>(() => [
     placeholder: $t('page.manage.user.form.siteNamePlaceholder')
   },
   {
-    key: 'status',
-    label: $t('page.manage.user.status'),
+    key: 'groupIds',
+    label: $t('page.manage.user.groupName'),
     type: 'select',
+    multiple: true,
     span: 8,
-    options: statusOptions.value,
-    placeholder: $t('page.manage.user.form.statusPlaceholder')
-  },
-  // 多选下拉走 custom 插槽（FormWrap 的 select 不支持 multiple）
-  { key: 'roleIds', label: $t('page.manage.user.roleName'), type: 'custom', span: 24 },
-  { key: 'groupIds', label: $t('page.manage.user.groupName'), type: 'custom', span: 24 },
-  { key: 'profileInfo', label: $t('page.manage.user.profileInfo'), type: 'section', span: 24 },
+    options: groupOptions.value,
+    placeholder: $t('page.manage.user.form.groupNamePlaceholder')
+  }
+]);
+
+/** 个人档案卡片字段：真实姓名 / 性别 / 生日 / 身份证 / 电话 / 邮箱 / 微信 / 其它联系方式 / 职位 / 入职 / 地址 / 附件 / 二维码 / 备注 */
+const profileItems = computed<FormItemConfig[]>(() => [
   {
     key: 'fullName',
     label: $t('page.manage.user.realName'),
@@ -269,13 +311,7 @@ const formItems = computed<FormItemConfig[]>(() => [
   {
     key: 'file',
     label: $t('page.manage.user.attachment'),
-    type: 'file',
-    span: 8
-  },
-  {
-    key: 'qrCodeUrl',
-    label: $t('page.manage.user.wechatQrcode'),
-    type: 'image',
+    type: 'custom',
     span: 8
   },
   {
@@ -284,6 +320,12 @@ const formItems = computed<FormItemConfig[]>(() => [
     type: 'input',
     span: 8,
     placeholder: $t('page.manage.user.form.remarkPlaceholder')
+  },
+  {
+    key: 'qrCodeUrl',
+    label: $t('page.manage.user.wechatQrcode'),
+    type: 'image',
+    span: 8
   }
 ]);
 
@@ -295,27 +337,34 @@ async function fillFormByRow() {
   if (error || !data) return;
 
   Object.assign(model, createEmptyModel());
-  model.account = data.account ?? '';
-  model.name = data.name ?? '';
-  model.siteId = data.siteId ?? '';
-  model.status = data.status;
-  model.roleIds = data.roleIds ?? [];
-  model.groupIds = data.groupIds ?? [];
-  model.fullName = data.fullName ?? '';
-  model.sex = data.sex ?? 0;
-  model.birthday = data.birthday ? dayjs(data.birthday).format('YYYY-MM-DD') : '';
-  // 后端为 Number，长号码已有精度损失，仅尽力还原展示
-  model.idCard = data.idCard === undefined || data.idCard === null ? '' : String(data.idCard);
-  model.address = data.address ?? '';
-  model.phone = data.phone ?? '';
-  model.email = data.email ?? '';
-  model.wx = data.wx ?? '';
-  model.contact = data.contact ?? '';
-  model.job = data.job ?? '';
-  model.entryDate = data.entryDate ? dayjs(data.entryDate).format('YYYY-MM-DD') : '';
-  model.qrCodeUrl = data.qrCodeUrl ?? '';
-  model.file = data.file ?? '';
-  model.note = data.note ?? '';
+
+  restoring = true;
+  try {
+    model.account = data.account ?? '';
+    model.name = data.name ?? '';
+    model.siteId = data.siteId ?? null;
+    model.status = data.status;
+    model.roleIds = data.roleIds ?? [];
+    model.groupIds = data.groupIds ?? [];
+    model.fullName = data.fullName ?? '';
+    model.sex = data.sex ?? 0;
+    model.birthday = data.birthday ? dayjs(data.birthday).format('YYYY-MM-DD') : '';
+    // 后端为 Number，长号码已有精度损失，仅尽力还原展示
+    model.idCard = data.idCard === undefined || data.idCard === null ? '' : String(data.idCard);
+    model.address = data.address ?? '';
+    model.phone = data.phone ?? '';
+    model.email = data.email ?? '';
+    model.wx = data.wx ?? '';
+    model.contact = data.contact ?? '';
+    model.job = data.job ?? '';
+    model.entryDate = data.entryDate ? dayjs(data.entryDate).format('YYYY-MM-DD') : '';
+    model.qrCodeUrl = data.qrCodeUrl ?? '';
+    model.file = data.file ?? '';
+    model.fileUrl = data.fileUrl ?? '';
+    model.note = data.note ?? '';
+  } finally {
+    restoring = false;
+  }
 }
 
 function resetForm() {
@@ -327,7 +376,8 @@ function buildSubmitParams() {
   return {
     account: model.account,
     name: model.name,
-    siteId: model.siteId,
+    // 校验已通过，siteId 此时必为 string；用非空断言避免 API 类型把 null 当成 string 报错
+    siteId: model.siteId!,
     status: model.status,
     roleIds: model.roleIds,
     groupIds: model.groupIds,
@@ -344,12 +394,26 @@ function buildSubmitParams() {
     entryDate: model.entryDate ? dayjs(model.entryDate).valueOf() : undefined,
     qrCodeUrl: model.qrCodeUrl,
     file: model.file,
+    fileUrl: model.fileUrl,
     note: model.note
   };
 }
 
+/** 附件上传成功：file 存原始文件名、fileUrl 存地址（与后端 User 字段语义一致） */
+function handleFileUploaded(raw: unknown) {
+  const result = raw as Api.Upload.Result;
+
+  model.file = result.name;
+  model.fileUrl = result.url;
+}
+
 async function handleSubmit() {
-  if (!(await formRef.value?.validate())) {
+  const [basicValid, profileValid] = await Promise.all([
+    basicFormRef.value?.validate(),
+    profileFormRef.value?.validate()
+  ]);
+
+  if (!basicValid || !profileValid) {
     return;
   }
 
@@ -408,32 +472,42 @@ watch(
     :title="title"
     :loading="submitting"
     :footer="!isDetail"
-    width="50%"
+    width="40%"
     @submit="handleSubmit"
   >
-    <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :mode="isDetail ? 'view' : 'edit'">
-      <template #roleIds="{ model: formModel }">
-        <NSelect
-          v-model:value="formModel.roleIds as string[]"
-          multiple
-          clearable
-          :options="roleOptions"
-          :disabled="isDetail"
-          :placeholder="$t('page.manage.user.form.roleNamePlaceholder')"
-        />
-      </template>
+    <NCard :title="$t('page.manage.user.basicInfo')" size="small" class="mb-12px">
+      <NFormWrap
+        ref="basicFormRef"
+        :model="model"
+        :items="basicItems"
+        :grid-x-gap="16"
+        :mode="isDetail ? 'view' : 'edit'"
+      />
+    </NCard>
 
-      <template #groupIds="{ model: formModel }">
-        <NSelect
-          v-model:value="formModel.groupIds as string[]"
-          multiple
-          clearable
-          :options="groupOptions"
-          :disabled="isDetail"
-          :placeholder="$t('page.manage.user.form.groupNamePlaceholder')"
-        />
-      </template>
-    </NFormWrap>
+    <NCard :title="$t('page.manage.user.profileInfo')" size="small">
+      <NFormWrap
+        ref="profileFormRef"
+        :model="model"
+        :items="profileItems"
+        :grid-x-gap="16"
+        :mode="isDetail ? 'view' : 'edit'"
+      >
+        <!-- 附件：输入框 + 上传图标控件（真实上传 /upload，目录 1-用户），file 存原始名、fileUrl 存地址 -->
+        <template #file>
+          <InputUpload
+            :value="model.file"
+            :dest="1"
+            :disabled="isDetail"
+            @success="handleFileUploaded"
+            @remove="
+              model.file = '';
+              model.fileUrl = '';
+            "
+          />
+        </template>
+      </NFormWrap>
+    </NCard>
   </UserDrawer>
 </template>
 

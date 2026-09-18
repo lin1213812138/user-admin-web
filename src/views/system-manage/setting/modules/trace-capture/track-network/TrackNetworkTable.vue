@@ -176,10 +176,13 @@ async function handleDelete(row: Api.SystemManage.TraceConfigItem) {
           </NButton>
         </template>
         <template #operation-right>
-          <NButton size="small" @click="configVisible = true">
-            <template #icon><icon-mdi-cog class="text-icon" /></template>
-            {{ $t('common.columnSetting') }}
-          </NButton>
+          <NSpace justify="end" wrap>
+            <NButton size="small" @click="getData">
+              <template #icon>
+                <icon-mdi-refresh class="text-icon" />
+              </template>
+            </NButton>
+          </NSpace>
         </template>
         <template #action="{ row }">
           <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>

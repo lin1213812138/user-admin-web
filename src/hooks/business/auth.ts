@@ -8,11 +8,14 @@ export function useAuth() {
       return false;
     }
 
-    if (typeof codes === 'string') {
-      return authStore.userInfo.buttons.includes(codes);
+    // super admin bypasses all permission checks
+    if (authStore.isSuperAdmin) {
+      return true;
     }
 
-    return codes.some(code => authStore.userInfo.buttons.includes(code));
+    const list = typeof codes === 'string' ? [codes] : codes;
+
+    return list.some(code => authStore.userInfo.permissions.includes(code));
   }
 
   return {

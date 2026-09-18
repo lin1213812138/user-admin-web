@@ -48,11 +48,14 @@ const local: App.I18n.Schema = {
     delete: 'Delete',
     deleteSuccess: 'Delete Success',
     confirmDelete: 'Are you sure you want to delete?',
+    confirmEnable: 'Are you sure you want to enable?',
+    confirmDisable: 'Are you sure you want to disable?',
     copy: 'Copy',
     chooseFile: 'Choose File',
     upload: {
       exceedSize: 'File size cannot exceed {size}MB',
-      draggerText: 'Click or drag files to this area to upload'
+      draggerText: 'Click or drag files to this area to upload',
+      invalidType: 'Unsupported file format, only {accept} allowed'
     },
     copySuccess: 'Copied successfully',
     copyFailed: 'Copy failed',
@@ -434,6 +437,7 @@ const local: App.I18n.Schema = {
         desc: 'Description',
         refId: 'Inherit Permissions',
         dataAuths: 'Data Permissions',
+        restrictSection: 'Restrictive Permission Settings',
         order: 'Sort',
         creator: 'Creator',
         createTime: 'Create Time',
@@ -451,16 +455,23 @@ const local: App.I18n.Schema = {
           user: 'Only own customers',
           group: 'Only own group customers'
         },
+        ctrlOptions: {
+          allow: 'Allowed',
+          deny: 'Not Allowed',
+          enable: 'Enabled',
+          disable: 'Disabled'
+        },
         ctrls: {
-          sendOrder: 'Allow editing after outbound',
+          sendOrder: 'Prohibit editing after outbound',
           sendCtrl: 'Weighing required for outbound',
-          orderCol: 'Allow configuring waybill columns',
-          editInfo: 'Allow editing personal info'
+          orderCol: 'Prohibit configuring waybill columns',
+          editInfo: 'Allow editing personal info',
+          editPwd: 'Allow changing password'
         },
         permission: 'Assign Permission',
         relationUser: 'Related Users',
         permissionTip: 'Check the menus that the role can access',
-        permissionDisabledTip: 'Super admin roles cannot be assigned permissions',
+        permissionDisabledTip: 'Admin type roles cannot be assigned permissions',
         builtIn: 'Built-in',
         builtInEditTip: 'Built-in roles cannot be modified',
         builtInDeleteTip: 'Built-in roles cannot be deleted',

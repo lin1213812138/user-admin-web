@@ -51,7 +51,7 @@ interface Props {
   cellConfig?: VxeTablePropTypes.CellConfig;
   /** vxe-table header-cell-config, e.g. { height: 35 } to align fixed columns' header */
   headerCellConfig?: VxeTablePropTypes.HeaderCellConfig;
-  /** search-action 快速搜索栏贴边：卡片向上/左/右各外扩 16px，抵消父容器（GlobalContent / VerticalTabLayout）默认 p-16px，使卡片通栏贴边 */
+  /** search-action 快速搜索栏贴边：卡片向上/左/右各外扩 10px，抵消父容器（GlobalContent / VerticalTabLayout）默认 p-10px，使卡片通栏贴边 */
   searchActionFlush?: boolean;
   /** 搜索栏配置项，传入即启用内嵌可折叠搜索栏（由所有使用本表格的页面各自配置） */
   searchItems?: FormItemConfig[];
@@ -256,9 +256,9 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
          想用自己的搜索栏时不传 searchItems 即不会出现默认搜索/重置按钮。
          卡片阴影用 shadow-sm；圆角不写死（不用 card-wrapper，其 rd-8px 会覆盖主题圆角），
          跟随 NCard 主题圆角（themeRadius），暗黑模式自动适配；
-        searchActionFlush 开启时卡片向上/左/右各外扩 16px，抵消父容器默认 p-16px 实现通栏贴边
+        searchActionFlush 开启时卡片向上/左/右各外扩 10px，抵消父容器默认 p-10px 实现通栏贴边
 -->
-    <div v-if="$slots['search-action']" class="mb-12px" :class="searchActionFlush ? '-mx-16px -mt-16px' : ''">
+    <div v-if="$slots['search-action']" class="mb-12px" :class="searchActionFlush ? '-mx-10px -mt-10px' : ''">
       <NCard :bordered="false" class="shadow-sm" :content-style="{ padding: '12px 16px' }">
         <slot name="search-action" :refresh="refresh" />
       </NCard>
@@ -272,22 +272,15 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         <slot name="operation-left" :refresh="refresh" />
       </div>
       <div class="flex-y-center gap-8px flex-wrap justify-end">
-        <NButton v-if="actionExport" size="small" @click="handleNativeExport">
-          <!--          {{ $t('common.export') }}-->
+        <LButton v-if="actionExport" circle :tooltip="$t('common.export')" @click="handleNativeExport">
           <template #icon>
             <icon-mdi-download class="text-icon" />
           </template>
-        </NButton>
+        </LButton>
         <slot name="operation-right" :refresh="refresh" />
-        <NButton
-          v-if="searchItems?.length"
-          size="small"
-          type="default"
-          :title="$t('common.search')"
-          @click="searchDrawerVisible = true"
-        >
+        <LButton v-if="searchItems?.length" circle :tooltip="$t('common.search')" @click="searchDrawerVisible = true">
           <template #icon><icon-ic-round-search class="text-icon" /></template>
-        </NButton>
+        </LButton>
       </div>
     </div>
 

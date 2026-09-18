@@ -2,7 +2,7 @@
 import dayjs from 'dayjs';
 import { computed, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { fetchDeleteUser, fetchGetUserCustomerList, fetchGetUserList } from '@/service/api/user';
+import { fetchDeleteUser, fetchGetUserCustomerList, fetchGetUserList, fetchUpdateUser } from '@/service/api/user';
 import { fetchGetSiteList } from '@/service/api/site';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
@@ -10,7 +10,6 @@ import type { FormItemConfig } from '@/components/Form/index.vue';
 import { TableExportAction } from '@/components/Export';
 import RelationModal from '@/components/common/relation-modal.vue';
 import UserOperateDrawer from './modules/user-operate-drawer.vue';
-import UserEditDrawer from './modules/user-edit-drawer.vue';
 
 const searchParams = reactive<{ keyword: string; siteId: string | null; status: Api.Common.EnableStatus | null }>({
   keyword: '',
@@ -34,13 +33,6 @@ const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() 
 ]);
 
 const searchItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'keyword',
-    label: $t('page.manage.user.keyword'),
-    type: 'input',
-    span: 6,
-    placeholder: $t('page.manage.user.form.keywordPlaceholder')
-  },
   {
     key: 'siteId',
     label: $t('page.manage.user.siteName'),
@@ -164,24 +156,27 @@ const operateVisible = ref(false);
 const operateMode = ref<'create' | 'edit' | 'detail'>('create');
 const operateRow = ref<Api.SystemManage.User | null>(null);
 
-/** 编辑抽屉（基本信息 + 多 tab），与新增/详情抽屉分离 */
-const editVisible = ref(false);
-const editRow = ref<Api.SystemManage.User | null>(null);
-
+/** 新增 / 编辑 / 详情统一走同一个抽屉（基本信息 + 个人档案两张卡片） */
 function openDrawer(mode: 'create' | 'edit' | 'detail', row?: Api.SystemManage.User) {
   operateMode.value = mode;
   operateRow.value = row ?? null;
   operateVisible.value = true;
 }
 
-function handleDetail(row: Api.SystemManage.User) {
-  openDrawer('detail', row);
+/** 列表操作栏启用 / 停用：复用 /user/update 部分更新，仅传 _id + status */
+async function handleToggleStatus(row: Api.SystemManage.User) {
+  const next: Api.Common.EnableStatus = row.status === 1 ? 0 : 1;
+
+  // 后端 /user/update 仅校验 _id、支持部分更新，这里只切 status；类型按全量定义，局部断言
+  const { error } = await fetchUpdateUser({ _id: row._id, status: next } as Api.SystemManage.UserUpdateParams);
+  if (error) return;
+
+  window.$message?.success($t('common.updateSuccess'));
+  getData();
 }
 
-/** 编辑打开侧滑抽屉（基本信息 + 多 tab），新增 / 详情仍走 UserOperateDrawer */
 function handleEdit(row: Api.SystemManage.User) {
-  editRow.value = row;
-  editVisible.value = true;
+  openDrawer('edit', row);
 }
 
 function handleSubmitted() {
@@ -239,7 +234,7 @@ const relationCustomerColumns = [
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col gap-12px p-16px">
+  <div class="h-full w-full flex flex-col gap-12px p-10px">
     <div class="flex-1 min-h-0">
       <Table
         :search-items="searchItems"
@@ -259,8 +254,17 @@ const relationCustomerColumns = [
         @refresh="getData"
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"
-        @detail="handleDetail"
       >
+        <!-- 快速搜索栏 -->
+        <template #search-action>
+          <div class="flex justify-start">
+            <NInput
+              v-model="searchParams.keyword"
+              class="w-300px!"
+              :placeholder="$t('page.manage.user.form.keywordPlaceholder')"
+            ></NInput>
+          </div>
+        </template>
         <template #createDate="{ row }">
           <span>{{ formatDate(row.createDate) }}</span>
         </template>
@@ -273,7 +277,7 @@ const relationCustomerColumns = [
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton size="small" type="primary" ghost @click="openDrawer('create')">
+            <NButton v-auth="'system:user:add'" size="small" type="primary" ghost @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
@@ -284,7 +288,13 @@ const relationCustomerColumns = [
               @positive-click="handleDelete(checkedRows.map(i => i._id))"
             >
               <template #trigger>
-                <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
+                <NButton
+                  v-auth="'system:user:delete'"
+                  size="small"
+                  type="error"
+                  ghost
+                  :disabled="checkedRows.length === 0"
+                >
                   <template #icon>
                     <icon-mdi-delete class="text-icon" />
                   </template>
@@ -293,13 +303,15 @@ const relationCustomerColumns = [
               </template>
               {{ $t('common.confirmDelete') }}
             </NPopconfirm>
-            <TableExportAction
-              :columns="columnConfigs"
-              :data="data"
-              :checked-data="checkedRows"
-              :fetch-all="fetchAllUsers"
-              :filename="$t('route.system-manage_user')"
-            />
+            <span v-auth="'system:user:export'">
+              <TableExportAction
+                :columns="columnConfigs"
+                :data="data"
+                :checked-data="checkedRows"
+                :fetch-all="fetchAllUsers"
+                :filename="$t('route.system-manage_user')"
+              />
+            </span>
           </NSpace>
         </template>
 
@@ -320,8 +332,18 @@ const relationCustomerColumns = [
         </template>
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</NButton>
-          <NPopconfirm @positive-click="handleDelete([row._id])">
+          <NButton v-auth="'system:user:edit'" size="small" type="primary" text @click="handleEdit(row)">
+            {{ $t('common.edit') }}
+          </NButton>
+          <NPopconfirm v-auth="'system:user:enableOrDisable'" @positive-click="handleToggleStatus(row)">
+            <template #trigger>
+              <NButton size="small" :type="row.status === 1 ? 'warning' : 'success'" text>
+                {{ row.status === 1 ? $t('common.disable') : $t('common.enable') }}
+              </NButton>
+            </template>
+            {{ row.status === 1 ? $t('common.confirmDisable') : $t('common.confirmEnable') }}
+          </NPopconfirm>
+          <NPopconfirm v-auth="'system:user:delete'" @positive-click="handleDelete([row._id])">
             <template #trigger>
               <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
             </template>
@@ -344,8 +366,6 @@ const relationCustomerColumns = [
       :row="operateRow"
       @submitted="handleSubmitted"
     />
-
-    <UserEditDrawer v-model:show="editVisible" :row="editRow" @submitted="handleSubmitted" />
 
     <RelationModal
       v-model:show="relationCustomerVisible"

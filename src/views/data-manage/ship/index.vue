@@ -1,53 +1,41 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, h, ref, type Component } from 'vue';
-import { NSpin } from 'naive-ui';
 import { $t } from '@/locales';
 import VerticalTabLayout from '@/components/VerticalTabLayout/index.vue';
-import type { ArchiveTabItem } from '@/views/data-manage/components/types';
+import { useArchiveTabs } from '@/views/data-manage/components/useArchiveTabs';
 
-/** 发货资料四项（懒加载子页）：左侧竖向 tab 与右侧内容均由它驱动 */
-const items: ArchiveTabItem[] = [
+/** 发货资料四项（懒加载子页）：左侧竖向 tab 按角色权限过滤后生成 */
+const { tabs, activeKey, activeComponent } = useArchiveTabs([
   {
     key: 'provider',
     labelKey: 'page.dataManage.ship.provider.title',
+    permission: 'system:dataShip:provider',
     load: () => import('@/views/data-manage/ship/modules/provider/Provider.vue')
   },
   {
     key: 'channelGroup',
     labelKey: 'page.dataManage.ship.channelGroup.title',
+    permission: 'system:dataShip:channelGroup',
     load: () => import('@/views/data-manage/ship/modules/channel-group/ChannelGroup.vue')
   },
   {
     key: 'weightRule',
     labelKey: 'page.dataManage.ship.weightRule.title',
+    permission: 'system:dataShip:weightRule',
     load: () => import('@/views/data-manage/ship/modules/weight-rule/WeightRule.vue')
   },
   {
     key: 'carrier',
     labelKey: 'page.dataManage.ship.carrier.title',
+    permission: 'system:dataShip:carrier',
     load: () => import('@/views/data-manage/ship/modules/carrier/Carrier.vue')
   }
-];
-
-/** 左侧竖向 tab（labelKey → 当前语言文案） */
-const tabs = items.map(item => ({ value: item.key, label: $t(item.labelKey) }));
-
-/** 分包加载中的占位 */
-const loadingComponent: Component = () =>
-  h('div', { class: 'flex h-full w-full items-center justify-center' }, [h(NSpin)]);
-
-/** 每个资料项一个异步组件：key 不同即组件不同，切 tab 时自动重建并重新取数 */
-const asyncComps: Record<string, Component> = {};
-for (const item of items) {
-  asyncComps[item.key] = defineAsyncComponent({ loader: item.load, loadingComponent });
-}
-
-const activeKey = ref(items[0]?.key ?? '');
-const activeComponent = computed(() => asyncComps[activeKey.value]);
+]);
 </script>
 
 <template>
   <VerticalTabLayout v-model:value="activeKey" :tabs="tabs" :title="$t('route.data-manage_ship')">
-    <component :is="activeComponent" :key="activeKey" class="h-full w-full" />
+    <KeepAlive>
+      <component :is="activeComponent" :key="activeKey" class="h-full w-full" />
+    </KeepAlive>
   </VerticalTabLayout>
 </template>

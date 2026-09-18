@@ -51,18 +51,36 @@ const refRoleOptions = ref<CommonType.Option<string>[]>([]);
 async function loadRefRoleOptions() {
   const { data } = await fetchGetRoleQueryList();
   refRoleOptions.value = (data?.list ?? [])
-    .filter(item => item._id !== props.row?._id)
+    .filter(item => item._id !== props.row?._id && item.roleType != null && Number(item.roleType) !== 100)
     .map(item => ({ label: item.name, value: item._id }));
 }
 
-/** 角色类型下拉选项（后端 RoleType：0-客服 1-销售 2-操作 3-财务 4-经理 5-管理员） */
+/** 角色类型下拉选项（后端 RoleType：0-客服 1-销售 2-操作 3-财务 4-经理 100-管理员） */
 const roleTypeOptions = computed<CommonType.Option<Api.SystemManage.RoleType>[]>(() => [
   { label: $t('page.manage.role.roleTypes.service'), value: 0 },
   { label: $t('page.manage.role.roleTypes.sales'), value: 1 },
   { label: $t('page.manage.role.roleTypes.operation'), value: 2 },
   { label: $t('page.manage.role.roleTypes.finance'), value: 3 },
   { label: $t('page.manage.role.roleTypes.manager'), value: 4 },
-  { label: $t('page.manage.role.roleTypes.admin'), value: 5 }
+  { label: $t('page.manage.role.roleTypes.admin'), value: 100 }
+]);
+
+/** 数据权限下拉选项（后端 RoleDataAuth：0-仅查看专属客户业务 1-仅查看所属组别客户业务） */
+const dataAuthOptions = computed<CommonType.Option<Api.SystemManage.RoleDataAuth>[]>(() => [
+  { label: $t('page.manage.role.dataAuthOptions.user'), value: 0 },
+  { label: $t('page.manage.role.dataAuthOptions.group'), value: 1 }
+]);
+
+/** 允许 / 不允许（sendOrderCtrl、orderColCtrl、editInfoCtrl、editPwdCtrl 共用） */
+const allowOptions = computed<CommonType.Option<Api.SystemManage.RoleCtrl>[]>(() => [
+  { label: $t('page.manage.role.ctrlOptions.deny'), value: 0 },
+  { label: $t('page.manage.role.ctrlOptions.allow'), value: 1 }
+]);
+
+/** 启用 / 不启用（仅 sendCtrl） */
+const enableOptions = computed<CommonType.Option<Api.SystemManage.RoleCtrl>[]>(() => [
+  { label: $t('page.manage.role.ctrlOptions.disable'), value: 0 },
+  { label: $t('page.manage.role.ctrlOptions.enable'), value: 1 }
 ]);
 
 const model = reactive<Api.SystemManage.RoleCreateParams>({
@@ -75,6 +93,7 @@ const model = reactive<Api.SystemManage.RoleCreateParams>({
   sendCtrl: 0,
   orderColCtrl: 1,
   editInfoCtrl: 1,
+  editPwdCtrl: 1,
   order: 0
 });
 
@@ -114,40 +133,51 @@ const formItems = computed<FormItemConfig[]>(() => [
   {
     key: 'dataAuths',
     label: $t('page.manage.role.dataAuths'),
-    slot: 'dataAuths',
-    span: 24
+    type: 'select',
+    multiple: true,
+    filterable: false,
+    span: 12,
+    options: dataAuthOptions.value
   },
   {
     key: 'sendOrderCtrl',
     label: $t('page.manage.role.ctrls.sendOrder'),
-    type: 'switch',
+    type: 'select',
     span: 12,
-    checkedValue: 1,
-    uncheckedValue: 0
+    options: allowOptions.value,
+    filterable: false
   },
   {
     key: 'sendCtrl',
     label: $t('page.manage.role.ctrls.sendCtrl'),
-    type: 'switch',
+    type: 'select',
     span: 12,
-    checkedValue: 1,
-    uncheckedValue: 0
+    options: enableOptions.value,
+    filterable: false
   },
   {
     key: 'orderColCtrl',
     label: $t('page.manage.role.ctrls.orderCol'),
-    type: 'switch',
+    type: 'select',
     span: 12,
-    checkedValue: 1,
-    uncheckedValue: 0
+    options: allowOptions.value,
+    filterable: false
   },
   {
     key: 'editInfoCtrl',
     label: $t('page.manage.role.ctrls.editInfo'),
-    type: 'switch',
+    type: 'select',
     span: 12,
-    checkedValue: 1,
-    uncheckedValue: 0
+    options: allowOptions.value,
+    filterable: false
+  },
+  {
+    key: 'editPwdCtrl',
+    label: $t('page.manage.role.ctrls.editPwd'),
+    type: 'select',
+    span: 12,
+    options: allowOptions.value,
+    filterable: false
   },
   {
     key: 'desc',
@@ -169,6 +199,7 @@ function fillFormByRow() {
   model.sendCtrl = props.row.sendCtrl ?? 0;
   model.orderColCtrl = props.row.orderColCtrl ?? 1;
   model.editInfoCtrl = props.row.editInfoCtrl ?? 1;
+  model.editPwdCtrl = props.row.editPwdCtrl ?? 1;
   model.order = props.row.order ?? 0;
 }
 
@@ -182,6 +213,7 @@ function resetForm() {
   model.sendCtrl = 0;
   model.orderColCtrl = 1;
   model.editInfoCtrl = 1;
+  model.editPwdCtrl = 1;
   model.order = 0;
 }
 
@@ -225,17 +257,9 @@ watch(
     :title="title"
     :loading="submitting"
     :footer="!isDetail"
+    :width="700"
     @submit="handleSubmit"
   >
-    <NForm ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :mode="isDetail ? 'view' : 'edit'">
-      <template #dataAuths>
-        <NCheckboxGroup v-model:value="model.dataAuths" :disabled="isDetail">
-          <NSpace :size="16" wrap>
-            <NCheckbox :value="0">{{ $t('page.manage.role.dataAuthOptions.user') }}</NCheckbox>
-            <NCheckbox :value="1">{{ $t('page.manage.role.dataAuthOptions.group') }}</NCheckbox>
-          </NSpace>
-        </NCheckboxGroup>
-      </template>
-    </NForm>
+    <NForm ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" :mode="isDetail ? 'view' : 'edit'"></NForm>
   </CommonDrawer>
 </template>

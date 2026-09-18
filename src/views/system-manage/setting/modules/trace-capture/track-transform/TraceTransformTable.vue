@@ -128,12 +128,6 @@ async function handleDelete(row: Api.SystemManage.TraceTransformItem) {
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
-              <template #icon>
-                <icon-mdi-cog class="text-icon" />
-              </template>
-              {{ $t('common.columnSetting') }}
-            </NButton>
             <NButton size="small" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />

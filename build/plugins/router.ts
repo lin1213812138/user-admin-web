@@ -91,6 +91,31 @@ export function setupElegantRouter() {
         'system-manage_label-designer': 5
       };
 
+      /** menu permission code for static-route auth (`system:{module}:list`).
+       *  Keep in sync with the `permission` field of MENU_PERMISSION_TREE in src/constants/menu-permissions.ts.
+       *  Leaf routes without a code are allowed by default (see filterAuthRoutesByPermission). */
+      const routePermissions: Partial<Record<RouteKey, string>> = {
+        'customer-manage_customer': 'system:customer:list',
+        'channel-quote_receive': 'system:channelQuote:receive:list',
+        'channel-quote_ship': 'system:channelQuote:ship:list',
+        'data-manage_ship': 'system:ship:list',
+        'data-manage_no-rule': 'system:noRule:list',
+        'data-manage_business': 'system:business:list',
+        'data-manage_finance': 'system:finance:list',
+        'data-manage_bl': 'system:bl:list',
+        'data-manage_basic': 'system:basic:list',
+        'system-manage_user': 'system:user:list',
+        'system-manage_role': 'system:role:list',
+        'system-manage_group': 'system:group:list',
+        'system-manage_site': 'system:site:list',
+        'system-manage_setting': 'system:setting:list',
+        'system-manage_log': 'system:log:list',
+        // hideInMenu entries are still guarded against direct URL access
+        'system-manage_print-design': 'system:printDesign:list',
+        'system-manage_label-designer': 'system:labelDesign:list',
+        'personal-center': 'system:personalCenter:list'
+      };
+
       const meta: Partial<RouteMeta> = {
         title: key,
         i18nKey: `route.${key}` as App.I18n.I18nKey
@@ -116,6 +141,10 @@ export function setupElegantRouter() {
 
       if (routeOrders[key] !== undefined) {
         meta.order = routeOrders[key];
+      }
+
+      if (routePermissions[key]) {
+        meta.permission = routePermissions[key];
       }
 
       return meta;

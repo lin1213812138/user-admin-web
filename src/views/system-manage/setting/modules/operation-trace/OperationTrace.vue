@@ -130,10 +130,13 @@ async function handleBatchSave() {
           </NButton>
         </template>
         <template #operation-right>
-          <NButton size="small" @click="configVisible = true">
-            <template #icon><icon-mdi-cog class="text-icon" /></template>
-            {{ $t('common.columnSetting') }}
-          </NButton>
+          <NSpace justify="end" wrap>
+            <NButton size="small" @click="getData">
+              <template #icon>
+                <icon-mdi-refresh class="text-icon" />
+              </template>
+            </NButton>
+          </NSpace>
         </template>
         <template #opType="{ row }">
           <NSelect v-model:value="row.opType" :options="opTypeOptions" size="small" :consistent-menu-width="false" />

@@ -122,7 +122,7 @@ function toggleGroup(group: FieldMappingGroup) {
       </NSpace>
     </template>
     <NScrollbar v-if="fill" class="min-h-0 flex-1" content-class="min-h-full">
-      <div class="min-w-full px-16px py-16px">
+      <div class="min-w-full px-10px py-10px">
         <div v-for="g in navGroups" :key="g.key" class="flex items-baseline gap-16px mb-12px last:mb-0">
           <div class="w-180px py-8px font-medium">
             {{ g.title }}

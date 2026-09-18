@@ -34,6 +34,8 @@ const activeComponent = computed<Component>(() => componentMap[activeKey.value] 
       <Transition mode="out-in"> 的过渡钩子只能挂到单个根元素上，会导致离开本页时过渡无法收尾、
       之后所有页面内容区永久空白。详见 changelog/系统设置tab切换后跳转空白页.md
     -->
-    <component :is="activeComponent" />
+    <KeepAlive>
+      <component :is="activeComponent" :key="activeKey" />
+    </KeepAlive>
   </VerticalTabLayout>
 </template>

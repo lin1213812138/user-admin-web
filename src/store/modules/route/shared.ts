@@ -4,42 +4,52 @@ import { useSvgIcon } from '@/hooks/common/icon';
 import { $t } from '@/locales';
 
 /**
- * Filter auth routes by roles
+ * Filter auth routes by permission codes (static route mode).
+ *
+ * Leaf routes are kept when their `meta.permission` is absent (allowed by default) or
+ * included in `permissions`; otherwise removed. Parent (directory) routes are kept only
+ * when at least one child survives the filter, so an empty directory is hidden.
  *
  * @param routes Auth routes
- * @param roles Roles
+ * @param permissions Permission codes the current user owns (e.g. `system:user:list`)
  */
-export function filterAuthRoutesByRoles(routes: ElegantConstRoute[], roles: string[]) {
-  return routes.flatMap(route => filterAuthRouteByRoles(route, roles));
+export function filterAuthRoutesByPermission(routes: ElegantConstRoute[], permissions: string[]) {
+  return routes.flatMap(route => filterAuthRouteByPermission(route, permissions));
 }
 
 /**
- * Filter auth route by roles
+ * Filter a single auth route by permission codes
  *
  * @param route Auth route
- * @param roles Roles
+ * @param permissions Permission codes the current user owns
  */
-function filterAuthRouteByRoles(route: ElegantConstRoute, roles: string[]): ElegantConstRoute[] {
-  const routeRoles = (route.meta && route.meta.roles) || [];
-
-  // if the route's "roles" is empty, then it is allowed to access
-  const isEmptyRoles = !routeRoles.length;
-
-  // if the user's role is included in the route's "roles", then it is allowed to access
-  const hasPermission = routeRoles.some(role => roles.includes(role));
-
+function filterAuthRouteByPermission(route: ElegantConstRoute, permissions: string[]): ElegantConstRoute[] {
   const filterRoute = { ...route };
 
+  // Recurse into children first, so a directory hides itself when all children are filtered out
   if (filterRoute.children?.length) {
-    filterRoute.children = filterRoute.children.flatMap(item => filterAuthRouteByRoles(item, roles));
+    filterRoute.children = filterRoute.children.flatMap(item => filterAuthRouteByPermission(item, permissions));
+
+    // Parent directory: keep only if it still has visible children
+    if (filterRoute.children.length === 0) {
+      return [];
+    }
+
+    return [filterRoute];
   }
 
-  // Exclude the route if it has no children after filtering
-  if (filterRoute.children?.length === 0) {
-    return [];
+  // Leaf route: decide by `meta.permission`
+  const permission = route.meta?.permission;
+
+  // Routes without a permission code are allowed by default (dev warning for misconfiguration)
+  if (!permission) {
+    if (import.meta.env.DEV) {
+      console.warn(`[permission] route "${String(route.name)}" has no meta.permission, allowed by default.`);
+    }
+    return [filterRoute];
   }
 
-  return hasPermission || isEmptyRoles ? [filterRoute] : [];
+  return permissions.includes(permission) ? [filterRoute] : [];
 }
 
 /**

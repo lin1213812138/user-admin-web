@@ -15,6 +15,7 @@ declare namespace Api {
       originAccount?: string;
       name?: string;
       accountType?: number;
+      roleType?: number;
       status?: number;
       userRoleIds?: string[];
       authMap?: Record<string, boolean>;
@@ -36,16 +37,15 @@ declare namespace Api {
 
     /** Normalized user info consumed by the frontend auth store.
      *  It keeps every field returned by the backend (`UserDetail`) plus the computed
-     *  `userId` / `userName` aliases and `roles` / `buttons` derived from `authMap`. */
+     *  `userId` / `userName` aliases and `permissions` derived from `authMap`. */
     interface UserInfo extends UserDetail {
       /** alias of `_id` */
       userId: string;
       /** alias of `name` / `account` */
       userName: string;
-      /** derived from `authMap` keys */
-      roles: string[];
-      /** derived from `authMap` keys + `showOps` */
-      buttons: string[];
+      /** derived from `authMap` keys, only codes containing ':' (e.g. `system:user:add`);
+       *  pure numeric menu ids are dropped on the fly, no DB migration needed */
+      permissions: string[];
     }
   }
 }

@@ -4,6 +4,7 @@ import type { UploadCustomRequestOptions, UploadFileInfo } from 'naive-ui';
 import { NButton, NUpload, NUploadDragger } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchUpload } from '@/service/api';
+import { validateUploadFileType } from '@/utils/upload';
 
 defineOptions({
   name: 'Upload'
@@ -116,8 +117,14 @@ function handleFileListUpdate(list: UploadFileInfo[]) {
   syncValue(list);
 }
 
-/** 选择文件前置校验：超过 maxSize 的文件不进入列表 */
+/** 选择文件前置校验：类型不合法或超过 maxSize 的文件不进入列表 */
 function handleBeforeUpload({ file }: { file: UploadFileInfo }) {
+  if (file.file && !validateUploadFileType(file.file, resolvedAccept.value)) {
+    window.$message?.warning($t('common.upload.invalidType', { accept: resolvedAccept.value || '' }));
+
+    return false;
+  }
+
   const maxSize = props.maxSize;
 
   if (!maxSize || (file.file?.size ?? 0) <= maxSize * 1024 * 1024) return true;

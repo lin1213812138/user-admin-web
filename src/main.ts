@@ -7,6 +7,7 @@ import {
   setupIconifyOffline,
   setupLoading,
   setupNProgress,
+  setupPermissionDirective,
   setupVxeTable
 } from './plugins';
 import { setupStore } from './store';
@@ -26,6 +27,8 @@ async function setupApp() {
   const app = createApp(App);
 
   setupStore(app);
+
+  setupPermissionDirective(app);
 
   setupVxeTable(app);
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, ref, type VNodeChild } from 'vue';
-import type { FormInst, FormItemRule, FormRules, SelectOption, UploadFileInfo } from 'naive-ui';
-import { NColorPicker, NDatePicker, NUpload } from 'naive-ui';
+import { computed, ref, type VNodeChild } from 'vue';
+import type { FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui';
+import { NColorPicker, NDatePicker } from 'naive-ui';
 import { $t } from '@/locales';
 import { type FormItemConfig } from './form-config';
 import IconPicker from '@/components/custom/icon-picker.vue';
 import IconRenderer from '@/components/custom/icon-renderer.vue';
+import Upload from '@/components/Upload/index.vue';
 
 export type { FormItemConfig } from './form-config';
 
@@ -99,7 +100,9 @@ function viewText(item: FormItemConfig): string {
     case 'password':
       return '••••••';
     case 'select':
-      return optionLabel(item.options, value);
+      return Array.isArray(value)
+        ? value.map(v => optionLabel(item.options, v)).join('、')
+        : optionLabel(item.options, value);
     case 'checkbox':
       return (value as unknown[]).map(v => optionLabel(item.options, v)).join('、');
     case 'switch': {
@@ -127,21 +130,6 @@ function cbValue(opt: SelectOption): string | number {
   return opt.value as string | number;
 }
 
-/** 上传控件的本地预览地址（blob），model 值本身只存文件名/URL */
-const uploadPreview = reactive<Record<string, string>>({});
-
-/** 上传控件的 file-list（由 model 值派生，受控模式保证编辑切换时正确回显） */
-function uploadFileList(key: string, isImage: boolean): UploadFileInfo[] {
-  const value = props.model[key];
-
-  if (typeof value !== 'string' || !value) return [];
-
-  const remoteUrl = /^(https?:|data:)/.test(value) ? value : undefined;
-  const url = isImage ? uploadPreview[key] || remoteUrl : undefined;
-
-  return [{ id: `${key}-${value}`, name: value, status: 'finished', url }];
-}
-
 /** 日期控件的值：model 中的空串需转 null（NDatePicker 收到 `''` 会抛 "Invalid time value"） */
 function dateValue(key: string): string | null {
   const value = props.model[key];
@@ -155,42 +143,6 @@ function handleDateChange(key: string, value: string | null) {
   // eslint-disable-next-line vue/no-mutating-props
   Object.assign(props.model, { [key]: value ?? '' });
 }
-
-/** 解析上传项的可预览地址：文件项已有地址直接用，否则由本地 File 生成对象 URL */
-function resolveUploadPreview(file?: UploadFileInfo): string {
-  if (!file) return '';
-  if (file.url) return file.url;
-  if (file.file instanceof File) return URL.createObjectURL(file.file);
-
-  return '';
-}
-
-/** 上传控件变更：文件名写回 model（单选场景取最后一个），图片额外记录本地预览地址 */
-function handleUploadChange(key: string, options: { fileList: UploadFileInfo[] }) {
-  const last = options.fileList[options.fileList.length - 1];
-
-  // FormWrap 的契约是「父级传入响应式 model、按字段写回」（模板 v-model 同此约定），此处按契约写回
-  // eslint-disable-next-line vue/no-mutating-props
-  Object.assign(props.model, { [key]: last?.name ?? '' });
-
-  // naive 在 default-upload=false 时不会给文件生成 url（pending 项 url/thumbnailUrl 均为 null），
-  // 而缩略图与预览按钮要求「status=finished 且 url 非空」，故这里自行用 File 生成 blob 预览地址
-  const previous = uploadPreview[key];
-  const next = resolveUploadPreview(last);
-
-  if (previous?.startsWith('blob:') && previous !== next) {
-    URL.revokeObjectURL(previous);
-  }
-
-  uploadPreview[key] = next;
-}
-
-// 组件卸载时回收本组件创建的 blob 地址，避免内存泄漏
-onBeforeUnmount(() => {
-  Object.values(uploadPreview).forEach(url => {
-    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-  });
-});
 
 /** total rows by span accumulation (24 per row) */
 const totalRows = computed<number>(() => {
@@ -380,12 +332,13 @@ defineExpose({
               </NSwitch>
               <NSelect
                 v-else-if="item.type === 'select'"
-                v-model:value="model[item.key] as string | number"
+                v-model:value="model[item.key] as string | number | Array<string | number>"
                 :options="item.options"
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
                 :clearable="item.clearable || true"
                 :filterable="item.filterable ?? true"
+                :multiple="item.multiple || false"
                 :render-label="item.renderLabel ?? fallbackOptionLabel"
               />
               <NDatePicker
@@ -399,29 +352,24 @@ defineExpose({
                 class="w-full"
                 @update:formatted-value="handleDateChange(item.key, $event)"
               />
-              <NUpload
+              <Upload
                 v-else-if="item.type === 'file'"
-                :file-list="uploadFileList(item.key, false)"
+                v-model:value="model[item.key] as string"
+                :dest="item.dest ?? 1"
+                list-type="file"
+                :accept="item.accept"
                 :max="1"
-                :default-upload="false"
                 :disabled="item.disabled"
-                @change="handleUploadChange(item.key, $event)"
-              >
-                <NButton size="small" :disabled="item.disabled">
-                  <template #icon>
-                    <icon-mdi-upload class="text-icon" />
-                  </template>
-                  {{ $t('common.chooseFile') }}
-                </NButton>
-              </NUpload>
-              <NUpload
+                show-file-list
+              />
+              <Upload
                 v-else-if="item.type === 'image'"
-                :file-list="uploadFileList(item.key, true)"
+                v-model:value="model[item.key] as string"
+                :dest="item.dest ?? 1"
                 list-type="image-card"
+                :accept="item.accept ?? 'image/*'"
                 :max="1"
-                :default-upload="false"
                 :disabled="item.disabled"
-                @change="handleUploadChange(item.key, $event)"
               />
               <NColorPicker
                 v-else-if="item.type === 'color'"

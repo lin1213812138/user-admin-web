@@ -26,10 +26,10 @@ export function createRouteGuard(router: Router) {
 
     const isLogin = Boolean(localStg.get('token'));
     const needLogin = !to.meta.constant;
-    const routeRoles = to.meta.roles || [];
+    const routePermission = to.meta.permission;
 
-    const hasRole = authStore.userInfo.roles.some(role => routeRoles.includes(role));
-    const hasAuth = authStore.isStaticSuper || !routeRoles.length || hasRole;
+    const hasPermission =
+      authStore.isSuperAdmin || !routePermission || authStore.userInfo.permissions.includes(routePermission);
 
     // if it is login route when logged in, then switch to the root page
     if (to.name === loginRoute && isLogin) {
@@ -47,7 +47,7 @@ export function createRouteGuard(router: Router) {
     }
 
     // if the user is logged in but does not have authorization, then switch to the 403 page
-    if (!hasAuth) {
+    if (!hasPermission) {
       return { name: noAuthorizationRoute };
     }
 

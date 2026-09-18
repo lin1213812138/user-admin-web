@@ -10,9 +10,10 @@ import {
   fetchCreateExportTemplate,
   fetchDeleteExportTemplate,
   fetchGetExportTemplateList,
-  fetchUpdateExportTemplate
+  fetchUpdateExportTemplate,
+  fetchUploadExportTemplate
 } from '@/service/api/export-format';
-import ExportTemplateUpload from './ExportTemplateUpload.vue';
+import InputUpload from '@/components/Upload/input-upload.vue';
 
 /** 模板类别（后端固定枚举 0~8，文案走 i18n） */
 const templateTypeOptions = computed(() => [
@@ -265,8 +266,20 @@ function openEdit(row: Api.ExportFormat.Template) {
   drawerVisible.value = true;
 }
 
-/** 上传解析成功：暂存字段清单，随保存一起提交 */
-function handleParsed(result: Api.ExportFormat.UploadResult) {
+/** 模板上传：走导出格式专用解析接口，返回地址与解析结果 */
+async function uploadExportTemplate(file: File) {
+  const { data: uploadData, error } = await fetchUploadExportTemplate(file);
+
+  return error || !uploadData ? null : { url: uploadData.fileUrl, raw: uploadData };
+}
+
+/** 上传解析成功：回填文件地址，并暂存字段清单随保存一起提交 */
+function handleParsed(raw: unknown) {
+  const result = raw as Api.ExportFormat.UploadResult;
+
+  formModel.value.file = result.file;
+  formModel.value.fileUrl = result.fileUrl;
+
   parsedFields.value = {
     fieldRow: result.fieldRow,
     infoList: result.infoList,
@@ -390,10 +403,14 @@ async function handleDrawerSubmit() {
     >
       <NFormWrap ref="formRef" :model="formModel" :items="formItems">
         <template #file>
-          <ExportTemplateUpload
-            v-model:file="formModel.file"
-            @update:file-url="formModel.fileUrl = $event"
-            @parsed="handleParsed"
+          <InputUpload
+            :value="formModel.file"
+            :upload="uploadExportTemplate"
+            @success="handleParsed"
+            @remove="
+              formModel.file = '';
+              formModel.fileUrl = '';
+            "
           />
         </template>
       </NFormWrap>

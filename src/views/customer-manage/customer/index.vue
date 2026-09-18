@@ -209,7 +209,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col gap-12px p-16px">
+  <div class="h-full w-full flex flex-col gap-12px p-10px">
     <div class="flex-1 min-h-0">
       <Table
         :search-items="searchItems"
@@ -235,42 +235,34 @@ onMounted(() => {
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton size="small" type="primary" ghost @click="openDrawer('create')">
+            <LButton type="primary" @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
               {{ $t('common.add') }}
-            </NButton>
+            </LButton>
             <!-- 后端暂无 /customer/delete 接口，按钮先保留并禁用 -->
-            <NTooltip :disabled="false">
-              <template #trigger>
-                <span>
-                  <NButton size="small" type="error" ghost disabled>
-                    <template #icon>
-                      <icon-mdi-delete class="text-icon" />
-                    </template>
-                    {{ $t('common.batchDelete') }}
-                  </NButton>
-                </span>
+            <LButton type="error" disabled :tooltip="$t('page.manage.customer.deleteDisabledTip')">
+              <template #icon>
+                <icon-mdi-delete class="text-icon" />
               </template>
-              {{ $t('page.manage.customer.deleteDisabledTip') }}
-            </NTooltip>
+              {{ $t('common.batchDelete') }}
+            </LButton>
           </NSpace>
         </template>
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
+            <LButton circle @click="configVisible = true">
               <template #icon>
                 <icon-mdi-cog class="text-icon" />
               </template>
-              {{ $t('common.columnSetting') }}
-            </NButton>
-            <NButton size="small" @click="getData">
+            </LButton>
+            <LButton circle :tooltip="$t('common.refresh')" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 

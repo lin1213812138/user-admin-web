@@ -1,12 +1,15 @@
 /**
  * 菜单权限配置（静态）
  * ------------------------------------------------------------------
- * 用途：在「角色管理 → 分配权限」抽屉中，按「一级菜单 / 二级菜单」列出可分配权限：
- *   - 按钮权限：该界面（二级菜单）可分配的操作按钮
- *   - 子模块权限：该界面内部的子模块（如「系统设置」的基础配置 / 录单格式…）
+ * 用途：在「角色管理 → 分配权限」抽屉中，以树形列出可分配权限：
+ *   - 一级菜单 → 二级菜单 → 子模块（如「单号资料」下的「单号规则」）
+ *   - 按钮权限：任一菜单节点上可分配的操作按钮
  *
- * 表格由本文件自动生成（见 getMenuPermissionTree）：新增菜单 / 调整按钮时只改本文件，
- * 无需改动页面代码；未配置按钮或子模块的菜单，表格中显示 --。
+ * 子模块就是挂在二级菜单下的普通菜单节点（同 MenuPermissionItem 结构，同样可挂 buttons），
+ * 只是业务层级更深一层，因此表格里它就是树上的一个可勾选行，而非独立的「子模块权限」列。
+ *
+ * 表格由本文件自动生成（见 getMenuPermissionTree）：新增菜单 / 子模块 / 按钮时只改本文件，
+ * 无需改动页面代码；未配置按钮的菜单，按钮列显示 --。
  *
  * 匹配 key（二选一，命中即返回对应按钮）：
  *   - 菜单的 `permission`（如 `system:user:list`）
@@ -24,15 +27,15 @@ export interface ButtonPermission {
   label: string;
 }
 
-/** 子模块权限：二级菜单（界面）内部可分配的子模块 */
-export interface SubMenuPermission {
-  /** 子模块权限码 */
-  code: string;
-  /** 子模块展示名称 */
-  label: string;
-}
-
-/** 二级菜单（「分配权限」表格中的一行 = 一个界面） */
+/**
+ * 菜单节点（一级 / 二级 / 子模块统一结构）
+ * ------------------------------------------------------------------
+ * 子模块（如「单号资料」下的「单号规则」）本质就是一个挂在二级菜单下的**普通菜单节点**，
+ * 与二级菜单结构完全一致：同样拥有 name / icon / routePath / permission / buttons，
+ * 同样作为树上的一行参与勾选、展开与权限提交。区别仅是业务层级更深一层。
+ *
+ * 因此不再区分 MenuPermissionGroup / SubMenuPermission，全部用本接口递归表达。
+ */
 export interface MenuPermissionItem {
   /** 菜单名称 */
   name: string;
@@ -42,27 +45,17 @@ export interface MenuPermissionItem {
   routePath?: string;
   /** 菜单权限标识 */
   permission?: string;
-  /** 该界面可分配的操作按钮（空数组 = 表格显示 --） */
-  buttons: ButtonPermission[];
-  /** 子模块权限：该界面的子模块（不传 / 空数组 = 表格显示 --） */
-  subMenus?: SubMenuPermission[];
-}
-
-/** 一级菜单（「分配权限」表格中的分组行，本身不承载权限） */
-export interface MenuPermissionGroup {
-  /** 菜单名称 */
-  name: string;
-  /** 菜单图标（iconify 名，与真实菜单保持一致） */
-  icon?: string;
-  /** 子菜单；没有子菜单的一级菜单（如「首页」）视为必选菜单 */
-  children: MenuPermissionItem[];
+  /** 该界面可分配的操作按钮（不传 / 空数组 = 表格按钮列显示 --） */
+  buttons?: ButtonPermission[];
+  /** 下级菜单 / 子模块；没有下级的一级菜单（如「首页」）视为必选菜单 */
+  children?: MenuPermissionItem[];
 }
 
 /** 「分配权限」表格的树行（由配置自动生成） */
 export interface MenuPermissionRow {
   /**
-   * 行 id：一级菜单 (i+1)*100，二级菜单 (i+1)*100+(j+1)
-   * 目前仅前端勾选 / 提交使用；后端权限接口对接真实菜单 id 时改 getMenuPermissionTree 即可
+   * 行 id：由父 id 递归派生（子 id = 父 id * 100 + 序号），保证全树唯一。
+   * 目前仅前端勾选 / 展开 / 提交使用；后端只认 permission 权限码。
    */
   id: number;
   title: string;
@@ -70,8 +63,7 @@ export interface MenuPermissionRow {
   routePath?: string;
   permission?: string;
   buttons: ButtonPermission[];
-  subMenus: SubMenuPermission[];
-  /** 必选菜单（没有子菜单的一级菜单，如「首页」）：默认勾选且不可取消 */
+  /** 必选菜单（没有下级的一级菜单，如「首页」）：默认勾选且不可取消 */
   home?: boolean;
   /** vxe 树表勾选回填字段，配合 checkbox-config.checkField 使用 */
   checked?: boolean;
@@ -86,29 +78,25 @@ const op = (module: string) => ({
   edit: { code: `system:${module}:edit`, label: '编辑' },
   delete: { code: `system:${module}:delete`, label: '删除' },
   export: { code: `system:${module}:export`, label: '导出' },
-  import: { code: `system:${module}:import`, label: '导入' }
+  import: { code: `system:${module}:import`, label: '导入' },
+  status: { code: `system:${module}:status`, label: '启用/停用' }
 });
 
-/** 按模块批量生成「子模块权限」（key 用于拼权限码，label 为展示名） */
-const sub = (module: string, items: [string, string][]): SubMenuPermission[] =>
-  items.map(([key, label]) => ({ code: `system:${module}:${key}`, label }));
+/**
+ * 子模块就是挂在二级菜单 children 下的普通菜单节点（与二级菜单同构，同样可带 icon / routePath / permission / buttons）。
+ * 权限码约定 system:{module}:{key}，与页面 ArchiveTabItem.permission 对齐（改动此规则会影响资料页 tab 显隐）。
+ * 参考「发货资料」「单号资料」：children 内每个子模块都直接写成完整对象，不挂下级时省略 children 即可。
+ */
 
 const user = op('user');
 const role = op('role');
 const site = op('site');
 const group = op('group');
 const customer = op('customer');
-const dataGeneral = op('dataGeneral');
-const dataBusiness = op('dataBusiness');
-const dataFinance = op('dataFinance');
-const dataNoRule = op('dataNoRule');
-const dataShip = op('dataShip');
-const dataBl = op('dataBl');
-const setting = op('setting');
 
-/** 各菜单的权限配置（一级菜单 → 二级菜单 → 按钮权限 / 子模块权限），顺序与侧栏菜单一致 */
-export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
-  { name: '首页', icon: 'mdi:monitor-dashboard', children: [] },
+/** 各菜单的权限配置（一级 → 二级 → 子模块，任意层级都可挂 buttons），顺序与侧栏菜单一致 */
+export const MENU_PERMISSION_TREE: MenuPermissionItem[] = [
+  { name: '首页', icon: 'mdi:monitor-dashboard', buttons: [], children: [] },
   {
     name: '客户管理',
     icon: 'ic:round-business',
@@ -130,13 +118,13 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
         name: '收货渠道',
         icon: 'ic:baseline-move-to-inbox',
         routePath: '/channel-quote/receive',
-        buttons: []
+        permission: 'system:channelQuote:receive:list'
       },
       {
         name: '发货渠道',
         icon: 'ic:baseline-local-shipping',
         routePath: '/channel-quote/ship',
-        buttons: []
+        permission: 'system:channelQuote:ship:list'
       }
     ]
   },
@@ -148,156 +136,174 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
         name: '发货资料',
         icon: 'ic:baseline-local-shipping',
         routePath: '/data-manage/ship',
-        buttons: [
-          dataShip.query,
-          dataShip.reset,
-          dataShip.add,
-          dataShip.edit,
-          dataShip.delete,
-          dataShip.export,
-          dataShip.import
-        ],
-        subMenus: sub('dataShip', [
-          ['provider', '服务商'],
-          ['channelGroup', '渠道类别'],
-          ['weightRule', '计泡规则'],
-          ['carrier', '承运网络']
-        ])
+        permission: 'system:ship:list',
+        buttons: [],
+        children: [
+          {
+            name: '服务商',
+            icon: 'ic:baseline-local-shipping',
+            permission: 'system:dataShip:provider',
+            buttons: [customer.query, customer.reset, customer.add, customer.edit, customer.delete]
+          },
+          {
+            name: '渠道类别',
+            icon: 'ic:baseline-local-shipping',
+            permission: 'system:dataShip:channelGroup',
+            buttons: [customer.query, customer.reset, customer.add, customer.edit, customer.delete]
+          },
+          {
+            name: '计泡规则',
+            icon: 'ic:baseline-local-shipping',
+            permission: 'system:dataShip:weightRule',
+            buttons: [customer.query, customer.reset, customer.add, customer.edit, customer.delete]
+          },
+          {
+            name: '承运网络',
+            icon: 'ic:baseline-local-shipping',
+            permission: 'system:dataShip:carrier',
+            buttons: [customer.query, customer.reset, customer.add, customer.edit, customer.delete]
+          }
+        ]
       },
       {
         name: '单号资料',
         icon: 'ic:round-numbers',
         routePath: '/data-manage/no-rule',
-        buttons: [
-          dataNoRule.query,
-          dataNoRule.reset,
-          dataNoRule.add,
-          dataNoRule.edit,
-          dataNoRule.delete,
-          dataNoRule.export,
-          dataNoRule.import
-        ],
-        subMenus: sub('dataNoRule', [
-          ['noRule', '单号规则'],
-          ['itemNoRule', '子单号规则'],
-          ['noPool', '运单号码池'],
-          ['longNoRule', '长单号截短']
-        ])
+        permission: 'system:noRule:list',
+        children: [
+          { name: '单号规则', icon: 'ic:round-numbers', permission: 'system:dataNoRule:noRule', buttons: [] },
+          { name: '子单号规则', icon: 'ic:round-numbers', permission: 'system:dataNoRule:itemNoRule', buttons: [] },
+          { name: '运单号码池', icon: 'ic:round-numbers', permission: 'system:dataNoRule:noPool', buttons: [] },
+          { name: '长单号截短', icon: 'ic:round-numbers', permission: 'system:dataNoRule:longNoRule', buttons: [] }
+        ]
       },
       {
         name: '运单资料',
         icon: 'ic:baseline-warehouse',
         routePath: '/data-manage/business',
-        buttons: [
-          dataBusiness.query,
-          dataBusiness.reset,
-          dataBusiness.add,
-          dataBusiness.edit,
-          dataBusiness.delete,
-          dataBusiness.export,
-          dataBusiness.import
-        ],
-        subMenus: sub('dataBusiness', [
-          ['declaredGoods', '申报物品'],
-          ['address', '地址簿'],
-          ['problemCategory', '问题类别'],
-          ['goodsCategory', '物品类别'],
-          ['customsType', '报关类型'],
-          ['exportReason', '出口原因'],
-          ['clearanceMethod', '清关方式'],
-          ['salesTerms', '销售条款']
-        ])
+        permission: 'system:business:list',
+        children: [
+          {
+            name: '申报物品',
+            icon: 'ic:baseline-warehouse',
+            permission: 'system:dataBusiness:declaredGoods',
+            buttons: []
+          },
+          { name: '地址簿', icon: 'ic:baseline-warehouse', permission: 'system:dataBusiness:address', buttons: [] },
+          {
+            name: '问题类别',
+            icon: 'ic:baseline-warehouse',
+            permission: 'system:dataBusiness:problemCategory',
+            buttons: []
+          },
+          {
+            name: '物品类别',
+            icon: 'ic:baseline-warehouse',
+            permission: 'system:dataBusiness:goodsCategory',
+            buttons: []
+          },
+          {
+            name: '报关类型',
+            icon: 'ic:baseline-warehouse',
+            permission: 'system:dataBusiness:customsType',
+            buttons: []
+          },
+          {
+            name: '出口原因',
+            icon: 'ic:baseline-warehouse',
+            permission: 'system:dataBusiness:exportReason',
+            buttons: []
+          },
+          {
+            name: '清关方式',
+            icon: 'ic:baseline-warehouse',
+            permission: 'system:dataBusiness:clearanceMethod',
+            buttons: []
+          },
+          { name: '销售条款', icon: 'ic:baseline-warehouse', permission: 'system:dataBusiness:salesTerms', buttons: [] }
+        ]
       },
       {
         name: '财务资料',
         icon: 'ic:baseline-account-balance-wallet',
         routePath: '/data-manage/finance',
-        buttons: [
-          dataFinance.query,
-          dataFinance.reset,
-          dataFinance.add,
-          dataFinance.edit,
-          dataFinance.delete,
-          dataFinance.export,
-          dataFinance.import
-        ],
-        subMenus: sub('dataFinance', [
-          ['expenseType', '费用类型'],
-          ['settlement', '结算方式'],
-          ['account', '银行账户'],
-          ['currency', '结算货币']
-        ])
+        permission: 'system:finance:list',
+        children: [
+          {
+            name: '费用类型',
+            icon: 'ic:baseline-account-balance-wallet',
+            permission: 'system:dataFinance:expenseType',
+            buttons: []
+          },
+          {
+            name: '结算方式',
+            icon: 'ic:baseline-account-balance-wallet',
+            permission: 'system:dataFinance:settlement',
+            buttons: []
+          },
+          {
+            name: '银行账户',
+            icon: 'ic:baseline-account-balance-wallet',
+            permission: 'system:dataFinance:account',
+            buttons: []
+          },
+          {
+            name: '结算货币',
+            icon: 'ic:baseline-account-balance-wallet',
+            permission: 'system:dataFinance:currency',
+            buttons: []
+          }
+        ]
       },
       {
         name: '提单资料',
         icon: 'ic:baseline-receipt-long',
         routePath: '/data-manage/bl',
-        buttons: [dataBl.query, dataBl.reset, dataBl.add, dataBl.edit, dataBl.delete, dataBl.export, dataBl.import],
-        subMenus: sub('dataBl', [
-          ['blRoute', '航线'],
-          ['blPort', '港口'],
-          ['blTrip', '航名航次'],
-          ['blAddress', '地址簿'],
-          ['blUnit', '柜型'],
-          ['trackConfig', '轨迹配置']
-        ])
+        permission: 'system:bl:list',
+        children: [
+          { name: '航线', icon: 'ic:baseline-receipt-long', permission: 'system:dataBl:blRoute', buttons: [] },
+          { name: '港口', icon: 'ic:baseline-receipt-long', permission: 'system:dataBl:blPort', buttons: [] },
+          { name: '航名航次', icon: 'ic:baseline-receipt-long', permission: 'system:dataBl:blTrip', buttons: [] },
+          { name: '地址簿', icon: 'ic:baseline-receipt-long', permission: 'system:dataBl:blAddress', buttons: [] },
+          { name: '柜型', icon: 'ic:baseline-receipt-long', permission: 'system:dataBl:blUnit', buttons: [] },
+          { name: '轨迹配置', icon: 'ic:baseline-receipt-long', permission: 'system:dataBl:trackConfig', buttons: [] }
+        ]
       },
       {
         name: '通用资料',
         icon: 'ic:baseline-inventory',
         routePath: '/data-manage/basic',
-        buttons: [
-          dataGeneral.query,
-          dataGeneral.reset,
-          dataGeneral.add,
-          dataGeneral.edit,
-          dataGeneral.delete,
-          dataGeneral.export,
-          dataGeneral.import
-        ],
-        subMenus: sub('dataGeneral', [
-          ['countryRegion', '国家地区'],
-          ['fbaWarehouse', 'FBA仓库']
-        ])
+        permission: 'system:basic:list',
+        children: [
+          {
+            name: '国家地区',
+            icon: 'ic:baseline-inventory',
+            permission: 'system:dataGeneral:countryRegion',
+            buttons: []
+          },
+          { name: 'FBA仓库', icon: 'ic:baseline-inventory', permission: 'system:dataGeneral:fbaWarehouse', buttons: [] }
+        ]
       }
     ]
   },
   {
     name: '系统管理',
     icon: 'ic:baseline-settings',
+    buttons: [],
     children: [
       {
         name: '用户管理',
         icon: 'ic:round-person',
         routePath: '/system-manage/user',
         permission: 'system:user:list',
-        buttons: [
-          user.query,
-          user.reset,
-          user.add,
-          user.edit,
-          user.delete,
-          user.export,
-          user.import,
-          { code: 'system:user:enableOrDisable', label: '启用/停用' },
-          { code: 'system:user:resetPwd', label: '重置密码' },
-          { code: 'system:user:assignRole', label: '分配角色' }
-        ]
+        buttons: [user.query, user.reset, user.add, user.edit, user.delete, user.export, user.import, user.status]
       },
       {
         name: '角色管理',
         icon: 'ic:round-supervisor-account',
         routePath: '/system-manage/role',
         permission: 'system:role:list',
-        buttons: [
-          role.query,
-          role.reset,
-          role.add,
-          role.edit,
-          role.delete,
-          { code: 'system:role:assign', label: '分配权限' },
-          { code: 'system:role:dataScope', label: '分配数据权限' }
-        ]
+        buttons: [role.query, role.reset, role.add, role.edit, role.delete]
       },
       {
         name: '组别管理',
@@ -317,20 +323,51 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
         name: '系统设置',
         icon: 'ic:baseline-settings-applications',
         routePath: '/system-manage/setting',
-        buttons: [setting.reset, setting.edit, { code: 'system:setting:save', label: '保存' }],
-        subMenus: sub('setting', [
-          ['basicConfig', '基础配置'],
-          ['inputFormat', '录单格式'],
-          ['printFormat', '打印格式'],
-          ['exportFormat', '导出格式'],
-          ['traceCapture', '轨迹抓取配置'],
-          ['operationTrace', '操作轨迹配置']
-        ])
+        permission: 'system:setting:list',
+        children: [
+          {
+            name: '基础配置',
+            icon: 'ic:baseline-settings-applications',
+            permission: 'system:setting:basicConfig',
+            buttons: []
+          },
+          {
+            name: '录单格式',
+            icon: 'ic:baseline-settings-applications',
+            permission: 'system:setting:inputFormat',
+            buttons: []
+          },
+          {
+            name: '打印格式',
+            icon: 'ic:baseline-settings-applications',
+            permission: 'system:setting:printFormat',
+            buttons: []
+          },
+          {
+            name: '导出格式',
+            icon: 'ic:baseline-settings-applications',
+            permission: 'system:setting:exportFormat',
+            buttons: []
+          },
+          {
+            name: '轨迹抓取配置',
+            icon: 'ic:baseline-settings-applications',
+            permission: 'system:setting:traceCapture',
+            buttons: []
+          },
+          {
+            name: '操作轨迹配置',
+            icon: 'ic:baseline-settings-applications',
+            permission: 'system:setting:operationTrace',
+            buttons: []
+          }
+        ]
       },
       {
         name: '系统日志',
         icon: 'ic:round-article',
         routePath: '/system-manage/log',
+        permission: 'system:log:list',
         buttons: []
       }
     ]
@@ -340,11 +377,19 @@ export const MENU_PERMISSION_TREE: MenuPermissionGroup[] = [
 const byPermission = new Map<string, ButtonPermission[]>();
 const byRoutePath = new Map<string, ButtonPermission[]>();
 
-MENU_PERMISSION_TREE.forEach(groupItem => {
-  groupItem.children.forEach(item => {
-    if (item.permission) byPermission.set(item.permission, item.buttons);
-    if (item.routePath) byRoutePath.set(item.routePath, item.buttons);
+/** 递归遍历所有层级（含子模块），建立 permission / routePath → 按钮的索引 */
+function walkItems(items: MenuPermissionItem[], visit: (item: MenuPermissionItem) => void) {
+  items.forEach(item => {
+    visit(item);
+    if (item.children?.length) {
+      walkItems(item.children, visit);
+    }
   });
+}
+
+walkItems(MENU_PERMISSION_TREE, item => {
+  if (item.permission) byPermission.set(item.permission, item.buttons ?? []);
+  if (item.routePath) byRoutePath.set(item.routePath, item.buttons ?? []);
 });
 
 /** 根据菜单的 permission 或 routePath 获取该界面所需的按钮权限列表 */
@@ -357,31 +402,28 @@ export function getMenuButtons(params: { permission?: string; routePath?: string
 }
 
 /**
- * 由配置生成「分配权限」表格的树行。
- * 行 id：一级菜单 (i+1)*100、二级菜单 (i+1)*100+(j+1)。
+ * 由配置递归生成「分配权限」表格的树行。
+ * 子模块与二级菜单同构，所以一套递归即可覆盖全部层级；行 id = 父 id * 100 + 序号，保证全树唯一。
  */
-export function getMenuPermissionTree(): MenuPermissionRow[] {
-  return MENU_PERMISSION_TREE.map((groupItem, groupIndex) => {
-    const groupId = (groupIndex + 1) * 100;
-    const children = groupItem.children.map<MenuPermissionRow>((item, itemIndex) => ({
-      id: groupId + itemIndex + 1,
-      title: item.name,
-      icon: item.icon,
-      routePath: item.routePath,
-      permission: item.permission,
-      buttons: item.buttons,
-      subMenus: item.subMenus ?? []
-    }));
+function buildRow(item: MenuPermissionItem, id: number): MenuPermissionRow {
+  const children = (item.children ?? []).map((child, index) => buildRow(child, id * 100 + index + 1));
 
-    return {
-      id: groupId,
-      title: groupItem.name,
-      icon: groupItem.icon,
-      buttons: [],
-      subMenus: [],
-      // 没有子菜单的一级菜单（如「首页」）为必选菜单
-      home: children.length === 0,
-      children: children.length ? children : undefined
-    };
+  return {
+    id,
+    title: item.name,
+    icon: item.icon,
+    routePath: item.routePath,
+    permission: item.permission,
+    buttons: item.buttons ?? [],
+    children: children.length ? children : undefined
+  };
+}
+
+export function getMenuPermissionTree(): MenuPermissionRow[] {
+  return MENU_PERMISSION_TREE.map((item, index) => {
+    const row = buildRow(item, (index + 1) * 100);
+
+    // 没有下级的一级菜单（如「首页」）为必选菜单：默认勾选且不可取消
+    return { ...row, home: !row.children?.length };
   });
 }

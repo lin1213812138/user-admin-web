@@ -362,11 +362,14 @@ declare namespace App {
         delete: string;
         deleteSuccess: string;
         confirmDelete: string;
+        confirmEnable: string;
+        confirmDisable: string;
         copy: string;
         chooseFile: string;
         upload: {
           exceedSize: string;
           draggerText: string;
+          invalidType: string;
         };
         copySuccess: string;
         copyFailed: string;
@@ -708,11 +711,19 @@ declare namespace App {
               user: string;
               group: string;
             };
+            restrictSection: string;
+            ctrlOptions: {
+              allow: string;
+              deny: string;
+              enable: string;
+              disable: string;
+            };
             ctrls: {
               sendOrder: string;
               sendCtrl: string;
               orderCol: string;
               editInfo: string;
+              editPwd: string;
             };
             permission: string;
             relationUser: string;

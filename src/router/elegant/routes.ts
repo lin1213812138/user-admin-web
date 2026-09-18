@@ -66,7 +66,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'channel-quote_receive',
           i18nKey: 'route.channel-quote_receive',
-          icon: 'ic:baseline-move-to-inbox'
+          icon: 'ic:baseline-move-to-inbox',
+          permission: 'system:channelQuote:receive:list'
         }
       },
       {
@@ -76,7 +77,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'channel-quote_ship',
           i18nKey: 'route.channel-quote_ship',
-          icon: 'ic:baseline-local-shipping'
+          icon: 'ic:baseline-local-shipping',
+          permission: 'system:channelQuote:ship:list'
         }
       }
     ]
@@ -100,7 +102,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'customer-manage_customer',
           i18nKey: 'route.customer-manage_customer',
           icon: 'ic:round-contacts',
-          order: 1
+          order: 1,
+          permission: 'system:customer:list'
         }
       }
     ]
@@ -124,7 +127,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_basic',
           i18nKey: 'route.data-manage_basic',
           icon: 'ic:baseline-inventory',
-          order: 6
+          order: 6,
+          permission: 'system:basic:list'
         }
       },
       {
@@ -135,7 +139,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_bl',
           i18nKey: 'route.data-manage_bl',
           order: 5,
-          icon: 'ic:baseline-receipt-long'
+          icon: 'ic:baseline-receipt-long',
+          permission: 'system:bl:list'
         }
       },
       {
@@ -146,7 +151,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_business',
           i18nKey: 'route.data-manage_business',
           icon: 'ic:baseline-warehouse',
-          order: 3
+          order: 3,
+          permission: 'system:business:list'
         }
       },
       {
@@ -157,7 +163,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_finance',
           i18nKey: 'route.data-manage_finance',
           icon: 'ic:baseline-account-balance-wallet',
-          order: 4
+          order: 4,
+          permission: 'system:finance:list'
         }
       },
       {
@@ -168,7 +175,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_no-rule',
           i18nKey: 'route.data-manage_no-rule',
           icon: 'ic:round-numbers',
-          order: 2
+          order: 2,
+          permission: 'system:noRule:list'
         }
       },
       {
@@ -179,7 +187,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'data-manage_ship',
           i18nKey: 'route.data-manage_ship',
           icon: 'ic:baseline-local-shipping',
-          order: 1
+          order: 1,
+          permission: 'system:ship:list'
         }
       }
     ]
@@ -227,7 +236,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'personal-center',
       i18nKey: 'route.personal-center',
-      hideInMenu: true
+      hideInMenu: true,
+      permission: 'system:personalCenter:list'
     }
   },
   {
@@ -249,7 +259,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_group',
           i18nKey: 'route.system-manage_group',
           icon: 'ic:round-groups',
-          order: 3
+          order: 3,
+          permission: 'system:group:list'
         }
       },
       {
@@ -262,7 +273,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           hideInMenu: true,
           activeMenu: 'system-manage_setting',
           icon: 'ic:round-label',
-          order: 6
+          order: 6,
+          permission: 'system:labelDesign:list'
         }
       },
       {
@@ -273,7 +285,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_log',
           i18nKey: 'route.system-manage_log',
           icon: 'ic:round-article',
-          order: 6
+          order: 6,
+          permission: 'system:log:list'
         }
       },
       {
@@ -283,7 +296,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'system-manage_print-design',
           i18nKey: 'route.system-manage_print-design',
-          hideInMenu: true
+          hideInMenu: true,
+          permission: 'system:printDesign:list'
         }
       },
       {
@@ -294,7 +308,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_role',
           i18nKey: 'route.system-manage_role',
           icon: 'ic:round-supervisor-account',
-          order: 2
+          order: 2,
+          permission: 'system:role:list'
         }
       },
       {
@@ -305,7 +320,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_setting',
           i18nKey: 'route.system-manage_setting',
           icon: 'ic:baseline-settings-applications',
-          order: 5
+          order: 5,
+          permission: 'system:setting:list'
         }
       },
       {
@@ -316,7 +332,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_site',
           i18nKey: 'route.system-manage_site',
           icon: 'ic:round-place',
-          order: 4
+          order: 4,
+          permission: 'system:site:list'
         }
       },
       {
@@ -327,7 +344,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'system-manage_user',
           i18nKey: 'route.system-manage_user',
           icon: 'ic:round-person',
-          order: 1
+          order: 1,
+          permission: 'system:user:list'
         }
       }
     ]

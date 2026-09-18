@@ -99,7 +99,7 @@ function handleSelect(id: number) {
       <NCard class="h-full" :content-style="{ padding: '0', display: 'flex', flexDirection: 'column', minHeight: '0' }">
         <div
           v-if="showActions"
-          class="flex shrink-0 items-center justify-between px-16px py-16px border-b-1 border-[#ebeef5]"
+          class="flex shrink-0 items-center justify-between px-10px py-10px border-b-1 border-[#ebeef5]"
         >
           <slot name="header">
             <NSpace>
@@ -134,7 +134,7 @@ function handleSelect(id: number) {
           <slot name="operation-extra" />
         </div>
         <!-- 右侧内容区：固定高度（flex-1 + min-h-0 + overflow-hidden），整体不滚动；高度不足时卡片 flex:1 吃掉剩余空间，内容超高时由各页内容自行内部滚动（如录单格式字段映射卡片） -->
-        <div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-16px py-16px">
+        <div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-10px py-10px">
           <slot />
         </div>
       </NCard>

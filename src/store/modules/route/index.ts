@@ -12,7 +12,7 @@ import { getRouteName, getRoutePath } from '@/router/elegant/transform';
 import { useAuthStore } from '../auth';
 import { useTabStore } from '../tab';
 import {
-  filterAuthRoutesByRoles,
+  filterAuthRoutesByPermission,
   getBreadcrumbsByRoute,
   getCacheRouteNames,
   getGlobalMenusByAuthRoutes,
@@ -130,13 +130,28 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   /** Global breadcrumbs */
   const breadcrumbs = computed(() => getBreadcrumbsByRoute(router.currentRoute.value, menus.value));
 
+  /**
+   * The user id which the current auth routes were initialized for
+   *
+   * It is compared with the logged-in user id to detect an account switch, so the auth routes
+   * (and therefore the menus) can be rebuilt with the new user's permissions.
+   */
+  const authRouteUserId = ref('');
+
   /** Reset store */
   async function resetStore() {
-    const routeStore = useRouteStore();
-
-    routeStore.$reset();
-
+    // setup store has no built-in `$reset`, so every piece of state is cleared by hand
     resetVueRoutes();
+
+    constantRoutes.value = [];
+    authRoutes.value = [];
+    menus.value = [];
+    cacheRoutes.value = [];
+    excludeCacheRoutes.value = [];
+    authRouteUserId.value = '';
+
+    setIsInitConstantRoute(false);
+    setIsInitAuthRoute(false);
 
     // after reset store, need to re-init constant route
     await initConstantRoute();
@@ -194,15 +209,17 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   function initStaticAuthRoute() {
     const { authRoutes: staticAuthRoutes } = createStaticRoutes();
 
-    if (authStore.isStaticSuper) {
+    if (authStore.isSuperAdmin) {
       addAuthRoutes(staticAuthRoutes);
     } else {
-      const filteredAuthRoutes = filterAuthRoutesByRoles(staticAuthRoutes, authStore.userInfo.roles);
+      const filteredAuthRoutes = filterAuthRoutesByPermission(staticAuthRoutes, authStore.userInfo.permissions);
 
       addAuthRoutes(filteredAuthRoutes);
     }
 
     handleConstantAndAuthRoutes();
+
+    authRouteUserId.value = authStore.userInfo.userId;
 
     setIsInitAuthRoute(true);
   }
@@ -221,6 +238,8 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
       setRouteHome(home);
 
       handleUpdateRootRouteRedirect(home);
+
+      authRouteUserId.value = authStore.userInfo.userId;
 
       setIsInitAuthRoute(true);
     } else {
@@ -327,6 +346,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
 
   return {
     resetStore,
+    authRouteUserId,
     routeHome,
     menus,
     searchMenus,
