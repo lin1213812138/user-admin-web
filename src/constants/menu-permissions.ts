@@ -79,7 +79,8 @@ const op = (module: string) => ({
   delete: { code: `system:${module}:delete`, label: '删除' },
   export: { code: `system:${module}:export`, label: '导出' },
   import: { code: `system:${module}:import`, label: '导入' },
-  status: { code: `system:${module}:status`, label: '启用/停用' }
+  status: { code: `system:${module}:status`, label: '启用/停用' },
+  permission: { code: `system:${module}:permission`, label: '分配权限' }
 });
 
 /**
@@ -303,7 +304,7 @@ export const MENU_PERMISSION_TREE: MenuPermissionItem[] = [
         icon: 'ic:round-supervisor-account',
         routePath: '/system-manage/role',
         permission: 'system:role:list',
-        buttons: [role.query, role.reset, role.add, role.edit, role.delete]
+        buttons: [role.query, role.reset, role.add, role.edit, role.delete, role.permission]
       },
       {
         name: '组别管理',

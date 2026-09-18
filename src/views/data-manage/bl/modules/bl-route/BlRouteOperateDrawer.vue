@@ -9,8 +9,13 @@ type BlRoute = Api.DataManageBl.BlRoute;
 
 /** 航线类型（后端固定枚举 0-空运 1-海运） */
 const routeTypeOptions = computed(() => [
-  { label: '空运', value: 0 },
-  { label: '海运', value: 1 }
+  { label: $t('page.dataManage.bl.blRoute.routeTypeOption.air'), value: 0 },
+  { label: $t('page.dataManage.bl.blRoute.routeTypeOption.sea'), value: 1 }
+]);
+
+const statusOptions = computed(() => [
+  { label: $t('common.enable'), value: 1 },
+  { label: $t('common.disable'), value: 0 }
 ]);
 
 const emit = defineEmits<{
@@ -24,7 +29,7 @@ const formModel = ref<Partial<BlRoute>>(emptyForm());
 const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
 
 function emptyForm(): Partial<BlRoute> {
-  return { code: '', nameCn: '', nameEn: '', routeType: 1, status: 1, note: '' };
+  return { code: '', nameCn: '', nameEn: '', routeType: 1, order: 0, status: 1, note: '' };
 }
 
 const drawerTitle = computed(() =>
@@ -36,10 +41,10 @@ const drawerTitle = computed(() =>
 const formItems = computed<FormItemConfig[]>(() => [
   {
     key: 'routeType',
-    label: '航线类型',
+    label: $t('page.dataManage.bl.blRoute.routeType'),
     type: 'select',
     required: true,
-    span: 12,
+    span: 24,
     options: routeTypeOptions.value,
     filterable: false
   },
@@ -48,27 +53,31 @@ const formItems = computed<FormItemConfig[]>(() => [
     label: $t('page.dataManage.bl.blRoute.code'),
     type: 'input',
     required: true,
-    span: 12,
+    span: 24,
     placeholder: $t('page.dataManage.bl.blRoute.form.codePlaceholder')
   },
   {
     key: 'nameCn',
-    label: '中文名',
+    label: $t('page.dataManage.bl.blRoute.nameCn'),
     type: 'input',
     required: true,
-    span: 12,
+    span: 24,
     placeholder: $t('page.dataManage.bl.blRoute.form.namePlaceholder')
   },
-  { key: 'nameEn', label: '英文名', type: 'input', span: 12 },
+  { key: 'nameEn', label: $t('page.dataManage.bl.blRoute.nameEn'), type: 'input', span: 24 },
+  {
+    key: 'order',
+    label: $t('page.dataManage.bl.blRoute.order'),
+    type: 'number',
+    span: 24
+  },
   {
     key: 'status',
     label: $t('common.status'),
-    type: 'switch',
+    type: 'select',
+    required: true,
     span: 24,
-    checkedValue: 1,
-    uncheckedValue: 0,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
+    options: statusOptions.value
   },
   { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
 ]);
@@ -88,6 +97,7 @@ function openEdit(row: BlRoute) {
     nameCn: row.nameCn,
     nameEn: row.nameEn,
     routeType: row.routeType,
+    order: row.order ?? 0,
     status: row.status ?? 1,
     note: row.note ?? ''
   };

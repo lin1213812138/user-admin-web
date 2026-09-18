@@ -13,7 +13,7 @@ export * from './track-config';
 export * from './capture-time';
 export * from './operation-trace';
 export * from './op-log';
-export * from './data-manage';
+export * from './data-manage-archive';
 export * from './no-rule';
 export * from './channel-quote';
 export * from './print-format';

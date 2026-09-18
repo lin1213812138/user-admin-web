@@ -340,6 +340,7 @@ defineExpose({
                 :filterable="item.filterable ?? true"
                 :multiple="item.multiple || false"
                 :render-label="item.renderLabel ?? fallbackOptionLabel"
+                @update:value="(value, option) => item.onUpdate?.(value, option)"
               />
               <NDatePicker
                 v-else-if="item.type === 'date'"

@@ -958,6 +958,7 @@ declare namespace App {
                 statePlaceholder: string;
                 cityPlaceholder: string;
                 zipPlaceholder: string;
+                customerPlaceholder: string;
               };
               fileName: string;
               uploader: string;
@@ -1429,7 +1430,7 @@ declare namespace App {
             code: string;
             name: string;
             form: { codePlaceholder: string; namePlaceholder: string };
-            address: { title: string };
+            address: { title: string; shipTo: string; shipper: string };
             declaredGoods: { title: string };
             problemCategory: { title: string };
             goodsCategory: { title: string };
@@ -1444,6 +1445,11 @@ declare namespace App {
               title: string;
               code: string;
               name: string;
+              nameCn: string;
+              nameEn: string;
+              routeType: string;
+              order: string;
+              routeTypeOption: { air: string; sea: string };
               form: { codePlaceholder: string; namePlaceholder: string };
             };
             blPort: {

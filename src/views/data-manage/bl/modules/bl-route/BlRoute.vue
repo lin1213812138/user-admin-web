@@ -47,9 +47,15 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         minWidth: 120,
         sortable: false
       },
-      { key: 'nameCn', title: '中文名', visible: true, minWidth: 140, sortable: false },
-      { key: 'nameEn', title: '英文名', visible: true, minWidth: 140, sortable: false },
-      { key: 'routeType', title: '航线类型', visible: true, width: 110, sortable: false },
+      {
+        key: 'routeType',
+        title: $t('page.dataManage.bl.blRoute.routeType'),
+        visible: true,
+        minWidth: 110,
+        sortable: false
+      },
+      { key: 'nameCn', title: $t('page.dataManage.bl.blRoute.nameCn'), visible: true, minWidth: 140, sortable: false },
+      { key: 'nameEn', title: $t('page.dataManage.bl.blRoute.nameEn'), visible: true, minWidth: 140, sortable: false },
       { key: 'status', title: $t('common.status'), visible: true, width: 90, align: 'center', sortable: false },
       {
         key: 'createDate',
@@ -130,7 +136,11 @@ const drawerRef = ref<InstanceType<typeof BlRouteOperateDrawer> | null>(null);
       </template>
       <template #routeType="{ row }">
         <NTag :type="row.routeType === 1 ? 'success' : 'warning'" size="small">
-          {{ row.routeType === 1 ? '海运' : '空运' }}
+          {{
+            row.routeType === 1
+              ? $t('page.dataManage.bl.blRoute.routeTypeOption.sea')
+              : $t('page.dataManage.bl.blRoute.routeTypeOption.air')
+          }}
         </NTag>
       </template>
       <template #status="{ row }">

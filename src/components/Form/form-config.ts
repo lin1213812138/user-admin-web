@@ -58,6 +58,11 @@ export interface FormItemConfig {
   filterable?: boolean;
   /** 下拉是否多选（type 为 select 时使用），默认 false；多选时 model[key] 为 Array<string|number> */
   multiple?: boolean;
+  /** 下拉选中回调（type 为 select 时使用），回传 (value, option)，option 带完整选中项数据（如 code2），避免父级再反查 */
+  onUpdate?: (
+    value: string | number | Array<string | number> | null,
+    option: SelectOption | Array<SelectOption> | null
+  ) => void;
   /** 上传允许的文件类型（type 为 file 时自定义，如 '.pdf,.doc'；不传则 file 不限制、image 默认 image/*） */
   accept?: string;
   /** 上传目录（type 为 image / file 时透传给公共 Upload 组件，对应后端 dest；默认 1-用户） */

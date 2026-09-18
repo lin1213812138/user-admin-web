@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { $t } from '@/locales';
-import MasterDataArchive from '@/views/data-manage/finance/components/MasterDataArchive.vue';
+import MasterDataArchive from '@/views/data-manage/components/MasterDataArchive.vue';
 import type { ArchiveConfig } from '@/views/data-manage/components/types';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
@@ -77,7 +77,7 @@ const config: ArchiveConfig<Api.DataManage.FinanceExpenseType> = {
 <template>
   <MasterDataArchive :config="config">
     <template #scope="{ row }">
-      <span>{{ scopeLabel(row.scope) }}</span>
+      <span>{{ scopeLabel((row as { scope?: number }).scope) }}</span>
     </template>
   </MasterDataArchive>
 </template>

@@ -1,58 +1,41 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import type { Component } from 'vue';
 import { $t } from '@/locales';
-import MasterDataArchive from '@/views/data-manage/business/components/MasterDataArchive.vue';
-import type { ArchiveConfig } from '@/views/data-manage/components/types';
-import type { VxeColumnConfig } from '@/components/Table';
-import type { FormItemConfig } from '@/components/Form/index.vue';
-import { useArchiveStatusOptions } from '@/views/data-manage/components/shared';
+import { NCard, NTabPane, NTabs } from 'naive-ui';
+import ShipTo from './ship-to/ShipTo.vue';
+import Shipper from './shipper/Shipper.vue';
 
-const statusOptions = useArchiveStatusOptions();
+type SubTabKey = 'ship-to' | 'shipper';
 
-const searchItems: FormItemConfig[] = [
-  {
-    key: 'keyword',
-    label: $t('common.keyword'),
-    type: 'input',
-    span: 8,
-    placeholder: $t('page.dataManage.common.keywordPlaceholder')
-  },
-  { key: 'status', label: $t('common.status'), type: 'select', span: 8, options: statusOptions.value },
-  { key: 'actions', label: ' ', slot: 'actions', span: 8 }
+const subTabs: { key: SubTabKey; label: string }[] = [
+  { key: 'ship-to', label: $t('page.dataManage.business.address.shipTo') },
+  { key: 'shipper', label: $t('page.dataManage.business.address.shipper') }
 ];
 
-const config: ArchiveConfig<Api.DataManage.BusinessAddress> = {
-  archive: 'address',
-  cacheKey: 'data-manage-business-address',
-  titleI18nKey: 'page.dataManage.business.address.title',
-  searchItems,
-  columns: () =>
-    [
-      { key: 'code', title: $t('page.dataManage.business.code'), type: 'detail', visible: true, sortable: false },
-      { key: 'name', title: $t('page.dataManage.business.name'), visible: true, sortable: false }
-    ] as VxeColumnConfig[],
-  formItems: [
-    {
-      key: 'code',
-      label: $t('page.dataManage.business.code'),
-      type: 'input',
-      required: true,
-      span: 12,
-      placeholder: $t('page.dataManage.business.form.codePlaceholder')
-    },
-    {
-      key: 'name',
-      label: $t('page.dataManage.business.name'),
-      type: 'input',
-      required: true,
-      span: 12,
-      placeholder: $t('page.dataManage.business.form.namePlaceholder')
-    },
-    { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
-  ],
-  createDefault: () => ({ code: '', name: '', status: 1, remark: '' })
+const active = ref<SubTabKey>('ship-to');
+
+function handleTabChange(value: string | number) {
+  active.value = value as SubTabKey;
+}
+
+const tableMap: Record<SubTabKey, Component> = {
+  'ship-to': ShipTo,
+  shipper: Shipper
 };
 </script>
 
 <template>
-  <MasterDataArchive :config="config" />
+  <NCard class="h-full" :content-style="{ padding: '0', display: 'flex', flexDirection: 'column', minHeight: '0' }">
+    <div class="min-w-0 flex-1 flex-col min-h-0 overflow-hidden px-10px py-10px">
+      <NTabs :value="active" type="line" class="mb-5px" @update:value="handleTabChange">
+        <NTabPane v-for="t in subTabs" :key="t.key" :name="t.key" :tab="t.label" />
+      </NTabs>
+      <KeepAlive>
+        <component :is="tableMap[active]" :key="active" class="min-h-0 flex-1" />
+      </KeepAlive>
+    </div>
+  </NCard>
 </template>
+
+<style scoped></style>

@@ -29,7 +29,7 @@ function renderCountryOptionLabel(option: SelectOption): VNodeChild {
   // 实测补偿后二字码与滚动条之间留白 = 选项左内边距 12px，视觉左右对称
   return h('div', { class: 'country-option-row flex items-center justify-between w-full pr-9px' }, [
     h('span', { class: 'truncate' }, String(name ?? '')),
-    code2 ? h('span', { class: 'text-12px text-gray-400 pl-8px' }, code2) : null
+    code2 ? h('span', { class: 'country-option-code2 text-12px text-gray-400 pl-8px' }, code2) : null
   ]);
 }
 

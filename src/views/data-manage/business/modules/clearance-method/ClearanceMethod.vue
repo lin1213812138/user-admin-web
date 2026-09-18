@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { $t } from '@/locales';
-import MasterDataArchive from '@/views/data-manage/business/components/MasterDataArchive.vue';
+import MasterDataArchive from '@/views/data-manage/components/MasterDataArchive.vue';
 import type { ArchiveConfig } from '@/views/data-manage/components/types';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';

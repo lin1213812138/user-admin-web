@@ -696,7 +696,8 @@ const local: App.I18n.Schema = {
             addressPlaceholder: '请输入地址',
             statePlaceholder: '请输入省州',
             cityPlaceholder: '请输入城市',
-            zipPlaceholder: '请输入邮编'
+            zipPlaceholder: '请输入邮编',
+            customerPlaceholder: '请选择客户'
           },
           fileName: '文件名称',
           uploader: '上传人',
@@ -1174,7 +1175,7 @@ const local: App.I18n.Schema = {
         code: '编码',
         name: '名称',
         form: { codePlaceholder: '请输入编码', namePlaceholder: '请输入名称' },
-        address: { title: '地址簿' },
+        address: { title: '地址簿', shipTo: '收件地址', shipper: '发件地址' },
         declaredGoods: { title: '申报物品' },
         problemCategory: { title: '问题类别' },
         goodsCategory: { title: '物品类别' },
@@ -1189,7 +1190,15 @@ const local: App.I18n.Schema = {
           title: '航线',
           code: '航线代码',
           name: '航线名称',
-          form: { codePlaceholder: '请输入航线代码', namePlaceholder: '请输入航线名称' }
+          nameCn: '中文名',
+          nameEn: '英文名',
+          routeType: '航线类型',
+          order: '排序',
+          routeTypeOption: {
+            air: '空运',
+            sea: '海运'
+          },
+          form: { codePlaceholder: '请输入航线代码', namePlaceholder: '请输入航线代码/中文名/英文名' }
         },
         blPort: {
           title: '港口',

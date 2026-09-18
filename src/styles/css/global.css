@@ -36,3 +36,12 @@ html {
 .n-base-select-option:has(.country-option-row) .n-base-select-option__check-mark {
   display: none;
 }
+
+/* naive Space（NSpace）会给每个「非 Comment」子 vnode 套一层 <div role="none"> 包装（itemClass 未传 ⇒ 该层无类名）；
+   子组件自身「不渲染」时（如 LButton 的 auth 无权限只渲染注释、v-auth 的 el.remove() 删掉按钮），
+   这层壳会变成空壳，但它仍然是 flex item ⇒ Space 的 gap（medium 横向 12px）照常生效 ⇒ 按钮组左侧残留空白。
+   :empty 按规范只算元素节点与非空文本、忽略注释节点 ⇒ 空壳命中后 display:none，不再参与 flex 布局，间隔随之消失。
+   限定 [role='none'] 只命中 Space 自己生成的包装层，不误伤页面自己写的空 div */
+.n-space > div[role='none']:empty {
+  display: none;
+}

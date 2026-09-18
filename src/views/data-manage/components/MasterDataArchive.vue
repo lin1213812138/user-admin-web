@@ -1,12 +1,8 @@
 <script setup lang="ts" generic="T extends MasterDataRow">
-import { computed, reactive, ref, useSlots } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import dayjs from 'dayjs';
 import { $t } from '@/locales';
-import {
-  fetchCreateDataManage,
-  fetchDeleteDataManage,
-  fetchGetDataManageList,
-  fetchUpdateDataManage
-} from '@/service/api/data-manage';
+import { archiveApiMap } from '@/service/api/data-manage-archive';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import NFormWrap from '@/components/Form/index.vue';
@@ -14,14 +10,8 @@ import Drawer from '@/components/common/drawer.vue';
 import type { ArchiveConfig, MasterDataRow } from '@/views/data-manage/components/types';
 
 const props = defineProps<{ config: ArchiveConfig<T> }>();
+const apiGroup = archiveApiMap[props.config.archive]!;
 
-const slots = useSlots();
-
-/** 组件内部已固定渲染的插槽，不参与透传（否则会覆盖 Table 内置的操作区/操作列） */
-const reservedSlots = ['operation-left', 'operation-right', 'action'];
-
-/** 透传给 Table 的业务插槽（如单元格自定义 #scope），使子档案可自定义列渲染而不必改写本组件 */
-const forwardedSlots = computed(() => Object.keys(slots).filter(name => !reservedSlots.includes(name)));
 const searchParams = reactive<Record<string, unknown>>({});
 for (const it of props.config.searchItems) {
   searchParams[it.key] = it.type === 'select' ? null : '';
@@ -31,14 +21,24 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
   Api.DataManage.ArchiveList<T>,
   T
 >({
-  api: ({ current, size }) => {
+  api: async ({ current, size }) => {
     const params: Record<string, unknown> = { current, size };
     for (const [k, v] of Object.entries(searchParams)) {
       if (v !== '' && v !== null && v !== undefined) params[k] = v;
     }
-    return fetchGetDataManageList<T>(props.config.archive, params as unknown as Api.DataManage.ArchiveSearchParams);
+    const { data: res, error } = await apiGroup.list(params as unknown as Api.DataManage.ArchiveSearchParams);
+    if (error || !res) return { list: [], total: 0 };
+    return res as Api.DataManage.ArchiveList<T>;
   },
-  transform: r => ({ records: r.records, total: r.total }),
+  transform: r => ({
+    records: (r.list ?? []).map(it => ({
+      ...(it as object),
+      createTime: (it as { createDate?: number }).createDate
+        ? dayjs((it as { createDate: number }).createDate).format('YYYY-MM-DD HH:mm:ss')
+        : (it as { createTime?: string }).createTime
+    })) as unknown as T[],
+    total: r.total
+  }),
   columns: () =>
     [
       ...props.config.columns(),
@@ -59,7 +59,6 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         sortable: true
       }
     ] as VxeColumnConfig[],
-  // 默认分页不传，useVxeTable 全局兜底为 50
   cacheKey: props.config.cacheKey
 });
 
@@ -88,8 +87,8 @@ function handleReset() {
   handleSearch();
 }
 
-async function handleDelete(ids: number[]) {
-  await fetchDeleteDataManage(props.config.archive, ids);
+async function handleDelete(ids: string[]) {
+  await apiGroup.remove(ids);
   window.$message?.success($t('common.deleteSuccess'));
   checkedRows.value = [];
   getData();
@@ -99,6 +98,7 @@ const drawerVisible = ref(false);
 const drawerMode = ref<'create' | 'edit' | 'detail'>('create');
 const submitting = ref(false);
 const model = reactive<Record<string, unknown>>({});
+const currentId = ref<string>('');
 const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
 
 const drawerTitle = computed(() => {
@@ -115,6 +115,7 @@ const drawerTitle = computed(() => {
 function openDrawer(mode: 'create' | 'edit' | 'detail', row?: T) {
   drawerMode.value = mode;
   const source = (mode === 'create' ? props.config.createDefault() : (row ?? {})) as Record<string, unknown>;
+  currentId.value = (row as { _id?: string })?._id ?? '';
   for (const it of props.config.formItems) {
     model[it.key] = source[it.key];
   }
@@ -131,10 +132,10 @@ async function handleSubmit() {
   submitting.value = true;
   try {
     if (drawerMode.value === 'create') {
-      await fetchCreateDataManage<T>(props.config.archive, model as Partial<T>);
+      await apiGroup.create(model as Partial<T>);
       window.$message?.success($t('common.createSuccess'));
     } else {
-      await fetchUpdateDataManage<T>(props.config.archive, model as T);
+      await apiGroup.update({ ...(model as object), _id: currentId.value } as T);
       window.$message?.success($t('common.updateSuccess'));
     }
     drawerVisible.value = false;
@@ -173,7 +174,7 @@ async function handleSubmit() {
             </NButton>
             <NPopconfirm
               :disabled="checkedRows.length === 0"
-              @positive-click="handleDelete(checkedRows.map(i => i.id))"
+              @positive-click="handleDelete(checkedRows.map(i => (i as { _id: string })._id))"
             >
               <template #trigger>
                 <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
@@ -205,7 +206,7 @@ async function handleSubmit() {
           <NButton size="small" type="info" text @click="openDrawer('detail', row as T)">
             {{ $t('common.detail') }}
           </NButton>
-          <NPopconfirm @positive-click="handleDelete([(row as T).id])">
+          <NPopconfirm @positive-click="handleDelete([(row as T & { _id: string })._id])">
             <template #trigger>
               <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
             </template>
@@ -213,8 +214,8 @@ async function handleSubmit() {
           </NPopconfirm>
         </template>
 
-        <template v-for="name in forwardedSlots" :key="name" #[name]="scope">
-          <slot :name="name" v-bind="scope" />
+        <template v-for="(slot, name) in $slots" :key="name" #[name]="slotProps">
+          <slot :name="name" v-bind="slotProps" />
         </template>
       </Table>
     </div>

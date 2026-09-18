@@ -289,28 +289,27 @@ function handleSubmitted() {
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton v-auth="'system:role:add'" size="small" type="primary" ghost @click="openDrawer('create')">
+            <LButton auth="'system:role:add'" type="primary" @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
               {{ $t('common.add') }}
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
+            <LButton circle @click="configVisible = true">
               <template #icon>
                 <icon-mdi-cog class="text-icon" />
               </template>
-              {{ $t('common.columnSetting') }}
-            </NButton>
-            <NButton size="small" @click="getData">
+            </LButton>
+            <LButton circle @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
@@ -336,6 +335,7 @@ function handleSubmitted() {
             <template #trigger>
               <span>
                 <NButton
+                  v-auth="'system:role:permission'"
                   size="small"
                   type="info"
                   text

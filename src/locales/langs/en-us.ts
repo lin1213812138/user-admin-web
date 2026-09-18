@@ -700,7 +700,8 @@ const local: App.I18n.Schema = {
             addressPlaceholder: 'Please enter address',
             statePlaceholder: 'Please enter state',
             cityPlaceholder: 'Please enter city',
-            zipPlaceholder: 'Please enter zip'
+            zipPlaceholder: 'Please enter zip',
+            customerPlaceholder: 'Please select customer'
           },
           fileName: 'File Name',
           uploader: 'Uploaded By',
@@ -1179,7 +1180,7 @@ const local: App.I18n.Schema = {
         code: 'Code',
         name: 'Name',
         form: { codePlaceholder: 'Enter code', namePlaceholder: 'Enter name' },
-        address: { title: 'Address Book' },
+        address: { title: 'Address Book', shipTo: 'Ship To', shipper: 'Shipper' },
         declaredGoods: { title: 'Declared Goods' },
         problemCategory: { title: 'Problem Category' },
         goodsCategory: { title: 'Goods Category' },
@@ -1194,6 +1195,14 @@ const local: App.I18n.Schema = {
           title: 'Route',
           code: 'Route Code',
           name: 'Route Name',
+          nameCn: 'Chinese Name',
+          nameEn: 'English Name',
+          routeType: 'Route Type',
+          order: 'Sort',
+          routeTypeOption: {
+            air: 'Air Freight',
+            sea: 'Sea Freight'
+          },
           form: { codePlaceholder: 'Enter route code', namePlaceholder: 'Enter route name' }
         },
         blPort: {

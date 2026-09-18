@@ -14,7 +14,7 @@ const emit = defineEmits<{
   <div class="flex flex-wrap items-center gap-12px">
     <NInput
       v-model:value="keyword"
-      class="w-200px!"
+      class="w-300px!"
       clearable
       :placeholder="$t('page.dataManage.bl.blRoute.form.namePlaceholder')"
       @keyup.enter="emit('search')"

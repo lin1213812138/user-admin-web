@@ -1,62 +1,52 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
+import type { SelectOption } from 'naive-ui';
 import { $t } from '@/locales';
 import { useCountrySelect } from '@/hooks/business/use-country-select';
-import {
-  fetchCreateShipTo,
-  fetchCreateShipper,
-  fetchUpdateShipTo,
-  fetchUpdateShipper
-} from '@/service/api/ship-address';
+import { fetchCreateShipTo, fetchUpdateShipTo } from '@/service/api/ship-address';
+import { fetchGetCustomerList } from '@/service/api/customer';
 import Drawer from '@/components/common/drawer.vue';
 import Upload from '@/components/Upload/index.vue';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 
-defineOptions({ name: 'AddressOperateDrawer' });
+defineOptions({ name: 'ShipToOperateDrawer' });
 
 interface Props {
-  /** 抽屉显隐，v-model:show */
-  show?: boolean;
-  /** 初始地址类型：ship-to-收件地址 / shipper-发件地址（新增时可在弹窗内切换） */
-  type?: 'ship-to' | 'shipper';
-  /** 所属客户 id（新增时必带） */
+  /** 所属客户 id（客户详情页传入，独立地址簿新增时不传） */
   customerId?: string;
-  /** 客户名称（只读展示，对齐老系统「客户」灰底项） */
+  /** 客户名称（只读展示） */
   customerName?: string;
-  /** 编辑行（null 为新增） */
-  row?: Api.SystemManage.CustomerAddress | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  show: false,
-  type: 'ship-to',
   customerId: '',
-  customerName: '',
-  row: null
+  customerName: ''
 });
 
-const emit = defineEmits<{
-  'update:show': [value: boolean];
-  submitted: [];
-}>();
+const emit = defineEmits<{ submitted: [] }>();
 
-const drawerVisible = computed({
-  get: () => props.show,
-  set: val => emit('update:show', val)
-});
-
-const isCreate = computed(() => !props.row);
+const show = ref(false);
+const row = ref<Api.SystemManage.CustomerAddress | null>(null);
+const isCreate = computed(() => !row.value);
 const submitting = ref(false);
 const formRef = ref<InstanceType<typeof NFormWrap>>();
 
-/** 地址类型由所在列表 tab 决定（收件地址 tab 新增即收件表单，发件同理） */
-const isShipTo = computed(() => props.type === 'ship-to');
+/** 客户下拉选项（独立地址簿新增时可选客户；客户详情页走只读 customerName，不加载） */
+const customerOptions = ref<{ label: string; value: string }[]>([]);
+async function loadCustomerOptions() {
+  if (customerOptions.value.length) return;
+  const { data: res, error } = await fetchGetCustomerList({ page: 1, size: 1000, scene: 1 });
+  if (error || !res) return;
+  customerOptions.value = res.list.map(c => ({ label: c.name, value: c._id }));
+}
 
 /** 目的地国家下拉（/country/query），由公共 Hook 提供并缓存 */
-const { options: countryOptions, load: loadCountryOptions, getName: getCountryName } = useCountrySelect();
+const { options: countryOptions, load: loadCountryOptions, renderLabel: renderCountryOptionLabel } = useCountrySelect();
 
-const model = reactive<Api.SystemManage.CustomerAddressSaveParams>({
-  customerId: '',
+type AddressFormModel = Omit<Api.SystemManage.CustomerAddressSaveParams, 'customerId'> & { customerId?: string };
+
+const model = reactive<AddressFormModel>({
+  customerId: undefined,
   countryId: undefined,
   country: '',
   name: '',
@@ -78,25 +68,30 @@ const model = reactive<Api.SystemManage.CustomerAddressSaveParams>({
   imgUrl2: ''
 });
 
-/** 选择目的地后自动带出国家名称（可手动修改） */
-watch(
-  () => model.countryId,
-  id => {
-    if (!id) return;
-    model.country = getCountryName(id);
-  }
-);
+/** 合并当前行中的 countryId（可能不在全局缓存里）作为回显选项 */
+const countrySelectOptions = computed<SelectOption[]>(() => {
+  const list = countryOptions.value;
+  const currentId = model.countryId;
+  if (!currentId || list.some(opt => opt.value === currentId)) return list;
+  const rowCountry = row.value?.country;
+  return [{ label: rowCountry || currentId, value: currentId, name: rowCountry || currentId } as SelectOption, ...list];
+});
 
 const formItems = computed<FormItemConfig[]>(() => [
-  // FBA 仓库代码仅收件地址有（shipper 模型无 fbaCode 字段）
-  ...(isShipTo.value
-    ? [{ key: 'fbaCode', label: $t('page.manage.customer.detail.fbaCode'), type: 'input', span: 12 } as FormItemConfig]
-    : []),
+  // FBA 仓库代码仅收件地址有
+  { key: 'fbaCode', label: $t('page.manage.customer.detail.fbaCode'), type: 'input', span: 12 },
+  // 客户：客户详情页由父级传入，禁用并展示客户名称；独立地址簿新增时由用户自选
   {
-    key: 'customerName',
+    key: 'customerId',
     label: $t('page.manage.customer.detail.customer'),
-    type: 'custom',
-    span: 12
+    type: 'select',
+    required: !props.customerId,
+    disabled: !!props.customerId,
+    span: 12,
+    filterable: true,
+    clearable: !props.customerId,
+    placeholder: $t('page.manage.customer.detail.form.customerPlaceholder'),
+    options: props.customerId ? [{ label: props.customerName, value: props.customerId }] : customerOptions.value
   },
   {
     key: 'countryId',
@@ -105,19 +100,19 @@ const formItems = computed<FormItemConfig[]>(() => [
     required: true,
     span: 12,
     filterable: true,
-    options: countryOptions.value,
-    placeholder: $t('page.manage.customer.detail.form.countryPlaceholder')
+    options: countrySelectOptions.value,
+    placeholder: $t('page.manage.customer.detail.form.countryPlaceholder'),
+    /** 下拉项显示 名称+二字码，选中态的二字码由抽屉 scoped 样式隐藏，只显示名称 */
+    renderLabel: renderCountryOptionLabel,
+    /** 选中目的地后，直接从选中项带出国家二字码（可手动修改） */
+    onUpdate: (_value, option) => {
+      model.country = (option as SelectOption & { code2?: string })?.code2 ?? '';
+    }
   },
-  {
-    key: 'country',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stCountry') : $t('page.manage.customer.detail.spCountry'),
-    type: 'input',
-    required: true,
-    span: 12
-  },
+  { key: 'country', label: $t('page.manage.customer.detail.stCountry'), type: 'input', required: true, span: 12 },
   {
     key: 'name',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stName') : $t('page.manage.customer.detail.spName'),
+    label: $t('page.manage.customer.detail.stName'),
     type: 'input',
     required: true,
     span: 12,
@@ -125,7 +120,7 @@ const formItems = computed<FormItemConfig[]>(() => [
   },
   {
     key: 'zip',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stZip') : $t('page.manage.customer.detail.spZip'),
+    label: $t('page.manage.customer.detail.stZip'),
     type: 'input',
     required: true,
     span: 12,
@@ -133,7 +128,7 @@ const formItems = computed<FormItemConfig[]>(() => [
   },
   {
     key: 'phone',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stPhone') : $t('page.manage.customer.detail.spPhone'),
+    label: $t('page.manage.customer.detail.stPhone'),
     type: 'input',
     required: true,
     span: 12,
@@ -141,7 +136,7 @@ const formItems = computed<FormItemConfig[]>(() => [
   },
   {
     key: 'state',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stState') : $t('page.manage.customer.detail.spState'),
+    label: $t('page.manage.customer.detail.stState'),
     type: 'input',
     required: true,
     span: 12,
@@ -149,7 +144,7 @@ const formItems = computed<FormItemConfig[]>(() => [
   },
   {
     key: 'city',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stCity') : $t('page.manage.customer.detail.spCity'),
+    label: $t('page.manage.customer.detail.stCity'),
     type: 'input',
     required: true,
     span: 12,
@@ -158,21 +153,21 @@ const formItems = computed<FormItemConfig[]>(() => [
   { key: 'company', label: $t('page.manage.customer.detail.formCompany'), type: 'input', span: 12 },
   {
     key: 'mobile',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stMobile') : $t('page.manage.customer.detail.spMobile'),
+    label: $t('page.manage.customer.detail.stMobile'),
     type: 'input',
     span: 12,
     placeholder: $t('page.manage.customer.detail.form.mobilePlaceholder')
   },
   {
     key: 'email',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stEmail') : $t('page.manage.customer.detail.spEmail'),
+    label: $t('page.manage.customer.detail.stEmail'),
     type: 'input',
     span: 12,
     placeholder: $t('page.manage.customer.detail.form.emailPlaceholder')
   },
   {
     key: 'address',
-    label: isShipTo.value ? $t('page.manage.customer.detail.stAddress') : $t('page.manage.customer.detail.spAddress'),
+    label: $t('page.manage.customer.detail.stAddress'),
     type: 'textarea',
     required: true,
     span: 12,
@@ -190,37 +185,39 @@ const formItems = computed<FormItemConfig[]>(() => [
     ]
   },
   { key: 'address2', label: $t('page.manage.customer.detail.address2'), type: 'textarea', span: 12 },
-  { key: 'address3', label: $t('page.manage.customer.detail.address3'), type: 'textarea', span: 12 },
+  { key: 'address3', label: $t('page.manage.customer.detail.address3'), type: 'textarea', span: 24 },
   { key: 'imgUrl1', label: $t('page.manage.customer.detail.idCardFront'), type: 'custom', span: 12 },
   { key: 'imgUrl2', label: $t('page.manage.customer.detail.idCardBack'), type: 'custom', span: 12 }
 ]);
 
 function fillFormByRow() {
-  const row = props.row;
-  if (!row) return;
+  const r = row.value;
+  if (!r) return;
 
-  model.countryId = row.countryId || undefined;
-  model.country = row.country ?? '';
-  model.name = row.name ?? '';
-  model.company = row.company ?? '';
-  model.phone = row.phone ?? '';
-  model.mobile = row.mobile ?? '';
-  model.email = row.email ?? '';
-  model.address = row.address ?? '';
-  model.address2 = row.address2 ?? '';
-  model.address3 = row.address3 ?? '';
-  model.state = row.state ?? '';
-  model.city = row.city ?? '';
-  model.zip = row.zip ?? '';
-  model.taxNo = row.taxNo ?? '';
-  model.fbaCode = row.fbaCode ?? '';
-  model.tag = row.tag ?? '';
-  model.isDefault = row.isDefault ?? 0;
-  model.imgUrl1 = row.imgUrl1 ?? '';
-  model.imgUrl2 = row.imgUrl2 ?? '';
+  model.customerId = r.customerId || props.customerId || undefined;
+  model.countryId = r.countryId || undefined;
+  model.country = r.country ?? '';
+  model.name = r.name ?? '';
+  model.company = r.company ?? '';
+  model.phone = r.phone ?? '';
+  model.mobile = r.mobile ?? '';
+  model.email = r.email ?? '';
+  model.address = r.address ?? '';
+  model.address2 = r.address2 ?? '';
+  model.address3 = r.address3 ?? '';
+  model.state = r.state ?? '';
+  model.city = r.city ?? '';
+  model.zip = r.zip ?? '';
+  model.taxNo = r.taxNo ?? '';
+  model.fbaCode = r.fbaCode ?? '';
+  model.tag = r.tag ?? '';
+  model.isDefault = r.isDefault ?? 0;
+  model.imgUrl1 = r.imgUrl1 ?? '';
+  model.imgUrl2 = r.imgUrl2 ?? '';
 }
 
 function resetForm() {
+  model.customerId = props.customerId || undefined;
   model.countryId = undefined;
   model.country = '';
   model.name = '';
@@ -247,9 +244,8 @@ async function handleSubmit() {
 
   submitting.value = true;
   try {
-    // 必填字段收敛空串为 undefined，避免空串覆盖
     const payload: Api.SystemManage.CustomerAddressSaveParams = {
-      customerId: props.customerId,
+      customerId: props.customerId || model.customerId || '',
       countryId: model.countryId || undefined,
       country: model.country?.trim() || undefined,
       name: model.name?.trim() || undefined,
@@ -271,25 +267,36 @@ async function handleSubmit() {
       imgUrl2: model.imgUrl2 || undefined
     };
 
-    const createFn = isShipTo.value ? fetchCreateShipTo : fetchCreateShipper;
-    const updateFn = isShipTo.value ? fetchUpdateShipTo : fetchUpdateShipper;
-    const { error } = isCreate.value ? await createFn(payload) : await updateFn({ ...payload, _id: props.row!._id });
+    const { error } = isCreate.value
+      ? await fetchCreateShipTo(payload)
+      : await fetchUpdateShipTo({ ...payload, _id: row.value!._id });
     if (error) return;
 
     window.$message?.success($t(isCreate.value ? 'common.addSuccess' : 'common.updateSuccess'));
-    drawerVisible.value = false;
+    show.value = false;
     emit('submitted');
   } finally {
     submitting.value = false;
   }
 }
 
+/** 命令式打开：不传 row 为新增，传 row 为编辑 */
+function open(editRow?: Api.SystemManage.CustomerAddress | null) {
+  row.value = editRow ?? null;
+  show.value = true;
+}
+
+defineExpose({ open });
+
 watch(
-  () => props.show,
+  () => show.value,
   val => {
     if (!val) return;
 
     loadCountryOptions();
+    if (!props.customerId) {
+      loadCustomerOptions();
+    }
 
     if (isCreate.value) {
       resetForm();
@@ -302,18 +309,13 @@ watch(
 
 <template>
   <Drawer
-    v-model:show="drawerVisible"
+    v-model:show="show"
     :title="`${isCreate ? $t('common.add') : $t('common.edit')}${$t('page.manage.customer.detail.addressBook')}`"
     :loading="submitting"
     width="800"
     @submit="handleSubmit"
   >
     <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="24">
-      <!-- 客户（只读灰底，对齐老系统） -->
-      <template #customerName>
-        <NInput :value="customerName" disabled placeholder="" />
-      </template>
-
       <!-- 证件照 -->
       <template #imgUrl1>
         <Upload v-model:value="model.imgUrl1" :dest="7" list-type="image-card" />
@@ -325,4 +327,9 @@ watch(
   </Drawer>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* 选中态只显示国家名称，隐藏右侧二字码（下拉菜单是 teleport 到 body 的，不受 scoped 影响，仍保留 code2） */
+:deep(.n-base-selection__label .country-option-code2) {
+  display: none;
+}
+</style>
