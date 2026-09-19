@@ -23,6 +23,7 @@ const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
 
 function emptyForm(): Model {
   return {
+    countryId: undefined,
     nameCn: '',
     nameEn: '',
     price: undefined,
@@ -52,6 +53,7 @@ const formItems = computed<FormItemConfig[]>(() => [
     type: 'select',
     span: 12,
     options: countryOptions.value,
+    placeholder: $t(`${F}.country`),
     filterable: true
   },
   { key: 'weight', label: $t(`${F}.weight`), type: 'number', span: 12 },
@@ -65,13 +67,13 @@ const formItems = computed<FormItemConfig[]>(() => [
   { key: 'feeCustom', label: $t(`${F}.feeCustom`), type: 'number', span: 12 },
   { key: 'taxRate', label: $t(`${F}.taxRate`), type: 'number', span: 12 },
   { key: 'sellUrl', label: $t(`${F}.sellUrl`), type: 'input', span: 12 },
-  { key: 'imgUrl', label: $t(`${F}.imgUrl`), type: 'image', span: 12 },
-  { key: 'note', label: $t(`${F}.note`), type: 'textarea', span: 24 }
+  { key: 'note', label: $t(`${F}.note`), type: 'textarea', span: 12 },
+  { key: 'imgUrl', label: $t(`${F}.imgUrl`), type: 'image', span: 12 }
 ]);
 
 function openCreate() {
   drawerMode.value = 'create';
-  formModel.value = { ...emptyForm(), countryId: '' };
+  formModel.value = { ...emptyForm() };
   formRef.value?.restoreValidation();
   drawerVisible.value = true;
 }
@@ -80,8 +82,8 @@ function openEdit(row: Row) {
   drawerMode.value = 'edit';
   formModel.value = {
     _id: row._id,
-    customerId: row.customerId ?? '',
-    countryId: row.countryId ?? '',
+    customerId: row.customerId ?? undefined,
+    countryId: row.countryId ?? undefined,
     nameCn: row.nameCn ?? '',
     nameEn: row.nameEn ?? '',
     hsCode: row.hsCode ?? '',

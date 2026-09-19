@@ -86,12 +86,12 @@ async function handleDelete(row: Api.SystemManage.CustomerFileItem) {
     >
       <template #operation-left>
         <Upload :ref-id="customerId" :dest="7" list-type="file" :max="50" @success="handleUploadSuccess">
-          <NButton size="small" type="primary" ghost>
+          <LButton type="primary" ghost>
             <template #icon>
               <icon-mdi-upload class="text-icon" />
             </template>
             {{ $t('page.manage.customer.detail.batchUpload') }}
-          </NButton>
+          </LButton>
         </Upload>
       </template>
 
@@ -110,12 +110,7 @@ async function handleDelete(row: Api.SystemManage.CustomerFileItem) {
         <a v-if="row.url" :href="row.url" target="_blank" rel="noopener noreferrer" class="text-primary">
           {{ $t('page.manage.customer.detail.download') }}
         </a>
-        <NPopconfirm @positive-click="handleDelete(row)">
-          <template #trigger>
-            <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-          </template>
-          {{ $t('common.confirmDelete') }}
-        </NPopconfirm>
+        <LButton type="error" text popconfirm @positive-click="handleDelete(row)">{{ $t('common.delete') }}</LButton>
       </template>
     </Table>
 

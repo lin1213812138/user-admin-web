@@ -62,12 +62,11 @@ function toggleSelectAll(checked: boolean) {
 <template>
   <NPopover placement="bottom-end" trigger="click">
     <template #trigger>
-      <NButton size="small">
+      <LButton circle :tooltip="$t('common.columnSetting')">
         <template #icon>
           <icon-ant-design-setting-outlined class="text-icon" />
         </template>
-        {{ $t('common.columnSetting') }}
-      </NButton>
+      </LButton>
     </template>
     <div>
       <div class="h-36px flex-y-center rd-4px pl-26px hover:(bg-primary bg-opacity-20)">

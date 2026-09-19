@@ -355,6 +355,7 @@ declare namespace App {
         fixed: string;
         width: string;
         minWidth: string;
+        autoDefault: string;
         sortable: string;
         unFixed: string;
         fixedLeft: string;

@@ -41,6 +41,7 @@ const local: App.I18n.Schema = {
     fixed: 'Fixed',
     width: 'Width',
     minWidth: 'Min Width',
+    autoDefault: 'Auto Width',
     sortable: 'Sortable',
     unFixed: 'Unfixed',
     fixedLeft: 'Fixed Left',

@@ -267,12 +267,12 @@ onMounted(() => {
         </template>
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</NButton>
+          <LButton type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</LButton>
           <!-- 后端暂无 /customer/delete 接口，按钮先保留并禁用 -->
           <NTooltip>
             <template #trigger>
               <span>
-                <NButton size="small" type="error" text disabled>{{ $t('common.delete') }}</NButton>
+                <LButton type="error" text disabled>{{ $t('common.delete') }}</LButton>
               </span>
             </template>
             {{ $t('page.manage.customer.deleteDisabledTip') }}

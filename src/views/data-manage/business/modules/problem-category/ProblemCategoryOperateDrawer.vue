@@ -25,9 +25,9 @@ const formItems: FormItemConfig[] = [
     span: 24,
     placeholder: $t(`${F}.namePlaceholder`)
   },
-  { key: 'status', label: $t('common.status'), type: 'select', span: 12, options: statusOptions.value },
-  { key: 'desc', label: $t(`${F}.desc`), type: 'textarea', span: 24 },
-  { key: 'note', label: $t(`${F}.note`), type: 'textarea', span: 24 }
+  { key: 'desc', label: $t(`${F}.desc`), type: 'textarea', rows: 3, span: 24 },
+  { key: 'note', label: $t(`${F}.note`), type: 'textarea', rows: 3, span: 24 },
+  { key: 'status', label: $t('common.status'), type: 'select', span: 24, required: true, options: statusOptions.value }
 ];
 
 const createDefault = (): Record<string, unknown> => ({ name: '', desc: '', note: '', status: 1 });
@@ -88,7 +88,7 @@ defineExpose({ openCreate, openEdit });
 </script>
 
 <template>
-  <Drawer v-model:show="drawerVisible" :title="drawerTitle" :loading="submitting" width="520" @submit="handleSubmit">
+  <Drawer v-model:show="drawerVisible" :title="drawerTitle" :loading="submitting" @submit="handleSubmit">
     <NFormWrap ref="formRef" :model="model" :items="formItems" :grid-x-gap="16" label-placement="top" />
   </Drawer>
 </template>

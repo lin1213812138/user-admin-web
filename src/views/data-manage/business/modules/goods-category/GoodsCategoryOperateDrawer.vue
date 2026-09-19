@@ -31,7 +31,7 @@ const formItems: FormItemConfig[] = [
   { key: 'charged', label: $t(`${F}.charged`), type: 'select', span: 12, options: yesNoOptions.value },
   { key: 'danger', label: $t(`${F}.danger`), type: 'select', span: 12, options: yesNoOptions.value },
   { key: 'isDefault', label: $t(`${F}.isDefault`), type: 'select', span: 12, options: yesNoOptions.value },
-  { key: 'note', label: $t(`${F}.note`), type: 'textarea', span: 24 }
+  { key: 'note', label: $t(`${F}.note`), type: 'textarea', rows: 3, span: 24 }
 ];
 
 const createDefault = (): Record<string, unknown> => ({

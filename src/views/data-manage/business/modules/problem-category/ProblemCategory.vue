@@ -7,6 +7,7 @@ import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
 import type { FormItemConfig } from '@/components/Form/index.vue';
 import ProblemCategoryOperateDrawer from './ProblemCategoryOperateDrawer.vue';
+import LButton from '@/components/basic/LButton.vue';
 
 type Row = Api.DataManage.BusinessProblemCategory;
 
@@ -23,7 +24,7 @@ const searchItems: FormItemConfig[] = [
   { key: 'actions', label: ' ', slot: 'actions', span: 12 }
 ];
 
-const searchParams = reactive<Record<string, unknown>>({
+const searchParams = reactive<Api.DataManage.ProblemGroupSearchParams>({
   keyword: ''
 });
 
@@ -124,7 +125,7 @@ function handleEdit(row: Row) {
         :show-seq="true"
         :show-checkbox="true"
         :show-action="true"
-        :action-width="180"
+        :action-width="100"
         :search-items="searchItems"
         :search-model="searchParams"
         @search="handleSearch"
@@ -133,49 +134,47 @@ function handleEdit(row: Row) {
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"
       >
+        <template #search-action>
+          <div class="flex flex-wrap items-center gap-12px">
+            <NInput v-model:value="searchParams.keyword" class="w-260px!" @keyup.enter="handleSearch" />
+          </div>
+        </template>
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton size="small" type="primary" ghost @click="handleAdd">
+            <LButton type="primary" @click="handleAdd">
               <template #icon><icon-ic-round-plus class="text-icon" /></template>
               {{ $t('common.add') }}
-            </NButton>
-            <NPopconfirm
+            </LButton>
+            <LButton
+              type="error"
+              popconfirm
               :disabled="checkedRows.length === 0"
               @positive-click="handleDelete(checkedRows.map(i => (i as { _id: string })._id))"
             >
-              <template #trigger>
-                <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
-                  <template #icon><icon-mdi-delete class="text-icon" /></template>
-                  {{ $t('common.batchDelete') }}
-                </NButton>
-              </template>
-              {{ $t('common.confirmDelete') }}
-            </NPopconfirm>
+              <template #icon><icon-mdi-delete class="text-icon" /></template>
+              {{ $t('common.batchDelete') }}
+            </LButton>
           </NSpace>
         </template>
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
+            <LButton circle @click="configVisible = true">
               <template #icon><icon-mdi-cog class="text-icon" /></template>
-              {{ $t('common.columnSetting') }}
-            </NButton>
-            <NButton size="small" @click="getData">
+            </LButton>
+            <LButton circle @click="getData">
               <template #icon><icon-mdi-refresh class="text-icon" /></template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="handleEdit(row as Row)">
+          <LButton type="primary" text @click="handleEdit(row as Row)">
             {{ $t('common.edit') }}
-          </NButton>
-          <NPopconfirm @positive-click="handleDelete([(row as Row & { _id: string })._id])">
-            <template #trigger>
-              <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-            </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+          </LButton>
+          <LButton type="error" popconfirm text @positive-click="handleDelete([(row as Row & { _id: string })._id])">
+            {{ $t('common.delete') }}
+          </LButton>
         </template>
       </Table>
     </div>

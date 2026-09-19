@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import { NButton, NInput, NPopconfirm } from 'naive-ui';
+import { NInput } from 'naive-ui';
 import { fetchDeleteTrackConfig, fetchGetTrackConfigList } from '@/service/api/track-config';
 import { trackTypeLabel } from '@/constants/track-config';
 import TrackNetworkDrawer from './TrackNetworkDrawer.vue';
@@ -159,42 +159,37 @@ async function handleDelete(row: Api.SystemManage.TraceConfigItem) {
               placeholder="请输入网络名称"
               @keyup.enter="handleSearch"
             />
-            <NButton size="small" type="primary" @click="handleSearch">
+            <LButton type="primary" @click="handleSearch">
               <template #icon><icon-ic-round-search class="text-icon" /></template>
               {{ $t('common.search') }}
-            </NButton>
-            <NButton size="small" @click="handleReset">
+            </LButton>
+            <LButton @click="handleReset">
               <template #icon><icon-ic-round-refresh class="text-icon" /></template>
               {{ $t('common.reset') }}
-            </NButton>
+            </LButton>
           </div>
         </template>
         <template #operation-left>
-          <NButton size="small" type="primary" ghost @click="openCreate">
+          <LButton type="primary" ghost @click="openCreate">
             <template #icon><icon-ic-round-plus class="text-icon" /></template>
             {{ $t('common.add') }}
-          </NButton>
+          </LButton>
         </template>
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="getData">
+            <LButton circle :tooltip="$t('common.refresh')" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
-          <NButton size="small" type="primary" text @click="openReplace(row)">
+          <LButton type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</LButton>
+          <LButton type="primary" text @click="openReplace(row)">
             {{ $t('page.manage.setting.traceCapture.traceInfoTransform') }}
-          </NButton>
-          <NPopconfirm @positive-click="handleDelete(row)">
-            <template #trigger>
-              <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-            </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+          </LButton>
+          <LButton type="error" text popconfirm @positive-click="handleDelete(row)">{{ $t('common.delete') }}</LButton>
         </template>
         <template #trackType="{ row }">
           <span>{{ trackTypeLabel(row.trackType) }}</span>

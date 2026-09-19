@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import { NButton, NTag } from 'naive-ui';
+import { NTag } from 'naive-ui';
 import { fetchGetOpLogList } from '@/service/api/op-log';
 import CaptureTimeModal from './CaptureTimeModal.vue';
 
@@ -136,18 +136,18 @@ function handlePageChange({ current, size }: { current: number; size: number }) 
         @page-change="handlePageChange"
       >
         <template #operation-left>
-          <NButton size="small" type="primary" ghost @click="modalVisible = true">
+          <LButton type="primary" ghost @click="modalVisible = true">
             <template #icon><icon-mdi-clock-outline class="text-icon" /></template>
             {{ $t('page.manage.setting.traceCapture.captureTime.entry') }}
-          </NButton>
+          </LButton>
         </template>
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="getData">
+            <LButton circle :tooltip="$t('common.refresh')" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
         <template #client="{ row }">

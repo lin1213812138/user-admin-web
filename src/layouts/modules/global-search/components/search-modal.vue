@@ -107,7 +107,7 @@ registerShortcut();
           <icon-uil-search class="text-15px text-#c2c2c2" />
         </template>
       </NInput>
-      <NButton v-if="isMobile" type="primary" ghost @click="handleClose">{{ $t('common.cancel') }}</NButton>
+      <LButton v-if="isMobile" type="primary" ghost @click="handleClose">{{ $t('common.cancel') }}</LButton>
     </NInputGroup>
 
     <div class="mt-20px">

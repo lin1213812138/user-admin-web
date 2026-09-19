@@ -247,12 +247,12 @@ function handleConfirm() {
       <div class="flex-y-center justify-between gap-12px pb-8px">
         <div class="flex-y-center gap-12px">
           <!--
- <NButton size="small" type="primary" ghost @click="addField">
+ <LButton type="primary" ghost @click="addField">
             <template #icon>
               <icon-mdi-plus class="text-icon" />
             </template>
             {{ $t('common.addField') }}
-          </NButton> 
+          </LButton> 
 -->
           <template v-if="scopes?.length">
             <span class="text-14px">{{ $t('common.exportScope') }}</span>
@@ -333,9 +333,9 @@ function handleConfirm() {
           <!--
  <vxe-column :title="$t('common.action')" :width="70" align="center">
             <template #default="{ row }">
-              <NButton v-if="row.custom" size="small" quaternary type="error" text @click="removeField(row)">
+              <LButton v-if="row.custom" quaternary type="error" text @click="removeField(row)">
                 {{ $t('common.delete') }}
-              </NButton>
+              </LButton>
             </template>
           </vxe-column> 
 -->
@@ -344,11 +344,11 @@ function handleConfirm() {
     </div>
     <template #footer>
       <div class="flex justify-end gap-12px">
-        <NButton size="small" @click="handleReset">{{ $t('common.reset') }}</NButton>
-        <NButton size="small" @click="handleCancel">{{ $t('common.cancel') }}</NButton>
-        <NButton size="small" type="primary" :disabled="checkedCount === 0" :loading="loading" @click="handleConfirm">
+        <LButton @click="handleReset">{{ $t('common.reset') }}</LButton>
+        <LButton @click="handleCancel">{{ $t('common.cancel') }}</LButton>
+        <LButton type="primary" :disabled="checkedCount === 0" :loading="loading" @click="handleConfirm">
           {{ $t('common.export') }}
-        </NButton>
+        </LButton>
       </div>
     </template>
   </NModal>

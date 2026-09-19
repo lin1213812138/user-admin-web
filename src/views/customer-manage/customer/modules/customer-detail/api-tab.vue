@@ -119,14 +119,15 @@ async function handleResetPassword() {
 
         <div class="flex items-center">
           <span class="w-100px shrink-0 text-right pr-16px">{{ $t('page.manage.customer.detail.webPassword') }}</span>
-          <NPopconfirm @positive-click="handleResetPassword">
-            <template #trigger>
-              <NButton size="small" type="warning" ghost :loading="resetting">
-                {{ $t('page.manage.customer.detail.resetPassword') }}
-              </NButton>
-            </template>
-            {{ $t('page.manage.customer.detail.resetPasswordTip') }}
-          </NPopconfirm>
+          <LButton
+            type="warning"
+            ghost
+            :loading="resetting"
+            :popconfirm="$t('page.manage.customer.detail.resetPasswordTip')"
+            @positive-click="handleResetPassword"
+          >
+            {{ $t('page.manage.customer.detail.resetPassword') }}
+          </LButton>
         </div>
       </div>
     </NCard>
@@ -155,23 +156,23 @@ async function handleResetPassword() {
         <div class="flex items-center">
           <span class="w-100px shrink-0 text-right pr-16px">appToken</span>
           <span class="flex-1 truncate">{{ mask(customer.appToken) }}</span>
-          <NButton size="tiny" :disabled="!customer.appToken" @click="handleCopy(customer.appToken)">
+          <LButton size="tiny" :disabled="!customer.appToken" @click="handleCopy(customer.appToken)">
             <template #icon>
               <icon-mdi-content-copy class="text-icon" />
             </template>
             {{ $t('page.manage.customer.detail.copy') }}
-          </NButton>
+          </LButton>
         </div>
 
         <div class="flex items-center">
           <span class="w-100px shrink-0 text-right pr-16px">appKey</span>
           <span class="flex-1 truncate">{{ mask(customer.appKey) }}</span>
-          <NButton size="tiny" :disabled="!customer.appKey" @click="handleCopy(customer.appKey)">
+          <LButton size="tiny" :disabled="!customer.appKey" @click="handleCopy(customer.appKey)">
             <template #icon>
               <icon-mdi-content-copy class="text-icon" />
             </template>
             {{ $t('page.manage.customer.detail.copy') }}
-          </NButton>
+          </LButton>
         </div>
       </div>
     </NCard>

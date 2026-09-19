@@ -179,7 +179,7 @@ watch(
           <span class="truncate">{{ row.title }}</span>
         </template>
         <template #width="{ row }">
-          <NInputNumber v-model:value="row.width" :placeholder="$t('common.width')" size="small" :min="0" />
+          <NInputNumber v-model:value="row.width" :placeholder="$t('common.autoDefault')" size="small" :min="0" />
         </template>
         <template #minWidth="{ row }">
           <NInputNumber v-model:value="row.minWidth" :placeholder="$t('common.minWidth')" size="small" :min="0" />

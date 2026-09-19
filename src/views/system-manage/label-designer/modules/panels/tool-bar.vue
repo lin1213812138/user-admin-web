@@ -56,10 +56,10 @@ function handleClear() {
 <template>
   <!-- 单行工具栏：返回 | 模板名称 | 纸张 | 撤销/重做 | 缩放 | 显示网格 …… 清空 预览 保存 -->
   <div class="flex items-center gap-8px border-b border-#e5e7eb px-12px py-8px dark:border-#2a2a2a">
-    <NButton quaternary @click="goBack">
+    <LButton quaternary @click="goBack">
       <template #icon><icon-ic-round-arrow-back class="text-icon" /></template>
       {{ $t('page.manage.labelDesign.back') }}
-    </NButton>
+    </LButton>
 
     <NDivider vertical />
 
@@ -98,16 +98,16 @@ function handleClear() {
 
     <NDivider vertical />
 
-    <NButton :type="store.showGrid ? 'primary' : 'default'" @click="store.showGrid = !store.showGrid">
+    <LButton :type="store.showGrid ? 'primary' : 'default'" @click="store.showGrid = !store.showGrid">
       {{ $t('page.manage.labelDesign.grid') }}
-    </NButton>
+    </LButton>
 
     <div class="flex-1" />
 
-    <NButton quaternary :disabled="!store.elements.length" @click="handleClear">
+    <LButton quaternary :disabled="!store.elements.length" @click="handleClear">
       {{ $t('page.manage.labelDesign.clear') }}
-    </NButton>
-    <NButton @click="emit('preview')">{{ $t('page.manage.labelDesign.preview') }}</NButton>
-    <NButton type="primary" :loading="loading" @click="emit('save')">{{ $t('page.manage.labelDesign.save') }}</NButton>
+    </LButton>
+    <LButton @click="emit('preview')">{{ $t('page.manage.labelDesign.preview') }}</LButton>
+    <LButton type="primary" :loading="loading" @click="emit('save')">{{ $t('page.manage.labelDesign.save') }}</LButton>
   </div>
 </template>

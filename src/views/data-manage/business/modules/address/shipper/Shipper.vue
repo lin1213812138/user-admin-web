@@ -180,44 +180,33 @@ async function handleDelete(row: Api.SystemManage.CustomerAddress) {
             :placeholder="$t('page.manage.customer.detail.addressSearchPlaceholder')"
             @keyup.enter="handleSearch"
           />
-          <NButton size="small" type="primary" @click="handleSearch">
-            <template #icon><icon-ic-round-search class="text-icon" /></template>
-            {{ $t('common.search') }}
-          </NButton>
-          <NButton size="small" @click="handleReset">
-            <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-            {{ $t('common.reset') }}
-          </NButton>
         </div>
       </template>
 
       <template #operation-left>
-        <NButton size="small" type="primary" ghost @click="openCreate">
+        <LButton type="primary" @click="openCreate">
           <template #icon>
             <icon-ic-round-plus class="text-icon" />
           </template>
           {{ $t('common.add') }}
-        </NButton>
+        </LButton>
       </template>
 
       <template #operation-right>
         <NSpace justify="end" wrap>
-          <NButton size="small" @click="getData">
+          <LButton circle @click="getData">
             <template #icon>
               <icon-mdi-refresh class="text-icon" />
             </template>
-          </NButton>
+          </LButton>
         </NSpace>
       </template>
 
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
-        <NPopconfirm @positive-click="handleDelete(row)">
-          <template #trigger>
-            <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-          </template>
-          {{ $t('common.confirmDelete') }}
-        </NPopconfirm>
+        <LButton type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</LButton>
+        <LButton type="error" text popconfirm @positive-click="handleDelete(row)">
+          {{ $t('common.delete') }}
+        </LButton>
       </template>
     </Table>
 

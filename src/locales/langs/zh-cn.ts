@@ -41,6 +41,7 @@ const local: App.I18n.Schema = {
     fixed: '固定',
     width: '宽度',
     minWidth: '最小宽度',
+    autoDefault: '不填自动宽度',
     sortable: '可排序',
     unFixed: '不固定',
     fixedLeft: '左固定',
@@ -1175,7 +1176,7 @@ const local: App.I18n.Schema = {
         code: '编码',
         name: '名称',
         form: { codePlaceholder: '请输入编码', namePlaceholder: '请输入名称' },
-        address: { title: '地址簿', shipTo: '收件地址', shipper: '发件地址' },
+        address: { title: '收发地址', shipTo: '收件地址', shipper: '发件地址' },
         declaredGoods: {
           title: '申报物品',
           library: '申报物品库',

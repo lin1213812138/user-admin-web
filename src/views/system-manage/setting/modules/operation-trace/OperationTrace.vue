@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import { NButton, NInput, NSelect, NSwitch } from 'naive-ui';
+import { NInput, NSelect, NSwitch } from 'naive-ui';
 import { fetchBatchUpdateTrackOp, fetchGetTrackOpList } from '@/service/api/operation-trace';
 
 const { data, loading, columnConfigs, columns, getData, persistColumns, resetColumns } = useVxeTable<
@@ -120,22 +120,22 @@ async function handleBatchSave() {
     <div class="min-h-0 flex-1">
       <Table :columns="columns" :data="data" :loading="loading" :pagination="null" :show-seq="true" @refresh="getData">
         <template #operation-left>
-          <NButton size="small" @click="handleAddRow">
+          <LButton @click="handleAddRow">
             <template #icon><icon-mdi-plus class="text-icon" /></template>
             {{ $t('page.manage.setting.operationTrace.addRow') }}
-          </NButton>
-          <NButton size="small" type="primary" :loading="saving" @click="handleBatchSave">
+          </LButton>
+          <LButton type="primary" :loading="saving" @click="handleBatchSave">
             <template #icon><icon-mdi-content-save class="text-icon" /></template>
             {{ $t('page.manage.setting.operationTrace.batchSave') }}
-          </NButton>
+          </LButton>
         </template>
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="getData">
+            <LButton circle :tooltip="$t('common.refresh')" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
         <template #opType="{ row }">

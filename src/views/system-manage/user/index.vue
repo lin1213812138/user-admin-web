@@ -259,9 +259,11 @@ const relationCustomerColumns = [
         <template #search-action>
           <div class="flex justify-start">
             <NInput
-              v-model="searchParams.keyword"
+              v-model:value="searchParams.keyword"
+              clearable
               class="w-300px!"
               :placeholder="$t('page.manage.user.form.keywordPlaceholder')"
+              @input="handleSearch"
             ></NInput>
           </div>
         </template>
@@ -270,9 +272,9 @@ const relationCustomerColumns = [
         </template>
 
         <template #relationCustomer="{ row }">
-          <NButton size="small" type="primary" text @click="openRelationModal(row)">
+          <LButton type="primary" text @click="openRelationModal(row)">
             {{ $t('page.manage.site.view') }}
-          </NButton>
+          </LButton>
         </template>
 
         <template #operation-left>
@@ -283,20 +285,18 @@ const relationCustomerColumns = [
               </template>
               {{ $t('common.add') }}
             </LButton>
-            <NPopconfirm
+            <LButton
+              v-auth="'system:user:delete'"
+              type="error"
               :disabled="checkedRows.length === 0"
+              popconfirm
               @positive-click="handleDelete(checkedRows.map(i => i._id))"
             >
-              <template #trigger>
-                <LButton v-auth="'system:user:delete'" type="error" :disabled="checkedRows.length === 0">
-                  <template #icon>
-                    <icon-mdi-delete class="text-icon" />
-                  </template>
-                  {{ $t('common.batchDelete') }}
-                </LButton>
+              <template #icon>
+                <icon-mdi-delete class="text-icon" />
               </template>
-              {{ $t('common.confirmDelete') }}
-            </NPopconfirm>
+              {{ $t('common.batchDelete') }}
+            </LButton>
             <span v-auth="'system:user:export'">
               <TableExportAction
                 :columns="columnConfigs"
@@ -325,23 +325,21 @@ const relationCustomerColumns = [
         </template>
 
         <template #action="{ row }">
-          <NButton v-auth="'system:user:edit'" size="small" type="primary" text @click="handleEdit(row)">
+          <LButton v-auth="'system:user:edit'" type="primary" text @click="handleEdit(row)">
             {{ $t('common.edit') }}
-          </NButton>
-          <NPopconfirm @positive-click="handleToggleStatus(row)">
-            <template #trigger>
-              <NButton v-auth="'system:user:status'" size="small" :type="row.status === 1 ? 'warning' : 'success'" text>
-                {{ row.status === 1 ? $t('common.disable') : $t('common.enable') }}
-              </NButton>
-            </template>
-            {{ row.status === 1 ? $t('common.confirmDisable') : $t('common.confirmEnable') }}
-          </NPopconfirm>
-          <NPopconfirm @positive-click="handleDelete([row._id])">
-            <template #trigger>
-              <NButton v-auth="'system:user:delete'" size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-            </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+          </LButton>
+          <LButton
+            v-auth="'system:user:status'"
+            :type="row.status === 1 ? 'warning' : 'success'"
+            text
+            :popconfirm="row.status === 1 ? $t('common.confirmDisable') : $t('common.confirmEnable')"
+            @positive-click="handleToggleStatus(row)"
+          >
+            {{ row.status === 1 ? $t('common.disable') : $t('common.enable') }}
+          </LButton>
+          <LButton v-auth="'system:user:delete'" type="error" text popconfirm @positive-click="handleDelete([row._id])">
+            {{ $t('common.delete') }}
+          </LButton>
         </template>
       </Table>
     </div>

@@ -8,7 +8,7 @@
  */
 import { computed, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import { NButton, NModal, NSelect } from 'naive-ui';
+import { NModal, NSelect } from 'naive-ui';
 import { fetchGetCaptureTimeConfig, fetchSaveCaptureTimeConfig } from '@/service/api/capture-time';
 
 const props = withDefaults(defineProps<{ show?: boolean }>(), { show: false });
@@ -102,17 +102,17 @@ async function handleSave() {
           :placeholder="$t('page.manage.setting.traceCapture.captureTime.timePlaceholder')"
           class="w-180px!"
         />
-        <NButton size="small" type="error" text :disabled="rows.length <= 1" @click="handleRemove(row.id)">
+        <LButton type="error" text :disabled="rows.length <= 1" @click="handleRemove(row.id)">
           {{ $t('common.delete') }}
-        </NButton>
+        </LButton>
       </div>
       <div class="mt-16px flex-y-center gap-12px">
-        <NButton size="small" @click="handleAdd">
+        <LButton @click="handleAdd">
           {{ $t('page.manage.setting.traceCapture.captureTime.addTime') }}
-        </NButton>
-        <NButton size="small" type="primary" :loading="saving" @click="handleSave">
+        </LButton>
+        <LButton type="primary" :loading="saving" @click="handleSave">
           {{ $t('page.manage.setting.traceCapture.captureTime.saveConfig') }}
-        </NButton>
+        </LButton>
       </div>
     </div>
   </NModal>

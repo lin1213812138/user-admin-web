@@ -125,9 +125,9 @@ const applyPreset = (preset: ThemePreset): void => {
           </h5>
           <NBadge :value="`v${preset.version}`" type="info" size="small" class="flex-shrink-0 opacity-80" />
         </div>
-        <NButton type="primary" size="tiny" ghost round class="ml-2 flex-shrink-0" @click="applyPreset(preset)">
+        <LButton type="primary" size="tiny" ghost round class="ml-2 flex-shrink-0" @click="applyPreset(preset)">
           {{ $t('theme.appearance.preset.apply') }}
-        </NButton>
+        </LButton>
       </div>
 
       <p class="line-clamp-2 mb-3 text-xs text-gray-500 leading-4">{{ getPresetDesc(preset) }}</p>

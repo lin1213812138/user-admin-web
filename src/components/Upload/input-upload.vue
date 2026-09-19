@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { UploadFileInfo } from 'naive-ui';
-import { NButton, NInput, NTooltip, NUpload } from 'naive-ui';
+import { NInput, NTooltip, NUpload } from 'naive-ui';
 import { fetchUpload } from '@/service/api';
 
 defineOptions({
@@ -103,7 +103,7 @@ function handleRemove() {
       <NInput :value="displayName" readonly :placeholder="$t('common.chooseFile')" :disabled="disabled">
         <template #suffix>
           <div class="flex items-center gap-4px">
-            <NButton
+            <LButton
               v-if="displayName && !disabled"
               text
               type="error"
@@ -113,7 +113,7 @@ function handleRemove() {
               <template #icon>
                 <icon-mdi-close-circle class="text-16px" />
               </template>
-            </NButton>
+            </LButton>
             <NUpload
               :accept="accept"
               :default-upload="false"
@@ -121,11 +121,11 @@ function handleRemove() {
               :disabled="disabled"
               @change="handleChange"
             >
-              <NButton text :disabled="disabled" :loading="uploading">
+              <LButton text :disabled="disabled" :loading="uploading">
                 <template #icon>
                   <icon-mdi-upload class="text-16px" />
                 </template>
-              </NButton>
+              </LButton>
             </NUpload>
           </div>
         </template>

@@ -112,8 +112,9 @@ export function setupElegantRouter() {
         'system-manage_log': 'system:log:list',
         // hideInMenu entries are still guarded against direct URL access
         'system-manage_print-design': 'system:printDesign:list',
-        'system-manage_label-designer': 'system:labelDesign:list',
-        'personal-center': 'system:personalCenter:list'
+        'system-manage_label-designer': 'system:labelDesign:list'
+        // 个人中心由侧栏头像下拉进入，是用户自助页，任何登录用户都需可访问，故意不设权限门禁
+        // （页面内部用 editInfoCtrl 控制可编辑字段，路由层不应按 system:personalCenter:list 过滤，否则无该码用户点击报 No match）
       };
 
       const meta: Partial<RouteMeta> = {
@@ -145,6 +146,13 @@ export function setupElegantRouter() {
 
       if (routePermissions[key]) {
         meta.permission = routePermissions[key];
+      }
+
+      // 业务页面（非 constant）全部开启 keep-alive：顶部页签切回时命中缓存，
+      // 不重新挂载、不重新请求列表/详情接口；登录/错误页（login/403/404/500）为
+      // constant 路由，天然不进入业务流，不缓存。
+      if (!constantRoutes.includes(key)) {
+        meta.keepAlive = true;
       }
 
       return meta;

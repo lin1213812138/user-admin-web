@@ -42,30 +42,24 @@ function refresh() {
   <NSpace :align="itemAlign" wrap justify="end" class="lt-sm:w-200px">
     <slot name="prefix"></slot>
     <slot name="default">
-      <NButton size="small" ghost type="primary" @click="add">
+      <LButton ghost type="primary" @click="add">
         <template #icon>
           <icon-ic-round-plus class="text-icon" />
         </template>
         {{ $t('common.add') }}
-      </NButton>
-      <NPopconfirm @positive-click="batchDelete">
-        <template #trigger>
-          <NButton size="small" ghost type="error" :disabled="disabledDelete">
-            <template #icon>
-              <icon-ic-round-delete class="text-icon" />
-            </template>
-            {{ $t('common.batchDelete') }}
-          </NButton>
+      </LButton>
+      <LButton ghost type="error" :disabled="disabledDelete" popconfirm @positive-click="batchDelete">
+        <template #icon>
+          <icon-ic-round-delete class="text-icon" />
         </template>
-        {{ $t('common.confirmDelete') }}
-      </NPopconfirm>
+        {{ $t('common.batchDelete') }}
+      </LButton>
     </slot>
-    <NButton size="small" @click="refresh">
+    <LButton circle :tooltip="$t('common.refresh')" @click="refresh">
       <template #icon>
         <icon-mdi-refresh class="text-icon" :class="{ 'animate-spin': loading }" />
       </template>
-      {{ $t('common.refresh') }}
-    </NButton>
+    </LButton>
     <TableColumnSetting v-model:columns="columns" />
     <slot name="suffix"></slot>
   </NSpace>

@@ -22,10 +22,10 @@ const options = paperOptions.map(item => ({ label: item.label, value: item.label
 
 <template>
   <div class="h-48px w-full flex shrink-0 items-center gap-8px border-b border-#eee px-16px dark:border-#333">
-    <NButton size="small" @click="emit('back')">
+    <LButton @click="emit('back')">
       <template #icon><icon-ic-round-arrow-back class="text-icon" /></template>
       {{ $t('page.manage.printDesign.back') }}
-    </NButton>
+    </LButton>
 
     <span class="max-w-240px truncate text-14px font-500">{{ title }}</span>
 
@@ -38,37 +38,35 @@ const options = paperOptions.map(item => ({ label: item.label, value: item.label
     />
 
     <div class="ml-8px flex items-center gap-4px">
-      <NButton size="small" quaternary :title="$t('page.manage.printDesign.zoomOut')" @click="emit('zoomOut')">
+      <LButton quaternary :title="$t('page.manage.printDesign.zoomOut')" @click="emit('zoomOut')">
         <template #icon><icon-ic-round-remove class="text-icon" /></template>
-      </NButton>
+      </LButton>
       <span class="w-48px text-center text-12px">{{ Math.round(scale * 100) }}%</span>
-      <NButton size="small" quaternary :title="$t('page.manage.printDesign.zoomIn')" @click="emit('zoomIn')">
+      <LButton quaternary :title="$t('page.manage.printDesign.zoomIn')" @click="emit('zoomIn')">
         <template #icon><icon-ic-round-add class="text-icon" /></template>
-      </NButton>
+      </LButton>
     </div>
 
-    <NButton
-      size="small"
+    <LButton
       quaternary
       :title="showGrid ? $t('page.manage.printDesign.hideGrid') : $t('page.manage.printDesign.showGrid')"
       @click="emit('toggleGrid')"
     >
       {{ showGrid ? $t('page.manage.printDesign.hideGrid') : $t('page.manage.printDesign.showGrid') }}
-    </NButton>
+    </LButton>
 
-    <NButton
-      size="small"
+    <LButton
       quaternary
       :title="showRuler ? $t('page.manage.printDesign.hideRuler') : $t('page.manage.printDesign.showRuler')"
       @click="emit('toggleRuler')"
     >
       {{ showRuler ? $t('page.manage.printDesign.hideRuler') : $t('page.manage.printDesign.showRuler') }}
-    </NButton>
+    </LButton>
 
     <div class="flex-1"></div>
 
-    <NButton size="small" @click="emit('clear')">{{ $t('page.manage.printDesign.clear') }}</NButton>
-    <NButton size="small" @click="emit('preview')">{{ $t('page.manage.printDesign.preview') }}</NButton>
-    <NButton type="primary" size="small" @click="emit('save')">{{ $t('page.manage.printDesign.save') }}</NButton>
+    <LButton @click="emit('clear')">{{ $t('page.manage.printDesign.clear') }}</LButton>
+    <LButton @click="emit('preview')">{{ $t('page.manage.printDesign.preview') }}</LButton>
+    <LButton type="primary" @click="emit('save')">{{ $t('page.manage.printDesign.save') }}</LButton>
   </div>
 </template>

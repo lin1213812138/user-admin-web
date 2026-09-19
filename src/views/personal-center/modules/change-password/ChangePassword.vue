@@ -76,9 +76,9 @@ function handleSubmit() {
       <NFormWrap ref="formRef" :model="model" :items="items" :rules="rules" :grid-x-gap="16" disabled />
 
       <div class="mt-16px flex justify-end">
-        <NButton type="primary" disabled @click="handleSubmit">
+        <LButton type="primary" disabled @click="handleSubmit">
           {{ $t('common.submitModify') }}
-        </NButton>
+        </LButton>
       </div>
     </NCard>
   </div>

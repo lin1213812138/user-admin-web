@@ -470,7 +470,7 @@ function handleDelete() {
         </div>
       </NScrollbar>
       <div class="border-t border-#e5e7eb px-12px py-8px dark:border-#2a2a2a">
-        <NButton type="error" block @click="handleDelete">{{ $t('page.manage.labelDesign.deleteElement') }}</NButton>
+        <LButton type="error" block @click="handleDelete">{{ $t('page.manage.labelDesign.deleteElement') }}</LButton>
       </div>
     </template>
   </div>

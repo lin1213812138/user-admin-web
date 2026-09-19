@@ -109,7 +109,7 @@ function toggleGroup(group: FieldMappingGroup) {
   <NCard :title="$t('page.manage.setting.fieldMapping')" :class="cardClass" :content-style="cardContentStyle">
     <template #header-extra>
       <NSpace class="min-w-0 justify-end" :size="8" wrap>
-        <NButton
+        <LButton
           v-for="g in navGroups"
           :key="g.key"
           :type="groupButtonType(g)"
@@ -118,7 +118,7 @@ function toggleGroup(group: FieldMappingGroup) {
           @click="toggleGroup(g)"
         >
           {{ `${g.title} ${checkedCountOf(g)}/${g.fields.length}` }}
-        </NButton>
+        </LButton>
       </NSpace>
     </template>
     <NScrollbar v-if="fill" class="min-h-0 flex-1" content-class="min-h-full">

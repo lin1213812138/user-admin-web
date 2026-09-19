@@ -46,8 +46,8 @@ function print() {
     </div>
     <template #footer>
       <div class="flex justify-end gap-8px">
-        <NButton @click="close">{{ $t('common.cancel') }}</NButton>
-        <NButton type="primary" @click="print">{{ $t('page.manage.labelDesign.print') }}</NButton>
+        <LButton @click="close">{{ $t('common.cancel') }}</LButton>
+        <LButton type="primary" @click="print">{{ $t('page.manage.labelDesign.print') }}</LButton>
       </div>
     </template>
   </NModal>

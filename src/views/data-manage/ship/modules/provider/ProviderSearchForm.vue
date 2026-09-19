@@ -35,13 +35,13 @@ const emit = defineEmits<{
       :options="props.statusOptions"
       placeholder="状态"
     />
-    <NButton size="small" type="primary" @click="emit('search')">
+    <LButton type="primary" @click="emit('search')">
       <template #icon><icon-ic-round-search class="text-icon" /></template>
       {{ $t('common.search') }}
-    </NButton>
-    <NButton size="small" @click="emit('reset')">
+    </LButton>
+    <LButton @click="emit('reset')">
       <template #icon><icon-ic-round-refresh class="text-icon" /></template>
       {{ $t('common.reset') }}
-    </NButton>
+    </LButton>
   </div>
 </template>

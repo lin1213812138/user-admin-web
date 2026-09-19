@@ -78,8 +78,8 @@ watch(
     </div>
     <template #footer>
       <div class="flex justify-end gap-8px">
-        <NButton size="small" @click="emit('update:show', false)">{{ $t('common.cancel') }}</NButton>
-        <NButton type="primary" size="small" @click="handlePrint">{{ $t('page.manage.printDesign.print') }}</NButton>
+        <LButton @click="emit('update:show', false)">{{ $t('common.cancel') }}</LButton>
+        <LButton type="primary" @click="handlePrint">{{ $t('page.manage.printDesign.print') }}</LButton>
       </div>
     </template>
   </NModal>

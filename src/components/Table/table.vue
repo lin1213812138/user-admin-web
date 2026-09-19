@@ -259,7 +259,7 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         searchActionFlush 开启时卡片向上/左/右各外扩 10px，抵消父容器默认 p-10px 实现通栏贴边
 -->
     <div v-if="$slots['search-action']" class="mb-12px" :class="searchActionFlush ? '-mx-10px -mt-10px' : ''">
-      <NCard :bordered="false" class="shadow-sm" :content-style="{ padding: '12px 16px' }">
+      <NCard :bordered="false" class="shadow-sm" :content-style="{ padding: '10px' }">
         <slot name="search-action" :refresh="refresh" />
       </NCard>
     </div>

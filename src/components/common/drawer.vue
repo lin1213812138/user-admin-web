@@ -71,12 +71,12 @@ function handleSubmit() {
       <template #footer>
         <slot name="footer">
           <NSpace v-if="footer" justify="end">
-            <NButton :disabled="loading" @click="handleUpdateShow(false)">
+            <LButton :disabled="loading" @click="handleUpdateShow(false)">
               {{ cancelText || $t('common.cancel') }}
-            </NButton>
-            <NButton type="primary" :loading="loading" @click="handleSubmit">
+            </LButton>
+            <LButton type="primary" :loading="loading" @click="handleSubmit">
               {{ confirmText || $t('common.confirm') }}
-            </NButton>
+            </LButton>
           </NSpace>
         </slot>
       </template>

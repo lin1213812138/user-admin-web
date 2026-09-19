@@ -221,12 +221,12 @@ async function handleDelete(row: Api.SystemManage.CustomerAddress) {
       @page-change="handlePageChange"
     >
       <template #operation-left>
-        <NButton size="small" type="primary" ghost @click="openCreate">
+        <LButton type="primary" ghost @click="openCreate">
           <template #icon>
             <icon-ic-round-plus class="text-icon" />
           </template>
           {{ $t('common.add') }}
-        </NButton>
+        </LButton>
       </template>
 
       <template #operation-right>
@@ -241,13 +241,8 @@ async function handleDelete(row: Api.SystemManage.CustomerAddress) {
       </template>
 
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
-        <NPopconfirm @positive-click="handleDelete(row)">
-          <template #trigger>
-            <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-          </template>
-          {{ $t('common.confirmDelete') }}
-        </NPopconfirm>
+        <LButton type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</LButton>
+        <LButton type="error" text popconfirm @positive-click="handleDelete(row)">{{ $t('common.delete') }}</LButton>
       </template>
     </Table>
 

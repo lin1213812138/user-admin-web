@@ -1,6 +1,7 @@
+import LButton from '@/components/basic/LButton.vue';
 import { h } from 'vue';
 import type { App } from 'vue';
-import { NButton } from 'naive-ui';
+
 import { $t } from '@/locales';
 
 export function setupAppErrorHandle(app: App) {
@@ -39,7 +40,7 @@ export function setupAppVersionNotification() {
       action() {
         return h('div', { style: { display: 'flex', justifyContent: 'end', gap: '12px', width: '325px' } }, [
           h(
-            NButton,
+            LButton,
             {
               onClick() {
                 n?.destroy();
@@ -49,7 +50,7 @@ export function setupAppVersionNotification() {
             () => $t('system.updateCancel')
           ),
           h(
-            NButton,
+            LButton,
             {
               type: 'primary',
               onClick() {

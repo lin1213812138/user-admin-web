@@ -67,4 +67,6 @@ export interface FormItemConfig {
   accept?: string;
   /** 上传目录（type 为 image / file 时透传给公共 Upload 组件，对应后端 dest；默认 1-用户） */
   dest?: Api.Upload.Dest;
+  /** textarea 行数（type 为 textarea 时使用） */
+  rows?: number;
 }

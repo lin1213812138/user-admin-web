@@ -180,9 +180,9 @@ defineExpose({ openCreate, openEdit });
       >
         <div class="mb-8px flex items-center gap-8px">
           <NSelect v-model:value="carry.carry" :options="carryOptions" class="min-w-240px" />
-          <NButton quaternary type="error" size="small" @click="removeCarryGroup(ci)">
+          <LButton quaternary type="error" @click="removeCarryGroup(ci)">
             {{ $t('page.dataManage.ship.weightRule.removeCarryGroup') }}
-          </NButton>
+          </LButton>
         </div>
         <div v-for="(rule, ri) in carry.ruleList" :key="ri" class="mb-8px flex items-center gap-8px">
           <NInputNumber
@@ -200,17 +200,17 @@ defineExpose({ openCreate, openEdit });
             class="w-150px!"
             :placeholder="$t('page.dataManage.ship.weightRule.unit')"
           />
-          <NButton quaternary type="error" size="small" @click="removeRule(ci, ri)">
+          <LButton quaternary type="error" @click="removeRule(ci, ri)">
             {{ $t('page.dataManage.ship.weightRule.removeRule') }}
-          </NButton>
+          </LButton>
         </div>
-        <NButton dashed size="small" @click="addRule(ci)">
+        <LButton dashed @click="addRule(ci)">
           {{ $t('page.dataManage.ship.weightRule.addRule') }}
-        </NButton>
+        </LButton>
       </div>
-      <NButton dashed size="small" @click="addCarryGroup">
+      <LButton dashed @click="addCarryGroup">
         {{ $t('page.dataManage.ship.weightRule.addCarryGroup') }}
-      </NButton>
+      </LButton>
     </div>
   </Drawer>
 </template>

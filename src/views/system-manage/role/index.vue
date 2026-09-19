@@ -270,9 +270,9 @@ function handleSubmitted() {
         </template>
 
         <template #relationUser="{ row }">
-          <NButton size="small" type="primary" text @click="openRelationModal(row)">
+          <LButton type="primary" text @click="openRelationModal(row)">
             {{ $t('page.manage.site.view') }}
-          </NButton>
+          </LButton>
         </template>
 
         <template #dataAuths="{ row }">
@@ -289,7 +289,7 @@ function handleSubmitted() {
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <LButton auth="'system:role:add'" type="primary" @click="openDrawer('create')">
+            <LButton auth="system:role:add" type="primary" @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
@@ -317,16 +317,15 @@ function handleSubmitted() {
           <NTooltip :disabled="row.buildIn !== 1">
             <template #trigger>
               <span>
-                <NButton
+                <LButton
                   v-auth="'system:role:edit'"
-                  size="small"
                   type="primary"
                   text
                   :disabled="row.buildIn === 1"
                   @click="handleEdit(row)"
                 >
                   {{ $t('common.edit') }}
-                </NButton>
+                </LButton>
               </span>
             </template>
             {{ $t('page.manage.role.builtInEditTip') }}
@@ -334,16 +333,15 @@ function handleSubmitted() {
           <NTooltip :disabled="row.roleType !== 100">
             <template #trigger>
               <span>
-                <NButton
+                <LButton
                   v-auth="'system:role:permission'"
-                  size="small"
                   type="info"
                   text
                   :disabled="row.roleType === 100"
                   @click="openPermissionDrawer(row)"
                 >
                   {{ $t('page.manage.role.permission') }}
-                </NButton>
+                </LButton>
               </span>
             </template>
             {{ $t('page.manage.role.permissionDisabledTip') }}
@@ -351,14 +349,16 @@ function handleSubmitted() {
           <NTooltip :disabled="row.buildIn !== 1">
             <template #trigger>
               <span>
-                <NPopconfirm @positive-click="handleDelete([row])">
-                  <template #trigger>
-                    <NButton v-auth="'system:role:delete'" size="small" type="error" text :disabled="row.buildIn === 1">
-                      {{ $t('common.delete') }}
-                    </NButton>
-                  </template>
-                  {{ $t('common.confirmDelete') }}
-                </NPopconfirm>
+                <LButton
+                  v-auth="'system:role:delete'"
+                  type="error"
+                  text
+                  :disabled="row.buildIn === 1"
+                  popconfirm
+                  @positive-click="handleDelete([row])"
+                >
+                  {{ $t('common.delete') }}
+                </LButton>
               </span>
             </template>
             {{ $t('page.manage.role.builtInDeleteTip') }}

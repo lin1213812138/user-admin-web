@@ -162,21 +162,21 @@ async function handleDelete(row: Api.SystemManage.TraceKeywordItem) {
         @page-change="handlePageChange"
       >
         <template #operation-left>
-          <NButton size="small" type="primary" ghost @click="openCreate">
+          <LButton type="primary" ghost @click="openCreate">
             <template #icon>
               <icon-ic-round-plus class="text-icon" />
             </template>
             {{ $t('page.manage.setting.traceCapture.addRow') }}
-          </NButton>
+          </LButton>
         </template>
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="getData">
+            <LButton circle :tooltip="$t('common.refresh')" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
@@ -191,13 +191,8 @@ async function handleDelete(row: Api.SystemManage.TraceKeywordItem) {
         <template #updateDate="{ row }">{{ formatDateTime(row.updateDate) }}</template>
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
-          <NPopconfirm @positive-click="handleDelete(row)">
-            <template #trigger>
-              <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-            </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+          <LButton type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</LButton>
+          <LButton type="error" text popconfirm @positive-click="handleDelete(row)">{{ $t('common.delete') }}</LButton>
         </template>
       </Table>
     </div>

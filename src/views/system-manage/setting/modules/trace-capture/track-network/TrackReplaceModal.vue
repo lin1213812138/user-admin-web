@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, h, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import { NButton, NDataTable, NInput } from 'naive-ui';
+import { NDataTable, NInput } from 'naive-ui';
 import type { DataTableColumns } from 'naive-ui';
 import { fetchBatchSaveTrackReplace, fetchGetTrackReplaceList } from '@/service/api/track-replace';
 
@@ -47,7 +47,7 @@ const columns: DataTableColumns<Api.SystemManage.TraceReplaceItem> = [
     align: 'center',
     render: (row: Api.SystemManage.TraceReplaceItem) =>
       h(
-        NButton,
+        LButton,
         {
           text: true,
           type: 'error',
@@ -110,16 +110,16 @@ async function handleSave() {
     </div>
     <div class="mb-12px flex items-center justify-between">
       <span class="font-medium">{{ $t('page.manage.setting.traceCapture.transformRules') }}</span>
-      <NButton size="small" type="primary" @click="addRow">
+      <LButton type="primary" @click="addRow">
         {{ $t('page.manage.setting.traceCapture.addRuleRow') }}
-      </NButton>
+      </LButton>
     </div>
     <NDataTable :columns="columns" :data="list" :bordered="false" />
 
     <template #footer>
       <div class="flex justify-end gap-12px">
-        <NButton @click="visible = false">{{ $t('common.cancel') }}</NButton>
-        <NButton type="primary" :loading="saving" @click="handleSave">{{ $t('common.save') }}</NButton>
+        <LButton @click="visible = false">{{ $t('common.cancel') }}</LButton>
+        <LButton type="primary" :loading="saving" @click="handleSave">{{ $t('common.save') }}</LButton>
       </div>
     </template>
   </NModal>

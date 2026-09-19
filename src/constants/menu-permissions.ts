@@ -77,10 +77,13 @@ const op = (module: string) => ({
   add: { code: `system:${module}:add`, label: '新增' },
   edit: { code: `system:${module}:edit`, label: '编辑' },
   delete: { code: `system:${module}:delete`, label: '删除' },
+  batchDelete: { code: `system:${module}:batchDelete`, label: '批量删除' },
   export: { code: `system:${module}:export`, label: '导出' },
   import: { code: `system:${module}:import`, label: '导入' },
   status: { code: `system:${module}:status`, label: '启用/停用' },
-  permission: { code: `system:${module}:permission`, label: '分配权限' }
+  permission: { code: `system:${module}:permission`, label: '分配权限' },
+  refresh: { code: `system:${module}:refresh`, label: '刷新' },
+  setting: { code: `system:${module}:setting`, label: '列设置' } // 表格配置
 });
 
 /**

@@ -133,23 +133,24 @@ const drawerRef = ref<InstanceType<typeof TrackConfigOperateDrawer> | null>(null
         <span>{{ formatDateTime(row.createDate) }}</span>
       </template>
       <template #operation-left>
-        <NButton type="primary" ghost size="small" @click="drawerRef?.openCreate()">
+        <LButton type="primary" ghost @click="drawerRef?.openCreate()">
           <template #icon><icon-ic-round-plus class="text-icon" /></template>
           {{ $t('common.add') }}
-        </NButton>
-        <NPopconfirm @positive-click="confirmBatchDelete">
-          <template #trigger>
-            <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
-              {{ $t('common.delete') }}
-            </NButton>
-          </template>
-          {{ $t('common.confirmDelete') }}
-        </NPopconfirm>
+        </LButton>
+        <LButton
+          type="error"
+          ghost
+          :disabled="checkedRows.length === 0"
+          popconfirm
+          @positive-click="confirmBatchDelete"
+        >
+          {{ $t('common.delete') }}
+        </LButton>
       </template>
       <template #operation-right="{ refresh }">
-        <NButton size="small" @click="refresh">
+        <LButton circle :tooltip="$t('common.refresh')" @click="refresh">
           <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-        </NButton>
+        </LButton>
         <TableColumnConfig
           v-model:visible="columnConfigVisible"
           v-model:columns="columnConfigs"
@@ -158,13 +159,8 @@ const drawerRef = ref<InstanceType<typeof TrackConfigOperateDrawer> | null>(null
         />
       </template>
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="drawerRef?.openEdit(row)">{{ $t('common.edit') }}</NButton>
-        <NPopconfirm @positive-click="confirmDelete(row)">
-          <template #trigger>
-            <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-          </template>
-          {{ $t('common.confirmDelete') }}
-        </NPopconfirm>
+        <LButton type="primary" text @click="drawerRef?.openEdit(row)">{{ $t('common.edit') }}</LButton>
+        <LButton type="error" text popconfirm @positive-click="confirmDelete(row)">{{ $t('common.delete') }}</LButton>
       </template>
     </Table>
 

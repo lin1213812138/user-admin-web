@@ -103,32 +103,18 @@ function handleSelect(id: number) {
         >
           <slot name="header">
             <NSpace>
-              <NButton v-if="editable" type="primary" ghost size="small" @click="emit('create')">
+              <LButton v-if="editable" type="primary" ghost @click="emit('create')">
                 <template #icon><icon-ic-round-plus class="text-icon" /></template>
                 {{ $t('common.add') }}
-              </NButton>
-              <NButton
-                v-if="editable"
-                type="primary"
-                ghost
-                size="small"
-                :disabled="selectedId === null"
-                @click="emit('edit')"
-              >
+              </LButton>
+              <LButton v-if="editable" type="primary" ghost :disabled="selectedId === null" @click="emit('edit')">
                 <template #icon><icon-ic-round-edit class="text-icon" /></template>
                 {{ $t('common.edit') }}
-              </NButton>
-              <NButton
-                v-if="editable"
-                type="error"
-                ghost
-                size="small"
-                :disabled="selectedId === null"
-                @click="emit('delete')"
-              >
+              </LButton>
+              <LButton v-if="editable" type="error" ghost :disabled="selectedId === null" @click="emit('delete')">
                 <template #icon><icon-ic-round-delete class="text-icon" /></template>
                 {{ $t('common.delete') }}
-              </NButton>
+              </LButton>
             </NSpace>
           </slot>
           <slot name="operation-extra" />

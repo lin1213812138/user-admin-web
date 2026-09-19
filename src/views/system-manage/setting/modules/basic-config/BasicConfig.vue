@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
 import { $t } from '@/locales';
-import { NButton, NCard, NScrollbar } from 'naive-ui';
+import { NCard, NScrollbar } from 'naive-ui';
 import type { SelectOption } from 'naive-ui';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 import Upload from '@/components/Upload/index.vue';
@@ -303,9 +303,9 @@ async function handleSubmit() {
       </div>
     </NScrollbar>
     <div class="shrink-0 -mb-16px flex justify-center border-t border-#eee py-8px">
-      <NButton type="primary" :loading="saving" :disabled="loading" @click="handleSubmit">
+      <LButton type="primary" :loading="saving" :disabled="loading" @click="handleSubmit">
         {{ $t('common.submitModify') }}
-      </NButton>
+      </LButton>
     </div>
   </div>
 </template>

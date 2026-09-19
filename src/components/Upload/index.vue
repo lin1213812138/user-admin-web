@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import type { UploadCustomRequestOptions, UploadFileInfo } from 'naive-ui';
-import { NButton, NUpload, NUploadDragger } from 'naive-ui';
+import { NUpload, NUploadDragger } from 'naive-ui';
 import { $t } from '@/locales';
 import { fetchUpload } from '@/service/api';
 import { validateUploadFileType } from '@/utils/upload';
@@ -193,12 +193,12 @@ const uploadProps = computed(() => ({
             <span class="text-14px">{{ $t('common.upload.draggerText') }}</span>
           </div>
         </NUploadDragger>
-        <NButton v-else size="small">
+        <LButton v-else>
           <template #icon>
             <icon-mdi-upload class="text-icon" />
           </template>
           {{ $t('common.chooseFile') }}
-        </NButton>
+        </LButton>
       </slot>
     </template>
   </NUpload>

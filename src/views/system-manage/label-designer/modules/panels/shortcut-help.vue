@@ -48,9 +48,9 @@ const cols = computed(() => [
     <template #trigger>
       <NTooltip>
         <template #trigger>
-          <NButton quaternary>
+          <LButton quaternary>
             <template #icon><icon-ic-round-keyboard class="text-icon" /></template>
-          </NButton>
+          </LButton>
         </template>
         {{ $t('page.manage.labelDesign.shortcut') }}
       </NTooltip>

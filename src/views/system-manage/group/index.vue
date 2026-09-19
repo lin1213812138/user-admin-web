@@ -263,15 +263,15 @@ const relationCustomerColumns = [
         </template>
 
         <template #relationUser="{ row }">
-          <NButton size="small" type="primary" text @click="openRelationModal('user', row)">
+          <LButton type="primary" text @click="openRelationModal('user', row)">
             {{ $t('page.manage.site.view') }}
-          </NButton>
+          </LButton>
         </template>
 
         <template #relationCustomer="{ row }">
-          <NButton size="small" type="primary" text @click="openRelationModal('customer', row)">
+          <LButton type="primary" text @click="openRelationModal('customer', row)">
             {{ $t('page.manage.site.view') }}
-          </NButton>
+          </LButton>
         </template>
 
         <template #updateDate="{ row }">
@@ -280,53 +280,47 @@ const relationCustomerColumns = [
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton size="small" type="primary" ghost @click="openDrawer('create')">
+            <LButton type="primary" ghost @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
               {{ $t('common.add') }}
-            </NButton>
-            <NPopconfirm
+            </LButton>
+            <LButton
+              type="error"
+              ghost
               :disabled="checkedRows.length === 0"
+              popconfirm
               @positive-click="handleDelete(checkedRows.map(i => i._id))"
             >
-              <template #trigger>
-                <NButton size="small" type="error" ghost :disabled="checkedRows.length === 0">
-                  <template #icon>
-                    <icon-mdi-delete class="text-icon" />
-                  </template>
-                  {{ $t('common.batchDelete') }}
-                </NButton>
+              <template #icon>
+                <icon-mdi-delete class="text-icon" />
               </template>
-              {{ $t('common.confirmDelete') }}
-            </NPopconfirm>
+              {{ $t('common.batchDelete') }}
+            </LButton>
           </NSpace>
         </template>
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
+            <LButton circle :tooltip="$t('common.columnSetting')" @click="configVisible = true">
               <template #icon>
                 <icon-mdi-cog class="text-icon" />
               </template>
-              {{ $t('common.columnSetting') }}
-            </NButton>
-            <NButton size="small" @click="getData">
+            </LButton>
+            <LButton circle :tooltip="$t('common.refresh')" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</NButton>
-          <NPopconfirm @positive-click="handleDelete([row._id])">
-            <template #trigger>
-              <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-            </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+          <LButton type="primary" text @click="handleEdit(row)">{{ $t('common.edit') }}</LButton>
+          <LButton type="error" text popconfirm @positive-click="handleDelete([row._id])">
+            {{ $t('common.delete') }}
+          </LButton>
         </template>
       </Table>
     </div>

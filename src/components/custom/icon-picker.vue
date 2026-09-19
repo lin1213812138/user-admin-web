@@ -130,9 +130,9 @@ function handleClear() {
         </div>
       </div>
 
-      <NButton v-if="props.clearable" block secondary size="small" @click="handleClear">
+      <LButton v-if="props.clearable" block secondary @click="handleClear">
         {{ $t('common.iconPicker.clear') }}
-      </NButton>
+      </LButton>
     </div>
   </NPopover>
 </template>

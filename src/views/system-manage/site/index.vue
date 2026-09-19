@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import { computed, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { $t } from '@/locales';
 import { fetchDeleteSite, fetchGetSiteCustomerList, fetchGetSiteList, fetchGetSiteUserList } from '@/service/api/site';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import type { FormItemConfig } from '@/components/Form/index.vue';
+// import type { FormItemConfig } from '@/components/Form/index.vue';
 import RelationModal from '@/components/common/relation-modal.vue';
 import SiteOperateDrawer from './modules/site-operate-drawer.vue';
 
@@ -13,16 +13,17 @@ const searchParams = reactive<{ keyword: string }>({
   keyword: ''
 });
 
-const searchItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'keyword',
-    label: $t('page.manage.site.keyword'),
-    type: 'input',
-    span: 6,
-    placeholder: $t('page.manage.site.form.keywordPlaceholder')
-  },
-  { key: 'actions', label: ' ', slot: 'actions', span: 6 }
-]);
+// 搜索栏
+// const searchItems = computed<FormItemConfig[]>(() => [
+//   {
+//     key: 'keyword',
+//     label: $t('page.manage.site.keyword'),
+//     type: 'input',
+//     span: 6,
+//     placeholder: $t('page.manage.site.form.keywordPlaceholder')
+//   },
+//   { key: 'actions', label: ' ', slot: 'actions', span: 6 }
+// ]);
 
 const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   Api.SystemManage.SiteList,
@@ -240,7 +241,6 @@ const relationCustomerColumns = [
   <div class="h-full w-full flex flex-col gap-12px p-10px bg-#eff0f5">
     <div class="flex-1 min-h-0">
       <Table
-        :search-items="searchItems"
         :search-model="searchParams"
         :columns="columns"
         :data="data"
@@ -260,7 +260,13 @@ const relationCustomerColumns = [
         <!-- 快速搜索栏 -->
         <template #search-action>
           <div class="flex justify-start">
-            <NInput v-model="searchParams.keyword" class="w-300px!" placeholder="关键词搜索"></NInput>
+            <NInput
+              v-model:value="searchParams.keyword"
+              class="w-300px!"
+              placeholder="关键词搜索"
+              clearable
+              @input="handleSearch"
+            ></NInput>
           </div>
         </template>
         <template #siteType="{ row }">
@@ -272,15 +278,15 @@ const relationCustomerColumns = [
         </template>
 
         <template #relationUser="{ row }">
-          <NButton size="small" type="primary" text @click="openRelationModal('user', row)">
+          <LButton type="primary" text @click="openRelationModal('user', row)">
             {{ $t('page.manage.site.view') }}
-          </NButton>
+          </LButton>
         </template>
 
         <template #relationCustomer="{ row }">
-          <NButton size="small" type="primary" text @click="openRelationModal('customer', row)">
+          <LButton type="primary" text @click="openRelationModal('customer', row)">
             {{ $t('page.manage.site.view') }}
-          </NButton>
+          </LButton>
         </template>
 
         <template #updateDate="{ row }">
@@ -289,43 +295,43 @@ const relationCustomerColumns = [
 
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <NButton size="small" type="primary" @click="openDrawer('create')">
+            <LButton type="primary" @click="openDrawer('create')">
               <template #icon>
                 <icon-ic-round-plus class="text-icon" />
               </template>
               {{ $t('common.add') }}
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
         <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
+            <LButton circle :tooltip="$t('common.columnSetting')" @click="configVisible = true">
               <template #icon>
                 <icon-mdi-cog class="text-icon" />
               </template>
-              {{ $t('common.columnSetting') }}
-            </NButton>
-            <NButton size="small" @click="getData">
+            </LButton>
+            <LButton circle :tooltip="$t('common.refresh')" @click="getData">
               <template #icon>
                 <icon-mdi-refresh class="text-icon" />
               </template>
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text :disabled="isHeadquarters(row)" @click="handleEdit(row)">
+          <LButton type="primary" text :disabled="isHeadquarters(row)" @click="handleEdit(row)">
             {{ $t('common.edit') }}
-          </NButton>
-          <NPopconfirm @positive-click="handleDelete([row._id])">
-            <template #trigger>
-              <NButton size="small" type="error" text :disabled="isHeadquarters(row)">
-                {{ $t('common.delete') }}
-              </NButton>
-            </template>
-            {{ $t('common.confirmDelete') }}
-          </NPopconfirm>
+          </LButton>
+          <LButton
+            type="error"
+            text
+            :disabled="isHeadquarters(row)"
+            popconfirm
+            @positive-click="handleDelete([row._id])"
+          >
+            {{ $t('common.delete') }}
+          </LButton>
         </template>
       </Table>
     </div>

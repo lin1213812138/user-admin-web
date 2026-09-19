@@ -42,7 +42,7 @@ const swatches: string[] = [
           <p>
             <span class="pr-12px">{{ $t('theme.appearance.recommendColorDesc') }}</span>
             <br />
-            <NButton
+            <LButton
               text
               tag="a"
               href="https://uicolors.app/create"
@@ -51,7 +51,7 @@ const swatches: string[] = [
               class="text-gray"
             >
               https://uicolors.app/create
-            </NButton>
+            </LButton>
           </p>
         </IconTooltip>
       </template>

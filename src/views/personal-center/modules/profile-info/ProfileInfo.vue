@@ -284,9 +284,9 @@ async function handleSave() {
       <NFormWrap ref="formRef" :model="model" :items="profileItems" :grid-x-gap="16" :disabled="!canEdit || loading" />
 
       <div class="mt-16px flex justify-end">
-        <NButton type="primary" :loading="submitting" :disabled="!canEdit || loading" @click="handleSave">
+        <LButton type="primary" :loading="submitting" :disabled="!canEdit || loading" @click="handleSave">
           {{ $t('common.submitModify') }}
-        </NButton>
+        </LButton>
       </div>
     </NCard>
   </div>

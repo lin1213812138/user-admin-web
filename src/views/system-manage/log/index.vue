@@ -193,14 +193,14 @@ function handleDetail(row: Api.SystemManage.OpLog) {
               class="w-240px!"
               @keyup.enter="handleSearch"
             />
-            <NButton type="primary" ghost @click="handleSearch">
+            <LButton type="primary" ghost @click="handleSearch">
               <template #icon><icon-ic-round-search class="text-icon" /></template>
               {{ $t('common.search') }}
-            </NButton>
-            <NButton @click="handleReset">
+            </LButton>
+            <LButton @click="handleReset">
               <template #icon><icon-ic-round-refresh class="text-icon" /></template>
               {{ $t('common.reset') }}
-            </NButton>
+            </LButton>
           </div>
         </template>
 
@@ -225,20 +225,20 @@ function handleDetail(row: Api.SystemManage.OpLog) {
         <!--
  <template #operation-right>
           <NSpace justify="end" wrap>
-            <NButton size="small" @click="configVisible = true">
+            <LButton @click="configVisible = true">
               <template #icon>
                 <icon-mdi-cog class="text-icon" />
               </template>
               {{ $t('common.columnSetting') }}
-            </NButton>
+            </LButton>
           </NSpace>
         </template>
 -->
 
         <template #action="{ row }">
-          <NButton size="small" type="primary" text @click="handleDetail(row)">
+          <LButton type="primary" text @click="handleDetail(row)">
             {{ $t('common.detail') }}
-          </NButton>
+          </LButton>
         </template>
       </Table>
     </div>
