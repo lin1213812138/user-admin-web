@@ -17,6 +17,7 @@ const local: App.I18n.Schema = {
     backToHome: '返回首页',
     batchDelete: '批量删除',
     batchDisable: '批量停用',
+    batchDisableSuccess: '批量停用成功',
     cancel: '取消',
     close: '关闭',
     check: '勾选',
@@ -1155,20 +1156,42 @@ const local: App.I18n.Schema = {
         title: '财务资料',
         account: {
           title: '银行账户',
-          code: '账户编码',
-          name: '账户名称',
-          accountType: '账户类型',
-          bank: '开户行',
-          balance: '余额',
-          form: { codePlaceholder: '请输入账户编码', namePlaceholder: '请输入账户名称' }
+          alias: '账户别名',
+          bank: '开户银行',
+          name: '开户名称',
+          no: '开户账号',
+          balance: '账户余额',
+          buildIn: '内置',
+          builtInDisableTip: '系统内置银行账户不可停用',
+          form: {
+            aliasPlaceholder: '请输入账户别名',
+            bankPlaceholder: '请输入开户银行',
+            namePlaceholder: '请输入开户名称',
+            noPlaceholder: '请输入开户账号',
+            balancePlaceholder: '请输入账户余额',
+            notePlaceholder: '请输入备注',
+            keywordPlaceholder: '请输入账户别名/开户名称'
+          }
         },
         currency: {
           title: '结算货币',
           code: '币种代码',
           name: '币种名称',
+          country: '国家',
+          local: '是否本币',
+          localDomestic: '本币',
+          localForeign: '外币',
           rate: '汇率',
-          symbol: '符号',
-          form: { codePlaceholder: '请输入币种代码', namePlaceholder: '请输入币种名称' }
+          status: '状态',
+          keywordPlaceholder: '请输入币种名称/代码',
+          form: {
+            codePlaceholder: '请输入币种代码',
+            namePlaceholder: '请输入币种名称',
+            countryPlaceholder: '请选择国家',
+            ratePlaceholder: '请输入汇率',
+            statusPlaceholder: '请选择状态',
+            localPlaceholder: '请选择是否本币'
+          }
         },
         expenseType: {
           title: '费用类型',

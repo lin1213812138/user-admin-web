@@ -14,8 +14,6 @@ declare namespace Api {
     type DataManageArchiveKey =
       | 'countryRegion'
       | 'fbaWarehouse'
-      | 'account'
-      | 'currency'
       | 'address'
       | 'declaredGoods'
       | 'problemCategory'

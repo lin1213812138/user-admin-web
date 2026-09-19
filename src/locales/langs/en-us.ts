@@ -17,6 +17,7 @@ const local: App.I18n.Schema = {
     backToHome: 'Back to home',
     batchDelete: 'Batch Delete',
     batchDisable: 'Batch Disable',
+    batchDisableSuccess: 'Batch disabled successfully',
     cancel: 'Cancel',
     close: 'Close',
     check: 'Check',
@@ -1160,20 +1161,42 @@ const local: App.I18n.Schema = {
         title: 'Finance',
         account: {
           title: 'Bank Account',
-          code: 'Account Code',
-          name: 'Account Name',
-          accountType: 'Account Type',
+          alias: 'Alias',
           bank: 'Bank',
+          name: 'Holder Name',
+          no: 'Account No.',
           balance: 'Balance',
-          form: { codePlaceholder: 'Enter account code', namePlaceholder: 'Enter account name' }
+          buildIn: 'Built-in',
+          builtInDisableTip: 'Built-in bank accounts cannot be disabled',
+          form: {
+            aliasPlaceholder: 'Enter account alias',
+            bankPlaceholder: 'Enter bank name',
+            namePlaceholder: 'Enter holder name',
+            noPlaceholder: 'Enter account no.',
+            balancePlaceholder: 'Enter balance',
+            notePlaceholder: 'Enter remark',
+            keywordPlaceholder: 'Enter alias / holder name'
+          }
         },
         currency: {
           title: 'Currency',
           code: 'Currency Code',
           name: 'Currency Name',
+          country: 'Country',
+          local: 'Local Currency',
+          localDomestic: 'Domestic',
+          localForeign: 'Foreign',
           rate: 'Rate',
-          symbol: 'Symbol',
-          form: { codePlaceholder: 'Enter currency code', namePlaceholder: 'Enter currency name' }
+          status: 'Status',
+          keywordPlaceholder: 'Enter currency name / code',
+          form: {
+            codePlaceholder: 'Enter currency code',
+            namePlaceholder: 'Enter currency name',
+            countryPlaceholder: 'Select country',
+            ratePlaceholder: 'Enter rate',
+            statusPlaceholder: 'Select status',
+            localPlaceholder: 'Select local currency'
+          }
         },
         expenseType: {
           title: 'Expense Type',

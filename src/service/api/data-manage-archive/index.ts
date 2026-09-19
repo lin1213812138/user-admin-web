@@ -7,7 +7,7 @@ import { request } from '../../request';
  * - 后端 api-v1-web 已存在路由的 7 个（currency / sales-terms / export-reason / customs-type /
  *   problem-category / goods-category / clearance-method(=customs-clear)）走真实 request，调用方需解包
  *   { data, error }（与 basic/bl/ship/no-rule 一致）；list 均显式 current→page 映射且 status 拼 where。
- * - 后端暂未实现的 2 个（account / declared-goods）暂走本地 mock 兜底，返回结构与真实接口一致
+ * - 后端暂未实现的 1 个（declared-goods）暂走本地 mock 兜底，返回结构与真实接口一致
  *   （{ list, total } + _id），将来后端补好路由后只需把对应函数体从 mock 改为 request 即可，零成本切换。
  *
  * 通用分页契约：{ current, size, keyword, status } → { list, total }；
@@ -27,36 +27,6 @@ export interface ArchiveApiGroup {
 // ---------------------------------------------------------------------------
 // 真实接口（后端 api-v1-web 已存在路由）
 // ---------------------------------------------------------------------------
-
-/** 币种 /currency */
-export function fetchGetCurrencyList(params: Api.DataManage.ArchiveSearchParams) {
-  return request<Api.DataManage.ArchiveList<Api.DataManage.FinanceCurrency>>({
-    url: '/currency/query',
-    method: 'post',
-    data: params
-  }) as Promise<{
-    data: Api.DataManage.ArchiveList<Api.DataManage.MasterDataRow> | null;
-    error: unknown;
-  }>;
-}
-export function fetchCreateCurrency(params: Partial<Api.DataManage.FinanceCurrency>) {
-  return request<unknown>({ url: '/currency/create', method: 'post', data: params }) as Promise<{
-    data: unknown;
-    error: unknown;
-  }>;
-}
-export function fetchUpdateCurrency(params: Partial<Api.DataManage.FinanceCurrency>) {
-  return request<unknown>({ url: '/currency/update', method: 'post', data: params }) as Promise<{
-    data: unknown;
-    error: unknown;
-  }>;
-}
-export function fetchDeleteCurrency(ids: string[]) {
-  return request<unknown>({ url: '/currency/delete', method: 'post', data: { ids } }) as Promise<{
-    data: unknown;
-    error: unknown;
-  }>;
-}
 
 /** 销售条款 /sales-terms（后端 keywordFields 固定 ['name']，status 需放进 where） */
 export function fetchGetSalesTermsList(params: Api.DataManage.ArchiveSearchParams) {
@@ -269,24 +239,12 @@ export function fetchDeleteCustomsClear(ids: string[]) {
 }
 
 // ---------------------------------------------------------------------------
-// 本地 mock 兜底（后端暂未实现路由的 5 个档案）
+// 本地 mock 兜底（后端暂未实现路由的档案：仅 declaredGoods，account 已改走真实 /trade-account/*）
 // ---------------------------------------------------------------------------
 
 type RowFactory = (i: number) => Api.DataManage.MasterDataRow;
 
 const factories: Partial<Record<Api.DataManage.DataManageArchiveKey, RowFactory>> = {
-  account: i =>
-    ({
-      _id: `ACC${i}`,
-      code: `ACC${String(i).padStart(3, '0')}`,
-      name: `结算账户${i}`,
-      accountType: i % 2 === 0 ? '银行' : '现金',
-      bank: i % 2 === 0 ? `招商银行 ${i}` : '',
-      balance: i * 1000,
-      status: i % 4 === 0 ? 0 : 1,
-      remark: '',
-      createTime: `2026-0${(i % 9) + 1}-05 13:00:00`
-    }) as unknown as Api.DataManage.MasterDataRow,
   declaredGoods: i =>
     ({
       _id: `DG${i}`,
@@ -402,18 +360,5 @@ export const archiveApiMap: Partial<Record<Api.DataManage.DataManageArchiveKey, 
     create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('declaredGoods', p),
     update: (p: Api.DataManage.MasterDataRow) => mockUpdate('declaredGoods', p),
     remove: (ids: string[]) => mockDelete('declaredGoods', ids)
-  },
-  // finance
-  currency: {
-    list: fetchGetCurrencyList,
-    create: fetchCreateCurrency,
-    update: fetchUpdateCurrency,
-    remove: fetchDeleteCurrency
-  },
-  account: {
-    list: (p: Api.DataManage.ArchiveSearchParams) => mockList('account', p),
-    create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('account', p),
-    update: (p: Api.DataManage.MasterDataRow) => mockUpdate('account', p),
-    remove: (ids: string[]) => mockDelete('account', ids)
   }
 };

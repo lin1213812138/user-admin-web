@@ -377,6 +377,8 @@ declare namespace App {
         copySuccess: string;
         copyFailed: string;
         createSuccess: string;
+        updateSuccess: string;
+        batchDisableSuccess: string;
         detail: string;
         edit: string;
         enable: string;
@@ -1410,20 +1412,42 @@ declare namespace App {
             title: string;
             account: {
               title: string;
-              code: string;
-              name: string;
-              accountType: string;
+              alias: string;
               bank: string;
+              name: string;
+              no: string;
               balance: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
+              buildIn: string;
+              builtInDisableTip: string;
+              form: {
+                namePlaceholder: string;
+                aliasPlaceholder: string;
+                bankPlaceholder: string;
+                noPlaceholder: string;
+                balancePlaceholder: string;
+                notePlaceholder: string;
+                keywordPlaceholder: string;
+              };
             };
             currency: {
               title: string;
               code: string;
               name: string;
+              country: string;
+              local: string;
+              localDomestic: string;
+              localForeign: string;
               rate: string;
-              symbol: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
+              status: string;
+              keywordPlaceholder: string;
+              form: {
+                codePlaceholder: string;
+                namePlaceholder: string;
+                countryPlaceholder: string;
+                ratePlaceholder: string;
+                statusPlaceholder: string;
+                localPlaceholder: string;
+              };
             };
             expenseType: {
               title: string;

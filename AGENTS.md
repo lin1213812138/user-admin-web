@@ -3,7 +3,13 @@
 > **重要规则**:
 >
 > 1. 每次与本 Agent 讨论的问题定位、决策、修复，必须在 `changelog/` 目录下生成单独的文档，文件名从用户提示词中提取（如 `changelog/转运项批量搜索.md`），同时将条目链接追加到 [AGENTS_CHANGELOG.md](./AGENTS_CHANGELOG.md) 中（该索引按日期分组，日期最新在上）。AGENTS.md 只维护项目架构信息，不直接存储讨论记录。
-> 2. **开发新功能或修复 Bug 前必须先设计**：在提出任何设计方案之前，不得编写任何代码。设计方案必须使用 `brainstorming` skill 完成，待用户确认设计后才能进入开发阶段。用户确认之前，任何实现动作（代码编写、文件创建等）都是违规操作。
+> 2. **开发必须使用 agent-skills 工作流，且先设计后编码**：禁止直接写代码。开发必须遵循 agent-skills 技能合集（位于 `~/.codebuddy/skills/`，来源 `addyosmani/agent-skills`）的生命周期工作流：
+>    - 先用 `using-agent-skills` 判定当前任务适用的技能；
+>    - 设计闸门：用 `spec-driven-development` 产出 spec（必要时配合 `interview-me` / `idea-refine` / `source-driven-development` 澄清需求与对齐官方文档）；
+>    - **用户确认 spec 后**才进入 `planning-and-task-breakdown` → `incremental-implementation` 实现阶段；
+>    - 实现后按 `test-driven-development` / `code-review-and-quality` / `browser-testing-with-devtools` 等技能验证。
+>    - 用户确认设计之前，任何实现动作（代码编写、文件创建等）均属违规操作。
+>    - （历史 superpowers 映射：`brainstorming`/`spec`/`plan` → `spec-driven-development`/`spec-driven-development`/`planning-and-task-breakdown`；设计/计划文档仍落地 `docs/superpowers/specs/` 与 `docs/superpowers/plans/`，路径约定保持不变。）
 
 ## 项目概览
 
