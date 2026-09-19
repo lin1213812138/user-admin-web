@@ -7,6 +7,7 @@ import type { VxeColumnConfig } from '@/components/Table';
 import { fetchDeleteProvider, fetchGetProviderList } from '@/service/api/data-manage-ship';
 import ProviderSearchForm from './ProviderSearchForm.vue';
 import ProviderOperateDrawer from './ProviderOperateDrawer.vue';
+import { useStatusOptions } from '@/composables/use-options';
 
 /** 当前服务商类型（NRadioGroup 切换后重查） */
 const providerType = ref<0 | 1 | 2 | 3>(0);
@@ -15,10 +16,7 @@ const keyword = ref('');
 /** 状态筛选（null = 全部） */
 const statusFilter = ref<0 | 1 | null>(null);
 
-const statusOptions = computed(() => [
-  { label: $t('common.enable'), value: 1 },
-  { label: $t('common.disable'), value: 0 }
-]);
+const statusOptions = useStatusOptions();
 
 const providerTypeOptions = computed(() => [
   { label: $t('page.dataManage.ship.provider.typeOption.out'), value: 0 },

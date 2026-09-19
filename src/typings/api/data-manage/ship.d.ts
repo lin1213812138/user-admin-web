@@ -68,17 +68,20 @@ declare namespace Api {
       ruleList?: WeightRuleCarryItem[];
     }
 
-    /** 计泡规则（mode：0-件实重之和 1-件体积重之和 2-票总重和票总体积重取大值 3-件计费重之和；calcMode：0-按公斤 1-按方，后端新增字段） */
+    /** 计泡规则（mode：0-件实重之和 1-件体积重之和 2-票总重和票总体积重取大值 3-件计费重之和；unit：计费单位 0-公斤 1-方；weightToVolume：折方系数，unit=1 且 mode∈{0,1,2} 时必填） */
     interface WeightRule extends ShipBaseRow {
       name: string;
       order?: number;
+      /** 计费单位 0-公斤 1-方 */
+      unit?: number;
       mode?: number;
-      calcMode?: number;
       carryList?: WeightRuleCarry[];
       /** 材积除 */
       cubicNum?: number;
       /** 计泡比率 0-100 */
       weightOff?: number;
+      /** 折方系数（计费单位为方、计泡类型 0/1/2 时必填） */
+      weightToVolume?: number;
     }
 
     /** 承运网络（trackConfigId 选项来自追踪网络=系统设置→轨迹抓取；remoteGroupId 数据源页面不存在，字段保留不展示） */

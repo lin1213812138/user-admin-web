@@ -82,12 +82,10 @@ const formItems = computed<FormItemConfig[]>(() => [
   {
     key: 'status',
     label: $t('common.status'),
-    type: 'switch',
-    span: 24,
-    checkedValue: 1,
-    uncheckedValue: 0,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
+    type: 'select',
+    span: 12,
+    optionsKey: 'status',
+    filterable: false
   },
   { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
 ]);
@@ -148,6 +146,7 @@ defineExpose({ openCreate, openEdit });
     v-model:show="drawerVisible"
     :title="drawerTitle"
     :loading="submitting"
+    :width="700"
     :confirm-text="$t('common.save')"
     @submit="handleDrawerSubmit"
   >

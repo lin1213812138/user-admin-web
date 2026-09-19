@@ -7,8 +7,6 @@ import { request } from '../../request';
  * - 后端 api-v1-web 已存在路由的 7 个（currency / sales-terms / export-reason / customs-type /
  *   problem-category / goods-category / clearance-method(=customs-clear)）走真实 request，调用方需解包
  *   { data, error }（与 basic/bl/ship/no-rule 一致）；list 均显式 current→page 映射且 status 拼 where。
- * - 后端暂未实现的 1 个（declared-goods）暂走本地 mock 兜底，返回结构与真实接口一致
- *   （{ list, total } + _id），将来后端补好路由后只需把对应函数体从 mock 改为 request 即可，零成本切换。
  *
  * 通用分页契约：{ current, size, keyword, status } → { list, total }；
  * create 收 body（update 必带 _id）；delete 收 { ids: string[] }（_id 数组）。
@@ -239,81 +237,6 @@ export function fetchDeleteCustomsClear(ids: string[]) {
 }
 
 // ---------------------------------------------------------------------------
-// 本地 mock 兜底（后端暂未实现路由的档案：仅 declaredGoods，account 已改走真实 /trade-account/*）
-// ---------------------------------------------------------------------------
-
-type RowFactory = (i: number) => Api.DataManage.MasterDataRow;
-
-const factories: Partial<Record<Api.DataManage.DataManageArchiveKey, RowFactory>> = {
-  declaredGoods: i =>
-    ({
-      _id: `DG${i}`,
-      code: `DG${String(i).padStart(4, '0')}`,
-      name: `申报物品${i}`,
-      status: i % 5 === 0 ? 0 : 1,
-      remark: '',
-      createTime: `2026-0${(i % 9) + 1}-11 19:00:00`
-    }) as unknown as Api.DataManage.MasterDataRow
-};
-
-const mockKeys = Object.keys(factories) as Api.DataManage.DataManageArchiveKey[];
-
-const datasets: Partial<Record<Api.DataManage.DataManageArchiveKey, Api.DataManage.MasterDataRow[]>> =
-  Object.fromEntries(
-    mockKeys.map(key => [key, Array.from({ length: 18 }, (_, k) => factories[key]!(k + 1))])
-  ) as Partial<Record<Api.DataManage.DataManageArchiveKey, Api.DataManage.MasterDataRow[]>>;
-
-const idSeq: Record<string, number> = {};
-mockKeys.forEach(key => {
-  idSeq[key] = 19;
-});
-
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-const LIST_DELAY_MS = 400;
-const MUTATE_DELAY_MS = 200;
-
-async function mockList(archive: Api.DataManage.DataManageArchiveKey, params: Api.DataManage.ArchiveSearchParams) {
-  await delay(LIST_DELAY_MS);
-  let rows = datasets[archive] ?? [];
-  const { keyword, status, current, size } = params;
-  if (keyword && keyword.trim()) {
-    const kw = keyword.trim().toLowerCase();
-    rows = rows.filter(r => {
-      const rec = r as unknown as Record<string, unknown>;
-      return `${rec.name ?? ''} ${rec.code ?? ''}`.toLowerCase().includes(kw);
-    });
-  }
-  if (status) {
-    rows = rows.filter(r => r.status === status);
-  }
-  const total = rows.length;
-  const start = (current - 1) * size;
-  return { data: { list: rows.slice(start, start + size), total }, error: null };
-}
-async function mockCreate(archive: Api.DataManage.DataManageArchiveKey, params: Partial<Api.DataManage.MasterDataRow>) {
-  await delay(MUTATE_DELAY_MS);
-  const id = `${archive}-${idSeq[archive]++}`;
-  const row = { ...(params as object), _id: id } as Api.DataManage.MasterDataRow;
-  (datasets[archive] ??= []).push(row);
-  return { data: row, error: null };
-}
-async function mockUpdate(archive: Api.DataManage.DataManageArchiveKey, params: Api.DataManage.MasterDataRow) {
-  await delay(MUTATE_DELAY_MS);
-  const list = datasets[archive] ?? [];
-  const idx = list.findIndex(r => r._id === params._id);
-  if (idx >= 0) list[idx] = { ...list[idx], ...(params as object) } as Api.DataManage.MasterDataRow;
-  return { data: list[idx], error: null };
-}
-async function mockDelete(archive: Api.DataManage.DataManageArchiveKey, ids: string[]) {
-  await delay(MUTATE_DELAY_MS);
-  const set = new Set(ids);
-  datasets[archive] = (datasets[archive] ?? []).filter(r => !set.has(r._id));
-  return { data: true, error: null };
-}
-
-// ---------------------------------------------------------------------------
 // archive → fetch 函数组映射表（供共享 MasterDataArchive 组件按 archive 分流）
 // ---------------------------------------------------------------------------
 
@@ -354,11 +277,5 @@ export const archiveApiMap: Partial<Record<Api.DataManage.DataManageArchiveKey, 
     create: fetchCreateCustomsClear,
     update: fetchUpdateCustomsClear,
     remove: fetchDeleteCustomsClear
-  },
-  declaredGoods: {
-    list: (p: Api.DataManage.ArchiveSearchParams) => mockList('declaredGoods', p),
-    create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('declaredGoods', p),
-    update: (p: Api.DataManage.MasterDataRow) => mockUpdate('declaredGoods', p),
-    remove: (ids: string[]) => mockDelete('declaredGoods', ids)
   }
 };

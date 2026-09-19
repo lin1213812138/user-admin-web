@@ -5,6 +5,7 @@ import { $t } from '@/locales';
 import { useAuthStore } from '@/store/modules/auth';
 import { fetchGetUser, fetchUpdateSelfProfile } from '@/service/api/user';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
+import { useStatusOptions } from '@/composables/use-options';
 
 defineOptions({
   name: 'PersonalProfileInfo'
@@ -28,10 +29,7 @@ const readonlyModel = reactive({
   status: 1 as Api.Common.EnableStatus
 });
 
-const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() => [
-  { label: $t('common.enable'), value: 1 },
-  { label: $t('common.disable'), value: 0 }
-]);
+const statusOptions = useStatusOptions();
 
 const readonlyItems = computed<FormItemConfig[]>(() => [
   { key: 'account', label: $t('page.manage.user.userName'), type: 'input', span: 8 },

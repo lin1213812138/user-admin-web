@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { $t } from '@/locales';
+import type { SelectOption } from 'naive-ui';
 
 const keyword = defineModel<string>('keyword', { default: '' });
 const statusFilter = defineModel<0 | 1 | null>('statusFilter', { default: null });
 const providerType = defineModel<0 | 1 | 2 | 3>('providerType', { default: 0 });
 const props = defineProps<{
   providerTypeOptions: { label: string; value: number }[];
-  statusOptions: { label: string; value: number }[];
+  statusOptions: SelectOption[];
 }>();
 const emit = defineEmits<{
   search: [];

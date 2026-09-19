@@ -1461,10 +1461,11 @@ const local: App.I18n.Schema = {
         },
         weightRule: {
           title: 'Weight Rule',
-          calcMode: 'Calc Mode',
+          billUnit: 'Bill Unit',
           mode: 'Calc Type',
           weightOff: 'Volumetric Ratio',
           cubicNum: 'Cubic Divisor',
+          weightToVolume: 'Volume Factor',
           order: 'Order',
           calcModeOption: { byKg: 'By Weight', byCubic: 'By Volume' },
           modeOption: {
@@ -1474,6 +1475,10 @@ const local: App.I18n.Schema = {
             m3: 'Sum of Chargeable Weight'
           },
           carry: 'Carry Rule',
+          basicInfo: 'Basic Info',
+          carryType: 'Carry Type',
+          carryEmpty: 'No carry rule yet, click to add',
+          ruleEmpty: 'No range yet',
           carryOption: {
             c0: 'Round Per-piece Real & Volumetric',
             c1: 'Round Per-piece Chargeable',

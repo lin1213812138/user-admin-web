@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { $t } from '@/locales';
+import type { SelectOption } from 'naive-ui';
 
 const keyword = defineModel<string>('keyword', { default: '' });
 const statusFilter = defineModel<0 | 1 | null>('statusFilter', { default: null });
-const props = defineProps<{ statusOptions: { label: string; value: number }[] }>();
+const props = defineProps<{ statusOptions: SelectOption[] }>();
 const emit = defineEmits<{
   search: [];
   reset: [];

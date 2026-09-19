@@ -6,9 +6,14 @@ import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
 import { fetchCreateCarrier, fetchUpdateCarrier } from '@/service/api/data-manage-ship';
 
 type Carrier = Api.DataManageShip.Carrier;
+/** 表单态允许 cubicNum / weightOff 为 null（NInputNumber 清空时回填 null，提交前归一为 undefined） */
+type CarrierForm = Omit<Partial<Carrier>, 'cubicNum' | 'weightOff'> & {
+  cubicNum?: number | null;
+  weightOff?: number | null;
+};
 
 const props = defineProps<{
-  weightRuleOptions: { label: string; value: string }[];
+  weightRuleOptions: { label: string; value: string; cubicNum?: number; weightOff?: number }[];
   trackConfigOptions: { label: string; value: string }[];
 }>();
 const emit = defineEmits<{
@@ -18,10 +23,10 @@ const emit = defineEmits<{
 const drawerVisible = ref(false);
 const drawerMode = ref<'create' | 'edit'>('create');
 const submitting = ref(false);
-const formModel = ref<Partial<Carrier>>(emptyForm());
+const formModel = ref<CarrierForm>(emptyForm());
 const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
 
-function emptyForm(): Partial<Carrier> {
+function emptyForm(): CarrierForm {
   return {
     name: '',
     weightRuleId: undefined,
@@ -42,6 +47,14 @@ const drawerTitle = computed(() =>
     : `${$t('common.edit')}${$t('page.dataManage.ship.carrier.title')}`
 );
 
+/** 选择计泡规则后同步该规则的 材积除 / 计泡比率；规则未配置时写 null（NInputNumber 才能正确清空显示，undefined 不清空）；清空选择不动已填值 */
+function handleWeightRuleChange(value: string | number | Array<string | number> | null) {
+  const rule = props.weightRuleOptions.find(opt => opt.value === value);
+  if (!rule) return;
+  formModel.value.cubicNum = rule.cubicNum ?? null;
+  formModel.value.weightOff = rule.weightOff ?? null;
+}
+
 const formItems = computed<FormItemConfig[]>(() => [
   {
     key: 'name',
@@ -58,7 +71,8 @@ const formItems = computed<FormItemConfig[]>(() => [
     span: 12,
     options: props.weightRuleOptions,
     clearable: true,
-    filterable: false
+    filterable: false,
+    onUpdate: handleWeightRuleChange
   },
   {
     key: 'trackConfigId',
@@ -110,10 +124,14 @@ async function handleDrawerSubmit() {
 
   submitting.value = true;
   try {
+    // NInputNumber 清空回填 null，提交前归一为 undefined 以保住既有字段契约（number | undefined）
+    const payload = {
+      ...formModel.value,
+      cubicNum: formModel.value.cubicNum ?? undefined,
+      weightOff: formModel.value.weightOff ?? undefined
+    };
     const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateCarrier(formModel.value)
-        : await fetchUpdateCarrier(formModel.value);
+      drawerMode.value === 'create' ? await fetchCreateCarrier(payload) : await fetchUpdateCarrier(payload);
 
     if (error) return;
 
@@ -133,6 +151,7 @@ defineExpose({ openCreate, openEdit });
     v-model:show="drawerVisible"
     :title="drawerTitle"
     :loading="submitting"
+    :width="700"
     :confirm-text="$t('common.save')"
     @submit="handleDrawerSubmit"
   >

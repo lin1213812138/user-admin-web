@@ -1703,14 +1703,19 @@ declare namespace App {
             };
             weightRule: {
               title: string;
-              calcMode: string;
+              billUnit: string;
               mode: string;
               weightOff: string;
               cubicNum: string;
               order: string;
               calcModeOption: { byKg: string; byCubic: string };
+              weightToVolume: string;
               modeOption: { m0: string; m1: string; m2: string; m3: string };
               carry: string;
+              basicInfo: string;
+              carryType: string;
+              carryEmpty: string;
+              ruleEmpty: string;
               carryOption: { c0: string; c1: string; c2: string; c3: string };
               carryGroup: string;
               addCarryGroup: string;

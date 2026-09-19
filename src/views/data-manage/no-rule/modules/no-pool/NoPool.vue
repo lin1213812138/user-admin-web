@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
@@ -7,6 +7,7 @@ import type { VxeColumnConfig } from '@/components/Table';
 import { fetchDeleteNoPool, fetchGetNoPoolList, type NoPool as NoPoolItem } from '@/service/api/data-manage-no-rule';
 import NoPoolSearchForm from './NoPoolSearchForm.vue';
 import NoPoolOperateDrawer from './NoPoolOperateDrawer.vue';
+import { useStatusOptions } from '@/composables/use-options';
 
 const refTypeOptions = [
   { label: '收货渠道', value: 0 },
@@ -16,10 +17,7 @@ const refTypeOptions = [
 
 const keyword = ref('');
 const statusFilter = ref<0 | 1 | null>(null);
-const statusOptions = computed(() => [
-  { label: $t('common.enable'), value: 1 },
-  { label: $t('common.disable'), value: 0 }
-]);
+const statusOptions = useStatusOptions();
 function formatDateTime(ts?: number) {
   return ts ? dayjs(ts).format('YYYY-MM-DD HH:mm:ss') : '--';
 }

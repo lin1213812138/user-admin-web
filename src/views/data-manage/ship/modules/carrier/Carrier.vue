@@ -12,13 +12,18 @@ import CarrierOperateDrawer from './CarrierOperateDrawer.vue';
 /** 名称搜索关键字 */
 const keyword = ref('');
 
-/** 计泡规则全量缓存：列表名称映射 + 表单下拉共用 */
-const weightRuleOptions = ref<{ label: string; value: string }[]>([]);
+/** 计泡规则全量缓存：列表名称映射 + 表单下拉共用（附带 材积除/计泡比率，供承运网络表单选择后自动带出） */
+const weightRuleOptions = ref<{ label: string; value: string; cubicNum?: number; weightOff?: number }[]>([]);
 
 async function loadWeightRuleOptions() {
   const { data: res, error } = await fetchGetWeightRuleList({ page: 1, size: 500, where: {} });
   if (error || !res) return;
-  weightRuleOptions.value = res.list.map(item => ({ label: item.name, value: item._id }));
+  weightRuleOptions.value = res.list.map(item => ({
+    label: item.name,
+    value: item._id,
+    cubicNum: item.cubicNum,
+    weightOff: item.weightOff
+  }));
 }
 
 /** 追踪网络全量缓存：列表名称映射 + 表单下拉共用（数据源=系统设置→轨迹抓取→追踪网络） */

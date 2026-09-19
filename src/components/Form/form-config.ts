@@ -36,6 +36,11 @@ export interface FormItemConfig {
   placeholder?: string;
   /** 下拉选项（type 为 select 时使用） */
   options?: SelectOption[];
+  /**
+   * 全局选项 key：填写后从全局注册表（src/constants/options.ts）按 key 解析选项，
+   * 与 options 二选一；optionsKey 优先。例如 status 取「启用 / 禁用」。
+   */
+  optionsKey?: string;
   /** 下拉自定义 label 渲染（type 为 select 时使用），作用于下拉项与选中态；未传时回退 option 自带 renderLabel 或纯文本 label */
   renderLabel?: (option: SelectOption) => VNodeChild;
   /** 开关选中时文案 */

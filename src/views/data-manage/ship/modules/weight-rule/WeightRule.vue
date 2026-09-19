@@ -11,8 +11,8 @@ import WeightRuleOperateDrawer from './WeightRuleOperateDrawer.vue';
 /** 名称搜索关键字 */
 const keyword = ref('');
 
-/** 计算方式（后端新增字段 calcMode：0-按公斤 1-按方） */
-const calcModeOptions = computed(() => [
+/** 计费单位（后端字段 unit：0-公斤 1-方） */
+const unitOptions = computed(() => [
   { label: $t('page.dataManage.ship.weightRule.calcModeOption.byKg'), value: 0 },
   { label: $t('page.dataManage.ship.weightRule.calcModeOption.byCubic'), value: 1 }
 ]);
@@ -30,9 +30,9 @@ function modeLabel(mode?: number) {
   return modeOptions.value.find(item => item.value === mode)?.label ?? '';
 }
 
-/** 计算方式列展示文案 */
-function calcModeLabel(calcMode?: number) {
-  return calcModeOptions.value.find(item => item.value === calcMode)?.label ?? '';
+/** 计费单位列展示文案 */
+function unitLabel(unit?: number) {
+  return unitOptions.value.find(item => item.value === unit)?.label ?? '';
 }
 
 /** 毫秒时间戳格式化展示 */
@@ -66,13 +66,21 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         sortable: false
       },
       {
-        key: 'calcMode',
-        title: $t('page.dataManage.ship.weightRule.calcMode'),
+        key: 'unit',
+        title: $t('page.dataManage.ship.weightRule.billUnit'),
         visible: true,
         width: 110,
         sortable: false
       },
       { key: 'mode', title: $t('page.dataManage.ship.weightRule.mode'), visible: true, minWidth: 200, sortable: false },
+      {
+        key: 'weightToVolume',
+        title: $t('page.dataManage.ship.weightRule.weightToVolume'),
+        visible: true,
+        width: 110,
+        align: 'right',
+        sortable: false
+      },
       {
         key: 'weightOff',
         title: $t('page.dataManage.ship.weightRule.weightOff'),
@@ -173,8 +181,8 @@ const drawerRef = ref<InstanceType<typeof WeightRuleOperateDrawer> | null>(null)
       <template #search-action>
         <WeightRuleSearchForm v-model:keyword="keyword" @search="handleSearch" @reset="handleReset" />
       </template>
-      <template #calcMode="{ row }">
-        <span>{{ calcModeLabel(row.calcMode) }}</span>
+      <template #unit="{ row }">
+        <span>{{ unitLabel(row.unit) }}</span>
       </template>
       <template #mode="{ row }">
         <span>{{ modeLabel(row.mode) }}</span>

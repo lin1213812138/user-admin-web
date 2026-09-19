@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
@@ -11,6 +11,7 @@ import {
 } from '@/service/api/data-manage-no-rule';
 import ItemNoRuleSearchForm from './ItemNoRuleSearchForm.vue';
 import ItemNoRuleOperateDrawer from './ItemNoRuleOperateDrawer.vue';
+import { useStatusOptions } from '@/composables/use-options';
 
 const prefixTypeOptions = [
   { label: '内单号', value: 0 },
@@ -28,10 +29,7 @@ const suffixPadOptions = [
 
 const keyword = ref('');
 const statusFilter = ref<0 | 1 | null>(null);
-const statusOptions = computed(() => [
-  { label: $t('common.enable'), value: 1 },
-  { label: $t('common.disable'), value: 0 }
-]);
+const statusOptions = useStatusOptions();
 function formatDateTime(ts?: number) {
   return ts ? dayjs(ts).format('YYYY-MM-DD HH:mm:ss') : '--';
 }

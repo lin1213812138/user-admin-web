@@ -7,6 +7,7 @@ import { type FormItemConfig } from './form-config';
 import IconPicker from '@/components/custom/icon-picker.vue';
 import IconRenderer from '@/components/custom/icon-renderer.vue';
 import Upload from '@/components/Upload/index.vue';
+import { getGlobalOptions } from '@/constants/options';
 
 export type { FormItemConfig } from './form-config';
 
@@ -101,10 +102,10 @@ function viewText(item: FormItemConfig): string {
       return '••••••';
     case 'select':
       return Array.isArray(value)
-        ? value.map(v => optionLabel(item.options, v)).join('、')
-        : optionLabel(item.options, value);
+        ? value.map(v => optionLabel(itemOptions(item), v)).join('、')
+        : optionLabel(itemOptions(item), value);
     case 'checkbox':
-      return (value as unknown[]).map(v => optionLabel(item.options, v)).join('、');
+      return (value as unknown[]).map(v => optionLabel(itemOptions(item), v)).join('、');
     case 'switch': {
       const checked = item.checkedValue === undefined ? value === true : value === item.checkedValue;
 
@@ -128,6 +129,11 @@ const actionItems = computed<FormItemConfig[]>(() => (props.items ?? []).filter(
 /** checkbox 选项值（SelectOption.value 可能为数组/null，这里收敛为 string | number） */
 function cbValue(opt: SelectOption): string | number {
   return opt.value as string | number;
+}
+
+/** select / checkbox 选项解析：优先取全局 optionsKey，否则用 item 自带 options */
+function itemOptions(item: FormItemConfig): SelectOption[] {
+  return item.optionsKey ? getGlobalOptions(item.optionsKey) : (item.options ?? []);
 }
 
 /** 日期控件的值：model 中的空串需转 null（NDatePicker 收到 `''` 会抛 "Invalid time value"） */
@@ -333,7 +339,7 @@ defineExpose({
               <NSelect
                 v-else-if="item.type === 'select'"
                 v-model:value="model[item.key] as string | number | Array<string | number>"
-                :options="item.options"
+                :options="itemOptions(item)"
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
                 :clearable="item.clearable ?? true"
@@ -385,7 +391,7 @@ defineExpose({
                 :disabled="item.disabled"
               >
                 <NSpace>
-                  <NCheckbox v-for="opt in item.options ?? []" :key="String(opt.value)" :value="cbValue(opt)">
+                  <NCheckbox v-for="opt in itemOptions(item)" :key="String(opt.value)" :value="cbValue(opt)">
                     {{ opt.label }}
                   </NCheckbox>
                 </NSpace>

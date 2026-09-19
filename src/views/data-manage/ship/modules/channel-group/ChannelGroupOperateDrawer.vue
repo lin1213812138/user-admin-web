@@ -33,17 +33,17 @@ const formItems = computed<FormItemConfig[]>(() => [
     label: $t('page.dataManage.ship.channelGroup.name'),
     type: 'input',
     required: true,
-    span: 12,
+    span: 24,
     placeholder: '请输入类别名称'
   },
   {
     key: 'nameEn',
     label: $t('page.dataManage.ship.channelGroup.nameEn'),
     type: 'input',
-    span: 12,
+    span: 24,
     placeholder: '请输入英文名称'
   },
-  { key: 'order', label: $t('page.dataManage.ship.channelGroup.order'), type: 'number', span: 12 },
+  { key: 'order', label: $t('page.dataManage.ship.channelGroup.order'), type: 'number', span: 24 },
   { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
 ]);
 
@@ -96,6 +96,7 @@ defineExpose({ openCreate, openEdit });
     v-model:show="drawerVisible"
     :title="drawerTitle"
     :loading="submitting"
+    :width="700"
     :confirm-text="$t('common.save')"
     @submit="handleDrawerSubmit"
   >

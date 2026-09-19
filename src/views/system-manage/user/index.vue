@@ -10,6 +10,7 @@ import type { FormItemConfig } from '@/components/Form/index.vue';
 import { TableExportAction } from '@/components/Export';
 import RelationModal from '@/components/common/relation-modal.vue';
 import UserOperateDrawer from './modules/user-operate-drawer.vue';
+import { useStatusOptions } from '@/composables/use-options';
 
 const searchParams = reactive<{ keyword: string; siteId: string | null; status: Api.Common.EnableStatus | null }>({
   keyword: '',
@@ -27,10 +28,7 @@ async function loadSiteOptions() {
 
 loadSiteOptions();
 
-const statusOptions = computed<CommonType.Option<Api.Common.EnableStatus>[]>(() => [
-  { label: $t('common.enable'), value: 1 },
-  { label: $t('common.disable'), value: 0 }
-]);
+const statusOptions = useStatusOptions();
 
 const searchItems = computed<FormItemConfig[]>(() => [
   {

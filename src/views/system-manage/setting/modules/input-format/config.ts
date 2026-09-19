@@ -1,5 +1,6 @@
 import type { SelectOption } from 'naive-ui';
 import { $t } from '@/locales';
+import { getGlobalOptions } from '@/constants/options';
 import type { FormItemConfig } from '@/components/Form/index.vue';
 import type { VxeColumnConfig } from '@/components/Table';
 
@@ -75,12 +76,9 @@ export function buildInputFormatColumns(): VxeColumnConfig[] {
   ];
 }
 
-/** 状态下拉：启用(1) / 禁用(0) */
+/** 状态下拉：启用(1) / 禁用(0)，统一取全局 status 选项 */
 function statusOptions(): SelectOption[] {
-  return [
-    { label: $t('common.enable'), value: 1 },
-    { label: $t('common.disable'), value: 0 }
-  ];
+  return getGlobalOptions('status');
 }
 
 /** 是 / 否下拉（客户可用、是否默认共用）：是(1) / 否(0) */
