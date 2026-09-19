@@ -11,6 +11,7 @@ const local: App.I18n.Schema = {
     expandFilter: '展开',
     collapseFilter: '收起',
     add: '新增',
+    noDataToExport: '暂无数据可导出',
     addSuccess: '添加成功',
     saveSuccess: '保存成功',
     submitModify: '提交修改',
@@ -307,6 +308,8 @@ const local: App.I18n.Schema = {
     'system-manage_log': '系统日志',
     'customer-manage': '客户管理',
     'customer-manage_customer': '客户列表',
+    'customer-manage_customer-level': '客户等级',
+    'customer-manage_customer-source': '客户来源',
     'data-manage': '资料管理',
     'data-manage_basic': '通用资料',
     'data-manage_finance': '财务资料',
@@ -611,6 +614,46 @@ const local: App.I18n.Schema = {
         webStatus: '开通下单',
         createDate: '创建时间',
         deleteDisabledTip: '删除功能暂未开放',
+        customerLevelManage: {
+          title: '客户等级',
+          add: '新增等级',
+          edit: '编辑等级',
+          num: '客户等级',
+          numPlaceholder: '请输入客户等级',
+          alias: '等级名称',
+          name: '等级名称',
+          keywordPlaceholder: '请输入等级名称检索',
+          limitDays: '期限时间',
+          limitDaysWithUnit: '期限时间(天)',
+          limitFeeSpent: '消费金额满',
+          limitFeeSpentWithUnit: '消费金额满(¥)',
+          feeShipRate: '运费折扣',
+          feeShipRateWithUnit: '运费折扣(%)',
+          status: '状态',
+          updateBy: '编辑人',
+          updateDate: '编辑时间',
+          form: {
+            namePlaceholder: '请输入等级别名',
+            limitDaysPlaceholder: '请输入期限时间',
+            limitFeeSpentPlaceholder: '请输入消费金额满',
+            feeShipRatePlaceholder: '请输入运费折扣'
+          }
+        },
+        customerSourceManage: {
+          title: '客户来源',
+          add: '新增来源',
+          edit: '编辑来源',
+          order: '排序',
+          name: '来源名称',
+          note: '备注',
+          status: '状态',
+          keywordPlaceholder: '请输入来源名称检索',
+          form: {
+            namePlaceholder: '请输入来源名称',
+            orderPlaceholder: '请输入排序',
+            notePlaceholder: '请输入备注'
+          }
+        },
         form: {
           keywordPlaceholder: '编码 / 名称 / 账号',
           codePlaceholder: '不填写则按单号规则自动生成',

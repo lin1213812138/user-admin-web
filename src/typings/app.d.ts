@@ -436,6 +436,7 @@ declare namespace App {
         valueModeFixed: string;
         fixedValuePlaceholder: string;
         notSupported: string;
+        noDataToExport: string;
       };
       request: {
         logout: string;
@@ -873,6 +874,46 @@ declare namespace App {
             webStatus: string;
             createDate: string;
             deleteDisabledTip: string;
+            customerLevelManage: {
+              title: string;
+              add: string;
+              edit: string;
+              num: string;
+              numPlaceholder: string;
+              alias: string;
+              name: string;
+              keywordPlaceholder: string;
+              limitDays: string;
+              limitDaysWithUnit: string;
+              limitFeeSpent: string;
+              limitFeeSpentWithUnit: string;
+              feeShipRate: string;
+              feeShipRateWithUnit: string;
+              status: string;
+              updateBy: string;
+              updateDate: string;
+              form: {
+                namePlaceholder: string;
+                limitDaysPlaceholder: string;
+                limitFeeSpentPlaceholder: string;
+                feeShipRatePlaceholder: string;
+              };
+            };
+            customerSourceManage: {
+              title: string;
+              add: string;
+              edit: string;
+              order: string;
+              name: string;
+              note: string;
+              status: string;
+              keywordPlaceholder: string;
+              form: {
+                namePlaceholder: string;
+                orderPlaceholder: string;
+                notePlaceholder: string;
+              };
+            };
             form: {
               keywordPlaceholder: string;
               codePlaceholder: string;

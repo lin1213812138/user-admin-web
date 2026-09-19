@@ -11,6 +11,7 @@ const local: App.I18n.Schema = {
     expandFilter: 'Expand',
     collapseFilter: 'Collapse',
     add: 'Add',
+    noDataToExport: 'No data to export',
     addSuccess: 'Add Success',
     saveSuccess: 'Save Success',
     submitModify: 'Submit Changes',
@@ -311,6 +312,8 @@ const local: App.I18n.Schema = {
     'system-manage_log': 'System Logs',
     'customer-manage': 'Customer Management',
     'customer-manage_customer': 'Customer List',
+    'customer-manage_customer-level': 'Customer Level',
+    'customer-manage_customer-source': 'Customer Source',
     'data-manage': 'Data Manage',
     'data-manage_basic': 'General',
     'data-manage_finance': 'Finance',
@@ -615,6 +618,46 @@ const local: App.I18n.Schema = {
         webStatus: 'Order Enabled',
         createDate: 'Created At',
         deleteDisabledTip: 'Delete is not available yet',
+        customerLevelManage: {
+          title: 'Customer Level',
+          add: 'Add Level',
+          edit: 'Edit Level',
+          num: 'Level',
+          numPlaceholder: 'Please enter level',
+          alias: 'Level Name',
+          name: 'Level Name',
+          keywordPlaceholder: 'Search by level name',
+          limitDays: 'Limit Days',
+          limitDaysWithUnit: 'Limit Days (day)',
+          limitFeeSpent: 'Min. Spent',
+          limitFeeSpentWithUnit: 'Min. Spent (¥)',
+          feeShipRate: 'Ship Rate',
+          feeShipRateWithUnit: 'Ship Rate (%)',
+          status: 'Status',
+          updateBy: 'Updated By',
+          updateDate: 'Updated At',
+          form: {
+            namePlaceholder: 'Please enter level alias',
+            limitDaysPlaceholder: 'Please enter limit days',
+            limitFeeSpentPlaceholder: 'Please enter min. spent',
+            feeShipRatePlaceholder: 'Please enter ship rate'
+          }
+        },
+        customerSourceManage: {
+          title: 'Customer Source',
+          add: 'Add Source',
+          edit: 'Edit Source',
+          order: 'Order',
+          name: 'Source Name',
+          note: 'Note',
+          status: 'Status',
+          keywordPlaceholder: 'Search by source name',
+          form: {
+            namePlaceholder: 'Please enter source name',
+            orderPlaceholder: 'Please enter order',
+            notePlaceholder: 'Please enter note'
+          }
+        },
         form: {
           keywordPlaceholder: 'Code / Name / Account',
           codePlaceholder: 'Auto-generated if left blank',

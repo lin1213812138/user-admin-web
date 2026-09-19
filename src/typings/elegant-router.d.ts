@@ -25,6 +25,8 @@ declare module "@elegant-router/types" {
     "channel-quote_ship": "/channel-quote/ship";
     "customer-manage": "/customer-manage";
     "customer-manage_customer": "/customer-manage/customer";
+    "customer-manage_customer-level": "/customer-manage/customer-level";
+    "customer-manage_customer-source": "/customer-manage/customer-source";
     "data-manage": "/data-manage";
     "data-manage_basic": "/data-manage/basic";
     "data-manage_bl": "/data-manage/bl";
@@ -110,6 +112,8 @@ declare module "@elegant-router/types" {
     | "login"
     | "channel-quote_receive"
     | "channel-quote_ship"
+    | "customer-manage_customer-level"
+    | "customer-manage_customer-source"
     | "customer-manage_customer"
     | "data-manage_basic"
     | "data-manage_bl"

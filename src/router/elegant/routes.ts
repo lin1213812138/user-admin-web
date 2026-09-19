@@ -110,6 +110,32 @@ export const generatedRoutes: GeneratedRoute[] = [
           permission: 'system:customer:list',
           keepAlive: true
         }
+      },
+      {
+        name: 'customer-manage_customer-level',
+        path: '/customer-manage/customer-level',
+        component: 'view.customer-manage_customer-level',
+        meta: {
+          title: 'customer-manage_customer-level',
+          i18nKey: 'route.customer-manage_customer-level',
+          keepAlive: true,
+          icon: 'ic:round-stars',
+          order: 2,
+          permission: 'system:customerLevel:list'
+        }
+      },
+      {
+        name: 'customer-manage_customer-source',
+        path: '/customer-manage/customer-source',
+        component: 'view.customer-manage_customer-source',
+        meta: {
+          title: 'customer-manage_customer-source',
+          i18nKey: 'route.customer-manage_customer-source',
+          keepAlive: true,
+          icon: 'ic:round-ads-click',
+          order: 3,
+          permission: 'system:customerSource:list'
+        }
       }
     ]
   },

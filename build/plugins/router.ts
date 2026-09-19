@@ -47,6 +47,7 @@ export function setupElegantRouter() {
         'system-manage_log': 'ic:round-article',
         'customer-manage': 'ic:round-business',
         'customer-manage_customer': 'ic:round-contacts',
+        'customer-manage_customer-level': 'ic:round-stars',
         'system-manage_group': 'ic:round-groups',
         'system-manage_setting': 'ic:baseline-settings-applications',
         'data-manage': 'ic:baseline-folder',
@@ -80,6 +81,7 @@ export function setupElegantRouter() {
         'system-manage_log': 6,
         // 客户管理模块
         'customer-manage_customer': 1,
+        'customer-manage_customer-level': 2,
         // 资料管理模块（显式排序：发货 → 单号 → 运单 → 财务 → 提单 → 通用）
         'data-manage_ship': 1,
         'data-manage_no-rule': 2,
@@ -96,6 +98,7 @@ export function setupElegantRouter() {
        *  Leaf routes without a code are allowed by default (see filterAuthRoutesByPermission). */
       const routePermissions: Partial<Record<RouteKey, string>> = {
         'customer-manage_customer': 'system:customer:list',
+        'customer-manage_customer-level': 'system:customerLevel:list',
         'channel-quote_receive': 'system:channelQuote:receive:list',
         'channel-quote_ship': 'system:channelQuote:ship:list',
         'data-manage_ship': 'system:ship:list',

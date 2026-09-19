@@ -649,39 +649,108 @@ declare namespace Api {
       _id: string;
     };
 
-    /** 客户等级字典（/customer-level/query） */
+    /** 客户等级（/customer-level/query|get|create|update|delete） */
     interface CustomerLevelItem {
       _id: string;
       /** 等级名称 */
       name: string;
-      /** 等级序号 */
+      /** 等级序号（后端自动重排，无需前端维护） */
       num?: number;
+      /** 期限时间（天） */
+      limitDays?: number;
+      /** 消费金额满 */
+      limitFeeSpent?: number;
+      /** 运费折扣（百分比，默认 100） */
+      feeShipRate?: number;
       /** 状态 0-未启用 1-已启用 */
       status?: Api.Common.EnableStatus;
+      /** 关联客户数（/customer-level/query 聚合返回） */
+      customerCount?: number;
+      /** 创建人名称 */
+      creator?: string;
+      /** 编辑人名称 */
+      updateBy?: string;
+      /** 创建时间 */
       createDate?: number;
+      /** 更新时间 */
       updateDate?: number;
     }
 
-    /** 客户等级字典列表 */
+    /** 客户等级搜索参数（/customer-level/query） */
+    type CustomerLevelSearchParams = {
+      current: number;
+      size: number;
+      /** 等级名称模糊匹配（后端 keywordFields: ['name']） */
+      keyword?: string;
+      /** 状态筛选 */
+      status?: Api.Common.EnableStatus | null;
+    };
+
+    /** 客户等级保存参数（/customer-level/create|update，name 必填且唯一） */
+    type CustomerLevelSaveParams = {
+      /** 等级序号：可选，不传由后端自动重排；传值也可能被后端 updateNum 覆盖（以实际后端为准） */
+      num?: number;
+      name: string;
+      limitDays?: number;
+      limitFeeSpent?: number;
+      feeShipRate?: number;
+      status?: Api.Common.EnableStatus;
+    };
+
+    /** 客户等级更新参数（需 _id） */
+    type CustomerLevelUpdateParams = CustomerLevelSaveParams & { _id: string };
+
+    /** 客户等级列表 */
     type CustomerLevelList = {
       list: CustomerLevelItem[];
       total: number;
     };
 
-    /** 客户来源字典（/customer-source/query） */
+    /** 客户来源（/customer-source/query|get|create|update，后端无 delete 路由） */
     interface CustomerSourceItem {
       _id: string;
-      /** 来源名称 */
+      /** 来源名称（必填，后端按 name 唯一） */
       name: string;
       /** 排序 */
       order?: number;
       /** 状态 0-禁用 1-启用 */
       status?: Api.Common.EnableStatus;
+      /** 备注 */
+      note?: string;
+      /** 创建人 ID（后端写入） */
+      creatorId?: string;
+      /** 创建人名称（后端写入） */
+      creator?: string;
+      /** 创建时间（毫秒时间戳） */
       createDate?: number;
+      /** 更新时间（毫秒时间戳） */
       updateDate?: number;
     }
 
-    /** 客户来源字典列表 */
+    /** 客户来源搜索参数（/customer-source/query） */
+    type CustomerSourceSearchParams = {
+      current: number;
+      size: number;
+      /** 来源名称模糊匹配（后端 keywordFields: ['name']） */
+      keyword?: string;
+      /** 状态筛选 */
+      status?: Api.Common.EnableStatus | null;
+    };
+
+    /** 客户来源保存参数（/customer-source/create|update，name 必填且唯一） */
+    type CustomerSourceSaveParams = {
+      name: string;
+      /** 排序（默认 0） */
+      order?: number;
+      /** 备注 */
+      note?: string;
+      status?: Api.Common.EnableStatus;
+    };
+
+    /** 客户来源更新参数（需 _id） */
+    type CustomerSourceUpdateParams = CustomerSourceSaveParams & { _id: string };
+
+    /** 客户来源列表 */
     type CustomerSourceList = {
       list: CustomerSourceItem[];
       total: number;

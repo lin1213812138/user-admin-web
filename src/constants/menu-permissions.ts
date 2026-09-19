@@ -97,6 +97,8 @@ const role = op('role');
 const site = op('site');
 const group = op('group');
 const customer = op('customer');
+const customerLevel = op('customerLevel');
+const customerSource = op('customerSource');
 
 /** 各菜单的权限配置（一级 → 二级 → 子模块，任意层级都可挂 buttons），顺序与侧栏菜单一致 */
 export const MENU_PERMISSION_TREE: MenuPermissionItem[] = [
@@ -111,6 +113,35 @@ export const MENU_PERMISSION_TREE: MenuPermissionItem[] = [
         routePath: '/customer-manage/customer',
         permission: 'system:customer:list',
         buttons: [customer.query, customer.reset, customer.add, customer.edit, customer.delete]
+      },
+      {
+        name: '客户等级',
+        icon: 'ic:round-stars',
+        routePath: '/customer-manage/customer-level',
+        permission: 'system:customerLevel:list',
+        buttons: [
+          customerLevel.query,
+          customerLevel.reset,
+          customerLevel.add,
+          customerLevel.edit,
+          customerLevel.delete,
+          customerLevel.export,
+          customerLevel.status
+        ]
+      },
+      {
+        name: '客户来源',
+        icon: 'ic:round-ads-click',
+        routePath: '/customer-manage/customer-source',
+        permission: 'system:customerSource:list',
+        buttons: [
+          customerSource.query,
+          customerSource.reset,
+          customerSource.add,
+          customerSource.edit,
+          customerSource.export,
+          customerSource.status
+        ]
       }
     ]
   },
