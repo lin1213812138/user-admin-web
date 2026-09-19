@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onActivated } from 'vue';
-import { useRoute } from 'vue-router';
 import { $t } from '@/locales';
 import VerticalTabLayout from '@/components/VerticalTabLayout/index.vue';
 import { useArchiveTabs } from '@/views/data-manage/components/useArchiveTabs';
@@ -11,58 +9,52 @@ import TraceCapture from './modules/trace-capture/TraceCapture.vue';
 import OperationTrace from './modules/operation-trace/OperationTrace.vue';
 import BasicConfig from './modules/basic-config/BasicConfig.vue';
 
-const route = useRoute();
-
-/** 各子模块平铺为左侧 tab（基础配置置顶），按角色权限过滤后生成 */
-const { tabs, activeKey, activeComponent } = useArchiveTabs([
-  {
-    key: 'basic-config',
-    labelKey: 'page.manage.setting.basicConfig.title',
-    component: BasicConfig,
-    permission: 'system:setting:basicConfig'
-  },
-  {
-    key: 'input-format',
-    labelKey: 'page.manage.setting.inputFormat.title',
-    component: InputFormat,
-    permission: 'system:setting:inputFormat'
-  },
-  {
-    key: 'print-format',
-    labelKey: 'page.manage.setting.printFormat.title',
-    component: PrintFormat,
-    permission: 'system:setting:printFormat'
-  },
-  {
-    key: 'export-format',
-    labelKey: 'page.manage.setting.exportFormat.title',
-    component: ExportFormat,
-    permission: 'system:setting:exportFormat'
-  },
-  {
-    key: 'trace-capture',
-    labelKey: 'page.manage.setting.traceCapture.title',
-    component: TraceCapture,
-    permission: 'system:setting:traceCapture'
-  },
-  {
-    key: 'operation-trace',
-    labelKey: 'page.manage.setting.operationTrace.title',
-    component: OperationTrace,
-    permission: 'system:setting:operationTrace'
-  }
-]);
-
-/** 从 URL query（如 ?tab=print-format，来自标签设计页「返回上一页」）切换到对应分页 */
-function syncTabFromQuery() {
-  const tab = route.query.tab;
-  if (typeof tab === 'string' && tabs.some(t => t.value === tab)) {
-    activeKey.value = tab;
-  }
-}
-
-syncTabFromQuery();
-onActivated(syncTabFromQuery);
+/**
+ * 各子模块平铺为左侧 tab（基础配置置顶），按角色权限过滤后生成。
+ * urlSync：分页状态与 URL（?tab=xxx）双向同步 —— 切 tab 写回地址栏（replace，不新增历史），
+ * 刷新/分享可定位当前分页；标签设计页「返回」的 ?tab=print-format 定位也由它接管。
+ */
+const { tabs, activeKey, activeComponent } = useArchiveTabs(
+  [
+    {
+      key: 'basic-config',
+      labelKey: 'page.manage.setting.basicConfig.title',
+      component: BasicConfig,
+      permission: 'system:setting:basicConfig'
+    },
+    {
+      key: 'input-format',
+      labelKey: 'page.manage.setting.inputFormat.title',
+      component: InputFormat,
+      permission: 'system:setting:inputFormat'
+    },
+    {
+      key: 'print-format',
+      labelKey: 'page.manage.setting.printFormat.title',
+      component: PrintFormat,
+      permission: 'system:setting:printFormat'
+    },
+    {
+      key: 'export-format',
+      labelKey: 'page.manage.setting.exportFormat.title',
+      component: ExportFormat,
+      permission: 'system:setting:exportFormat'
+    },
+    {
+      key: 'trace-capture',
+      labelKey: 'page.manage.setting.traceCapture.title',
+      component: TraceCapture,
+      permission: 'system:setting:traceCapture'
+    },
+    {
+      key: 'operation-trace',
+      labelKey: 'page.manage.setting.operationTrace.title',
+      component: OperationTrace,
+      permission: 'system:setting:operationTrace'
+    }
+  ],
+  { urlSync: true }
+);
 </script>
 
 <template>

@@ -294,7 +294,7 @@ defineExpose({
                 v-model:value="model[item.key] as string"
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
-                :clearable="item.clearable || true"
+                :clearable="item.clearable ?? true"
               />
               <NInput
                 v-else-if="item.type === 'textarea'"
@@ -317,7 +317,7 @@ defineExpose({
                 v-model:value="model[item.key] as number"
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
-                :clearable="item.clearable || true"
+                :clearable="item.clearable ?? true"
                 class="w-full"
               />
               <NSwitch
@@ -336,7 +336,7 @@ defineExpose({
                 :options="item.options"
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
-                :clearable="item.clearable || true"
+                :clearable="item.clearable ?? true"
                 :filterable="item.filterable ?? true"
                 :multiple="item.multiple || false"
                 :render-label="item.renderLabel ?? fallbackOptionLabel"

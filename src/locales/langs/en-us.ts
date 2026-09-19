@@ -20,6 +20,7 @@ const local: App.I18n.Schema = {
     close: 'Close',
     check: 'Check',
     selectAll: 'Select All',
+    clear: 'Clear',
     unselectAll: 'Unselect All',
     expandColumn: 'Expand Column',
     columnSetting: 'Column Setting',
@@ -737,6 +738,7 @@ const local: App.I18n.Schema = {
           order: 'Sort',
           yes: 'Yes',
           no: 'No',
+          setDefault: 'Set Default',
           newTitle: 'New Input Format',
           editTitle: 'Edit Input Format',
           namePlaceholder: 'Please enter format name',
@@ -957,7 +959,14 @@ const local: App.I18n.Schema = {
           }
         },
         fieldMapping: 'Field Mapping',
-        fieldMappingRequired: 'Required'
+        fieldMappingRequired: 'Required',
+        fieldMappingSummary: 'Shown {shown}/{total} · Required {required}',
+        fieldMappingCounts: '{shown}/{total} · required {required}',
+        fieldMappingGroupAll: 'All',
+        fieldMappingSearchPlaceholder: 'Search fields',
+        fieldMappingOnlyShown: 'Selected only',
+        fieldMappingNoMatch: 'No matching fields',
+        fieldMappingLockedTip: 'Fixed by client, cannot be hidden'
       },
       printDesign: {
         title: 'Design Label',
@@ -1080,7 +1089,9 @@ const local: App.I18n.Schema = {
         saveSuccess: 'Saved successfully',
         saveFailed: 'Failed to save',
         loadFailed: 'Failed to load template',
-        selectTemplate: 'Select Template'
+        selectTemplate: 'Select Template',
+        unsavedTitle: 'Unsaved Changes',
+        unsavedContent: 'The current template has unsaved changes. Continuing will discard them. Continue?'
       }
     },
     order: {

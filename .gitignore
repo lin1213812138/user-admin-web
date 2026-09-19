@@ -34,5 +34,12 @@ yarn.lock
 
 .VSCodeCounter
 
+# 可视化设计对比（brainstorm 伴随服务器的 mockup，见 changelog/字段映射改为行式布局.md）
+.superpowers/
+
 # 字体源文件（体积大，仅用于重建子集；重建命令见 changelog/阿里巴巴普惠体字体子集化.md）
 src/assets/fonts/source/
+
+.superpowers
+docs/*
+.playwright-cli/*

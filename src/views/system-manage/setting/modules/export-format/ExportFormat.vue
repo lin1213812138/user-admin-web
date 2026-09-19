@@ -3,35 +3,13 @@ import { computed, ref } from 'vue';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
-import type { VxeColumnConfig } from '@/components/Table';
-import Drawer from '@/components/common/drawer.vue';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import {
-  fetchCreateExportTemplate,
-  fetchDeleteExportTemplate,
-  fetchGetExportTemplateList,
-  fetchUpdateExportTemplate,
-  fetchUploadExportTemplate
-} from '@/service/api/export-format';
-import InputUpload from '@/components/Upload/input-upload.vue';
+import { fetchDeleteExportTemplate, fetchGetExportTemplateList } from '@/service/api/export-format';
+import ExportFormatDrawer from './export-format-drawer.vue';
+import { buildExportFormatColumns } from './table-columns';
+import { getTemplateTypeOptions, templateTypeLabel } from './template-type';
 
-/** 模板类别（后端固定枚举 0~8，文案走 i18n） */
-const templateTypeOptions = computed(() => [
-  { label: $t('page.manage.setting.exportFormat.type.sysList'), value: 0 },
-  { label: $t('page.manage.setting.exportFormat.type.sendList'), value: 1 },
-  { label: $t('page.manage.setting.exportFormat.type.billRec'), value: 2 },
-  { label: $t('page.manage.setting.exportFormat.type.billPay'), value: 3 },
-  { label: $t('page.manage.setting.exportFormat.type.blLoadList'), value: 4 },
-  { label: $t('page.manage.setting.exportFormat.type.blInvoice'), value: 5 },
-  { label: $t('page.manage.setting.exportFormat.type.blFile'), value: 6 },
-  { label: $t('page.manage.setting.exportFormat.type.blCustoms'), value: 7 },
-  { label: $t('page.manage.setting.exportFormat.type.shipOrder'), value: 8 }
-]);
-
-/** 类别名（表格列展示用） */
-function templateTypeLabel(type?: number) {
-  return templateTypeOptions.value.find(item => item.value === type)?.label ?? '';
-}
+/** 模板类别选项（搜索筛选用；抽屉内取同一份） */
+const templateTypeOptions = computed(() => getTemplateTypeOptions());
 
 /** 毫秒时间戳格式化展示（最后更新时间） */
 function formatDateTime(ts?: number) {
@@ -62,63 +40,8 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
   },
   // 后端返回 ret:{ list, total }，映射为表格需要的 records/total
   transform: r => ({ records: r.list, total: r.total }),
-  columns: () =>
-    [
-      {
-        key: 'name',
-        title: $t('page.manage.setting.exportFormat.name'),
-        type: 'detail',
-        visible: true,
-        minWidth: 160,
-        sortable: false
-      },
-      {
-        key: 'templateType',
-        title: $t('page.manage.setting.exportFormat.templateType'),
-        visible: true,
-        width: 140,
-        sortable: false
-      },
-      {
-        key: 'thPos',
-        title: $t('page.manage.setting.exportFormat.thPos'),
-        visible: true,
-        width: 150,
-        sortable: false
-      },
-      {
-        key: 'tdPos',
-        title: $t('page.manage.setting.exportFormat.tdPos'),
-        visible: true,
-        width: 150,
-        sortable: false
-      },
-      {
-        key: 'note',
-        title: $t('page.manage.setting.exportFormat.note'),
-        visible: true,
-        minWidth: 160,
-        sortable: false
-      },
-      {
-        key: 'updateBy',
-        title: $t('page.manage.setting.exportFormat.lastOperation'),
-        visible: true,
-        width: 120,
-        fixed: 'right',
-        align: 'center',
-        sortable: false
-      },
-      {
-        key: 'updateDate',
-        title: $t('page.manage.setting.exportFormat.lastUpdateTime'),
-        visible: true,
-        width: 170,
-        fixed: 'right',
-        align: 'center',
-        sortable: false
-      }
-    ] as VxeColumnConfig[],
+  // 列配置见 ./table-columns.ts（列持久化 cacheKey 仍由本页管理）
+  columns: () => buildExportFormatColumns(),
   // 列已按后端字段整组调整：列配置缓存以缓存数组为准，升版本避免老缓存把新列挡住
   cacheKey: 'setting-export-format-v3'
 });
@@ -162,157 +85,19 @@ async function confirmDelete(row: Api.ExportFormat.Template) {
   window.$message?.success($t('common.deleteSuccess'));
 }
 
-// ---- 抽屉 ----
+// ---- 抽屉：新增 / 编辑由独立组件承载，页面只维护源行 ----
 const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit'>('create');
-const submitting = ref(false);
-/** 上传解析出的字段清单；未重新上传时保持 null ⇒ 提交体不含这些字段 ⇒ 后端不覆盖库中既有值 */
-const parsedFields = ref<Api.ExportFormat.ParsedFields | null>(null);
-
-function emptyForm(): Api.ExportFormat.SaveParams {
-  return {
-    name: '',
-    templateType: filterType.value ?? 0,
-    file: '',
-    fileUrl: '',
-    thPos: '',
-    tdPos: '',
-    note: ''
-  };
-}
-
-const formModel = ref<Api.ExportFormat.SaveParams>(emptyForm());
-const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
-
-const drawerTitle = computed(() =>
-  drawerMode.value === 'create'
-    ? $t('page.manage.setting.exportFormat.newTitle')
-    : $t('page.manage.setting.exportFormat.editTitle')
-);
-
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'name',
-    label: $t('page.manage.setting.exportFormat.name'),
-    type: 'input',
-    required: true,
-    span: 24,
-    placeholder: '请输入模板名称'
-  },
-  {
-    key: 'templateType',
-    label: $t('page.manage.setting.exportFormat.templateType'),
-    type: 'select',
-    required: true,
-    span: 24,
-    options: templateTypeOptions.value,
-    filterable: false
-  },
-  {
-    key: 'file',
-    label: $t('page.manage.setting.exportFormat.excelTemplate'),
-    type: 'custom',
-    required: true,
-    requiredMsg: $t('page.manage.setting.exportFormat.excelTemplateRequired'),
-    span: 24
-  },
-  {
-    key: 'thPos',
-    label: $t('page.manage.setting.exportFormat.thPos'),
-    type: 'input',
-    span: 24,
-    placeholder: '请输入(字母+数字,如A1)'
-  },
-  {
-    key: 'tdPos',
-    label: $t('page.manage.setting.exportFormat.tdPos'),
-    type: 'input',
-    required: true,
-    span: 24,
-    placeholder: '请输入(字母+数字,如B1)'
-  },
-  {
-    key: 'note',
-    label: $t('page.manage.setting.exportFormat.note'),
-    type: 'textarea',
-    span: 24,
-    placeholder: '请输入'
-  }
-]);
+/** 编辑时的行数据（新增时为 null） */
+const drawerRow = ref<Api.ExportFormat.Template | null>(null);
 
 function openCreate() {
-  drawerMode.value = 'create';
-  parsedFields.value = null;
-  formModel.value = emptyForm();
-  formRef.value?.restoreValidation();
+  drawerRow.value = null;
   drawerVisible.value = true;
 }
 
-/** 编辑：以列表行数据回填（query 未 omit 这 6 个字段，无需额外 /get） */
 function openEdit(row: Api.ExportFormat.Template) {
-  drawerMode.value = 'edit';
-  parsedFields.value = null;
-  formModel.value = {
-    _id: row._id,
-    name: row.name,
-    templateType: row.templateType,
-    file: row.file,
-    fileUrl: row.fileUrl,
-    thPos: row.thPos ?? '',
-    tdPos: row.tdPos ?? '',
-    note: row.note ?? ''
-  };
-  formRef.value?.restoreValidation();
+  drawerRow.value = row;
   drawerVisible.value = true;
-}
-
-/** 模板上传：走导出格式专用解析接口，返回地址与解析结果 */
-async function uploadExportTemplate(file: File) {
-  const { data: uploadData, error } = await fetchUploadExportTemplate(file);
-
-  return error || !uploadData ? null : { url: uploadData.fileUrl, raw: uploadData };
-}
-
-/** 上传解析成功：回填文件地址，并暂存字段清单随保存一起提交 */
-function handleParsed(raw: unknown) {
-  const result = raw as Api.ExportFormat.UploadResult;
-
-  formModel.value.file = result.file;
-  formModel.value.fileUrl = result.fileUrl;
-
-  parsedFields.value = {
-    fieldRow: result.fieldRow,
-    infoList: result.infoList,
-    fieldList: result.fieldList,
-    subFieldList: result.subFieldList,
-    subList: result.subList,
-    barcodeList: result.barcodeList,
-    subBarcodeList: result.subBarcodeList
-  };
-}
-
-async function handleDrawerSubmit() {
-  const ok = await formRef.value?.validate();
-  if (!ok) return;
-
-  submitting.value = true;
-  try {
-    // 未重新上传时 parsedFields 为 null：提交体不含字段清单，后端保持库中原值
-    const extraFields = parsedFields.value ?? {};
-    const payload: Api.ExportFormat.SaveParams = { ...formModel.value, ...extraFields };
-    const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateExportTemplate(payload)
-        : await fetchUpdateExportTemplate(payload);
-
-    if (error) return;
-
-    drawerVisible.value = false;
-    getData();
-    window.$message?.success($t(drawerMode.value === 'create' ? 'common.createSuccess' : 'common.saveSuccess'));
-  } finally {
-    submitting.value = false;
-  }
 }
 </script>
 
@@ -325,7 +110,7 @@ async function handleDrawerSubmit() {
       :pagination="pagination"
       :show-seq="true"
       show-action
-      :action-width="180"
+      :action-width="130"
       action-align="left"
       @refresh="getData"
       @page-change="handlePageChange"
@@ -394,26 +179,11 @@ async function handleDrawerSubmit() {
       </template>
     </Table>
 
-    <Drawer
+    <ExportFormatDrawer
       v-model:show="drawerVisible"
-      :title="drawerTitle"
-      :loading="submitting"
-      :confirm-text="$t('common.save')"
-      @submit="handleDrawerSubmit"
-    >
-      <NFormWrap ref="formRef" :model="formModel" :items="formItems">
-        <template #file>
-          <InputUpload
-            :value="formModel.file"
-            :upload="uploadExportTemplate"
-            @success="handleParsed"
-            @remove="
-              formModel.file = '';
-              formModel.fileUrl = '';
-            "
-          />
-        </template>
-      </NFormWrap>
-    </Drawer>
+      :row="drawerRow"
+      :default-template-type="filterType ?? 0"
+      @submitted="getData"
+    />
   </div>
 </template>

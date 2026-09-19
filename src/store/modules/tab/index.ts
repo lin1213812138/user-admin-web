@@ -324,6 +324,20 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
   }
 
   /**
+   * Set tab full path
+   *
+   * @param tabId Tab id
+   * @param fullPath The new full path of the tab
+   */
+  function setTabFullPath(tabId: string, fullPath: string) {
+    const tab = tabs.value.find(item => item.id === tabId);
+
+    if (tab) {
+      tab.fullPath = fullPath;
+    }
+  }
+
+  /**
    * Is tab retain
    *
    * @param tabId
@@ -380,6 +394,7 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
     isTabRetain,
     updateTabsByLocale,
     getTabIdByRoute,
+    setTabFullPath,
     cacheTabs
   };
 });

@@ -65,6 +65,20 @@ declare namespace Api {
       updateDate?: number;
     }
 
+    /**
+     * 列表快捷操作入参（部分更新：停用/启用、设为默认）
+     *
+     * `name` 必须回传：后端 updateCommon 以 name 为唯一键，body.name 与库中值不相等时会触发
+     * checkUniqField，而 `$in([undefined])` 长度为 1 时退化为 undefined 条件（mongoose 视作空查询，
+     * findOne({}) 命中任意文档）会误报「已存在」。
+     */
+    interface PatchParams {
+      _id: string;
+      name: string;
+      status?: Api.Common.EnableStatus;
+      isDefault?: Api.Common.EnableStatus;
+    }
+
     /** 列表返回结构（wms-user ret:{ list, total }） */
     interface List {
       list: OrderTemplate[];

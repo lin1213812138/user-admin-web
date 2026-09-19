@@ -133,6 +133,10 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
   const clipboard = ref<LabelElement | null>(null);
   /** 拖动/缩放中的几何预览：仅驱动属性面板实时显示，不进 elements/撤销/序列化 */
   const dragPreview = ref<{ x: number; y: number; width: number; height: number } | null>(null);
+  /** 相对上次加载/保存是否存在未保存修改（视图状态如缩放/网格不计入） */
+  const dirty = ref(false);
+  /** 上次加载/保存时的序列化快照，「放弃修改」时用它还原 */
+  const savedJson = ref('');
 
   const elements = computed(() => template.value.elements);
   const selected = computed(() => elements.value.find(e => e.id === selectedId.value) ?? null);
@@ -143,10 +147,16 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     return JSON.parse(JSON.stringify(list)) as LabelElement[];
   }
 
+  /** 标记「相对上次加载/保存已有修改」（view 状态变更不计入） */
+  function markDirty() {
+    dirty.value = true;
+  }
+
   function commit() {
     past.value.push(clone(elements.value));
     if (past.value.length > 50) past.value.shift();
     future.value = [];
+    markDirty();
   }
 
   function addElement(desc: ElementDescriptor, at: { x: number; y: number }, size?: { width: number; height: number }) {
@@ -170,12 +180,14 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     const el = elements.value.find(e => e.id === id);
     if (!el) return;
     Object.assign(el, patch);
+    markDirty();
   }
 
   function updateElementOptions(id: string, patch: Record<string, unknown>) {
     const el = elements.value.find(e => e.id === id);
     if (!el) return;
     el.options = { ...el.options, ...patch } as LabelElement['options'];
+    markDirty();
   }
 
   /**
@@ -283,6 +295,7 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
 
   function setPaper(size: string) {
     template.value.paperSize = size;
+    markDirty();
   }
 
   /** 一键清空画布全部元素（入撤销栈，可 undo 恢复） */
@@ -301,12 +314,14 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     if (!past.value.length) return;
     future.value.push(clone(elements.value));
     template.value.elements = past.value.pop()!;
+    markDirty();
   }
 
   function redo() {
     if (!future.value.length) return;
     past.value.push(clone(elements.value));
     template.value.elements = future.value.pop()!;
+    markDirty();
   }
 
   /** designJson 解析（目标格式 / 旧原生格式 / 非法输入统一兜底，mm 旧数据自动迁移 pt，见 export-format.ts） */
@@ -315,6 +330,8 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     selectedId.value = null;
     past.value = [];
     future.value = [];
+    savedJson.value = toJson();
+    dirty.value = false;
   }
 
   /** 序列化为目标存储格式（几何 pt 直传 + options 兼容层，见 export-format.ts） */
@@ -322,11 +339,25 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     return JSON.stringify(toExportTemplate(template.value));
   }
 
+  /** 保存成功后调用：刷新已保存快照并清除修改标记（详情加载完成后也用它确立基线） */
+  function markSaved() {
+    savedJson.value = toJson();
+    dirty.value = false;
+  }
+
+  /** 放弃未保存的修改：还原到上次加载/保存时的快照（无快照时不动作） */
+  function revert() {
+    if (!savedJson.value) return;
+    loadFromJson(savedJson.value);
+  }
+
   function reset() {
     template.value = { paperSize: '100×150mm', elements: [] };
     selectedId.value = null;
     past.value = [];
     future.value = [];
+    savedJson.value = '';
+    dirty.value = false;
   }
 
   return {
@@ -363,6 +394,9 @@ export const useLabelDesignStore = defineStore(SetupStoreId.LabelDesign, () => {
     loadFromJson,
     toJson,
     reset,
+    dirty,
+    markSaved,
+    revert,
     snapshot: commit
   };
 });

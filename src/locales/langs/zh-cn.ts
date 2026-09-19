@@ -20,6 +20,7 @@ const local: App.I18n.Schema = {
     close: '关闭',
     check: '勾选',
     selectAll: '全选',
+    clear: '清空',
     unselectAll: '取消全选',
     expandColumn: '展开列',
     columnSetting: '列设置',
@@ -733,6 +734,7 @@ const local: App.I18n.Schema = {
           order: '排序',
           yes: '是',
           no: '否',
+          setDefault: '设为默认',
           newTitle: '新增录单格式',
           editTitle: '编辑录单格式',
           namePlaceholder: '请输入格式名称',
@@ -953,7 +955,14 @@ const local: App.I18n.Schema = {
           }
         },
         fieldMapping: '字段映射',
-        fieldMappingRequired: '必填'
+        fieldMappingRequired: '必填',
+        fieldMappingSummary: '已显示 {shown}/{total} · 必填 {required}',
+        fieldMappingCounts: '{shown}/{total} · 必填 {required}',
+        fieldMappingGroupAll: '全部',
+        fieldMappingSearchPlaceholder: '搜索字段',
+        fieldMappingOnlyShown: '仅看已选',
+        fieldMappingNoMatch: '没有匹配的字段',
+        fieldMappingLockedTip: '客户端固定字段，不可取消显示'
       },
       printDesign: {
         title: '设计标签',
@@ -1076,7 +1085,9 @@ const local: App.I18n.Schema = {
         saveSuccess: '保存成功',
         saveFailed: '保存失败',
         loadFailed: '模板加载失败',
-        selectTemplate: '选择模板'
+        selectTemplate: '选择模板',
+        unsavedTitle: '有未保存的修改',
+        unsavedContent: '当前模板有未保存的修改，继续将丢失这些修改，是否继续？'
       }
     },
     order: {

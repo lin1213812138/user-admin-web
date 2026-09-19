@@ -3,9 +3,9 @@ import { ref } from 'vue';
 import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
-import type { VxeColumnConfig } from '@/components/Table';
-import { fetchDeleteInputFormat, fetchGetInputFormatList } from '@/service/api/input-format';
+import { fetchDeleteInputFormat, fetchGetInputFormatList, fetchPatchInputFormat } from '@/service/api/input-format';
 import InputFormatDrawer from './input-format-drawer.vue';
+import { buildInputFormatColumns } from './config';
 
 const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
   Api.InputFormat.List,
@@ -22,70 +22,8 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
   },
   // wms-user 返回 ret:{ list, total }，映射为表格需要的 records/total
   transform: r => ({ records: r.list, total: r.total }),
-  columns: () =>
-    [
-      {
-        key: 'name',
-        title: $t('page.manage.setting.inputFormat.name'),
-        type: 'detail',
-        visible: true,
-        minWidth: 180,
-        sortable: false
-      },
-      {
-        key: 'customerEnable',
-        title: $t('page.manage.setting.inputFormat.customerEnable'),
-        visible: true,
-        width: 100,
-        align: 'center',
-        sortable: false
-      },
-      {
-        key: 'isDefault',
-        title: $t('page.manage.setting.inputFormat.isDefault'),
-        visible: true,
-        width: 100,
-        align: 'center',
-        sortable: false
-      },
-      {
-        key: 'order',
-        title: $t('page.manage.setting.inputFormat.order'),
-        visible: true,
-        width: 80,
-        align: 'center',
-        sortable: false
-      },
-      { key: 'note', title: $t('common.remark'), visible: true, minWidth: 220, sortable: false },
-      {
-        key: 'status',
-        title: $t('common.status'),
-        type: 'status',
-        visible: true,
-        width: 100,
-        fixed: 'right',
-        align: 'center',
-        sortable: false
-      },
-      {
-        key: 'updateBy',
-        title: $t('page.manage.setting.inputFormat.lastOperation'),
-        visible: true,
-        width: 100,
-        fixed: 'right',
-        align: 'center',
-        sortable: false
-      },
-      {
-        key: 'updateDate',
-        title: $t('page.manage.setting.inputFormat.lastUpdateTime'),
-        visible: true,
-        width: 170,
-        fixed: 'right',
-        align: 'center',
-        sortable: false
-      }
-    ] as VxeColumnConfig[],
+  // 列配置见 ./config.ts（列持久化 cacheKey 仍由本页管理）
+  columns: () => buildInputFormatColumns(),
   // 新增两列：列配置缓存以缓存数组为准（useVxeTable 按缓存 map），升版本避免老缓存把新列挡住
   cacheKey: 'setting-input-format-v3'
 });
@@ -120,6 +58,28 @@ function confirmDelete(row: Api.InputFormat.OrderTemplate) {
   });
 }
 
+/** 列表停用 / 启用：部分更新，name 必须随行回传（否则后端重名校验会误判，见 PatchParams 注释） */
+async function handleToggleStatus(row: Api.InputFormat.OrderTemplate) {
+  const { error } = await fetchPatchInputFormat({
+    _id: row._id,
+    name: row.name,
+    status: row.status === 1 ? 0 : 1
+  });
+  if (error) return;
+
+  window.$message?.success($t('common.updateSuccess'));
+  getData();
+}
+
+/** 列表设为默认：后端会把其它格式的 isDefault 清 0 */
+async function handleSetDefault(row: Api.InputFormat.OrderTemplate) {
+  const { error } = await fetchPatchInputFormat({ _id: row._id, name: row.name, isDefault: 1 });
+  if (error) return;
+
+  window.$message?.success($t('common.updateSuccess'));
+  getData();
+}
+
 function handlePageChange({ current, size }: { current: number; size: number }) {
   pagination.current = current;
   pagination.size = size;
@@ -150,7 +110,7 @@ function openEdit(row: Api.InputFormat.OrderTemplate) {
       :show-seq="true"
       :show-checkbox="true"
       :show-action="true"
-      :action-width="130"
+      :action-width="200"
       @refresh="getData"
       @page-change="handlePageChange"
     >
@@ -173,15 +133,15 @@ function openEdit(row: Api.InputFormat.OrderTemplate) {
       <template #updateBy="{ row }">{{ row.updateBy || '--' }}</template>
       <template #updateDate="{ row }">{{ formatDateTime(row.updateDate) }}</template>
       <template #operation-left>
-        <NButton size="small" type="primary" ghost @click="openCreate">
+        <LButton type="primary" @click="openCreate">
           <template #icon><icon-ic-round-plus class="text-icon" /></template>
           {{ $t('common.add') }}
-        </NButton>
+        </LButton>
       </template>
       <template #operation-right="{ refresh }">
-        <NButton size="small" @click="refresh">
+        <LButton circle @click="refresh">
           <template #icon><icon-ic-round-refresh class="text-icon" /></template>
-        </NButton>
+        </LButton>
         <TableColumnConfig
           v-model:visible="configVisible"
           v-model:columns="columnConfigs"
@@ -190,14 +150,21 @@ function openEdit(row: Api.InputFormat.OrderTemplate) {
         />
       </template>
       <template #action="{ row }">
-        <NButton size="small" type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</NButton>
-        <!-- 内置格式（buildIn=1）由客户端依赖，不提供删除入口 -->
-        <NPopconfirm v-if="row.buildIn !== 1" @positive-click="confirmDelete(row)">
-          <template #trigger>
-            <NButton size="small" type="error" text>{{ $t('common.delete') }}</NButton>
-          </template>
-          {{ $t('common.confirmDelete') }}
-        </NPopconfirm>
+        <LButton type="primary" text @click="openEdit(row)">{{ $t('common.edit') }}</LButton>
+        <LButton type="primary" text :disabled="row.isDefault === 1" @click="handleSetDefault(row)">
+          {{ $t('page.manage.setting.inputFormat.setDefault') }}
+        </LButton>
+        <LButton
+          :type="row.status === 1 ? 'warning' : 'success'"
+          :popconfirm="row.status === 1 ? $t('common.confirmDisable') : $t('common.confirmEnable')"
+          text
+          @positive-click="handleToggleStatus(row)"
+        >
+          {{ row.status === 1 ? $t('common.disable') : $t('common.enable') }}
+        </LButton>
+        <LButton type="error" text popconfirm @positive-click="confirmDelete(row)">
+          {{ $t('common.delete') }}
+        </LButton>
       </template>
     </Table>
 

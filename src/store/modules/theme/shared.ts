@@ -254,6 +254,13 @@ export function getNaiveTheme(
 ) {
   const { primary: colorLoading } = colors;
 
+  // 深色侧栏（inverted）菜单 hover 反馈：
+  // naive 默认 itemColorHoverInverted 为 #0000（背景完全无变化），hover 文字/图标仅由 #BBB 转 #FFF，
+  // 在深蓝底 rgb(0,20,40) 上几乎不可见。这里改为「背景微亮 + 文字/图标/箭头转主题色亮色阶」。
+  // 刻意不动选中态变量（itemTextColorActiveHoverInverted 等）：选中项为蓝底白字，变蓝会导致不可读；
+  // 也刻意不动 itemTextColorChildActiveInverted：它同时是展开父项的常态色与 hover 色，改了会让常态变蓝。
+  const menuHoverColor = getPaletteColorByNumber(colors.primary, 400, settings.recommendColor);
+
   const theme: GlobalThemeOverrides = {
     common: {
       ...getNaiveThemeColors(colors, settings.recommendColor),
@@ -265,6 +272,12 @@ export function getNaiveTheme(
     },
     Tag: {
       borderRadius: `${settings.themeRadius}px`
+    },
+    Menu: {
+      itemColorHoverInverted: 'rgba(255, 255, 255, 0.12)',
+      itemTextColorHoverInverted: menuHoverColor,
+      itemIconColorHoverInverted: menuHoverColor,
+      arrowColorHoverInverted: menuHoverColor
     }
   };
 

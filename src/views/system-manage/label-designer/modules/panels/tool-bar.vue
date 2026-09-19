@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { $t } from '@/locales';
-import { useRouterPush } from '@/hooks/common/router';
 import { useLabelDesignStore } from '@/store/modules/label-design';
 import { PAPER_SIZES } from '../core/constant';
 import ShortcutHelp from './shortcut-help.vue';
@@ -16,15 +15,11 @@ defineProps<{
 const emit = defineEmits<{
   save: [];
   preview: [];
+  /** 返回：未保存确认与还原由页面统一处理 */
+  back: [];
 }>();
 
-const { routerPushByKey } = useRouterPush();
 const store = useLabelDesignStore();
-
-/** 返回「系统设置 → 打印格式」分页（设置页按 ?tab= 决定当前展示分页） */
-function goBack() {
-  void routerPushByKey('system-manage_setting', { query: { tab: 'print-format' } });
-}
 
 const paperOptions = PAPER_SIZES.map(s => ({ label: s, value: s }));
 
@@ -56,7 +51,7 @@ function handleClear() {
 <template>
   <!-- 单行工具栏：返回 | 模板名称 | 纸张 | 撤销/重做 | 缩放 | 显示网格 …… 清空 预览 保存 -->
   <div class="flex items-center gap-8px border-b border-#e5e7eb px-12px py-8px dark:border-#2a2a2a">
-    <LButton quaternary @click="goBack">
+    <LButton quaternary @click="emit('back')">
       <template #icon><icon-ic-round-arrow-back class="text-icon" /></template>
       {{ $t('page.manage.labelDesign.back') }}
     </LButton>

@@ -39,3 +39,14 @@ export interface ArchiveTabItem {
    */
   permission?: string;
 }
+
+/** useArchiveTabs 的可选行为 */
+export interface ArchiveTabsOptions {
+  /**
+   * 分页状态与 URL query（?tab=xxx）双向同步，默认 false：
+   * - 切 tab 时 `router.replace` 写回地址栏（不新增浏览器历史）
+   * - URL 变化（初始进入 / 前进后退 / 外部跳转）反向定位到对应 tab
+   * - 无效或无权限的 tab 值忽略，保持默认分页
+   */
+  urlSync?: boolean;
+}

@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { $t } from '@/locales';
-import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
+import NFormWrap from '@/components/Form/index.vue';
 import Drawer from '@/components/common/drawer.vue';
-import FieldMapping, { type FieldMappingValue } from '../../components/FieldMapping.vue';
+import FieldMappingRow, { type FieldMappingValue } from '../../components/FieldMappingRow.vue';
 import {
   fetchCreateInputFormat,
   fetchGetInputFormatDetail,
   fetchGetInputFormatList,
   fetchUpdateInputFormat
 } from '@/service/api/input-format';
-import { buildNavGroups, fieldListToMapping, mappingToFieldList } from './field-list-mapper';
+import { buildInputFormatFormItems } from './config';
+import { buildNavGroups, fieldListToMapping, initialMappingOf, mappingToFieldList } from './field-list-mapper';
 
 const props = withDefaults(
   defineProps<{
@@ -60,60 +61,8 @@ const drawerTitle = computed(() =>
   props.row ? $t('page.manage.setting.inputFormat.editTitle') : $t('page.manage.setting.inputFormat.newTitle')
 );
 
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'name',
-    label: $t('page.manage.setting.inputFormat.name'),
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: $t('page.manage.setting.inputFormat.namePlaceholder')
-  },
-  {
-    key: 'status',
-    label: $t('common.status'),
-    type: 'switch',
-    span: 12,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable'),
-    checkedValue: 1,
-    uncheckedValue: 0
-  },
-  {
-    key: 'customerEnable',
-    label: $t('page.manage.setting.inputFormat.customerEnable'),
-    type: 'switch',
-    span: 8,
-    checkedText: $t('page.manage.setting.inputFormat.yes'),
-    uncheckedText: $t('page.manage.setting.inputFormat.no'),
-    checkedValue: 1,
-    uncheckedValue: 0
-  },
-  {
-    key: 'isDefault',
-    label: $t('page.manage.setting.inputFormat.isDefault'),
-    type: 'switch',
-    span: 8,
-    checkedText: $t('page.manage.setting.inputFormat.yes'),
-    uncheckedText: $t('page.manage.setting.inputFormat.no'),
-    checkedValue: 1,
-    uncheckedValue: 0
-  },
-  {
-    key: 'order',
-    label: $t('page.manage.setting.inputFormat.order'),
-    type: 'number',
-    span: 8,
-    placeholder: $t('page.manage.setting.inputFormat.orderPlaceholder')
-  },
-  {
-    key: 'note',
-    label: $t('common.remark'),
-    type: 'input',
-    span: 24,
-    placeholder: $t('page.manage.setting.inputFormat.remarkPlaceholder')
-  }
-]);
+/** 表单项（三态下拉选项由 builder 内部取当前语言） */
+const formItems = computed(() => buildInputFormatFormItems());
 
 // 编辑器分组来自 fields-config（116 项 / 5 组），锁定态来自底稿中 disabled 的字段
 const navGroups = computed(() => buildNavGroups(baseFieldList.value));
@@ -124,7 +73,7 @@ function applyBaseFieldList(fieldList?: Api.InputFormat.Field[]) {
   fieldMapping.value = fieldListToMapping(baseFieldList.value);
 }
 
-/** 新增底稿：拷贝「是否默认」模板的 fieldList（含勾选状态），保证字段附加属性完整；无默认模板时为空 */
+/** 新增底稿：拷贝「是否默认」模板的 fieldList，保证字段附加属性（keyMap/options/width…）完整；无默认模板时为空 */
 async function fetchDefaultTemplateFieldList(): Promise<Api.InputFormat.Field[]> {
   const { data, error } = await fetchGetInputFormatList({ scene: 1, page: 1, size: 1, where: { isDefault: 1 } });
   const defaultId = data?.list?.[0]?._id;
@@ -144,7 +93,11 @@ async function loadDrawer() {
     if (!row) {
       formModel.value = emptyForm();
       channelIds.value = [];
-      applyBaseFieldList(await fetchDefaultTemplateFieldList());
+
+      // 底稿照旧拷贝（字段附加属性完整），但初始一个都不勾（锁定字段除外，其勾选框不可取消）
+      const draft = await fetchDefaultTemplateFieldList();
+      baseFieldList.value = draft;
+      fieldMapping.value = initialMappingOf(draft);
       return;
     }
 
@@ -216,13 +169,13 @@ async function handleSubmit() {
   <Drawer
     :show="show"
     :title="drawerTitle"
-    width="70%"
+    width="60%"
     :footer="true"
     :loading="loading || submitting"
     @update:show="value => emit('update:show', value)"
     @submit="handleSubmit"
   >
     <NFormWrap ref="formRef" :model="formModel" :items="formItems" :disabled="loading" />
-    <FieldMapping :nav-groups="navGroups" :model-value="fieldMapping" @update:model-value="fieldMapping = $event" />
+    <FieldMappingRow :nav-groups="navGroups" :model-value="fieldMapping" @update:model-value="fieldMapping = $event" />
   </Drawer>
 </template>

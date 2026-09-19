@@ -67,6 +67,27 @@ export function fieldListToMapping(fieldList?: Api.InputFormat.Field[]): Record<
   return mapping;
 }
 
+/**
+ * 底稿 → 编辑器模型（新增态：默认一个都不勾）
+ *
+ * 用于「新增」：底稿仍整体保留以保证字段附加属性完整，但初始勾选为空。
+ * 唯一例外是 `disabled === true` 的锁定项 —— 锁定项在编辑器里勾选框不可取消，
+ * 且 `mappingToFieldList` 对锁定项强制保留，初始不勾会造成「看着没选、保存却被带上」的错位。
+ */
+export function initialMappingOf(fieldList?: Api.InputFormat.Field[]): Record<string, FieldMappingValue> {
+  const checkedKeys = new Set(
+    (fieldList ?? []).filter(item => item.disabled === true).map(item => fieldKeyOf(item.fieldType, item.key))
+  );
+
+  const result: Record<string, FieldMappingValue> = {};
+  Object.entries(fieldListToMapping(fieldList)).forEach(([groupKey, value]) => {
+    const show = value.show.filter(key => checkedKeys.has(`${groupKey}:${key}`));
+    if (show.length) result[groupKey] = { show, required: value.required.filter(key => show.includes(key)) };
+  });
+
+  return result;
+}
+
 /** 取某分组在编辑器模型里的勾选值（缺省视为全空） */
 function groupMappingOf(mapping: Record<string, FieldMappingValue>, groupKey: string): FieldMappingValue {
   return mapping[groupKey] ?? { show: [], required: [] };

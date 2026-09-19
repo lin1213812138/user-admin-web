@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { $t } from '@/locales';
+import { useRouterPush } from '@/hooks/common/router';
 import { useLabelDesignStore } from '@/store/modules/label-design';
 import { dimensionsToSizeType } from '@/service/api/print-format/size-map';
 import { mmToPt, paperOfSizeType, parsePaper } from './modules/core/constant';
@@ -18,6 +19,8 @@ import PreviewModal from './modules/panels/preview-modal.vue';
 
 const store = useLabelDesignStore();
 const route = useRoute();
+const router = useRouter();
+const { routerPushByKey } = useRouterPush();
 const previewVisible = ref(false);
 
 /** 打印格式列表「设计」带 query.id 进来时直接打开该模板；无 id（手输地址/调试）回退到首个模板 */
@@ -33,8 +36,7 @@ async function loadTemplates() {
   const { data: res } = await fetchGetPrintTemplateList({ page: 1, size: 100 });
   templates.value = (res?.list ?? []).map(r => ({ label: r.name, value: r._id }));
   if (templates.value.length > 0 && currentId.value === null) {
-    currentId.value = templates.value[0].value;
-    await loadTemplate(currentId.value);
+    await applyTemplate(templates.value[0].value, templates.value[0].label);
   }
 }
 
@@ -43,6 +45,8 @@ async function loadTemplate(id: string) {
   try {
     const { data: detail, error } = await fetchGetPrintTemplateDetail(id);
     if (error || !detail) throw new Error('template not found');
+    // 加载期间又切了别的模板：丢弃过期结果，避免旧响应覆盖新模板
+    if (currentId.value !== id) return;
     currentTemplate.value = detail;
     // 标题以详情为准回填，详情缺名称时保留 query 带入的名字
     currentName.value = detail.name || currentName.value;
@@ -50,11 +54,20 @@ async function loadTemplate(id: string) {
     const { design } = detail;
     store.loadFromJson(typeof design === 'string' ? design : design ? JSON.stringify(design) : '');
     store.setPaper(paperOfSizeType(detail.sizeType, detail.width, detail.height));
+    // 详情加载完成 = 与库中版本一致：确立「已保存」基线、清除修改标记（setPaper 会标脏）
+    store.markSaved();
   } catch {
-    window.$message?.error($t('page.manage.labelDesign.loadFailed'));
+    if (currentId.value === id) window.$message?.error($t('page.manage.labelDesign.loadFailed'));
   } finally {
-    loading.value = false;
+    if (currentId.value === id) loading.value = false;
   }
+}
+
+/** 打开指定模板：同步当前 id/名称并拉取详情（首次进入与列表再次点「设计」切换模板共用） */
+async function applyTemplate(id: string, name = '') {
+  currentId.value = id;
+  currentName.value = name;
+  await loadTemplate(id);
 }
 
 async function handleSave() {
@@ -78,6 +91,7 @@ async function handleSave() {
       design
     });
     if (!error) {
+      store.markSaved();
       window.$message?.success($t('page.manage.labelDesign.saveSuccess'));
     } else {
       window.$message?.error($t('page.manage.labelDesign.saveFailed'));
@@ -88,6 +102,80 @@ async function handleSave() {
     loading.value = false;
   }
 }
+
+/**
+ * 「有未保存修改」确认弹窗（返回与切换模板共用同一套文案）
+ * @param onConfirm 确认放弃修改后执行
+ * @param onCancel 取消后执行
+ * @param onAfterLeave 弹窗关闭后执行（不论确认/取消，用于解除防重入）
+ */
+function confirmUnsaved(onConfirm: () => void, onCancel?: () => void, onAfterLeave?: () => void) {
+  window.$dialog?.warning({
+    title: $t('page.manage.labelDesign.unsavedTitle'),
+    content: $t('page.manage.labelDesign.unsavedContent'),
+    positiveText: $t('common.confirm'),
+    negativeText: $t('common.cancel'),
+    onPositiveClick: onConfirm,
+    onNegativeClick: onCancel,
+    onAfterLeave
+  });
+}
+
+/** 返回「系统设置 → 打印格式」分页；有未保存修改时先确认，确认后还原为已保存版本再离开 */
+function handleBack() {
+  const leave = () => void routerPushByKey('system-manage_setting', { query: { tab: 'print-format' } });
+
+  if (!store.dirty) {
+    leave();
+    return;
+  }
+
+  confirmUnsaved(() => {
+    store.revert();
+    leave();
+  });
+}
+
+/** 切换模板确认弹窗的防重入标记（连续点多条「设计」时只处理一次） */
+let switchConfirming = false;
+
+/**
+ * 打印格式列表再次点「设计」只会改 query.id，被 keep-alive 缓存的实例不会重新挂载，
+ * 这里监听 id 变化重载对应模板；同一条模板重复点「设计」保留当前编辑内容（id 相同直接返回）。
+ */
+watch(
+  () => route.query.id,
+  () => {
+    // 离开设计器时 query.id 也会变化，只处理本页的导航
+    if (route.name !== 'system-manage_label-designer') return;
+
+    const id = String(route.query.id ?? '');
+    if (!id || id === currentId.value) return;
+
+    if (!store.dirty) {
+      void applyTemplate(id, String(route.query.name ?? ''));
+      return;
+    }
+
+    if (switchConfirming) return;
+    switchConfirming = true;
+    confirmUnsaved(
+      () => {
+        // 弹窗期间路由可能又切了别的模板，以确认时刻的地址为准
+        const targetId = String(route.query.id ?? '');
+        if (!targetId || targetId === currentId.value) return;
+        void applyTemplate(targetId, String(route.query.name ?? ''));
+      },
+      () => {
+        // 取消：URL 回滚到仍在编辑的模板，保持地址与画布一致（回滚触发的 watch 因 id 相同直接返回）
+        void router.replace({ query: { ...route.query, id: currentId.value, name: currentName.value } });
+      },
+      () => {
+        switchConfirming = false;
+      }
+    );
+  }
+);
 
 function toggleBodyScroll(disable: boolean) {
   document.body.classList.toggle('label-designer-no-scroll', disable);
@@ -209,6 +297,7 @@ onBeforeUnmount(() => {
       :loading="loading"
       @save="handleSave"
       @preview="previewVisible = true"
+      @back="handleBack"
     />
 
     <div class="flex flex-1 overflow-hidden">

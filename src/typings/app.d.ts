@@ -334,6 +334,7 @@ declare namespace App {
         close: string;
         check: string;
         selectAll: string;
+        clear: string;
         unselectAll: string;
         expandColumn: string;
         columnSetting: string;
@@ -994,6 +995,7 @@ declare namespace App {
               order: string;
               yes: string;
               no: string;
+              setDefault: string;
               newTitle: string;
               editTitle: string;
               namePlaceholder: string;
@@ -1215,6 +1217,13 @@ declare namespace App {
             };
             fieldMapping: string;
             fieldMappingRequired: string;
+            fieldMappingSummary: string;
+            fieldMappingCounts: string;
+            fieldMappingGroupAll: string;
+            fieldMappingSearchPlaceholder: string;
+            fieldMappingOnlyShown: string;
+            fieldMappingNoMatch: string;
+            fieldMappingLockedTip: string;
           };
           printDesign: {
             title: string;
@@ -1338,6 +1347,8 @@ declare namespace App {
             saveFailed: string;
             loadFailed: string;
             selectTemplate: string;
+            unsavedTitle: string;
+            unsavedContent: string;
           };
         };
         order: {

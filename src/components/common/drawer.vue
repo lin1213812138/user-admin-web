@@ -21,8 +21,10 @@ interface Props {
   confirmText?: string;
   /** cancel button text */
   cancelText?: string;
-  /** whether to close on mask click / esc */
+  /** whether to close on mask click */
   closeOnMask?: boolean;
+  /** whether to close on esc */
+  closeOnEsc?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,7 +35,8 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   confirmText: '',
   cancelText: '',
-  closeOnMask: false
+  closeOnMask: true,
+  closeOnEsc: false
 });
 
 const emit = defineEmits<{
@@ -61,7 +64,7 @@ function handleSubmit() {
     :show="show"
     :width="drawerWidth"
     :mask-closable="closeOnMask"
-    :close-on-esc="closeOnMask"
+    :close-on-esc="closeOnEsc"
     display-directive="show"
     @update:show="handleUpdateShow"
   >

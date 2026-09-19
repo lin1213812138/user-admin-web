@@ -42,6 +42,20 @@ export function fetchUpdateInputFormat(params: Api.InputFormat.SaveParams & { _i
   });
 }
 
+/**
+ * 列表快捷操作（停用/启用、设为默认）
+ *
+ * 与 fetchUpdateInputFormat 同一个后端接口，但只提交 `_id + name + 目标字段`（部分更新）。
+ * `name` 必须随行回传：后端以 name 为唯一键做重名校验，缺省会误判为「已存在」，详见 PatchParams 注释。
+ */
+export function fetchPatchInputFormat(params: Api.InputFormat.PatchParams) {
+  return request<boolean>({
+    url: '/order-template/update',
+    method: 'post',
+    data: params
+  });
+}
+
 /** 删除录单格式（真实接口 /order-template/delete，仅支持单条 _id） */
 export function fetchDeleteInputFormat(_id: string) {
   return request<boolean>({
