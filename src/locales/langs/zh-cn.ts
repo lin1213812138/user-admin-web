@@ -16,6 +16,7 @@ const local: App.I18n.Schema = {
     submitModify: '提交修改',
     backToHome: '返回首页',
     batchDelete: '批量删除',
+    batchDisable: '批量停用',
     cancel: '取消',
     close: '关闭',
     check: '勾选',
@@ -1171,15 +1172,70 @@ const local: App.I18n.Schema = {
         },
         expenseType: {
           title: '费用类型',
-          code: '类型编码',
-          name: '类型名称',
-          form: { codePlaceholder: '请输入类型编码', namePlaceholder: '请输入类型名称' }
+          name: '费用名称',
+          scope: '使用范围',
+          order: '排序',
+          builtIn: '内置',
+          creator: '创建人',
+          createTime: '创建时间',
+          builtInDisableTip: '系统内置费用类型不可停用',
+          scopeOptions: {
+            orderRec: '运单应收',
+            orderPay: '运单应付',
+            blPay: '提单应付',
+            otherPay: '杂支应付',
+            otherRec: '杂支应收'
+          },
+          form: {
+            namePlaceholder: '请输入费用名称',
+            scopePlaceholder: '请选择使用范围',
+            orderPlaceholder: '请输入排序',
+            statusPlaceholder: '请选择状态',
+            notePlaceholder: '请输入备注',
+            keywordPlaceholder: '请输入费用名称'
+          }
         },
         settlement: {
           title: '结算方式',
-          name: '方式名称',
-          period: '结算周期',
-          form: { namePlaceholder: '请输入方式名称' }
+          name: '结算名称',
+          order: '排序',
+          billPeriod: '结算周期',
+          billDay: '结算日期',
+          billGenStatus: '关联运单状态',
+          builtIn: '内置',
+          creator: '创建人',
+          createTime: '创建时间',
+          builtInDisableTip: '系统内置结算方式不可停用',
+          periodOptions: { day: '每天', week: '每周', month: '每月' },
+          billDayOptions: {
+            hour: '{n}时',
+            week1: '周一',
+            week2: '周二',
+            week3: '周三',
+            week4: '周四',
+            week5: '周五',
+            week6: '周六',
+            week7: '周日',
+            monthDay: '{n}日',
+            last: '最后一天'
+          },
+          genStatusOptions: {
+            forecast: '已预报',
+            received: '已收货',
+            outbound: '已出库',
+            transit: '转运中',
+            delivered: '已送达'
+          },
+          form: {
+            namePlaceholder: '请输入结算名称',
+            orderPlaceholder: '请输入排序',
+            billPeriodPlaceholder: '请选择结算周期',
+            billDayPlaceholder: '请选择结算日期',
+            billGenStatusPlaceholder: '请选择关联运单状态',
+            statusPlaceholder: '请选择状态',
+            notePlaceholder: '请输入备注',
+            keywordPlaceholder: '请输入结算名称'
+          }
         }
       },
       business: {

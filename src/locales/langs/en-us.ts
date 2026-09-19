@@ -16,6 +16,7 @@ const local: App.I18n.Schema = {
     submitModify: 'Submit Changes',
     backToHome: 'Back to home',
     batchDelete: 'Batch Delete',
+    batchDisable: 'Batch Disable',
     cancel: 'Cancel',
     close: 'Close',
     check: 'Check',
@@ -1176,15 +1177,70 @@ const local: App.I18n.Schema = {
         },
         expenseType: {
           title: 'Expense Type',
-          code: 'Type Code',
-          name: 'Type Name',
-          form: { codePlaceholder: 'Enter type code', namePlaceholder: 'Enter type name' }
+          name: 'Fee Name',
+          scope: 'Usage Scope',
+          order: 'Order',
+          builtIn: 'Built-in',
+          creator: 'Creator',
+          createTime: 'Created At',
+          builtInDisableTip: 'Built-in fee types cannot be disabled',
+          scopeOptions: {
+            orderRec: 'Order Receivable',
+            orderPay: 'Order Payable',
+            blPay: 'B/L Payable',
+            otherPay: 'Other Payable',
+            otherRec: 'Other Receivable'
+          },
+          form: {
+            namePlaceholder: 'Enter fee name',
+            scopePlaceholder: 'Select usage scope',
+            orderPlaceholder: 'Enter order',
+            statusPlaceholder: 'Select status',
+            notePlaceholder: 'Enter remark',
+            keywordPlaceholder: 'Enter fee name'
+          }
         },
         settlement: {
           title: 'Settlement',
-          name: 'Method Name',
-          period: 'Period',
-          form: { namePlaceholder: 'Enter method name' }
+          name: 'Settlement Name',
+          order: 'Order',
+          billPeriod: 'Billing Period',
+          billDay: 'Billing Day',
+          billGenStatus: 'Related Order Status',
+          builtIn: 'Built-in',
+          creator: 'Creator',
+          createTime: 'Created At',
+          builtInDisableTip: 'Built-in settlement methods cannot be disabled',
+          periodOptions: { day: 'Daily', week: 'Weekly', month: 'Monthly' },
+          billDayOptions: {
+            hour: '{n}:00',
+            week1: 'Monday',
+            week2: 'Tuesday',
+            week3: 'Wednesday',
+            week4: 'Thursday',
+            week5: 'Friday',
+            week6: 'Saturday',
+            week7: 'Sunday',
+            monthDay: 'Day {n}',
+            last: 'Last day'
+          },
+          genStatusOptions: {
+            forecast: 'Forecasted',
+            received: 'Received',
+            outbound: 'Outbound',
+            transit: 'In Transit',
+            delivered: 'Delivered'
+          },
+          form: {
+            namePlaceholder: 'Enter settlement name',
+            orderPlaceholder: 'Enter order',
+            billPeriodPlaceholder: 'Select billing period',
+            billDayPlaceholder: 'Select billing day',
+            billGenStatusPlaceholder: 'Select related order status',
+            statusPlaceholder: 'Select status',
+            notePlaceholder: 'Enter remark',
+            keywordPlaceholder: 'Enter settlement name'
+          }
         }
       },
       business: {

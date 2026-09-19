@@ -330,6 +330,7 @@ declare namespace App {
         submitModify: string;
         backToHome: string;
         batchDelete: string;
+        batchDisable: string;
         cancel: string;
         close: string;
         check: string;
@@ -1426,15 +1427,70 @@ declare namespace App {
             };
             expenseType: {
               title: string;
-              code: string;
               name: string;
-              form: { codePlaceholder: string; namePlaceholder: string };
+              scope: string;
+              order: string;
+              builtIn: string;
+              creator: string;
+              createTime: string;
+              builtInDisableTip: string;
+              scopeOptions: {
+                orderRec: string;
+                orderPay: string;
+                blPay: string;
+                otherPay: string;
+                otherRec: string;
+              };
+              form: {
+                namePlaceholder: string;
+                scopePlaceholder: string;
+                orderPlaceholder: string;
+                statusPlaceholder: string;
+                notePlaceholder: string;
+                keywordPlaceholder: string;
+              };
             };
             settlement: {
               title: string;
               name: string;
-              period: string;
-              form: { namePlaceholder: string };
+              order: string;
+              billPeriod: string;
+              billDay: string;
+              billGenStatus: string;
+              builtIn: string;
+              creator: string;
+              createTime: string;
+              builtInDisableTip: string;
+              periodOptions: { day: string; week: string; month: string };
+              billDayOptions: {
+                hour: string;
+                week1: string;
+                week2: string;
+                week3: string;
+                week4: string;
+                week5: string;
+                week6: string;
+                week7: string;
+                monthDay: string;
+                last: string;
+              };
+              genStatusOptions: {
+                forecast: string;
+                received: string;
+                outbound: string;
+                transit: string;
+                delivered: string;
+              };
+              form: {
+                namePlaceholder: string;
+                orderPlaceholder: string;
+                billPeriodPlaceholder: string;
+                billDayPlaceholder: string;
+                billGenStatusPlaceholder: string;
+                statusPlaceholder: string;
+                notePlaceholder: string;
+                keywordPlaceholder: string;
+              };
             };
           };
           business: {

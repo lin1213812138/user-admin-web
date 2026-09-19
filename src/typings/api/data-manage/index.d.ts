@@ -16,8 +16,6 @@ declare namespace Api {
       | 'fbaWarehouse'
       | 'account'
       | 'currency'
-      | 'expense-type'
-      | 'settlement'
       | 'address'
       | 'declaredGoods'
       | 'problemCategory'

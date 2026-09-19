@@ -1,13 +1,13 @@
 import { request } from '../../request';
 
 /**
- * 业务资料(business) + 财务资料(finance) 共 12 个档案的独立接口。
+ * 业务资料(business) + 财务资料(finance) 档案的独立接口
+ * （费用类型 → service/api/fee-type、结算方式 → service/api/bill-mode 均已改走真实接口）。
  *
  * - 后端 api-v1-web 已存在路由的 7 个（currency / sales-terms / export-reason / customs-type /
  *   problem-category / goods-category / clearance-method(=customs-clear)）走真实 request，调用方需解包
  *   { data, error }（与 basic/bl/ship/no-rule 一致）；list 均显式 current→page 映射且 status 拼 where。
- * - 后端暂未实现的 5 个（account / settlement / address / declared-goods /
- *   expense-type）暂走本地 mock 兜底，返回结构与真实接口一致
+ * - 后端暂未实现的 2 个（account / declared-goods）暂走本地 mock 兜底，返回结构与真实接口一致
  *   （{ list, total } + _id），将来后端补好路由后只需把对应函数体从 mock 改为 request 即可，零成本切换。
  *
  * 通用分页契约：{ current, size, keyword, status } → { list, total }；
@@ -287,15 +287,6 @@ const factories: Partial<Record<Api.DataManage.DataManageArchiveKey, RowFactory>
       remark: '',
       createTime: `2026-0${(i % 9) + 1}-05 13:00:00`
     }) as unknown as Api.DataManage.MasterDataRow,
-  settlement: i =>
-    ({
-      _id: `ST${i}`,
-      name: `结算方式${i}`,
-      period: i % 2 === 0 ? '月结' : '现结',
-      status: 1,
-      remark: '',
-      createTime: `2026-0${(i % 9) + 1}-08 16:00:00`
-    }) as unknown as Api.DataManage.MasterDataRow,
   declaredGoods: i =>
     ({
       _id: `DG${i}`,
@@ -304,15 +295,6 @@ const factories: Partial<Record<Api.DataManage.DataManageArchiveKey, RowFactory>
       status: i % 5 === 0 ? 0 : 1,
       remark: '',
       createTime: `2026-0${(i % 9) + 1}-11 19:00:00`
-    }) as unknown as Api.DataManage.MasterDataRow,
-  'expense-type': i =>
-    ({
-      _id: `ET${i}`,
-      code: `ET${String(i).padStart(3, '0')}`,
-      name: `费用类型${i}`,
-      status: 1,
-      remark: '',
-      createTime: `2026-0${(i % 9) + 1}-07 15:00:00`
     }) as unknown as Api.DataManage.MasterDataRow
 };
 
@@ -427,18 +409,6 @@ export const archiveApiMap: Partial<Record<Api.DataManage.DataManageArchiveKey, 
     create: fetchCreateCurrency,
     update: fetchUpdateCurrency,
     remove: fetchDeleteCurrency
-  },
-  'expense-type': {
-    list: (p: Api.DataManage.ArchiveSearchParams) => mockList('expense-type', p),
-    create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('expense-type', p),
-    update: (p: Api.DataManage.MasterDataRow) => mockUpdate('expense-type', p),
-    remove: (ids: string[]) => mockDelete('expense-type', ids)
-  },
-  settlement: {
-    list: (p: Api.DataManage.ArchiveSearchParams) => mockList('settlement', p),
-    create: (p: Partial<Api.DataManage.MasterDataRow>) => mockCreate('settlement', p),
-    update: (p: Api.DataManage.MasterDataRow) => mockUpdate('settlement', p),
-    remove: (ids: string[]) => mockDelete('settlement', ids)
   },
   account: {
     list: (p: Api.DataManage.ArchiveSearchParams) => mockList('account', p),

@@ -687,12 +687,19 @@ declare namespace Api {
       total: number;
     };
 
-    /** 结算方式字典（/bill-mode/query） */
+    /**
+     * 结算方式（tms-user BillMode，真实接口 /bill-mode/*；客户结算方式字典与财务资料管理页共用）
+     *
+     * 与费用类型同理：无 delete 路由（只有 /bill-mode/disable 批量停用，后端自身会跳过内置行）；
+     * 查询必须传 scene，否则后端强制 where.status = 1（只能查到「使用中」的记录）。
+     */
     interface BillModeItem {
       _id: string;
-      /** 结算名称 */
+      /** 结算名称（必填，后端按 name 唯一） */
       name: string;
-      /** 系统类型 1-天结 2-周结 3-月结 4-签收结 5-现结 6-到付 */
+      /** 排序 */
+      order?: number;
+      /** 系统类型 1-天结 2-周结 3-月结 4-签收结 5-现结 6-到付（不在管理页展示/编辑） */
       sysType?: number;
       /** 结算周期 0-每天 1-每周 2-每月 */
       billPeriod?: number;
@@ -700,19 +707,47 @@ declare namespace Api {
       billDay?: number;
       /** 关联运单状态 0-已预报 1-已收货 2-已出库 3-转运中 4-已送达 */
       billGenStatus?: number[];
-      /** 是否内置 0-否 1-是 */
+      /** 是否内置 0-否 1-是（内置项不可停用，update 也只接受 note/status） */
       buildIn?: number;
       /** 状态 0-未启用 1-使用中 */
       status?: Api.Common.EnableStatus;
+      /** 备注 */
+      note?: string;
+      creatorId?: string;
+      /** 创建人名称 */
+      creator?: string;
       createDate?: number;
       updateDate?: number;
+      /** 列表展示用：createDate 格式化后的创建时间（前端 transform 生成） */
+      createTime?: string;
     }
 
-    /** 结算方式字典列表 */
+    /** 结算方式字典列表（/bill-mode/query 返回结构） */
     type BillModeList = {
       list: BillModeItem[];
       total: number;
     };
+
+    /** 结算方式列表查询参数（管理页用；status 为 null 表示不过滤，scene 由接口层恒定传入） */
+    interface BillModeSearchParams {
+      current: number;
+      size: number;
+      /** 关键字（后端 keywordFields 固定 ['name']） */
+      keyword?: string;
+      /** 状态筛选（必须与 scene 一起传，否则后端强制 status=1） */
+      status?: Api.Common.EnableStatus | null;
+    }
+
+    /** 结算方式新增/编辑入参（/bill-mode/create|update，update 需 _id） */
+    interface BillModeSaveParams {
+      name: string;
+      order: number;
+      billPeriod?: number | null;
+      billDay?: number | null;
+      billGenStatus: number[];
+      status: Api.Common.EnableStatus;
+      note?: string;
+    }
 
     /** 客户地址（tms-user ShipTo/Shipper 共有结构，/ship-to/*、/shipper/*；发件侧仅字段注释不同） */
     interface CustomerAddress {
