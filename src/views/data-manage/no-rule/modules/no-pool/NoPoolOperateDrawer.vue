@@ -1,82 +1,131 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref, computed, watch } from 'vue';
+import type { SelectOption } from 'naive-ui';
 import { $t } from '@/locales';
 import Drawer from '@/components/common/drawer.vue';
 import NFormWrap, { type FormItemConfig } from '@/components/Form/index.vue';
-import { fetchCreateNoPool, fetchUpdateNoPool, type NoPool as NoPoolItem } from '@/service/api/data-manage-no-rule';
+import { fetchImportNoPool } from '@/service/api/data-manage-no-rule';
+import { fetchGetChannelList } from '@/service/api/channel';
+import { fetchGetChannelOutList } from '@/service/api/channel-out';
 
 const emit = defineEmits<{
   submitted: [];
 }>();
 
-const refTypeOptions = [
-  { label: '收货渠道', value: 0 },
-  { label: '发货渠道', value: 1 },
-  { label: '派送渠道', value: 2 }
-];
-
 const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit'>('create');
 const submitting = ref(false);
-const formModel = ref<Partial<NoPoolItem>>(emptyForm());
+const formModel = ref<Api.NoPool.ImportForm>({
+  refType: 0,
+  channel: null,
+  noText: ''
+});
 const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
-function emptyForm(): Partial<NoPoolItem> {
-  return { no: '', refId: '', refType: 0, status: 1, note: '' };
-}
-const drawerTitle = computed(() => `${$t(drawerMode.value === 'create' ? 'common.add' : 'common.edit')}运单号码池`);
+const channelOptions = ref<SelectOption[]>([]);
+
+const drawerTitle = computed(() => $t('page.dataManage.noRule.noPool.importTitle'));
+
 const formItems = computed<FormItemConfig[]>(() => [
-  { key: 'no', label: '号码', type: 'input', required: true, span: 24 },
-  { key: 'refId', label: '收发货渠道', type: 'input', required: true, span: 24 },
-  { key: 'refType', label: '关联类型', type: 'select', required: true, span: 24, options: refTypeOptions },
   {
-    key: 'status',
-    label: $t('common.status'),
-    type: 'switch',
+    key: 'refType',
+    label: $t('page.dataManage.noRule.noPool.channelType'),
+    type: 'select',
+    required: true,
     span: 24,
-    checkedValue: 1,
-    uncheckedValue: 0,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
+    // 关联类型必填且联动渠道数据源，不允许清空
+    clearable: false,
+    optionsKey: 'noPoolRefType'
   },
-  { key: 'note', label: $t('common.remark'), type: 'textarea', span: 24 }
+  {
+    key: 'channel',
+    label: $t('page.dataManage.noRule.noPool.channel'),
+    type: 'select',
+    required: true,
+    span: 24,
+    filterable: true,
+    placeholder: $t('page.dataManage.noRule.noPool.channelPlaceholder'),
+    options: channelOptions.value
+  },
+  {
+    key: 'noText',
+    label: $t('page.dataManage.noRule.noPool.no'),
+    type: 'textarea',
+    required: true,
+    span: 24,
+    rows: 8,
+    placeholder: $t('page.dataManage.noRule.noPool.noPlaceholder')
+  }
 ]);
-function openCreate() {
-  drawerMode.value = 'create';
-  formModel.value = emptyForm();
+
+async function loadChannelOptions(refType: Api.NoPool.RefType) {
+  channelOptions.value = [];
+  formModel.value.channel = null;
+  try {
+    if (refType === 0) {
+      const { data, error } = await fetchGetChannelList({ page: 1, size: 9999 });
+      if (!error && data) {
+        channelOptions.value = data.list.map(item => ({ label: item.name, value: item._id }));
+      }
+    } else {
+      const { data, error } = await fetchGetChannelOutList({
+        page: 1,
+        size: 9999,
+        channelType: refType === 2 ? 1 : 0
+      });
+      if (!error && data) {
+        channelOptions.value = data.list.map(item => ({ label: item.name, value: item._id }));
+      }
+    }
+  } catch {
+    channelOptions.value = [];
+  }
+}
+
+watch(
+  () => formModel.value.refType,
+  val => loadChannelOptions(val)
+);
+
+function openImport() {
+  formModel.value = { refType: 0, channel: null, noText: '' };
+  channelOptions.value = [];
+  loadChannelOptions(0);
   formRef.value?.restoreValidation();
   drawerVisible.value = true;
 }
-function openEdit(row: NoPoolItem) {
-  drawerMode.value = 'edit';
-  formModel.value = {
-    _id: row._id,
-    no: row.no,
-    refId: row.refId,
-    refType: row.refType,
-    status: row.status ?? 1,
-    note: row.note ?? ''
-  };
-  formRef.value?.restoreValidation();
-  drawerVisible.value = true;
-}
+
 async function handleDrawerSubmit() {
   const ok = await formRef.value?.validate();
   if (!ok) return;
+  // 渠道必填校验已拦截，这里仅做类型收窄
+  const channel = formModel.value.channel;
+  if (!channel) return;
+  const raw = (formModel.value.noText || '')
+    .split(/\r?\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
+  if (raw.length === 0) {
+    window.$message?.warning($t('page.dataManage.noRule.noPool.emptyTip'));
+    return;
+  }
+  const dedup = [...new Set(raw)];
+  const list: Api.NoPool.ImportItem[] = dedup.map(no => ({
+    no,
+    refId: channel,
+    refType: formModel.value.refType
+  }));
   submitting.value = true;
   try {
-    const { error } =
-      drawerMode.value === 'create'
-        ? await fetchCreateNoPool(formModel.value)
-        : await fetchUpdateNoPool(formModel.value);
+    const { error } = await fetchImportNoPool(list);
     if (error) return;
     drawerVisible.value = false;
     emit('submitted');
-    window.$message?.success($t(drawerMode.value === 'create' ? 'common.createSuccess' : 'common.saveSuccess'));
+    window.$message?.success($t('page.dataManage.noRule.noPool.importSuccess', { count: dedup.length }));
   } finally {
     submitting.value = false;
   }
 }
-defineExpose({ openCreate, openEdit });
+
+defineExpose({ openImport });
 </script>
 
 <template>

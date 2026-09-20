@@ -3,8 +3,8 @@ import { computed, ref } from 'vue';
 import type { Component } from 'vue';
 import { $t } from '@/locales';
 import VerticalTabLayout from '@/components/VerticalTabLayout/index.vue';
-import ProfileInfo from './modules/profile-info/ProfileInfo.vue';
-import ChangePassword from './modules/change-password/ChangePassword.vue';
+import ProfileInfo from './modules/profile-info/index.vue';
+import ChangePassword from './modules/change-password/index.vue';
 
 defineOptions({
   name: 'PersonalCenter'

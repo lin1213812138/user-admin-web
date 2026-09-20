@@ -12,3 +12,10 @@ import { getGlobalOptions } from '@/constants/options';
 export function useStatusOptions() {
   return computed<SelectOption[]>(() => getGlobalOptions('status'));
 }
+
+/**
+ * 运单号码池「关联类型」选项（值 0-收货渠道 1-发货渠道 2-派送渠道）。
+ */
+export function useNoPoolRefTypeOptions() {
+  return computed<SelectOption[]>(() => getGlobalOptions('noPoolRefType'));
+}

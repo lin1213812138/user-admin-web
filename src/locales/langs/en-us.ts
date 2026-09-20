@@ -17,6 +17,7 @@ const local: App.I18n.Schema = {
     submitModify: 'Submit Changes',
     backToHome: 'Back to home',
     batchDelete: 'Batch Delete',
+    batchRemove: 'Batch Remove',
     batchDisable: 'Batch Disable',
     batchDisableSuccess: 'Batch disabled successfully',
     cancel: 'Cancel',
@@ -76,6 +77,7 @@ const local: App.I18n.Schema = {
     keyword: 'Keyword',
     status: 'Status',
     remark: 'Remark',
+    none: 'None',
     logout: 'Logout',
     logoutConfirm: 'Are you sure you want to log out?',
     lookForward: 'Coming soon',
@@ -326,6 +328,7 @@ const local: App.I18n.Schema = {
     'system-manage_label-designer': 'Label Designer',
     'channel-quote': 'Channel Quote',
     'channel-quote_receive': 'Receive Channel',
+    'channel-quote_receive_quote-setting': 'Quote Setting',
     'channel-quote_ship': 'Ship Channel',
     'personal-center': 'Personal Center'
   },
@@ -1442,7 +1445,27 @@ const local: App.I18n.Schema = {
       noRule: {
         title: 'Number Rule',
         itemNoRule: { title: 'Sub Number Rule' },
-        noPool: { title: 'Waybill Number Pool' },
+        noPool: {
+          title: 'Waybill Number Pool',
+          import: 'Import',
+          importTitle: 'Import Waybill Numbers',
+          channelType: 'Related Type',
+          channel: 'Specific Channel',
+          channelPlaceholder: 'Select a specific channel',
+          no: 'Waybill Numbers',
+          noPlaceholder: 'Paste waybill numbers here, one per line',
+          emptyTip: 'Please enter at least one waybill number',
+          importSuccess: 'Successfully imported {count} waybill numbers',
+          noTitle: 'Waybill Number',
+          channelName: 'Channel Name',
+          refType: 'Channel Type',
+          pickBy: 'Picker',
+          pickDate: 'Pick Time',
+          creator: 'Creator',
+          createDate: 'Entry Time',
+          picked: 'Picked',
+          unpicked: 'Unpicked'
+        },
         longNoRule: { title: 'Long Number Truncate' },
         name: 'Name',
         prefix: 'Prefix',
@@ -1546,7 +1569,40 @@ const local: App.I18n.Schema = {
           feeCustom: 'Customs Fee',
           cubicNum: 'Cubic Divisor',
           weightOff: 'Volumetric Ratio',
-          order: 'Order'
+          order: 'Order',
+          syncChannel: 'Sync Channel',
+          feeExt: 'Surcharge',
+          feeExtDrawer: {
+            title: 'Surcharge',
+            addBtn: 'Add Surcharge',
+            syncToChannel: 'Sync to Channels',
+            needFeeExt: 'Select fees to sync first',
+            needChannel: 'Select channels to sync first',
+            emptyChannel: 'No channels linked to this carrier',
+            col: {
+              name: 'Fee Name',
+              country: 'Country/Region',
+              type: 'Type',
+              condition: 'Condition',
+              price: 'Price'
+            }
+          },
+          sync: {
+            title: 'Sync to Receive Channels',
+            oriOilRate: 'Original Fuel Rate',
+            newOilRate: 'New Fuel Rate',
+            oriFeeCustom: 'Original Customs Fee',
+            newFeeCustom: 'New Customs Fee',
+            oriWeightRule: 'Original Weight Rule',
+            newWeightRule: 'New Weight Rule',
+            oriWeightOff: 'Original Volumetric Ratio',
+            newWeightOff: 'New Volumetric Ratio',
+            oriRemoteGroup: 'Original Remote Group',
+            newRemoteGroup: 'New Remote Group',
+            remove: 'Remove',
+            emptyChannel: 'No channels to sync',
+            needField: 'Select at least one field to sync'
+          }
         }
       }
     },
@@ -1559,13 +1615,133 @@ const local: App.I18n.Schema = {
         title: 'Receive Channel',
         code: 'Channel Code',
         name: 'Channel Name',
-        form: { codePlaceholder: 'Please enter channel code', namePlaceholder: 'Please enter channel name' }
+        basicInfo: 'Basic Info',
+        note: 'Channel Remark',
+        bindOrderTemplate: 'Bind Order Template',
+        orderTemplate: 'Order Template',
+        orderTemplatePlaceholder: 'Please select',
+        form: {
+          codePlaceholder: 'Auto-generated when left empty',
+          namePlaceholder: 'Please enter channel name',
+          carrier: 'Carrier Network',
+          carrierTooltip: 'Carrier network this channel belongs to',
+          channelGroup: 'Channel Category',
+          noRule: 'Inner No. Rule',
+          itemNoRule: 'Sub No. Rule',
+          channelNoRule: 'Transfer No. Rule',
+          channelOut: 'Bound Ship Channel',
+          channelOutDisabledTip: 'Available only when Transfer No. Rule is "From Ship Channel"',
+          customsNoRule: 'Customs No. Rule',
+          labelTemplate: 'Label Template',
+          customerEnable: 'Member Order',
+          customerEnableAllow: 'Allow',
+          customerEnableClose: 'Close',
+          weightRule: 'Volumetric Rule',
+          remoteGroup: 'Remote Category',
+          oilRate: 'Fuel Rate',
+          feeCustom: 'Customs Fee',
+          site: 'Site',
+          productGroup: 'Goods Category',
+          routeGroup: 'Route Code',
+          tag: 'Channel Tag',
+          tagPlaceholder: 'Please enter channel feature',
+          notePlaceholder: 'Please enter channel remark'
+        }
       },
       ship: {
         title: 'Ship Channel',
         code: 'Channel Code',
         name: 'Channel Name',
         form: { codePlaceholder: 'Please enter channel code', namePlaceholder: 'Please enter channel name' }
+      },
+      quoteSetting: {
+        title: 'Quote Setting',
+        channelLabel: 'Channel',
+        noChannel: 'Please open quote setting from the receive channel list',
+        tabs: {
+          zone: 'Zone',
+          price: 'Channel Price',
+          feeExt: 'Surcharge',
+          customerPrice: 'Customer Price',
+          costPrice: 'Cost Price'
+        },
+        actions: {
+          editZone: 'Edit Zones',
+          importZone: 'Import Zones',
+          editPrice: 'Edit Price',
+          importPrice: 'Import Price',
+          addFeeExt: 'Add Surcharge',
+          addPrice: 'Add Price',
+          deletePrice: 'Delete Price'
+        },
+        search: {
+          zonePlaceholder: 'Enter country or 2-letter code',
+          feeExtPlaceholder: 'Enter surcharge name'
+        },
+        empty: {
+          noData: 'No Data',
+          noChannelPrice: 'No Channel Price'
+        },
+        zone: {
+          name: 'Zone',
+          destination: 'Destination',
+          aging: 'Aging (day)',
+          tip: 'Special Note'
+        },
+        feeExt: {
+          name: 'Surcharge Name',
+          country: 'Country/Region',
+          type: 'Surcharge Type',
+          condition: 'Condition',
+          fee: 'Fee',
+          addTitle: 'Add Surcharge',
+          editTitle: 'Edit Surcharge',
+          form: {
+            namePlaceholder: 'Select or enter a surcharge name',
+            countryPlaceholder: 'Select destination countries/regions',
+            pricePlaceholder: 'Enter surcharge fee',
+            notePlaceholder: 'Enter remark',
+            valuePlaceholder: 'Value',
+            exprLabel: 'Expression',
+            exprPlaceholder: 'Generated after filling the range',
+            conditionClear: 'Clear',
+            conditionNeedValue: 'Fill in at least one condition value',
+            strategyTip:
+              'By weight: weight × unit price; By ticket: fixed per ticket; By piece: unit price × pieces; By excess weight: (weight − start weight) × unit price',
+            strategyOption: {
+              byWeight: 'By Weight',
+              byTicket: 'By Ticket',
+              byItem: 'By Piece',
+              byWeightOver: 'By Excess Weight'
+            },
+            varTypeOption: {
+              none: 'Unconditional',
+              weight: 'Weight',
+              length: 'Length',
+              volume: 'Volume'
+            },
+            opOption: {
+              gt: 'Greater than',
+              gte: 'Greater or equal',
+              lt: 'Less than',
+              lte: 'Less or equal'
+            },
+            unitOption: {
+              weight: 'KG',
+              length: 'CM',
+              volume: 'CBM'
+            }
+          }
+        },
+        customerPrice: {
+          customer: 'Customer',
+          priceType: 'Price Type',
+          otherFee: 'Other Fee',
+          note: 'Price Remark',
+          latestEdit: 'Last Editor',
+          editTime: 'Edit Time',
+          createTime: 'Create Time'
+        }
       }
     },
     home: {
@@ -1653,6 +1829,13 @@ const local: App.I18n.Schema = {
       right: 'Right Fixed',
       unFixed: 'Unfixed'
     }
+  },
+  handsontable: {
+    required: 'Row {row}: "{title}" is required',
+    invalid: 'Row {row}: "{title}" has an invalid value',
+    invalidWithMessage: 'Row {row}: "{title}" {message}',
+    validateFailed: '{count} cell(s) failed validation',
+    summaryLead: 'Total'
   }
 };
 

@@ -17,6 +17,7 @@ declare module "@elegant-router/types" {
   export type RouteMap = {
     "root": "/";
     "not-found": "/:pathMatch(.*)*";
+    "channel-quote_receive_quote-setting": "/channel-quote/receive/quote-setting";
     "403": "/403";
     "404": "/404";
     "500": "/500";
@@ -66,6 +67,7 @@ declare module "@elegant-router/types" {
     RouteKey,
     | "root"
     | "not-found"
+    | "channel-quote_receive_quote-setting"
   >;
 
   /**
@@ -98,6 +100,7 @@ declare module "@elegant-router/types" {
     CustomRouteKey,
     | "root"
     | "not-found"
+    | "channel-quote_receive_quote-setting"
   >;
 
   /**
@@ -140,6 +143,7 @@ declare module "@elegant-router/types" {
     CustomRouteKey,
     | "root"
     | "not-found"
+    | "channel-quote_receive_quote-setting"
   >;
 
   /**

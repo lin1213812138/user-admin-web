@@ -56,6 +56,20 @@ export function fetchPatchInputFormat(params: Api.InputFormat.PatchParams) {
   });
 }
 
+/**
+ * 绑定 / 解绑收货渠道（部分更新 `channelIds`，收货渠道页「绑定录单格式」用）
+ *
+ * 与 fetchPatchInputFormat 同一接口同一约定：必须随行回传 `name`（后端 uniqField:'name' 重名校验，
+ * 缺失会误判「已存在」）；只提交 `_id + name + channelIds`，不动其它字段。
+ */
+export function fetchBindInputFormatChannels(params: Api.InputFormat.BindChannelsParams) {
+  return request<boolean>({
+    url: '/order-template/update',
+    method: 'post',
+    data: params
+  });
+}
+
 /** 删除录单格式（真实接口 /order-template/delete，仅支持单条 _id） */
 export function fetchDeleteInputFormat(_id: string) {
   return request<boolean>({

@@ -2,12 +2,12 @@
 import { $t } from '@/locales';
 import VerticalTabLayout from '@/components/VerticalTabLayout/index.vue';
 import { useArchiveTabs } from '@/views/data-manage/components/useArchiveTabs';
-import InputFormat from './modules/input-format/InputFormat.vue';
-import PrintFormat from './modules/print-format/PrintFormat.vue';
-import ExportFormat from './modules/export-format/ExportFormat.vue';
-import TraceCapture from './modules/trace-capture/TraceCapture.vue';
-import OperationTrace from './modules/operation-trace/OperationTrace.vue';
-import BasicConfig from './modules/basic-config/BasicConfig.vue';
+import InputFormat from './modules/input-format/index.vue';
+import PrintFormat from './modules/print-format/index.vue';
+import ExportFormat from './modules/export-format/index.vue';
+import TraceCapture from './modules/trace-capture/index.vue';
+import OperationTrace from './modules/operation-trace/index.vue';
+import BasicConfig from './modules/basic-config/index.vue';
 
 /**
  * 各子模块平铺为左侧 tab（基础配置置顶），按角色权限过滤后生成。

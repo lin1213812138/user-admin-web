@@ -163,6 +163,7 @@ function transformElegantRouteToVueRoute(
 const routeMap: RouteMap = {
   "root": "/",
   "not-found": "/:pathMatch(.*)*",
+  "channel-quote_receive_quote-setting": "/channel-quote/receive/quote-setting",
   "403": "/403",
   "404": "/404",
   "500": "/500",

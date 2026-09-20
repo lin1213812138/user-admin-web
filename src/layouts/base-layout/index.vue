@@ -23,7 +23,7 @@ const appStore = useAppStore();
 const themeStore = useThemeStore();
 const { secondLevelMenus, childLevelMenus, isActiveFirstLevelMenuHasChildren } = provideMixMenuContext();
 
-// 打印设计页是整屏设计器，系统设置页、个人中心页与资料管理五个页面左侧为贴边侧栏，去掉 content 区域默认的 16px 外边距让其占满可视区
+// 打印设计页是整屏设计器，系统设置页、个人中心页、报价设置页与资料管理各页面左侧为贴边侧栏，去掉 content 区域默认的 16px 外边距让其占满可视区
 const route = useRoute();
 const contentShowPadding = computed(
   () =>
@@ -36,7 +36,8 @@ const contentShowPadding = computed(
       'data-manage_finance',
       'data-manage_no-rule',
       'data-manage_ship',
-      'data-manage_bl'
+      'data-manage_bl',
+      'channel-quote_receive_quote-setting'
     ].includes(route.name as string)
 );
 

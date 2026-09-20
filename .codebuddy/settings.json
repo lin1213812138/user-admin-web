@@ -1,5 +1,30 @@
 {
   "enabledPlugins": {
     "frontend-design@codebuddy-plugins-official": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|write|Edit|edit|MultiEdit|ApplyPatch|replace_in_file|write_to_file|delete_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CODEBUDDY_PROJECT_DIR/.codebuddy/hooks/gate-pre-write.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CODEBUDDY_PROJECT_DIR/.codebuddy/hooks/gate-user-prompt.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }

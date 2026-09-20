@@ -28,16 +28,7 @@ export interface ItemNoRule {
   status?: 0 | 1;
   createDate?: number;
 }
-/** 运单号码池 no-pool */
-export interface NoPool {
-  _id: string;
-  no: string;
-  refId: string;
-  refType: number;
-  status?: 0 | 1;
-  createDate?: number;
-  note?: string;
-}
+/** 运单号码池 no-pool：结构统一见 typings（Api.NoPool.Item / Api.NoPool.List / Api.NoPool.ImportItem） */
 /** 长单号截短 long-no-rule */
 export interface LongNoRule {
   _id: string;
@@ -65,16 +56,15 @@ export function fetchDeleteItemNoRule(id: string) {
 }
 
 export function fetchGetNoPoolList(params: NoRuleQueryParams) {
-  return request<NoRuleQueryResult<NoPool>>({ url: '/no-pool/query', method: 'post', data: params });
+  return request<Api.NoPool.List>({ url: '/no-pool/query', method: 'post', data: params });
 }
-export function fetchCreateNoPool(params: Partial<NoPool>) {
-  return request<boolean>({ url: '/no-pool/create', method: 'post', data: params });
+/** 运单号码批量导入（/no-pool/batch/create；body.list[]，每项 no / refId / refType） */
+export function fetchImportNoPool(list: Api.NoPool.ImportItem[]) {
+  return request<boolean>({ url: '/no-pool/batch/create', method: 'post', data: { list } });
 }
-export function fetchUpdateNoPool(params: Partial<NoPool>) {
-  return request<boolean>({ url: '/no-pool/update', method: 'post', data: params });
-}
-export function fetchDeleteNoPool(id: string) {
-  return request<boolean>({ url: '/no-pool/delete', method: 'post', data: { _id: id } });
+/** 删除运单号码（/no-pool/delete；后端校验 body.ids 为非空字符串数组，支持批量） */
+export function fetchDeleteNoPool(ids: string[]) {
+  return request<boolean>({ url: '/no-pool/delete', method: 'post', data: { ids } });
 }
 
 export function fetchGetLongNoRuleList(params: NoRuleQueryParams) {

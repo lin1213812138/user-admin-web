@@ -1,21 +1,47 @@
 # CWMS User Admin Web — Agent Guide
 
+## ⛔ 硬闸门（Hard Gate）— 违反即回滚
+
+> 本节是下方「重要规则 2」的可执行版本；与 [.codebuddy/rules/workflow-gate/RULE.mdc](./.codebuddy/rules/workflow-gate/RULE.mdc) 同源。
+
+开发类任务必须逐级通过以下闸门，**任何一级未通过都不得写生产代码**：
+
+| #   | 阶段       | 通过条件                                                                                                               |
+| --- | ---------- | ---------------------------------------------------------------------------------------------------------------------- |
+| G0  | 技能判定   | 先用 `using-agent-skills`（`d:\skills\agent-skills\skills\using-agent-skills\SKILL.md`）判定技能链，并在回复里写明结论 |
+| G1  | SPECIFY    | spec 落 `docs/superpowers/specs/<日期>-<主题>-design.md`，状态行固定为 `> 🔴 状态：待确认（禁止实现）`                 |
+| G2  | 用户确认   | 用户**对 spec 本体**的明确表态。**选择题被选中 ≠ spec 确认**；口令见下                                                 |
+| G3  | 落章       | 确认后才把状态行改为 `> ✅ 状态：已确认（用户确认：<原话摘要>）`——**这是写代码的唯一前置条件**                         |
+| G4  | PLAN/TASKS | 按 `planning-and-task-breakdown` 出任务清单（验收标准 + 验证方式 + 涉及文件）                                          |
+| G5  | IMPLEMENT  | 按 `incremental-implementation` 逐任务实现，每步跑 `pnpm typecheck` + `pnpm lint`                                      |
+| G6  | 记录       | `changelog/<主题>.md` + 追加 `AGENTS_CHANGELOG.md` 索引                                                                |
+
+**自动放行口令**：`确认 spec`、`spec 已确认`、`设计通过`、`按这个实现`、`开始实现`、`开始`（`开始` 为宽泛口令，消息含「开始」二字即开闸）。
+
+**禁令**：用户未确认 spec 前，禁改 `src/**`、`packages/**`、`build/**`（含新增组件 / 服务 / 类型 / i18n key）；禁止先写码后补 spec；禁止顺手扩大范围（顺带重构 / 加字段 / 删注释）。
+**回滚纪律**：逐项反向编辑；**禁止 `git checkout` / `git restore` / `git stash`**（会连带抹掉用户未提交的工作）。
+**例外**：用户明说「直接改」的单点修复（错别字 / 注释 / 格式）、纯文档记录类改动（`changelog/`、`docs/`、`.codebuddy/` 配置）、用户要求的回滚本身。
+**第四层强制**：`.codebuddy/settings.json` 已注册 hooks —— `PreToolUse`（`gate-pre-write.mjs`）在未确认 spec 时**直接拦截** `src/**` 写入并回传修复步骤；`UserPromptSubmit`（`gate-user-prompt.mjs`）每次自动注入本闸门提醒、命中口令才开闸；**新写一份 spec 会自动关门**，因此每个任务都必须重新等确认（改动 hooks 需新开会话生效）。
+
 > **重要规则**:
 >
 > 1. 每次与本 Agent 讨论的问题定位、决策、修复，必须在 `changelog/` 目录下生成单独的文档，文件名从用户提示词中提取（如 `changelog/转运项批量搜索.md`），同时将条目链接追加到 [AGENTS_CHANGELOG.md](./AGENTS_CHANGELOG.md) 中（该索引按日期分组，日期最新在上）。AGENTS.md 只维护项目架构信息，不直接存储讨论记录。
-> 2. **开发必须使用 agent-skills 工作流，且先设计后编码**：禁止直接写代码。开发必须遵循 agent-skills 技能合集（位于 `~/.codebuddy/skills/`，来源 `addyosmani/agent-skills`）的生命周期工作流：
+> 2. **开发必须使用 agent-skills 工作流，且先设计后编码**：禁止直接写代码。开发必须遵循 agent-skills 技能合集的生命周期工作流：
 >    - 先用 `using-agent-skills` 判定当前任务适用的技能；
 >    - 设计闸门：用 `spec-driven-development` 产出 spec（必要时配合 `interview-me` / `idea-refine` / `source-driven-development` 澄清需求与对齐官方文档）；
 >    - **用户确认 spec 后**才进入 `planning-and-task-breakdown` → `incremental-implementation` 实现阶段；
 >    - 实现后按 `test-driven-development` / `code-review-and-quality` / `browser-testing-with-devtools` 等技能验证。
 >    - 用户确认设计之前，任何实现动作（代码编写、文件创建等）均属违规操作。
->    - （历史 superpowers 映射：`brainstorming`/`spec`/`plan` → `spec-driven-development`/`spec-driven-development`/`planning-and-task-breakdown`；设计/计划文档仍落地 `docs/superpowers/specs/` 与 `docs/superpowers/plans/`，路径约定保持不变。）
 
 ## 项目概览
 
-Vue 3 + TypeScript 前端项目，WMS 出库管理的**管理端**界面（应用名 `CWMS Admin`）。后端为 `wms-user`（Node.js + Koa + MongoDB），前端直连 `/api/v1/...`。
+牛迈物流专线系统的**管理端**界面，Vue 3 + TypeScript 单页应用。
 
-工程底座来自 [SoybeanAdmin](https://github.com/soybeanjs/soybean-admin) v2.2.0 模板，因此存在大量模板遗留目录（如 `packages/@sa/*`、`views/home/modules/*` 演示组件），改造时不要误删底座、也不要照搬模板写法覆盖本仓库已有约定。
+- **纯前端仓库**：不含任何服务端代码，通过 `/api/v1/...` 直连后端 HTTP 接口（会话为 httpOnly Cookie，详见「接口与后端约定」）。
+- **业务范围**（对应 `src/views/`）：系统管理（用户 / 角色 / 菜单 / 部门）、资料管理（`data-manage`）、客户管理（`customer-manage`）、渠道报价（`channel-quote`）、个人中心（`personal-center`）；登录、403/404/500、内嵌页为 `_builtin/` 下的内置页。
+- **页面形态**：以「搜索区 + 列表（vxe-table）+ 抽屉表单」为主，统一复用 `Table` / `FormWrap` / `drawer` 三件套（见「核心组件架构」）。
+
+> ⚠️ 仓库中保留着大量**工程底座自带的模板遗留目录**（如 `packages/@sa/*` 内部包、`views/home/modules/*` 演示组件、`views/home/` 演示页）。改造时不要误删这些底座依赖，也不要照搬其写法覆盖本仓库既有约定。
 
 ---
 

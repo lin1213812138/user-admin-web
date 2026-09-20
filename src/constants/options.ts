@@ -26,3 +26,10 @@ registerGlobalOptions('status', () => [
   { label: $t('common.enable'), value: 1 },
   { label: $t('common.disable'), value: 0 }
 ]);
+
+// ---- 预置：运单号码池「关联类型」（值 0-收货渠道 1-发货渠道 2-派送渠道） ----
+registerGlobalOptions('noPoolRefType', () => [
+  { label: '收货渠道', value: 0 },
+  { label: '发货渠道', value: 1 },
+  { label: '派送渠道', value: 2 }
+]);

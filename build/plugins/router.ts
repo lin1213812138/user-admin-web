@@ -8,6 +8,25 @@ export function setupElegantRouter() {
       base: 'src/layouts/base-layout/index.vue',
       blank: 'src/layouts/blank-layout/index.vue'
     },
+    /**
+     * 页面扫描排除项（默认仅排除 `**\/components/**`）。
+     *
+     * `modules/` 目录只放业务子组件与「内嵌子页面」：`views/**\/modules/**` 下若出现 index.vue，
+     * 扫描会把父级页面（如 channel-quote/receive）顶成「有 children、无 component」的容器路由，
+     * 导致父级页面直接渲染不出来。需要独立路由的内嵌页请在下方 customRoutes.map 声明。
+     */
+    pageExcludePatterns: ['**/components/**', '**/modules/**'],
+    /**
+     * 自定义路由：只参与 RouteKey / RouteMap 等声明与 routeMap（路径表）生成，
+     * 真正的 vue 路由在 `src/router/routes/index.ts` 的 customRoutes 中注册（视图由那里合并的 views 挂载）。
+     *
+     * 报价设置页位于 receive/modules/quote-setting（不参与扫描），靠这里拿到类型与路径。
+     */
+    customRoutes: {
+      map: {
+        'channel-quote_receive_quote-setting': '/channel-quote/receive/quote-setting'
+      }
+    },
     routePathTransformer(routeName, routePath) {
       const key = routeName as RouteKey;
 

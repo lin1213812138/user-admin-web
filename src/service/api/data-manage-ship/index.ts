@@ -97,3 +97,12 @@ export function fetchUpdateCarrier(params: Partial<Api.DataManageShip.Carrier>) 
 export function fetchDeleteCarrier(id: string) {
   return request<boolean>({ url: '/carrier/delete', method: 'post', data: { _id: id } });
 }
+
+/**
+ * 承运网络 → 渠道 批量同步（/carrier/sync）。
+ * list 项 fields 为字段名数组（oilRate / feeCustom / weightRuleId / remoteGroupId），
+ * 值由后端从该承运网络文档 pick 后批量更新到渠道（channelType：0-收货渠道 1-发货渠道）。
+ */
+export function fetchSyncCarrierChannel(params: Api.DataManageShip.CarrierSyncParams) {
+  return request<boolean>({ url: '/carrier/sync', method: 'post', data: params });
+}

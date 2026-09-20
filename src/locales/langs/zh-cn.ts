@@ -17,6 +17,7 @@ const local: App.I18n.Schema = {
     submitModify: '提交修改',
     backToHome: '返回首页',
     batchDelete: '批量删除',
+    batchRemove: '批量移除',
     batchDisable: '批量停用',
     batchDisableSuccess: '批量停用成功',
     cancel: '取消',
@@ -76,6 +77,7 @@ const local: App.I18n.Schema = {
     keyword: '关键词',
     status: '状态',
     remark: '备注',
+    none: '无',
     logout: '退出登录',
     logoutConfirm: '确认退出登录吗？',
     lookForward: '敬请期待',
@@ -322,6 +324,7 @@ const local: App.I18n.Schema = {
     'system-manage_label-designer': '标签设计',
     'channel-quote': '渠道报价',
     'channel-quote_receive': '收货渠道',
+    'channel-quote_receive_quote-setting': '报价设置',
     'channel-quote_ship': '发货渠道',
     'personal-center': '个人中心'
   },
@@ -1437,7 +1440,27 @@ const local: App.I18n.Schema = {
       noRule: {
         title: '单号规则',
         itemNoRule: { title: '子单号规则' },
-        noPool: { title: '运单号码池' },
+        noPool: {
+          title: '运单号码池',
+          import: '导入',
+          importTitle: '运单号码导入',
+          channelType: '关联类型',
+          channel: '具体渠道',
+          channelPlaceholder: '请选择具体渠道',
+          no: '输入单号',
+          noPlaceholder: '请将运单号复制粘贴到这里，一行一个，回车换行',
+          emptyTip: '请输入至少一个运单号',
+          importSuccess: '成功导入 {count} 个运单号',
+          noTitle: '运单号码',
+          channelName: '渠道名称',
+          refType: '渠道类型',
+          pickBy: '提取者',
+          pickDate: '提取时间',
+          creator: '录入者',
+          createDate: '录入时间',
+          picked: '已提取',
+          unpicked: '未提取'
+        },
         longNoRule: { title: '长单号截短' },
         name: '名称',
         prefix: '前缀',
@@ -1536,7 +1559,40 @@ const local: App.I18n.Schema = {
           feeCustom: '报关费',
           cubicNum: '材积除',
           weightOff: '计泡比率',
-          order: '排序'
+          order: '排序',
+          syncChannel: '同步渠道',
+          feeExt: '附加费',
+          feeExtDrawer: {
+            title: '附加费',
+            addBtn: '新增附加费',
+            syncToChannel: '同步到渠道',
+            needFeeExt: '请先勾选要同步的费用',
+            needChannel: '请先勾选要同步的渠道',
+            emptyChannel: '该承运网络下暂无可同步的渠道',
+            col: {
+              name: '费用名称',
+              country: '国家或地区',
+              type: '类型',
+              condition: '条件',
+              price: '价格'
+            }
+          },
+          sync: {
+            title: '同步到收货渠道',
+            oriOilRate: '原燃油费',
+            newOilRate: '新燃油费',
+            oriFeeCustom: '原报关费',
+            newFeeCustom: '新报关费',
+            oriWeightRule: '原计泡规则',
+            newWeightRule: '新计泡规则',
+            oriWeightOff: '原计泡比',
+            newWeightOff: '新计泡比',
+            oriRemoteGroup: '原偏远',
+            newRemoteGroup: '新偏远',
+            remove: '移除',
+            emptyChannel: '暂无可同步的渠道',
+            needField: '请先勾选需要同步的字段'
+          }
         }
       }
     },
@@ -1547,15 +1603,135 @@ const local: App.I18n.Schema = {
       },
       receive: {
         title: '收货渠道',
-        code: '渠道编码',
+        code: '渠道代码',
         name: '渠道名称',
-        form: { codePlaceholder: '请输入渠道编码', namePlaceholder: '请输入渠道名称' }
+        basicInfo: '基本信息',
+        note: '渠道备注',
+        bindOrderTemplate: '绑定录单格式',
+        orderTemplate: '录单格式',
+        orderTemplatePlaceholder: '请输入',
+        form: {
+          codePlaceholder: '留空自动生成',
+          namePlaceholder: '请输入渠道名称',
+          carrier: '承运网络',
+          carrierTooltip: '该渠道所属的承运网络',
+          channelGroup: '渠道类别',
+          noRule: '内单号规则',
+          itemNoRule: '子内单号规则',
+          channelNoRule: '转单号规则',
+          channelOut: '绑定发货渠道',
+          channelOutDisabledTip: '仅「转单号规则」为发货渠道获取时可选',
+          customsNoRule: '报关号规则',
+          labelTemplate: '标签模板',
+          customerEnable: '会员下单',
+          customerEnableAllow: '允许',
+          customerEnableClose: '关闭',
+          weightRule: '计泡规则',
+          remoteGroup: '关联偏远',
+          oilRate: '燃油费率',
+          feeCustom: '报关费',
+          site: '所属站点',
+          productGroup: '承运物品类别',
+          routeGroup: '关联路由码',
+          tag: '渠道标签',
+          tagPlaceholder: '请输入渠道特点',
+          notePlaceholder: '请输入渠道备注'
+        }
       },
       ship: {
         title: '发货渠道',
         code: '渠道编码',
         name: '渠道名称',
         form: { codePlaceholder: '请输入渠道编码', namePlaceholder: '请输入渠道名称' }
+      },
+      quoteSetting: {
+        title: '报价设置',
+        channelLabel: '渠道',
+        noChannel: '请从收货渠道列表进入报价设置',
+        tabs: {
+          zone: '地址分区',
+          price: '渠道报价',
+          feeExt: '渠道加收',
+          customerPrice: '客户报价',
+          costPrice: '销售成本价'
+        },
+        actions: {
+          editZone: '编辑分区',
+          importZone: '导入分区',
+          editPrice: '编辑报价',
+          importPrice: '导入报价',
+          addFeeExt: '新增加收',
+          addPrice: '新增报价',
+          deletePrice: '删除报价'
+        },
+        search: {
+          zonePlaceholder: '输入国家或二字编码检索',
+          feeExtPlaceholder: '输入加收名称检索'
+        },
+        empty: {
+          noData: '暂无数据',
+          noChannelPrice: '暂无渠道报价'
+        },
+        zone: {
+          name: '分区',
+          destination: '目的地',
+          aging: '时效(天)',
+          tip: '特别提示'
+        },
+        feeExt: {
+          name: '费用名称',
+          country: '费用国家或地区',
+          type: '费用类型',
+          condition: '费用条件',
+          fee: '费用金额',
+          addTitle: '新增费用',
+          editTitle: '编辑费用',
+          form: {
+            namePlaceholder: '请选择或输入费用名称',
+            countryPlaceholder: '请选择国家或地区',
+            pricePlaceholder: '请输入费用金额',
+            notePlaceholder: '请输入备注',
+            valuePlaceholder: '数值',
+            exprLabel: '表达式',
+            exprPlaceholder: '填写区间后自动生成',
+            conditionClear: '清空',
+            conditionNeedValue: '请至少填写一个条件数值',
+            strategyTip:
+              '按重量：重量 × 单价；按票：每票固定金额；按件：单价 × 件数；按重量超出部分：（重量 − 起始重量）× 单价',
+            strategyOption: {
+              byWeight: '按重量',
+              byTicket: '按票',
+              byItem: '按件',
+              byWeightOver: '按重量超出部分'
+            },
+            varTypeOption: {
+              none: '无条件',
+              weight: '重量',
+              length: '长度',
+              volume: '体积'
+            },
+            opOption: {
+              gt: '大于',
+              gte: '大于等于',
+              lt: '小于',
+              lte: '小于等于'
+            },
+            unitOption: {
+              weight: 'KG',
+              length: 'CM',
+              volume: 'CBM'
+            }
+          }
+        },
+        customerPrice: {
+          customer: '客户',
+          priceType: '报价类型',
+          otherFee: '其他费用',
+          note: '报价备注',
+          latestEdit: '最新编辑',
+          editTime: '编辑时间',
+          createTime: '创建时间'
+        }
       }
     },
     home: {
@@ -1643,6 +1819,13 @@ const local: App.I18n.Schema = {
       right: '右固定',
       unFixed: '取消固定'
     }
+  },
+  handsontable: {
+    required: '第 {row} 行「{title}」不能为空',
+    invalid: '第 {row} 行「{title}」格式不正确',
+    invalidWithMessage: '第 {row} 行「{title}」{message}',
+    validateFailed: '共 {count} 处校验未通过',
+    summaryLead: '合计'
   }
 };
 

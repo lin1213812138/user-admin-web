@@ -4,20 +4,23 @@ import VerticalTabLayout from '@/components/VerticalTabLayout/index.vue';
 import { useArchiveTabs } from '@/views/data-manage/components/useArchiveTabs';
 
 /** 本组资料项（懒加载子档案）：左侧竖向 tab 按角色权限过滤后生成 */
-const { tabs, activeKey, activeComponent } = useArchiveTabs([
-  {
-    key: 'countryRegion',
-    labelKey: 'page.dataManage.basic.countryRegion.title',
-    permission: 'system:dataGeneral:countryRegion',
-    load: () => import('@/views/data-manage/basic/modules/country-region/CountryRegion.vue')
-  },
-  {
-    key: 'fbaWarehouse',
-    labelKey: 'page.dataManage.basic.fbaWarehouse.title',
-    permission: 'system:dataGeneral:fbaWarehouse',
-    load: () => import('@/views/data-manage/basic/modules/fba-warehouse/FbaWarehouse.vue')
-  }
-]);
+const { tabs, activeKey, activeComponent } = useArchiveTabs(
+  [
+    {
+      key: 'countryRegion',
+      labelKey: 'page.dataManage.basic.countryRegion.title',
+      permission: 'system:dataGeneral:countryRegion',
+      load: () => import('@/views/data-manage/basic/modules/country-region/index.vue')
+    },
+    {
+      key: 'fbaWarehouse',
+      labelKey: 'page.dataManage.basic.fbaWarehouse.title',
+      permission: 'system:dataGeneral:fbaWarehouse',
+      load: () => import('@/views/data-manage/basic/modules/fba-warehouse/index.vue')
+    }
+  ],
+  { urlSync: true }
+);
 </script>
 
 <template>

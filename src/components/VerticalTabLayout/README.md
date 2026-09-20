@@ -98,9 +98,10 @@ watch(activeKey, () => {
 
 ## 已接入页面
 
-| 页面                                    | 用法                                                        |
-| --------------------------------------- | ----------------------------------------------------------- |
-| `views/system-manage/setting/index.vue` | 标题「系统设置」，右侧 componentMap 动态组件（切 tab 重建） |
-| `views/data-manage/basic/index.vue`     | 标题「基础资料」，右侧 5 个档案懒加载组件（切 tab 重建）    |
-| `views/data-manage/business/index.vue`  | 标题「业务资料」，右侧 9 个档案懒加载组件（切 tab 重建）    |
-| `views/data-manage/finance/index.vue`   | 标题「财务资料」，右侧 4 个档案懒加载组件（切 tab 重建）    |
+| 页面                                                          | 用法                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `views/system-manage/setting/index.vue`                       | 标题「系统设置」，右侧 componentMap 动态组件（切 tab 重建）                 |
+| `views/data-manage/basic/index.vue`                           | 标题「基础资料」，右侧 5 个档案懒加载组件（切 tab 重建）                    |
+| `views/data-manage/business/index.vue`                        | 标题「业务资料」，右侧 9 个档案懒加载组件（切 tab 重建）                    |
+| `views/data-manage/finance/index.vue`                         | 标题「财务资料」，右侧 4 个档案懒加载组件（切 tab 重建）                    |
+| `views/channel-quote/receive/modules/quote-setting/index.vue` | 标题=渠道名，右侧 5 个报价面板 `v-if` 切换（切 tab 重建；本页为内嵌路由页） |

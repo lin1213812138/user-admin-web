@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, type VNodeChild } from 'vue';
 import type { FormInst, FormItemRule, FormRules, SelectOption } from 'naive-ui';
-import { NColorPicker, NDatePicker } from 'naive-ui';
+import { NColorPicker, NDatePicker, NTooltip } from 'naive-ui';
 import { $t } from '@/locales';
 import { type FormItemConfig } from './form-config';
 import IconPicker from '@/components/custom/icon-picker.vue';
@@ -134,6 +134,38 @@ function cbValue(opt: SelectOption): string | number {
 /** select / checkbox 选项解析：优先取全局 optionsKey，否则用 item 自带 options */
 function itemOptions(item: FormItemConfig): SelectOption[] {
   return item.optionsKey ? getGlobalOptions(item.optionsKey) : (item.options ?? []);
+}
+
+/** select 的绑定值（归一化后交给 NSelect） */
+type SelectValue = string | number | Array<string | number> | null;
+/** select 变更回调的 option 载荷 */
+type SelectOptionPayload = SelectOption | Array<SelectOption> | null;
+
+/** 选项里是否存在「空串值」选项（存在时不做 `''` → null 归一化，避免误伤合法选项） */
+function hasEmptyOption(item: FormItemConfig): boolean {
+  return itemOptions(item).some(opt => opt.value === '');
+}
+
+/**
+ * select 取值：空串收敛为 null（多选非数组收敛为 []）。
+ * NSelect 只在 null / undefined / [] 时显示 placeholder，值为 `''` 会被视作「已选」而渲染成空白选中态。
+ */
+function selectValue(item: FormItemConfig): SelectValue {
+  const value = props.model[item.key];
+
+  if (item.multiple) return Array.isArray(value) ? (value as Array<string | number>) : [];
+
+  if (value === null || value === undefined || (value === '' && !hasEmptyOption(item))) return null;
+
+  return value as string | number;
+}
+
+/** select 变更：按字段写回 model（清空为 null，与仓库既有下拉口径一致），并透传 item.onUpdate */
+function handleSelectChange(item: FormItemConfig, value: SelectValue, option: SelectOptionPayload) {
+  // FormWrap 的契约是「父级传入响应式 model、按字段写回」（模板 v-model 同此约定）
+  // eslint-disable-next-line vue/no-mutating-props
+  Object.assign(props.model, { [item.key]: value });
+  item.onUpdate?.(value, option);
 }
 
 /** 日期控件的值：model 中的空串需转 null（NDatePicker 收到 `''` 会抛 "Invalid time value"） */
@@ -273,6 +305,18 @@ defineExpose({
             <span class="text-15px font-600">{{ item.label }}</span>
           </div>
           <NFormItem v-else :label="item.label" :path="item.key" :show-label="item.showLabel">
+            <!-- 标签后的问号提示（如「承运网络 ⓘ」） -->
+            <template v-if="item.labelTooltip" #label>
+              <span class="inline-flex items-center gap-4px">
+                <span>{{ item.label }}</span>
+                <NTooltip trigger="hover" placement="top">
+                  <template #trigger>
+                    <icon-ic-baseline-help-outline class="cursor-help text-15px text-primary" />
+                  </template>
+                  {{ item.labelTooltip }}
+                </NTooltip>
+              </span>
+            </template>
             <!-- 只读展示态：值区域渲染纯文本，不渲染控件 -->
             <template v-if="isView">
               <NImage
@@ -324,8 +368,11 @@ defineExpose({
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
                 :clearable="item.clearable ?? true"
+                :show-button="item.showButton ?? true"
                 class="w-full"
-              />
+              >
+                <template v-if="item.suffix" #suffix>{{ item.suffix }}</template>
+              </NInputNumber>
               <NSwitch
                 v-else-if="item.type === 'switch'"
                 v-model:value="model[item.key] as string | number | boolean"
@@ -338,7 +385,7 @@ defineExpose({
               </NSwitch>
               <NSelect
                 v-else-if="item.type === 'select'"
-                v-model:value="model[item.key] as string | number | Array<string | number>"
+                :value="selectValue(item)"
                 :options="itemOptions(item)"
                 :placeholder="item.placeholder"
                 :disabled="item.disabled"
@@ -346,7 +393,7 @@ defineExpose({
                 :filterable="item.filterable ?? true"
                 :multiple="item.multiple || false"
                 :render-label="item.renderLabel ?? fallbackOptionLabel"
-                @update:value="(value, option) => item.onUpdate?.(value, option)"
+                @update:value="(value, option) => handleSelectChange(item, value, option)"
               />
               <NDatePicker
                 v-else-if="item.type === 'date'"

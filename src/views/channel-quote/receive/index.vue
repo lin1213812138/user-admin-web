@@ -1,49 +1,71 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
+import dayjs from 'dayjs';
 import { $t } from '@/locales';
 import type { SelectOption } from 'naive-ui';
-import {
-  fetchCreateChannelQuote,
-  fetchDeleteChannelQuote,
-  fetchGetChannelQuoteList,
-  fetchUpdateChannelQuote
-} from '@/service/api/channel-quote';
 import { Table, TableColumnConfig, useVxeTable } from '@/components/Table';
 import type { VxeColumnConfig } from '@/components/Table';
-import NFormWrap from '@/components/Form/index.vue';
 import type { FormItemConfig } from '@/components/Form/index.vue';
-import Drawer from '@/components/common/drawer.vue';
-
-const ARCHIVE = 'receive' as const;
+import { useRouterPush } from '@/hooks/common/router';
+import { fetchDeleteChannel, fetchGetChannelList, fetchUpdateChannel } from '@/service/api/channel';
+import { sessionStg } from '@/utils/storage';
+import ChannelOperateDrawer from './modules/channel-operate-drawer.vue';
+import BindOrderTemplateModal from './modules/bind-order-template-modal.vue';
 
 const statusOptions: SelectOption[] = [
   { label: $t('common.enable'), value: 1 },
   { label: $t('common.disable'), value: 0 }
 ];
 
+// 搜索条件：空值统一 null，不写空字符串
 const searchParams = reactive<Record<string, unknown>>({
-  keyword: '',
+  keyword: null,
   status: null
 });
 
+/** 毫秒时间戳格式化展示 */
+function formatDateTime(ts?: number) {
+  return ts ? dayjs(ts).format('YYYY-MM-DD HH:mm:ss') : '--';
+}
+
 const { data, loading, columnConfigs, columns, pagination, getData, persistColumns, resetColumns } = useVxeTable<
-  Api.ChannelQuote.ChannelQuoteList<Api.ChannelQuote.ReceiveChannel>,
+  Api.ChannelQuote.ReceiveChannelList,
   Api.ChannelQuote.ReceiveChannel
 >({
-  api: ({ current, size }) => {
-    const params: Record<string, unknown> = { current, size };
-    if (searchParams.keyword) params.keyword = searchParams.keyword;
-    if (searchParams.status !== null && searchParams.status !== undefined) params.status = searchParams.status;
-    return fetchGetChannelQuoteList<Api.ChannelQuote.ReceiveChannel>(
-      ARCHIVE,
-      params as unknown as Api.ChannelQuote.ChannelQuoteSearchParams
-    );
+  api: async ({ current, size }) => {
+    const params: Api.ChannelQuote.ReceiveChannelSearchParams = { page: current, size };
+    if (searchParams.keyword) params.keyword = searchParams.keyword as string;
+    if (searchParams.status !== null && searchParams.status !== undefined) {
+      params.status = searchParams.status as number;
+    }
+    const { data: res, error } = await fetchGetChannelList(params);
+    if (error || !res) return { list: [], total: 0 };
+    return res;
   },
-  transform: r => ({ records: r.records, total: r.total }),
+  transform: r => ({ records: r.list, total: r.total }),
   columns: () =>
     [
-      { key: 'code', title: $t('page.channelQuote.receive.code'), type: 'detail', visible: true, sortable: false },
+      { key: 'code', title: $t('page.channelQuote.receive.code'), visible: true, sortable: false },
       { key: 'name', title: $t('page.channelQuote.receive.name'), visible: true, sortable: false },
+      {
+        key: 'carrier',
+        title: $t('page.channelQuote.receive.form.carrier'),
+        visible: true,
+        sortable: false
+      },
+      {
+        key: 'channelGroup',
+        title: $t('page.channelQuote.receive.form.channelGroup'),
+        visible: true,
+        sortable: false
+      },
+      { key: 'site', title: $t('page.channelQuote.receive.form.site'), visible: true, sortable: false },
+      {
+        key: 'weightRuleName',
+        title: $t('page.channelQuote.receive.form.weightRule'),
+        visible: true,
+        sortable: false
+      },
       {
         key: 'status',
         title: $t('common.status'),
@@ -53,10 +75,15 @@ const { data, loading, columnConfigs, columns, pagination, getData, persistColum
         align: 'center',
         sortable: false
       },
-      { key: 'remark', title: $t('common.remark'), visible: true, sortable: false },
-      { key: 'createTime', title: $t('page.channelQuote.common.createTime'), visible: true, width: 180, sortable: true }
+      {
+        key: 'createDate',
+        title: $t('page.channelQuote.common.createTime'),
+        visible: true,
+        width: 180,
+        sortable: false
+      }
     ] as VxeColumnConfig[],
-  cacheKey: 'channel-quote-receive'
+  cacheKey: 'channel-quote-receive-v2'
 });
 
 const searchItems = computed<FormItemConfig[]>(() => [
@@ -69,36 +96,6 @@ const searchItems = computed<FormItemConfig[]>(() => [
   },
   { key: 'status', label: $t('common.status'), type: 'select', span: 8, options: statusOptions },
   { key: 'actions', label: ' ', slot: 'actions', span: 8 }
-]);
-
-const formItems = computed<FormItemConfig[]>(() => [
-  {
-    key: 'code',
-    label: $t('page.channelQuote.receive.code'),
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: $t('page.channelQuote.receive.form.codePlaceholder')
-  },
-  {
-    key: 'name',
-    label: $t('page.channelQuote.receive.name'),
-    type: 'input',
-    required: true,
-    span: 12,
-    placeholder: $t('page.channelQuote.receive.form.namePlaceholder')
-  },
-  {
-    key: 'status',
-    label: $t('common.status'),
-    type: 'switch',
-    span: 24,
-    checkedValue: 1,
-    uncheckedValue: 0,
-    checkedText: $t('common.enable'),
-    uncheckedText: $t('common.disable')
-  },
-  { key: 'remark', label: $t('common.remark'), type: 'textarea', span: 24 }
 ]);
 
 const configVisible = ref(false);
@@ -120,76 +117,54 @@ function handleSearch() {
 }
 
 function handleReset() {
-  searchParams.keyword = '';
+  searchParams.keyword = null;
   searchParams.status = null;
   handleSearch();
 }
 
-async function handleDelete(ids: number[]) {
-  await fetchDeleteChannelQuote(ARCHIVE, ids);
+/** 后端 /channel/delete 仅支持单条 _id，批量删除前端逐条调用 */
+async function handleDelete(ids: string[]) {
+  for (const id of ids) {
+    const { error } = await fetchDeleteChannel(id);
+    if (error) return;
+  }
   window.$message?.success($t('common.deleteSuccess'));
   checkedRows.value = [];
   getData();
 }
 
-const drawerVisible = ref(false);
-const drawerMode = ref<'create' | 'edit' | 'detail'>('create');
-const submitting = ref(false);
-const model = reactive<Record<string, unknown>>({});
-const formRef = ref<InstanceType<typeof NFormWrap> | null>(null);
+const drawerRef = ref<InstanceType<typeof ChannelOperateDrawer> | null>(null);
 
-const drawerTitle = computed(() => {
-  const base = $t('page.channelQuote.receive.title');
-  const op =
-    drawerMode.value === 'create'
-      ? $t('common.add')
-      : drawerMode.value === 'edit'
-        ? $t('common.edit')
-        : $t('common.detail');
-  return `${op}${base}`;
-});
+/** 列表启用 / 停用：/channel/update 走 uniqField:['name','code']，必须随行回传 name + code */
+async function handleToggleStatus(row: Api.ChannelQuote.ReceiveChannel) {
+  const next: Api.Common.EnableStatus = row.status === 1 ? 0 : 1;
 
-function openDrawer(mode: 'create' | 'edit' | 'detail', row?: Api.ChannelQuote.ReceiveChannel) {
-  drawerMode.value = mode;
-  const source = (mode === 'create' ? { code: '', name: '', status: 1, remark: '' } : (row ?? {})) as Record<
-    string,
-    unknown
-  >;
-  model.code = source.code;
-  model.name = source.name;
-  model.status = source.status;
-  model.remark = source.remark;
-  model.id = row?.id;
-  drawerVisible.value = true;
+  const { error } = await fetchUpdateChannel({
+    _id: row._id,
+    name: row.name,
+    code: row.code,
+    status: next
+  });
+  if (error) return;
+
+  row.status = next;
+  window.$message?.success(next === 1 ? $t('common.enable') : $t('common.disable'));
 }
 
-async function handleSubmit() {
-  if (drawerMode.value === 'detail') {
-    drawerVisible.value = false;
-    return;
-  }
-  const ok = await formRef.value?.validate();
-  if (!ok) return;
-  submitting.value = true;
-  try {
-    if (drawerMode.value === 'create') {
-      await fetchCreateChannelQuote<Api.ChannelQuote.ReceiveChannel>(
-        ARCHIVE,
-        model as unknown as Partial<Api.ChannelQuote.ReceiveChannel>
-      );
-      window.$message?.success($t('common.createSuccess'));
-    } else {
-      await fetchUpdateChannelQuote<Api.ChannelQuote.ReceiveChannel>(
-        ARCHIVE,
-        model as unknown as Api.ChannelQuote.ReceiveChannel
-      );
-      window.$message?.success($t('common.updateSuccess'));
-    }
-    drawerVisible.value = false;
-    getData();
-  } finally {
-    submitting.value = false;
-  }
+const bindModalRef = ref<InstanceType<typeof BindOrderTemplateModal> | null>(null);
+function handleBindTemplate(row: Api.ChannelQuote.ReceiveChannel) {
+  bindModalRef.value?.open(row);
+}
+
+const { routerPushByKey } = useRouterPush();
+
+/**
+ * 跳转报价设置页（渠道内嵌子页：不进菜单，侧栏「收货渠道」保持高亮）。
+ * 渠道上下文经 sessionStorage 传递、不落 URL——避免渠道 id / 名称明文出现在地址栏、浏览器历史与分享链接中。
+ */
+function handleQuoteSetting(row: Api.ChannelQuote.ReceiveChannel) {
+  sessionStg.set('quoteSettingContext', { channelId: row._id, channelName: row.name });
+  void routerPushByKey('channel-quote_receive_quote-setting');
 }
 </script>
 
@@ -204,7 +179,7 @@ async function handleSubmit() {
         :show-seq="true"
         :show-checkbox="true"
         :show-action="true"
-        :action-width="180"
+        :action-width="300"
         :search-items="searchItems"
         :search-model="searchParams"
         @search="handleSearch"
@@ -215,7 +190,7 @@ async function handleSubmit() {
       >
         <template #operation-left>
           <NSpace justify="start" wrap>
-            <LButton type="primary" ghost @click="openDrawer('create')">
+            <LButton type="primary" ghost @click="drawerRef?.openCreate()">
               <template #icon><icon-ic-round-plus class="text-icon" /></template>
               {{ $t('common.add') }}
             </LButton>
@@ -224,7 +199,7 @@ async function handleSubmit() {
               ghost
               :disabled="checkedRows.length === 0"
               popconfirm
-              @positive-click="handleDelete(checkedRows.map(i => i.id))"
+              @positive-click="handleDelete(checkedRows.map(i => i._id))"
             >
               <template #icon><icon-mdi-delete class="text-icon" /></template>
               {{ $t('common.batchDelete') }}
@@ -243,16 +218,45 @@ async function handleSubmit() {
           </NSpace>
         </template>
 
+        <template #carrier="{ row }">
+          <span>{{ row.carrier || '--' }}</span>
+        </template>
+        <template #channelGroup="{ row }">
+          <span>{{ row.channelGroup || '--' }}</span>
+        </template>
+        <template #site="{ row }">
+          <span>{{ row.site || '--' }}</span>
+        </template>
+        <template #weightRuleName="{ row }">
+          <span>{{ row.weightRuleName || '--' }}</span>
+        </template>
+        <template #createDate="{ row }">
+          <span>{{ formatDateTime(row.createDate) }}</span>
+        </template>
+
         <template #action="{ row }">
-          <LButton type="primary" text @click="openDrawer('edit', row)">
+          <LButton type="primary" text @click="drawerRef?.openEdit(row)">
             {{ $t('common.edit') }}
           </LButton>
-          <LButton type="info" text @click="openDrawer('detail', row)">
-            {{ $t('common.detail') }}
+          <LButton type="primary" text @click="handleQuoteSetting(row)">
+            {{ $t('page.channelQuote.quoteSetting.title') }}
           </LButton>
-          <LButton type="error" text popconfirm @positive-click="handleDelete([row.id])">
+          <LButton
+            :type="row.status === 1 ? 'warning' : 'success'"
+            text
+            :popconfirm="row.status === 1 ? $t('common.confirmDisable') : $t('common.confirmEnable')"
+            @positive-click="handleToggleStatus(row)"
+          >
+            {{ row.status === 1 ? $t('common.disable') : $t('common.enable') }}
+          </LButton>
+          <LButton type="primary" text @click="handleBindTemplate(row)">
+            {{ $t('page.channelQuote.receive.bindOrderTemplate') }}
+          </LButton>
+          <!--
+ <LButton type="error" text popconfirm @positive-click="handleDelete([row._id])">
             {{ $t('common.delete') }}
           </LButton>
+-->
         </template>
       </Table>
     </div>
@@ -264,23 +268,9 @@ async function handleSubmit() {
       @reset="resetColumns"
     />
 
-    <Drawer
-      v-model:show="drawerVisible"
-      :title="drawerTitle"
-      :loading="submitting"
-      :footer="drawerMode !== 'detail'"
-      width="520"
-      @submit="handleSubmit"
-    >
-      <NFormWrap
-        ref="formRef"
-        :model="model"
-        :items="formItems"
-        :disabled="drawerMode === 'detail'"
-        :grid-x-gap="16"
-        label-placement="top"
-      />
-    </Drawer>
+    <ChannelOperateDrawer ref="drawerRef" @submitted="getData" />
+
+    <BindOrderTemplateModal ref="bindModalRef" @submitted="getData" />
   </div>
 </template>
 

@@ -266,7 +266,7 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
 
     <div
       v-if="$slots['operation-left'] || $slots['operation-right']"
-      class="mb-12px flex-y-center justify-between gap-12px"
+      class="mb-10px flex-y-center justify-between gap-12px"
     >
       <div class="flex-y-center gap-8px flex-wrap">
         <slot name="operation-left" :refresh="refresh" />

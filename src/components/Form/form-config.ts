@@ -74,4 +74,13 @@ export interface FormItemConfig {
   dest?: Api.Upload.Dest;
   /** textarea 行数（type 为 textarea 时使用） */
   rows?: number;
+  /** 标签后的问号提示文案（渲染为 NTooltip 的 ⓘ 图标），不传则不渲染 */
+  labelTooltip?: string;
+  /** 控件后缀文案（如 % / 元），目前作用于 type 为 number 的 NInputNumber suffix 插槽 */
+  suffix?: string;
+  /**
+   * type 为 number 时是否显示 +/- 步进按钮，默认 true（不传即保持现状）；
+   * 后缀较长（如「元/KG」）或横向空间受限时传 false，避免后缀与按钮相互挤压。
+   */
+  showButton?: boolean;
 }

@@ -7,6 +7,11 @@ declare namespace StorageType {
     //  * the theme settings
     //  */
     // themeSettings: App.Theme.ThemeSetting;
+    /**
+     * 报价设置页的渠道上下文（渠道列表跳转时写入；经 sessionStorage 传递、不落 URL，
+     * 避免渠道 id / 名称明文出现在地址栏、浏览器历史与分享链接中；未从列表进入时为 null）
+     */
+    quoteSettingContext: { channelId: string; channelName: string } | null;
   }
 
   interface Local {

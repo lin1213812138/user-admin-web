@@ -79,6 +79,18 @@ declare namespace Api {
       isDefault?: Api.Common.EnableStatus;
     }
 
+    /**
+     * 绑定 / 解绑收货渠道入参（部分更新 channelIds）
+     *
+     * 与 PatchParams 同一约定：`name` 必须随行回传（后端 uniqField:'name' 重名校验）；
+     * `channelIds` 为**全量**列表（调用方负责增删），后端按覆盖写入。
+     */
+    interface BindChannelsParams {
+      _id: string;
+      name: string;
+      channelIds: string[];
+    }
+
     /** 列表返回结构（wms-user ret:{ list, total }） */
     interface List {
       list: OrderTemplate[];

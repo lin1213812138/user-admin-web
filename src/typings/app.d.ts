@@ -330,6 +330,7 @@ declare namespace App {
         submitModify: string;
         backToHome: string;
         batchDelete: string;
+        batchRemove: string;
         batchDisable: string;
         cancel: string;
         close: string;
@@ -377,7 +378,6 @@ declare namespace App {
         copySuccess: string;
         copyFailed: string;
         createSuccess: string;
-        updateSuccess: string;
         batchDisableSuccess: string;
         detail: string;
         edit: string;
@@ -390,6 +390,7 @@ declare namespace App {
         keyword: string;
         status: string;
         remark: string;
+        none: string;
         logout: string;
         logoutConfirm: string;
         lookForward: string;
@@ -1682,7 +1683,27 @@ declare namespace App {
           noRule: {
             title: string;
             itemNoRule: { title: string };
-            noPool: { title: string };
+            noPool: {
+              title: string;
+              import: string;
+              importTitle: string;
+              channelType: string;
+              channel: string;
+              channelPlaceholder: string;
+              no: string;
+              noPlaceholder: string;
+              emptyTip: string;
+              importSuccess: string;
+              noTitle: string;
+              channelName: string;
+              refType: string;
+              pickBy: string;
+              pickDate: string;
+              creator: string;
+              createDate: string;
+              picked: string;
+              unpicked: string;
+            };
             longNoRule: { title: string };
             name: string;
             prefix: string;
@@ -1777,6 +1798,39 @@ declare namespace App {
               cubicNum: string;
               weightOff: string;
               order: string;
+              syncChannel: string;
+              feeExt: string;
+              feeExtDrawer: {
+                title: string;
+                addBtn: string;
+                syncToChannel: string;
+                needFeeExt: string;
+                needChannel: string;
+                emptyChannel: string;
+                col: {
+                  name: string;
+                  country: string;
+                  type: string;
+                  condition: string;
+                  price: string;
+                };
+              };
+              sync: {
+                title: string;
+                oriOilRate: string;
+                newOilRate: string;
+                oriFeeCustom: string;
+                newFeeCustom: string;
+                oriWeightRule: string;
+                newWeightRule: string;
+                oriWeightOff: string;
+                newWeightOff: string;
+                oriRemoteGroup: string;
+                newRemoteGroup: string;
+                remove: string;
+                emptyChannel: string;
+                needField: string;
+              };
             };
           };
         };
@@ -1789,13 +1843,132 @@ declare namespace App {
             title: string;
             code: string;
             name: string;
-            form: { codePlaceholder: string; namePlaceholder: string };
+            basicInfo: string;
+            note: string;
+            bindOrderTemplate: string;
+            orderTemplate: string;
+            orderTemplatePlaceholder: string;
+            form: {
+              codePlaceholder: string;
+              namePlaceholder: string;
+              carrier: string;
+              carrierTooltip: string;
+              channelGroup: string;
+              noRule: string;
+              itemNoRule: string;
+              channelNoRule: string;
+              channelOut: string;
+              channelOutDisabledTip: string;
+              customsNoRule: string;
+              labelTemplate: string;
+              customerEnable: string;
+              customerEnableAllow: string;
+              customerEnableClose: string;
+              weightRule: string;
+              remoteGroup: string;
+              oilRate: string;
+              feeCustom: string;
+              site: string;
+              productGroup: string;
+              routeGroup: string;
+              tag: string;
+              tagPlaceholder: string;
+              notePlaceholder: string;
+            };
           };
           ship: {
             title: string;
             code: string;
             name: string;
             form: { codePlaceholder: string; namePlaceholder: string };
+          };
+          quoteSetting: {
+            title: string;
+            channelLabel: string;
+            noChannel: string;
+            tabs: {
+              zone: string;
+              price: string;
+              feeExt: string;
+              customerPrice: string;
+              costPrice: string;
+            };
+            actions: {
+              editZone: string;
+              importZone: string;
+              editPrice: string;
+              importPrice: string;
+              addFeeExt: string;
+              addPrice: string;
+              deletePrice: string;
+            };
+            search: {
+              zonePlaceholder: string;
+              feeExtPlaceholder: string;
+            };
+            empty: {
+              noData: string;
+              noChannelPrice: string;
+            };
+            zone: {
+              name: string;
+              destination: string;
+              aging: string;
+              tip: string;
+            };
+            feeExt: {
+              name: string;
+              country: string;
+              type: string;
+              condition: string;
+              fee: string;
+              addTitle: string;
+              editTitle: string;
+              form: {
+                namePlaceholder: string;
+                countryPlaceholder: string;
+                pricePlaceholder: string;
+                notePlaceholder: string;
+                valuePlaceholder: string;
+                exprLabel: string;
+                exprPlaceholder: string;
+                conditionClear: string;
+                conditionNeedValue: string;
+                strategyTip: string;
+                strategyOption: {
+                  byWeight: string;
+                  byTicket: string;
+                  byItem: string;
+                  byWeightOver: string;
+                };
+                varTypeOption: {
+                  none: string;
+                  weight: string;
+                  length: string;
+                  volume: string;
+                };
+                opOption: {
+                  gt: string;
+                  gte: string;
+                  lt: string;
+                  lte: string;
+                };
+                unitOption: {
+                  weight: string;
+                  length: string;
+                  volume: string;
+                };
+              };
+            };
+            customerPrice: {
+              customer: string;
+              priceType: string;
+              otherFee: string;
+              note: string;
+              latestEdit: string;
+              editTime: string;
+              createTime: string;
+            };
           };
         };
       };
@@ -1828,6 +2001,13 @@ declare namespace App {
           right: string;
           unFixed: string;
         };
+      };
+      handsontable: {
+        required: string;
+        invalid: string;
+        invalidWithMessage: string;
+        validateFailed: string;
+        summaryLead: string;
       };
     };
 

@@ -98,5 +98,38 @@ declare namespace Api {
       cubicNum?: number;
       weightOff?: number;
     }
+
+    /** 承运网络 → 渠道 可同步字段（Channel / ChannelOut 两个模型共有的字段） */
+    type CarrierSyncField = 'oilRate' | 'feeCustom' | 'weightRuleId' | 'remoteGroupId';
+
+    /** 承运网络同步到渠道的载荷（/carrier/sync；list 项 fields 为字段名，值取自该承运网络文档） */
+    interface CarrierSyncParams {
+      /** 承运网络 _id */
+      _id: string;
+      /** 0-收货渠道（Channel） 1-发货渠道（ChannelOut） */
+      channelType: 0 | 1;
+      /** 每项：渠道 _id + 需要同步过去的字段名 */
+      list: { _id: string; fields: CarrierSyncField[] }[];
+    }
+
+    /** 同步弹窗渠道行（Channel / ChannelOut 归一后的最小结构；名称类字段由后端 scene=1 fillName 回填） */
+    interface CarrierSyncChannel {
+      _id: string;
+      name: string;
+      /** 燃油费率 */
+      oilRate?: number | null;
+      /** 报关费 */
+      feeCustom?: number | null;
+      /** 计泡规则 */
+      weightRuleId?: string | null;
+      /** 计泡规则名称（fillName 回填） */
+      weightRuleName?: string;
+      /** 计泡规则计泡比率（fillName 回填） */
+      weightRuleWeightOff?: number;
+      /** 关联偏远 */
+      remoteGroupId?: string | null;
+      /** 关联偏远名称（fillName 回填） */
+      remoteGroup?: string;
+    }
   }
 }

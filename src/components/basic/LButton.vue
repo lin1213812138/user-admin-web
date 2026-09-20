@@ -39,6 +39,7 @@
  *
  * 说明：
  * - 未显式传 `size`（默认档）且非 `text` 按钮时高度固定 32px；显式传 tiny/small/medium/large 沿用组件库高度
+ * - 传 `text` 时 hover 自动显示下划线（disabled 除外；只作用于文字，图标与尺寸不受影响）
  * - 传 `tooltip` 自动包 NTooltip；`disabled` 时自动垫一层 span，保证 hover 提示生效
  * - 传 `popconfirm` 自动包 NPopconfirm，弹窗的 trigger 直接用内部 NButton，定位稳定不漂移
  * - `popconfirm` 与 `tooltip` 同时传入时，优先启用 `popconfirm`
@@ -131,12 +132,20 @@ const buttonProps = computed(() => {
   return rest;
 });
 
+/** text 文字按钮的 hover 下划线标记类（naive 的 text 模式不产生专属类名，只能在此自打标记） */
+const textUnderlineClass = computed(() => (props.text ? 'l-button--text-underline' : undefined));
+
 /** 透传给内部 NButton 的绑定（剔除会落到 NPopconfirm 上的确认事件，避免误传到按钮根） */
 const buttonBind = computed(() => {
-  const { onPositiveClick: _p, onNegativeClick: _n, ...restAttrs } = attrs as Record<string, unknown>;
+  const {
+    onPositiveClick: _p,
+    onNegativeClick: _n,
+    class: attrsClass,
+    ...restAttrs
+  } = attrs as Record<string, unknown>;
   void _p;
   void _n;
-  return { ...restAttrs, ...buttonProps.value };
+  return { ...restAttrs, ...buttonProps.value, class: [attrsClass, textUnderlineClass.value] };
 });
 
 const isPopconfirmEnabled = computed(
@@ -209,4 +218,11 @@ function handleNegativeClick(e: MouseEvent): unknown {
   </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* text 文字按钮：hover 时给文字内容节点加下划线
+   - 只作用于 .n-button__content（文字），不涉及图标，不改变 flex 布局与尺寸
+   - 排除 disabled（.n-button--disabled），避免灰态仍给出可点击暗示 */
+.l-button--text-underline:not(.n-button--disabled):hover :deep(.n-button__content) {
+  text-decoration: underline;
+}
+</style>

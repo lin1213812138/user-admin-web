@@ -62,6 +62,9 @@ importers:
       exceljs:
         specifier: ^4.4.0
         version: 4.4.0
+      handsontable:
+        specifier: 18.1.1
+        version: 18.1.1
       jquery:
         specifier: ^3.7.1
         version: 3.7.1
@@ -2736,6 +2739,9 @@ packages:
   gzip-size@6.0.0:
     resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
     engines: {node: '>=10'}
+
+  handsontable@18.1.1:
+    resolution: {integrity: sha512-8vz/jp96m0aJQPRepOBoImsC/bLe9mE/O4nOB6mll9DCjN5nqXHX9LV4zu/XDpD89TKJwtA+TNhVUkFQxW+q7w==}
 
   has-ansi@2.0.0:
     resolution: {integrity: sha512-C8vBJ8DwUCx19vhm7urhTuUsr4/IyP6l4VzNQDv+ryHQObW3TTTp9yB68WpYgRe2bbaGuZ/se74IqFeVnMnLZg==}
@@ -7168,6 +7174,8 @@ snapshots:
   gzip-size@6.0.0:
     dependencies:
       duplexer: 0.1.2
+
+  handsontable@18.1.1: {}
 
   has-ansi@2.0.0:
     dependencies:

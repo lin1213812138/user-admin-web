@@ -1,0 +1,45 @@
+---
+description: 开发硬闸门：技能判定 → spec → 用户确认 spec → 才允许实现（违反即回滚）
+alwaysApply: true
+enabled: true
+updatedAt: 2026-09-20T00:00:00.000Z
+provider:
+---
+
+# 开发硬闸门（Hard Gate）
+
+> 与 `AGENTS.md` 顶部「硬闸门」同源；本节为准。修改规则需**新开会话**生效。
+
+## 闸门（顺序不可跳、不可合并）
+
+| # | 阶段 | 通过条件（可验证） |
+| --- | --- | --- |
+| G0 | 技能判定 | 先用 `using-agent-skills`（`d:\skills\agent-skills\skills\using-agent-skills\SKILL.md`）判定技能链，并在回复里写明结论 |
+| G1 | SPECIFY | spec 落 `docs/superpowers/specs/<日期>-<主题>-design.md`，其**状态行固定为** `> 🔴 状态：待确认（禁止实现）` |
+| G2 | 用户确认 | 用户**对 spec 本体**的明确表态（口令见下）。**选择题被选中 ≠ spec 确认**；必须停下等用户对 spec 表态 |
+| G3 | 落章 | 确认后把状态行改成 `> ✅ 状态：已确认（用户确认：<用户原话摘要>）`。**改这一行之前，禁止写任何生产代码** |
+| G4 | PLAN/TASKS | 按 `planning-and-task-breakdown` 出任务清单：验收标准 + 验证方式 + 涉及文件 |
+| G5 | IMPLEMENT | 按 `incremental-implementation` 逐任务实现；每步跑 `pnpm typecheck` + `pnpm lint` |
+| G6 | 记录 | `changelog/<主题>.md` + 追加 `AGENTS_CHANGELOG.md` 索引；spec 状态与最终实现保持一致 |
+
+## 禁令（触发即违规：立即停止 → 逐项回滚 → 向用户说明）
+
+1. 用户未确认 spec 前，禁改 `src/**`、`packages/**`、`build/**`；禁止新增组件 / 服务 / 类型 / i18n key。
+2. 禁止把「选择题选项被选中」「用户对某个细节的回答」当作 spec 确认。
+3. 禁止先写代码后补 spec，或把 spec 写成事后说明。
+4. 禁止顺手扩大范围（顺带重构、顺带加字段、顺手删注释）。
+5. 回滚必须逐项反向编辑；**禁止 `git checkout` / `git restore` / `git stash`**（会连带抹掉用户未提交的工作）。
+
+## 例外（可不走闸门）
+
+- 用户明确说「直接改 / 不用流程」的单点修复（错别字、注释、格式、依赖版本号）；
+- 纯文档与记录类改动：`changelog/`、`docs/`、`AGENTS_CHANGELOG.md`、`.codebuddy/` 配置；
+- 用户要求的回滚动作本身。
+
+## 自动放行口令（`.codebuddy/hooks` 据此开闸）
+
+`确认 spec`、`spec 已确认`、`设计通过`、`按这个实现`、`开始实现`、`开始`
+
+> 说明：`开始` 为宽泛口令——用户消息中只要出现「开始」二字即视为确认并开闸（如「开始吧」「开始」）。
+
+用户未说口令时：`.codebuddy/hooks/gate-pre-write.mjs` 会**直接拦截**对 `src/**` 的写入（退出码 2），并回传修复步骤——请按提示先补 spec 并等确认。

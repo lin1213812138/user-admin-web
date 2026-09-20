@@ -162,7 +162,7 @@ const formItems = computed<FormItemConfig[]>(() => [
     key: 'note',
     label: $t('common.remark'),
     type: 'textarea',
-    span: 24,
+    span: 12,
     placeholder: $t('page.dataManage.noRule.form.notePlaceholder')
   }
 ]);
