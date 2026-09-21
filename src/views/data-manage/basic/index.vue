@@ -17,6 +17,12 @@ const { tabs, activeKey, activeComponent } = useArchiveTabs(
       labelKey: 'page.dataManage.basic.fbaWarehouse.title',
       permission: 'system:dataGeneral:fbaWarehouse',
       load: () => import('@/views/data-manage/basic/modules/fba-warehouse/index.vue')
+    },
+    {
+      key: 'remote',
+      labelKey: 'page.dataManage.basic.remote.title',
+      permission: 'system:dataGeneral:remote',
+      load: () => import('@/views/data-manage/basic/modules/remote/index.vue')
     }
   ],
   { urlSync: true }

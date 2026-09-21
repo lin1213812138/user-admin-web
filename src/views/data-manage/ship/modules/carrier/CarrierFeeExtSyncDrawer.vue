@@ -4,7 +4,10 @@
  *
  * 把附加费维护弹窗中勾选的加收，同步到「该承运网络关联」的收货 / 发货渠道：
  * - 目标渠道仅取 carrierId = 当前承运网络的渠道（收货渠道 /channel/query、发货渠道 /channel-out/query）；
- * - 勾选列自绘（表头全选 ↔ 行内联动，与「同步渠道」抽屉同款），加载后默认全勾；
+ * - 列表列与「收货渠道」列表页一致（按用户要求**去掉「创建时间」**），收货 / 发货两个 tab 共用同一套列；
+ * - 勾选列走 vxe 内置 checkbox（`show-checkbox` + `row-config.keyField` + `@selection-change`），
+ *   **默认全不勾**（勾选即选择）；切换收货 / 发货渠道会重载列表并清空勾选；
+ * - 保存前二次确认「将把 N 条费用同步到 M 个渠道」；
  * - 落库接口：POST /channel-fee-ext/sync（ids = 勾选的源加收；refIds = 勾选的渠道）。
  */
 import { computed, ref, watch } from 'vue';
@@ -20,11 +23,26 @@ defineOptions({
   name: 'CarrierFeeExtSyncDrawer'
 });
 
-/** 目标渠道行（收货 / 发货归一；checked 为本次待同步勾选，默认全勾） */
+/**
+ * 目标渠道行（收货 / 发货归一）。
+ * 勾选态由 vxe 内置 checkbox 维护、不落到数据行；下列可选字段供列表列展示
+ * （收货渠道查询固定带 `scene=1`、发货渠道本次补传 `scene=1`，回填后才有值）。
+ */
 interface SyncChannelRow {
   _id: string;
   name: string;
-  checked: boolean;
+  /** 渠道代码 */
+  code?: string | null;
+  /** 承运网络名称（scene=1 回填） */
+  carrier?: string | null;
+  /** 渠道分组名称（scene=1 回填） */
+  channelGroup?: string | null;
+  /** 所属站点名称（scene=1 回填） */
+  site?: string | null;
+  /** 计泡规则名称（scene=1 回填） */
+  weightRuleName?: string | null;
+  /** 状态 0-停用 1-启用 */
+  status?: number | null;
 }
 
 interface Props {
@@ -64,25 +82,41 @@ const loading = ref(false);
 const saving = ref(false);
 const rows = ref<SyncChannelRow[]>([]);
 
-// ---- 渠道列表（仅该承运网络关联的渠道） ----
+/** 表格勾选行（vxe 内置 checkbox，由 `@selection-change` 回传）；保存时按此提交 refIds */
+const checkedRows = ref<SyncChannelRow[]>([]);
+
+function handleSelectionChange(list: SyncChannelRow[]) {
+  checkedRows.value = list;
+}
+
+/** 表格实例：用于清空 vxe 内部勾选态（`Table` 已 expose `setAllCheckboxRow`） */
+const tableRef = ref<InstanceType<typeof Table> | null>(null);
+
+// ---- 渠道列表（仅该承运网络关联的渠道；两个 tab 共用同一套列，故都需回填名称类字段） ----
 async function loadChannels() {
   const carrier = props.carrier;
+  // 先清 vxe 勾选再换数据：`row-config.keyField` 会按 `_id` 记忆勾选，顺序颠倒会把旧勾选恢复回来
+  await tableRef.value?.setAllCheckboxRow(false);
   rows.value = [];
+  checkedRows.value = [];
   if (!carrier) return;
 
   loading.value = true;
   try {
     if (channelType.value === 0) {
+      // 收货渠道：service 内固定 scene=1（回填 carrier / channelGroup / site / weightRuleName）
       const { data, error } = await fetchGetChannelList({ page: 1, size: 500, where: { carrierId: carrier._id } });
-      rows.value = error || !data ? [] : data.list.map(item => ({ _id: item._id, name: item.name, checked: true }));
+      rows.value = error || !data ? [] : (data.list as SyncChannelRow[]);
     } else {
+      // 发货渠道：必须显式传 scene=1，否则名称类字段不回填（后端按 scene 触发 fillName）
       const { data, error } = await fetchGetChannelOutList({
         page: 1,
         size: 500,
         channelType: 0,
+        scene: 1,
         carrierId: carrier._id
       });
-      rows.value = error || !data ? [] : data.list.map(item => ({ _id: item._id, name: item.name, checked: true }));
+      rows.value = error || !data ? [] : (data.list as unknown as SyncChannelRow[]);
     }
   } finally {
     loading.value = false;
@@ -96,58 +130,51 @@ function handleChannelTypeChange(value: string | number) {
   loadChannels();
 }
 
-// ---- 勾选列（自绘：表头全选 ↔ 行内联动，口径同 CarrierSyncDrawer） ----
-const headerCheckState = computed(() => {
-  const total = rows.value.length;
-  const checkedCount = rows.value.filter(row => row.checked).length;
-  return {
-    checked: total > 0 && checkedCount === total,
-    indeterminate: checkedCount > 0 && checkedCount < total
-  };
-});
+/** 列与「收货渠道」列表页一致（按用户要求去掉「创建时间」）；收货 / 发货两个 tab 共用 */
+const columns: VxeColumnRenderColumn[] = [
+  { key: 'code', title: $t('page.channelQuote.receive.code'), minWidth: 110, sortable: false },
+  { key: 'name', title: $t('page.channelQuote.receive.name'), minWidth: 160, sortable: false },
+  { key: 'carrier', title: $t('page.channelQuote.receive.form.carrier'), minWidth: 120, sortable: false },
+  { key: 'channelGroup', title: $t('page.channelQuote.receive.form.channelGroup'), minWidth: 120, sortable: false },
+  { key: 'site', title: $t('page.channelQuote.receive.form.site'), minWidth: 120, sortable: false },
+  { key: 'weightRuleName', title: $t('page.channelQuote.receive.form.weightRule'), minWidth: 120, sortable: false },
+  { key: 'status', title: $t('common.status'), type: 'status', width: 100, align: 'center', sortable: false }
+];
 
-function toggleAll(checked: boolean) {
-  rows.value.forEach(row => {
-    row.checked = checked;
-  });
-}
-
-const columns = computed<VxeColumnRenderColumn[]>(() => [
-  {
-    key: 'rowCheck',
-    title: '',
-    width: 50,
-    fixed: 'left',
-    align: 'center',
-    sortable: false,
-    headerSlot: 'rowCheckHeader'
-  },
-  { key: 'name', title: $t('page.channelQuote.receive.name'), minWidth: 160, sortable: false }
-]);
-
-// ---- 保存 ----
+// ---- 保存（未勾费用 / 未勾渠道均警示且不发请求；通过了再二次确认） ----
 async function handleSave() {
   if (props.feeExtIds.length === 0) {
     window.$message?.warning($t('page.dataManage.ship.carrier.feeExtDrawer.needFeeExt'));
     return;
   }
 
-  const refIds = rows.value.filter(row => row.checked).map(row => row._id);
+  const refIds = checkedRows.value.map(row => row._id);
   if (refIds.length === 0) {
     window.$message?.warning($t('page.dataManage.ship.carrier.feeExtDrawer.needChannel'));
     return;
   }
 
-  saving.value = true;
-  try {
-    const { error } = await fetchSyncChannelFeeExt({ ids: props.feeExtIds, refIds });
-    if (error) return;
+  window.$dialog?.warning({
+    title: $t('common.tip'),
+    content: $t('page.dataManage.ship.carrier.feeExtDrawer.syncConfirm', {
+      n: props.feeExtIds.length,
+      m: refIds.length
+    }),
+    positiveText: $t('common.confirm'),
+    negativeText: $t('common.cancel'),
+    onPositiveClick: async () => {
+      saving.value = true;
+      try {
+        const { error } = await fetchSyncChannelFeeExt({ ids: props.feeExtIds, refIds });
+        if (error) return;
 
-    window.$message?.success($t('common.saveSuccess'));
-    drawerVisible.value = false;
-  } finally {
-    saving.value = false;
-  }
+        window.$message?.success($t('common.saveSuccess'));
+        drawerVisible.value = false;
+      } finally {
+        saving.value = false;
+      }
+    }
+  });
 }
 
 watch(
@@ -156,6 +183,7 @@ watch(
     if (!value) return;
     channelType.value = 0;
     rows.value = [];
+    checkedRows.value = [];
     await loadChannels();
   }
 );
@@ -171,7 +199,17 @@ watch(
     @submit="handleSave"
   >
     <div class="h-[calc(100vh_-_160px)] flex-col">
-      <Table :columns="columns" :data="rows" :loading="loading" :pagination="null">
+      <Table
+        ref="tableRef"
+        :columns="columns"
+        :data="rows"
+        :loading="loading"
+        :pagination="null"
+        :row-config="{ keyField: '_id' }"
+        show-checkbox
+        show-seq
+        @selection-change="handleSelectionChange"
+      >
         <template #operation-left>
           <NRadioGroup :value="channelType" :disabled="saving" @update:value="handleChannelTypeChange">
             <NRadioButton :value="1">{{ $t('page.channelQuote.ship.title') }}</NRadioButton>
@@ -179,16 +217,21 @@ watch(
           </NRadioGroup>
         </template>
 
-        <template #rowCheckHeader>
-          <NCheckbox
-            :checked="headerCheckState.checked"
-            :indeterminate="headerCheckState.indeterminate"
-            @update:checked="toggleAll"
-          />
+        <!-- 空值统一兜底 `--`（与项目其他列表口径一致） -->
+        <template #code="{ row }">
+          <span>{{ row.code || '--' }}</span>
         </template>
-
-        <template #rowCheck="{ row }">
-          <NCheckbox v-model:checked="row.checked" />
+        <template #carrier="{ row }">
+          <span>{{ row.carrier || '--' }}</span>
+        </template>
+        <template #channelGroup="{ row }">
+          <span>{{ row.channelGroup || '--' }}</span>
+        </template>
+        <template #site="{ row }">
+          <span>{{ row.site || '--' }}</span>
+        </template>
+        <template #weightRuleName="{ row }">
+          <span>{{ row.weightRuleName || '--' }}</span>
         </template>
       </Table>
     </div>

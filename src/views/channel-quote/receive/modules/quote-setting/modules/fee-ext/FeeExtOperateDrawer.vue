@@ -11,7 +11,8 @@
  * - 加收类型决定计费口径：0 按重量(重量×单价) 1 按票 2 按件 3 按重量超出部分((重量−start)×单价)。
  *
  * 交互优化（相对老系统）：条件不再靠「按钮拼接 + 填充 + 清空公式」，改为
- * 「变量下拉 + 区间组（[>|≥] 值 ～ [<|≤] 值）+ 实时生成表达式」，两端可只填一端。
+ * 「变量下拉 + 区间组（[>|≥] 值 ～ [<|≤] 值）+ 实时生成表达式」，两端可只填一端；
+ * 表达式里的数值随变量类型带单位（重量 KG / 长度 CM / 体积 CBM），与输入框后缀同源。
  */
 import { computed, reactive, ref, watch } from 'vue';
 import { $t } from '@/locales';
@@ -166,24 +167,45 @@ function varTypeLabel(varType: FeeExtVarType) {
 const OP_SYMBOL: Record<0 | 1 | 2 | 3, string> = { 0: '>', 1: '≥', 2: '<', 3: '≤' };
 
 /**
- * 条件表达式（实时生成）：
- * - 无条件加收 → 「无条件加收」；
+ * 区间左侧（数值在前）的镜像运算符：数值换到左边必须反向，否则语义翻反
+ * （`重量>0.5` ⇔ `0.5<重量`；`重量≥0.5` ⇔ `0.5≤重量`）。
+ */
+const LEFT_OP_MIRROR: Record<0 | 1, 2 | 3> = { 0: 2, 1: 3 };
+
+/**
+ * 条件数值的单位（随变量类型：重量 KG / 长度 CM / 体积 CBM）。
+ * 必须定义在 conditionExpr 之前：后者被 immediate watch 求值，晚定义会踩 TDZ。
+ */
+const valueUnit = computed(() => {
+  if (form.varType === 1) return $t('page.channelQuote.quoteSetting.feeExt.form.unitOption.length');
+  if (form.varType === 2) return $t('page.channelQuote.quoteSetting.feeExt.form.unitOption.volume');
+
+  return $t('page.channelQuote.quoteSetting.feeExt.form.unitOption.weight');
+});
+
+/**
+ * 条件表达式（实时生成，数值随变量类型带单位）：
+ * - 无条件加收 → 「无条件加收」（后端魔法值，勿改）；
  * - 变量已选但两端都没填数值 → 空串（触发必填校验，提示至少填一端）。
+ * 例：`重量>4KG`、`0.5KG<重量≤20KG`（双端时左值用镜像运算符）、`体积≤3CBM`。
  */
 const conditionExpr = computed(() => {
   if (form.varType === null) return EXPR_UNCONDITIONAL;
 
   const label = varTypeLabel(form.varType);
+  const unit = valueUnit.value;
   const hasStart = typeof form.startValue === 'number';
   const hasEnd = typeof form.endValue === 'number';
 
   if (!hasStart && !hasEnd) return '';
   if (hasStart && hasEnd) {
-    return `${form.startValue}${OP_SYMBOL[form.startOp]}${label}${OP_SYMBOL[form.endOp]}${form.endValue}`;
-  }
-  if (hasStart) return `${label}${OP_SYMBOL[form.startOp]}${form.startValue}`;
+    const leftOp = OP_SYMBOL[LEFT_OP_MIRROR[form.startOp]];
 
-  return `${label}${OP_SYMBOL[form.endOp]}${form.endValue}`;
+    return `${form.startValue}${unit}${leftOp}${label}${OP_SYMBOL[form.endOp]}${form.endValue}${unit}`;
+  }
+  if (hasStart) return `${label}${OP_SYMBOL[form.startOp]}${form.startValue}${unit}`;
+
+  return `${label}${OP_SYMBOL[form.endOp]}${form.endValue}${unit}`;
 });
 
 // 表达式实时回填 form.expr：custom 项的必填校验与最终提交都用它
@@ -194,14 +216,6 @@ watch(
   },
   { immediate: true }
 );
-
-/** 条件数值的单位（随变量类型：重量 KG / 长度 CM / 体积 CBM） */
-const valueUnit = computed(() => {
-  if (form.varType === 1) return $t('page.channelQuote.quoteSetting.feeExt.form.unitOption.length');
-  if (form.varType === 2) return $t('page.channelQuote.quoteSetting.feeExt.form.unitOption.volume');
-
-  return $t('page.channelQuote.quoteSetting.feeExt.form.unitOption.weight');
-});
 
 // ---- 表单项 ----
 const formItems = computed<FormItemConfig[]>(() => [

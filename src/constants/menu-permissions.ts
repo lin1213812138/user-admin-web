@@ -316,7 +316,13 @@ export const MENU_PERMISSION_TREE: MenuPermissionItem[] = [
             permission: 'system:dataGeneral:countryRegion',
             buttons: []
           },
-          { name: 'FBA仓库', icon: 'ic:baseline-inventory', permission: 'system:dataGeneral:fbaWarehouse', buttons: [] }
+          {
+            name: 'FBA仓库',
+            icon: 'ic:baseline-inventory',
+            permission: 'system:dataGeneral:fbaWarehouse',
+            buttons: []
+          },
+          { name: '偏远数据', icon: 'ic:baseline-inventory', permission: 'system:dataGeneral:remote', buttons: [] }
         ]
       }
     ]

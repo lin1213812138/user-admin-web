@@ -317,8 +317,28 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
         @after-render="$emit('afterRender')"
         @toggle-tree-expand="handleToggleTreeExpand"
       >
-        <vxe-column v-if="showSeq" type="seq" title="#" :width="50" fixed="left" align="center" />
-        <vxe-column v-if="showCheckbox" type="checkbox" :width="50" fixed="left" align="center" />
+        <!--
+          序号 / 勾选列显式关闭溢出省略（两列内容天然不会溢出）：
+          vxe 的 show-overflow 会给 body 的 .vxe-cell 预留 2px（表头不受影响），
+          表格级为 'tooltip' 时会让两列在表头 / 行内的居中基准差 1px，故在列级关掉。
+        -->
+        <vxe-column
+          v-if="showSeq"
+          type="seq"
+          title="#"
+          :width="50"
+          fixed="left"
+          align="center"
+          :show-overflow="false"
+        />
+        <vxe-column
+          v-if="showCheckbox"
+          type="checkbox"
+          :width="50"
+          fixed="left"
+          align="center"
+          :show-overflow="false"
+        />
         <vxe-column
           v-for="(col, index) in columns"
           :key="`${col.key}-${index}`"
@@ -374,6 +394,13 @@ defineExpose({ getCheckboxRecords, setAllCheckboxRow, setTreeExpand });
             </div>
           </template>
         </vxe-column>
+        <!-- 加载态：用 naive 的 NSpin 替换 vxe 默认 loading（与全站 loading 风格统一），按要求不显示文字 -->
+        <template #loading>
+          <div class="h-full w-full flex items-center justify-center">
+            <NSpin size="large" />
+          </div>
+        </template>
+
         <template #empty>
           <NEmpty description="无数据" />
           <!-- <span class="text-14px text-#909399">{{ $t('common.noData') }}</span> -->

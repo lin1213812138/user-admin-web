@@ -1,4 +1,4 @@
-import VxePcUi from 'vxe-pc-ui';
+import VxePcUi, { VxeLoading, VxeTooltip } from 'vxe-pc-ui';
 import VxeTable, { VxeUI } from 'vxe-table';
 import * as ExcelJS from 'exceljs';
 import { VxeUIPluginExportXLSX } from '@vxe-ui/plugin-export-xlsx';
@@ -89,6 +89,17 @@ export function setupVxeTable(app: App) {
 
   app.use(VxePcUi);
   app.use(VxeTable);
+
+  /**
+   * 显式注册 tooltip / loading 子组件到 **vxe-table 所用的 VxeUI 实例**。
+   * vxe-table 4.21 起会在 setup 内校验 `VxeUI.getComponent('VxeTooltip' | 'VxeLoading')`；
+   * pnpm 下 vxe-pc-ui 与 vxe-table 各自依赖不同版本的 vxe-core（两份 VxeUI 单例），
+   * `app.use(VxePcUi)` 注册到的是 vxe-pc-ui 那份、vxe-table 取不到，
+   * 于是控制台报「缺少 vxe-tooltip / vxe-loading 组件」与「不支持的参数 show-overflow=tooltip / loading=true」。
+   * 组件定义本身无状态，可跨实例使用；注册时机早于任何表格实例化。
+   */
+  VxeUI.component(VxeTooltip);
+  VxeUI.component(VxeLoading);
 
   // 横向滚动条的宽度补偿基准：先探针兜底，表格渲染出真实 handle 后再实测校准
   measureScrollbarSize();

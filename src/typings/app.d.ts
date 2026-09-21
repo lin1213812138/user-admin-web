@@ -1449,6 +1449,42 @@ declare namespace App {
               country: string;
               form: { codePlaceholder: string; warehousePlaceholder: string };
             };
+            remote: {
+              title: string;
+              name: string;
+              namePlaceholder: string;
+              remoteCount: string;
+              updateBy: string;
+              updateDate: string;
+              destination: string;
+              destinationPlaceholder: string;
+              city: string;
+              zip: string;
+              cityOrZipTip: string;
+              groupPlaceholder: string;
+              addGroup: string;
+              createTitle: string;
+              import: string;
+              importTitle: string;
+              importTemplate: string;
+              chooseFile: string;
+              exportListData: string;
+              confirmImport: string;
+              importOverwriteTip: string;
+              importSuccess: string;
+              countryCode: string;
+              zipStart: string;
+              zipEnd: string;
+              checkResult: string;
+              checkPassed: string;
+              skipInvalidTip: string;
+              editTitle: string;
+              remove: string;
+              editUpdated: string;
+              noValidTip: string;
+              templateName: string;
+              exportName: string;
+            };
           };
           finance: {
             title: string;
@@ -1806,6 +1842,7 @@ declare namespace App {
                 syncToChannel: string;
                 needFeeExt: string;
                 needChannel: string;
+                syncConfirm: string;
                 emptyChannel: string;
                 col: {
                   name: string;

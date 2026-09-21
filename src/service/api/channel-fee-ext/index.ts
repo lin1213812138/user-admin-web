@@ -42,12 +42,18 @@ export function fetchUpdateChannelFeeExt(params: Api.ChannelQuote.ChannelFeeExtS
   });
 }
 
-/** 删除加收（/channel-fee-ext/delete；后端仅支持单条 _id） */
-export function fetchDeleteChannelFeeExt(_id: string) {
+/**
+ * 删除加收（/channel-fee-ext/delete）。
+ *
+ * 后端按 `ids: string[]` 接收（`validate.requireStrArr`：数组、minItems 1），单条删除即传长度 1 的数组。
+ * `sync` 为真时后端额外 `deleteMany({ syncId: ids })`：删除**承运网络侧的源附加费**时，
+ * 把此前同步到各渠道的副本一并清掉（渠道侧删除自身副本时无需传，传了也匹配不到记录）。
+ */
+export function fetchDeleteChannelFeeExt(_id: string, sync = false) {
   return request<null>({
     url: '/channel-fee-ext/delete',
     method: 'post',
-    data: { _id }
+    data: { ids: [_id], sync }
   });
 }
 

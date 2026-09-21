@@ -7,6 +7,9 @@
  * 新增 = **复用渠道加收的新增抽屉** `FeeExtOperateDrawer`（字段 / 校验 / 交互一致，唯一差别是 `refId`）；
  * 操作栏 = 行内「编辑 / 删除」（编辑复用同一抽屉 openEdit；删除走单条 delete，popconfirm 二次确认）；
  * 同步 = 勾选后打开「同步到渠道」抽屉，把勾选费用下发到该网络关联的收货 / 发货渠道。
+ *
+ * 勾选列走 vxe 内置 checkbox（`show-checkbox` + `row-config.keyField` + `@selection-change`），
+ * **默认全不勾**：勾选即选择 —— 自绘列那套「打开即全勾」会让用户把自己的「取消」误当成「勾选」。
  */
 import { computed, ref, watch } from 'vue';
 import { $t } from '@/locales';
@@ -20,9 +23,6 @@ import CarrierFeeExtSyncDrawer from './CarrierFeeExtSyncDrawer.vue';
 defineOptions({
   name: 'CarrierFeeExtDrawer'
 });
-
-/** 列表行：费用 + 本次待同步勾选（默认全勾） */
-type FeeExtRow = Api.ChannelQuote.ChannelFeeExt & { checked: boolean };
 
 interface Props {
   /** 抽屉可见性，use v-model:show */
@@ -61,8 +61,11 @@ function strategyLabel(strategy?: Api.ChannelQuote.FeeExtStrategy) {
   return $t('page.channelQuote.quoteSetting.feeExt.form.strategyOption.byWeight');
 }
 
-// ---- 费用列表（列与渠道加收面板一致；全量，不分页；打开时默认全勾） ----
-const { data, loading, columns, getData } = useVxeTable<Api.ChannelQuote.ChannelFeeExtList, FeeExtRow>({
+// ---- 费用列表（列与渠道加收面板一致；全量，不分页；勾选列走 vxe 内置 checkbox） ----
+const { data, loading, columns, getData } = useVxeTable<
+  Api.ChannelQuote.ChannelFeeExtList,
+  Api.ChannelQuote.ChannelFeeExt
+>({
   api: async () => {
     const carrier = props.carrier;
     if (!carrier) return { list: [], total: 0 };
@@ -74,19 +77,9 @@ const { data, loading, columns, getData } = useVxeTable<Api.ChannelQuote.Channel
     if (error || !res) return { list: [], total: 0 };
     return res;
   },
-  transform: r => ({ records: r.list.map(item => ({ ...item, checked: true })), total: r.total }),
+  transform: r => ({ records: r.list, total: r.total }),
   columns: () =>
     [
-      {
-        key: 'rowCheck',
-        title: '',
-        visible: true,
-        width: 50,
-        fixed: 'left',
-        align: 'center',
-        sortable: false,
-        headerSlot: 'rowCheckHeader'
-      },
       {
         key: 'name',
         title: $t('page.dataManage.ship.carrier.feeExtDrawer.col.name'),
@@ -136,33 +129,37 @@ const { data, loading, columns, getData } = useVxeTable<Api.ChannelQuote.Channel
     ] as VxeColumnConfig[],
   lazy: false,
   immediate: false,
-  cacheKey: 'data-manage-ship-carrier-fee-ext'
+  // 版本后缀：本版删掉了自绘 rowCheck 列，沿用旧 key 会让 localStorage 里缓存的该列回流（列配置按 key 覆盖），故换 key 作废旧缓存
+  cacheKey: 'data-manage-ship-carrier-fee-ext-v2'
 });
 
-/** 勾选列（自绘：表头全选 ↔ 行内联动，口径同 CarrierSyncDrawer） */
-const headerCheckState = computed(() => {
-  const total = data.value.length;
-  const checkedCount = data.value.filter(row => row.checked).length;
-  return {
-    checked: total > 0 && checkedCount === total,
-    indeterminate: checkedCount > 0 && checkedCount < total
-  };
-});
+/**
+ * 表格勾选行（vxe 内置 checkbox，由 `@selection-change` 回传）。
+ * 勾选态不落到数据行上、默认全不勾 —— 「勾选」即选择，不再有反直觉的语义反转。
+ */
+const checkedRows = ref<Api.ChannelQuote.ChannelFeeExt[]>([]);
 
-function toggleAll(checked: boolean) {
-  data.value.forEach(row => {
-    row.checked = checked;
-  });
+function handleSelectionChange(rows: Api.ChannelQuote.ChannelFeeExt[]) {
+  checkedRows.value = rows;
 }
 
-/** 重新取数（打开弹窗 / 新增、编辑、删除成功后；transform 会把每行重置为默认勾选） */
+/** 表格实例：用于清空 vxe 内部勾选态（`Table` 已 expose `setAllCheckboxRow`） */
+const tableRef = ref<InstanceType<typeof Table> | null>(null);
+
+/**
+ * 重新取数（打开弹窗 / 新增、编辑、删除成功后）。
+ * 必须先清 vxe 勾选再取数：`row-config.keyField` 会让 vxe 按 `_id` 记忆勾选，
+ * 顺序颠倒会把旧勾选恢复回来，造成「视觉勾着但 checkedRows 为空」而误报「请先勾选」。
+ */
 async function reload() {
+  checkedRows.value = [];
+  await tableRef.value?.setAllCheckboxRow(false);
   await getData();
 }
 
-/** 删除单条附加费（后端仅支持单条 _id，无批量路由；交互同渠道加收面板） */
+/** 删除单条附加费（承运网络侧为「源」：sync=true 连带清理已同步到各渠道的副本） */
 async function handleDelete(row: Api.ChannelQuote.ChannelFeeExt) {
-  const { error } = await fetchDeleteChannelFeeExt(row._id);
+  const { error } = await fetchDeleteChannelFeeExt(row._id, true);
   if (error) return;
 
   window.$message?.success($t('common.deleteSuccess'));
@@ -177,7 +174,7 @@ const syncDrawerVisible = ref(false);
 const syncFeeExtIds = ref<string[]>([]);
 
 function handleSyncToChannel() {
-  const ids = data.value.filter(row => row.checked).map(row => row._id);
+  const ids = checkedRows.value.map(row => row._id);
   if (ids.length === 0) {
     window.$message?.warning($t('page.dataManage.ship.carrier.feeExtDrawer.needFeeExt'));
     return;
@@ -200,7 +197,19 @@ watch(
 <template>
   <CommonDrawer v-model:show="drawerVisible" :title="drawerTitle" width="min(94vw, 75%)" :footer="false">
     <div class="h-[calc(100vh_-_160px)] flex-col">
-      <Table :columns="columns" :data="data" :loading="loading" :pagination="null" show-action :action-width="140">
+      <Table
+        ref="tableRef"
+        :columns="columns"
+        :data="data"
+        :loading="loading"
+        :pagination="null"
+        :row-config="{ keyField: '_id' }"
+        show-checkbox
+        show-seq
+        show-action
+        :action-width="140"
+        @selection-change="handleSelectionChange"
+      >
         <template #operation-left>
           <LButton type="primary" @click="feeExtDrawerRef?.open()">
             <template #icon><icon-ic-round-plus class="text-icon" /></template>
@@ -216,17 +225,6 @@ watch(
           </LButton>
         </template>
 
-        <template #rowCheckHeader>
-          <NCheckbox
-            :checked="headerCheckState.checked"
-            :indeterminate="headerCheckState.indeterminate"
-            @update:checked="toggleAll"
-          />
-        </template>
-
-        <template #rowCheck="{ row }">
-          <NCheckbox v-model:checked="row.checked" />
-        </template>
         <template #country="{ row }">
           <span>{{ row.country || '--' }}</span>
         </template>
